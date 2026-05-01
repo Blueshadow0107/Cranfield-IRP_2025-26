@@ -20,9 +20,6 @@ Individual Research Project for the MSc programme at Cranfield University.
 # Compile thesis
 cd Report && latexmk -pdf main
 
-# Sync with Overleaf
-./sync-report.sh push
-
 # Submit HPC job
 cd Validation/<case> && sbatch ../Scripts/hpc_submit_template.sh
 ```
