@@ -1,0 +1,104 @@
+# AI agent guidance file
+AGENTS.md
+
+# PowerPoint presentations (stored in OneDrive)
+*.pptx
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.bcf
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# PDF outputs (uncomment if you don't want to track PDFs)
+# *.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CAD files (large binaries, reference only)
+*.STEP
+*.STP
+*.step
+*.stl
+*.STL
+
+# CFD files (large binaries)
+*.cas
+*.cas.h5
+*.msh
+*.msh.h5
+*.dat
+*.dat.h5
+
+# ThesisTemplate2025 extra sections (using Report/ instead)
+ThesisTemplate2025/Sections/Conclusions.tex
+ThesisTemplate2025/Sections/Discussion.tex
+ThesisTemplate2025/Sections/LiteratureReview.tex
+ThesisTemplate2025/Sections/Methodology.tex
+ThesisTemplate2025/Sections/Nomenclature.tex
+ThesisTemplate2025/Sections/Results.tex
+
+# UIUC Propeller Database (large dataset, 117MB+ with 3600+ files)
+Geometries/UIUC-propDB/
+Geometries/UIUC-propDB.zip
+
+# Report backup directories created by sync-report.sh
+Report_backup*/
+
+# Data files - zipped versions are tracked instead
+PRELIMINARY DESIGN 9 JOSU/MISSION 1/*.txt
+PRELIMINARY DESIGN 9 JOSU/MISSION 2/*.txt
+Analysis/*.json
+
+# AI agent guidance files (local only)
+AGENTS.md
+GEMINI.md
+
+# Python files (project uses MATLAB only)
+*.py
+
+# Archive files (large binaries)
+*.zip
+FLUENT_JOURNAL_TEMPLATE.txt
+
+# Solver study output directories
+Validation/solver_study/solver_*/
+Validation/solver_study/figures/
+Validation/solver_study/figures_*/
+
+# RPM study output directories
+Validation/rpm_study/rpm_*/
+
+# CORRECTED CARADONNA meshes (large binaries)
+Validation/CORRECTED\ CARADONNA/*.cas.h5
+Validation/CORRECTED\ CARADONNA/*.msh.h5
+Validation/CORRECTED\ CARADONNA/zone_list*.txt
+*.o*
+
+# Fluent output files
+*.trn
+*-rfile.out
+*-rfile_*.out
+thrust_history.out
+torque_history.out
+
+# Archive directory (local backups only)
+Archive/
+
+# Vim swap files
+*.swp
+
+# Template directory (kept locally, not in git)
+ThesisTemplate2025/
