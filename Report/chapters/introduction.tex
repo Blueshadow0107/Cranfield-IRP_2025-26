@@ -1,0 +1,31 @@
+% Chapter: Introduction
+% Project 11: Fluid Neural Networks — Computing over Continuous Reactions
+
+\section{Background and Motivation}
+\label{sec:background}
+
+Artificial neural networks have become the dominant paradigm for machine learning, yet their physical implementation remains tied to a single substrate: silicon-based digital electronics. In a conventional neural network, computation is discrete --- neurons apply activation functions at fixed time steps, weights are stored as static memory, and inference proceeds layer by layer in a strictly sequential manner \cite{chen2018neural}. This architectural choice, while enabling remarkable advances in pattern recognition and generative modelling, imposes fundamental constraints on throughput and scalability. When multiple users or processes request inference simultaneously, the system must queue requests and process them sequentially (or via batching), creating latency bottlenecks that drive demand for ever-larger investments in GPU and CPU infrastructure at the network edge.
+
+An alternative paradigm is emerging in which computation is performed not by electronic switches but by \emph{continuous physical processes}: chemical reactions, fluid flows, and reaction-diffusion waves that evolve in parallel across a spatial domain \cite{adamatzky2005reaction, prakash2007bubble}. In these ``unconventional'' or ``physical'' computers, information is encoded in concentration fields, pressure distributions, or wave phases; processing occurs through the intrinsic dynamics of the medium; and multiple computations can proceed simultaneously in different regions of the same physical space. The present project investigates whether such a fluid-based computational substrate can implement neural network inference, offering two potential advantages over silicon:
+
+\begin{itemize}
+    \item \textbf{Continuity:} Mathematical processing occurs across the entire architecture space rather than at discrete nodes, potentially enabling representational capabilities beyond discrete neural networks (Point A).
+    \item \textbf{Parallelism:} Independent inference processes can be isolated in non-reactive fluid streams, reducing or eliminating the queueing delays inherent in sequential silicon inference (Point B).
+\end{itemize}
+
+\section{Research Aim and Objectives}
+\label{sec:aim}
+
+The aim of this project is to investigate the feasibility of a fluid-based neural computer --- a physical device in which controlled mixing of reactive fluids performs neural network inference in continuous time and parallel space.
+
+The specific objectives are:
+\begin{enumerate}
+    \item To design and computationally model a controllable physical space (reactor or microfluidic geometry) with input fluid streams and output detection of reaction products, capable of supporting controlled reactive mixing.
+    \item To develop and apply a training methodology for the hydrodynamic control parameters (flow rates, inlet scheduling, mixing topology) that encodes neural network functions for parallel inference tasks.
+    \item To benchmark the performance of the fluid neural network against equivalent silicon-based neural networks in terms of inference latency, throughput, and parallel capacity.
+\end{enumerate}
+
+\section{Thesis Structure}
+\label{sec:structure}
+
+The remainder of this thesis is organised as follows. \refChap{chap:literature_review} reviews the theoretical and experimental foundations of chemical and fluidic computation, from reaction-diffusion logic gates and chemical associative memories to microfluidic bubble logic and trainable chemical reaction networks. \refChap{chap:methodology} describes the CFD-based reactor design, the mathematical formulation of fluid-coupled neural dynamics, and the control optimisation strategy. \refChap{chap:results} presents simulation results and comparative benchmarks. \refChap{chap:conclusions} draws conclusions and identifies directions for future experimental realisation.

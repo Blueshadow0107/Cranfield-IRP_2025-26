@@ -1,0 +1,101 @@
+\documentclass[12pt,oneside]{book}
+
+\usepackage{CUThesis2025}
+\usepackage{lscape}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+
+%% --- THESIS METADATA --- %%
+\title{Fluid Neural Networks over Continuous Computations}
+\author{[Your Name]}
+\date{September 2026}
+\faculty{\FEAS}
+\course{[Your Course Title]}
+\degree{MSc}
+\supervisor{[Dr Supervisor Name]}
+\academicyear{2025--2026}
+\copyrightyear{2026}
+
+\begin{document}
+
+\maketitle
+
+%% --- ABSTRACT --- %%
+\begin{abstract}
+[Replace with abstract text of not more than 300 words.]
+\end{abstract}
+
+\begin{keywords}
+liquid neural networks, continuous computation, neural ordinary differential equations, 
+chemical reservoir computing, fluid dynamics, physical neural networks, molecular communication
+\end{keywords}
+
+%% --- ACKNOWLEDGEMENTS --- %%
+\chapter{Acknowledgements}
+[Optional: acknowledge support, supervisors, funding bodies, etc.]
+
+%% --- FRONT MATTER --- %%
+{
+\clearpage
+\singlespacing
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+}
+
+\begin{listofabbreviations}
+    \abbrev{LNN}{Liquid Neural Network}
+    \abbrev{LTC}{Liquid Time-Constant}
+    \abbrev{CfC}{Closed-form Continuous-time}
+    \abbrev{ODE}{Ordinary Differential Equation}
+    \abbrev{PDE}{Partial Differential Equation}
+    \abbrev{CRN}{Chemical Reaction Network}
+    \abbrev{CSTR}{Continuous Stirred-Tank Reactor}
+    \abbrev{SSM}{State-Space Model}
+    \abbrev{RNN}{Recurrent Neural Network}
+    \abbrev{PINN}{Physics-Informed Neural Network}
+    \abbrev{NCP}{Neural Circuit Policy}
+\end{listofabbreviations}
+
+%% --- MAIN MATTER --- %%
+\mainmatter
+\pagestyle{fancy}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\nouppercase{\rightmark}}
+
+\chapter{Introduction}
+\label{chap:introduction}
+\input{chapters/introduction}
+
+\chapter{Literature Review}
+\label{chap:literature_review}
+\input{chapters/literature_review}
+
+\chapter{Methodology}
+\label{chap:methodology}
+\input{chapters/methodology}
+
+\chapter{Results and Discussion}
+\label{chap:results}
+\input{chapters/results}
+
+\chapter{Conclusions and Future Work}
+\label{chap:conclusions}
+\input{chapters/conclusions}
+
+%% --- BACK MATTER --- %%
+\renewcommand{\bibname}{References}
+\bibliographystyle{vancouver}
+\bibliography{references}
+
+\appendix
+\chapter{Additional Derivations}
+\label{app:derivations}
+[Insert supplementary derivations, proofs, or data here.]
+
+\end{document}

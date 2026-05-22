@@ -1,0 +1,143 @@
+% Chapter: Literature Review
+% Fluid Neural Networks over Continuous Computations
+% Focus: physical/chemical computing substrates
+
+\section{Introduction}
+\label{sec:lr_intro}
+
+This chapter reviews the literature on computing with physical fluids and chemical reactions. The central premise of the present project is that neural computation need not be confined to silicon hardware executing discrete, sequential operations; instead, computation can be performed by continuous chemical and hydrodynamic processes that evolve in parallel across a physical space. The review spans four interconnected strands: (1) reaction-diffusion computing, in which excitable chemical media perform Boolean and higher-level logic; (2) neural and associative-memory architectures implemented in chemistry; (3) microfluidic logic and programmable fluidic circuits; and (4) trainable chemical reaction networks and reservoir computers. \refsec{sec:lr_synthesis} synthesises these strands, identifies the research gaps that the present project addresses, and positions the study within the broader landscape of unconventional computation.
+
+\section{Reaction-Diffusion Computing}
+\label{sec:reaction_diffusion}
+
+\subsection{Foundations: Chemical Logic Gates}
+\label{subsec:chemical_logic}
+
+The field of chemical computation has its roots in the observation that excitable reaction-diffusion (RD) systems can support propagating wave fronts whose interactions implement Boolean logic. Tóth and Showalter \cite{toth1995logic} demonstrated the first empirical realisation of chemical logic gates using the Belousov-Zhabotinsky (BZ) reaction: AND and OR gates were constructed by guiding excitation waves through geometrically constrained channels and exploiting their collision dynamics. Steinbock, Kettunen and Showalter \cite{steinbock1996chemical} extended this to ``printed'' catalyst patterns on gel substrates, creating reconfigurable chemical wave logic gates in which the gate function was determined by the spatial arrangement of the catalyst rather than by fixed hardware.
+
+Adamatzky and De Lacy Costello \cite{adamatzky2002xor} experimentally realised a chemical XOR gate using the palladium chloride--potassium iodide reaction in a geometrically structured gel medium. The XOR operation emerged from the collision and annihilation of diffusive wave fronts at channel junctions. This body of work established that a functionally complete set of logical operations could be implemented in chemical media, satisfying the theoretical requirement for universal computation \cite{magnasco1997chemical}. Adamatzky subsequently systematised these findings in comprehensive monographs on reaction-diffusion computers \cite{adamatzky2005reaction} and collision-based computing \cite{adamatzky2002collision}.
+
+\subsection{From Boolean Logic to Continuous Modulation}
+\label{subsec:continuous_modulation}
+
+A significant conceptual advance came with the recognition that chemical computation need not rely on discrete Boolean states. Egbert, Gagnon and Pérez-Mercader \cite{egbert2018dynamic, egbert2019soup} showed that a ``chemical soup'' --- a contiguous, homogeneous reaction-diffusion medium without pre-wired channels --- could be transformed into a network of logic gates by dynamically modulating external conditions (feed rates, temperature, illumination) in space and time. In their implementation, parameter regimes were switched sequentially to drive the Gray-Scott reaction through bistable, perturbatory, and monostable phases, thereby implementing NAND, OR, and AND operations. The computation was reprogrammable in real time, and the authors demonstrated a full binary adder constructed from cascaded chemical NAND gates.
+
+This approach is particularly relevant to the present project because it replaces fixed geometric constraints with \emph{controllable} external modulation --- a direct analogue to the ``control units'' (valves, flow controllers, inlet conditions) that will govern the proposed fluid neural network. The chemical medium itself is passive; the intelligence of the computation resides in the control policy.
+
+\subsection{Geometrically Constrained vs. Free-Space Computation}
+\label{subsec:constrained_vs_free}
+
+The literature distinguishes two paradigms for reaction-diffusion computing \cite{adamatzky2005reaction}. In \emph{geometrically constrained} systems, excitation waves travel along predefined channels and interact at junctions, mimicking conventional circuit topologies. In \emph{free-space} (architectureless) systems, localised excitations travel through a uniform medium and compute via collision, following the billiard-ball model of computation. The present project occupies an intermediate position: the physical space is geometrically defined (a microfluidic or reactor geometry), but the ``wiring'' is fluid and dynamically reconfigurable through flow control, allowing both constrained and free-space behaviours to emerge depending on the control policy.
+
+\section{Neural Architectures in Chemical Media}
+\label{sec:chemical_neural}
+
+\subsection{Chemical Neurons and Droplet Networks}
+\label{subsec:chemical_neurons}
+
+Moving beyond Boolean logic, researchers have sought to implement neural-network primitives directly in chemical hardware. Gentili \etal\ \cite{gentili2012chemical} demonstrated that a single BZ reaction site could function as a ``chemical neuron'' --- a binary and fuzzy logic processor whose output depended on the integrated history of excitatory and inhibitory inputs. The chemical neuron exhibited thresholding, saturation, and refractory behaviour analogous to biological neurons.
+
+Górecki and co-workers \cite{gorecki2009information} developed structured excitable media for information processing, constructing chemical diodes, counters, and cross-junction logic elements. Sielewiesiuk and Górecki \cite{sielewiesiuk2001logical} analysed the logical functions available at a cross junction of excitable chemical media, deriving the complete truth table for wave interactions at a four-way junction. These elements form the building blocks of chemical neural networks: diodes provide directed connections, junctions provide summation, and excitable sites provide thresholding.
+
+At a larger scale, Gruenert \etal\ \cite{gruenert2015droplet} constructed \emph{networks of computing chemical droplet neurons}. Each droplet contained BZ reagent and communicated with neighbours through lipid membranes; the information flow between droplets was characterised using information-theoretic measures. This work demonstrated that interconnected chemical elements could form functional networks with collective computational properties, bridging the gap between single chemical logic gates and system-level neural computation.
+
+\subsection{Associative Memory in Reaction-Diffusion Chemistry}
+\label{subsec:associative_memory}
+
+Stovold and O'Keefe \cite{stovold2012simulating, stovold2016associative, stovold2017associative} made the most direct antecedent contribution to chemical neural networks. They showed that the BZ reaction could implement an \emph{associative memory} --- a recurrent neural network that stores and retrieves patterns via dynamical attractors. Their approach encoded binary patterns as initial concentration distributions in a discretised reaction-diffusion medium; the system evolved under BZ kinetics toward the stored pattern most similar to the input, thereby performing pattern completion.
+
+The Stovold-O'Keefe associative memory is significant for two reasons. First, it demonstrated that a chemical medium could implement the fundamental operation of recurrent neural networks --- convergence to an attractor state --- without any digital electronics. Second, it established a methodology for mapping neural network weights onto chemical reaction rates and diffusion coefficients, providing a template for the ``training'' phase of the present project, in which control parameters must be optimised to encode desired network functions.
+
+Rambidi, Maximychev and Usatov \cite{rambidi1994molecular} had earlier proposed ``molecular neural network devices'' based on nonlinear dynamic media, framing the physical realisation of neural networks in molecular systems as a principled design problem. Their work anticipated the convergence of nonlinear chemical dynamics with neural network theory that Stovold and O'Keefe later demonstrated experimentally.
+
+\section{Microfluidic Logic and Programmable Fluidics}
+\label{sec:microfluidic}
+
+\subsection{Bubble and Droplet Logic}
+\label{subsec:bubble_logic}
+
+While reaction-diffusion computing exploits the intrinsic chemical dynamics of a medium, an alternative approach constructs logic elements from the hydrodynamics of multiphase flow in microchannels. Prakash and Gershenfeld \cite{prakash2007bubble} introduced \emph{bubble logic}, in which gas bubbles in a liquid carrier serve as bits of information and channel geometries implement Boolean operations. A bubble traversing a channel modifies the fluidic resistance of surrounding channels, enabling hydrodynamic interactions that realise AND, OR, NOT, and universal logic gates. The bubbles simultaneously carry a chemical payload, merging chemistry and computation in a single fluid stream.
+
+The bubble logic paradigm is directly relevant to Point B of the project description --- parallelism through non-reactive fluids. Because bubbles in separate channels do not interact unless deliberately merged, multiple independent computations can proceed in parallel within the same device. This inherent spatial parallelism addresses the ``queue issue'' of sequential silicon inference.
+
+\subsection{Integrated Fluidic Circuits and Pneumatic Control}
+\label{subsec:fluidic_circuits}
+
+Weaver \etal\ \cite{weaver2010fluidic} developed fluidic control-logic devices using pneumatic microvalves, creating analogues of electronic resistor-transistor circuits. Two valves in parallel implement an AND gate; two in series implement an OR gate. These primitives enable the construction of finite-state machines, multiplexers, and feedback controllers entirely within the fluidic domain.
+
+More recently, researchers have demonstrated \emph{pneumatic computers} for embedded control of microfluidics, achieving clock rates up to 5~Hz with reprogrammable logic arrays implemented as layered microfluidic membranes. While these switching speeds are far below electronic counterparts, the energy efficiency and chemical compatibility of fluidic control make them attractive for applications where the computation is intrinsically coupled to chemical or biological processes.
+
+\subsection{MIMIC: Microfluidic Signal Processing}
+\label{subsec:mimic}
+
+Kim \etal\ \cite{kim2023realtime} designed the MIMIC (Microfluidic Molecular Communication) platform, which performs signal-processing primitives --- amplification, thresholding, shaping, and detection --- entirely through designed chemical reactions in flowing fluid. The platform successfully transmitted ASCII-encoded messages via chemical bit sequences over metres of tubing, demonstrating that digital signal processing can be implemented as continuous-flow chemical circuits. The MIMIC platform provides an engineering blueprint for the input-output interface of a fluid neural network: chemical signals are injected, processed through reactions, and read out optically or electrochemically.
+
+\section{Trainable Chemical Networks and Reservoir Computing}
+\label{sec:trainable}
+
+\subsection{Chemical Reservoir Computing}
+\label{subsec:chemical_reservoir}
+
+Baltussen \etal\ \cite{baltussen2024chemical} reported a landmark demonstration of chemical reservoir computing using the Formose reaction in a continuous stirred-tank reactor (CSTR). The autocatalytic polymerisation of formaldehyde generates a self-organising network of approximately $10^6$ intermediate compounds, which serves as the reservoir. Input signals perturb the reactant inflow; a trainable linear readout maps the resulting high-dimensional concentration field to desired outputs. The system demonstrated nonlinear classification, metabolic prediction, and chaotic time-series forecasting.
+
+The CSTR configuration is inherently fluid and continuous, matching Point A of the project description. However, the reservoir's internal dynamics are fixed; only the readout layer is trained. The present project extends this paradigm by proposing to train the \emph{control parameters} of the physical space itself (flow rates, mixing ratios, temperature) to shape the internal dynamics for specific tasks.
+
+\subsection{Neural CRNs: Trainable Chemical Reaction Networks}
+\label{subsec:neural_crns}
+
+Nagipogu and Reif \cite{nagipogu2025neural} proposed Neural CRNs --- a framework for implementing trainable Neural ODEs using deterministic mass-action chemical reaction networks. Their key advance was showing that both linear and nonlinear modelling circuits could be implemented using exclusively unimolecular and bimolecular reactions, avoiding the impractical trimolecular chemistries required by prior art. The entire supervised learning pipeline executes in only two sequential phases, and first-order gradient approximations enable nonlinear models to scale linearly with input dimensionality.
+
+While Neural CRNs are currently validated only in silico, they provide the most credible design methodology for building trainable fluid neural networks. The framework maps directly onto the present project's Phase 2: training control parameters to encode network functions in a chemical medium.
+
+\subsection{Mathematical Framework: Neural ODEs as Control Policies}
+\label{subsec:neural_odes_control}
+
+Chen \etal\ \cite{chen2018neural} introduced Neural Ordinary Differential Equations (Neural ODEs), in which the hidden state evolves continuously according to a learned vector field. Although originally formulated for digital implementation, the Neural ODE framework provides the mathematical language for describing continuous computation in physical media: the state $\mathbf{h}(t)$ corresponds to the concentration field, the vector field $f$ corresponds to the reaction kinetics and advection, and the control parameters $\boldsymbol{\theta}$ correspond to the controllable physical variables (flow rates, inlet concentrations, temperature) that the present project seeks to optimise.
+
+\section{Synthesis and Research Gaps}
+\label{sec:lr_synthesis}
+
+\subsection{Unifying Themes}
+\label{subsec:themes}
+
+The reviewed literature converges on a single idea: \emph{computation can be performed by continuous physical processes rather than discrete electronic switches}. Table~\ref{tab:substrates} summarises the principal approaches.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of fluid and chemical computation substrates}
+    \label{tab:substrates}
+    \begin{tabular}{@{}p{3.5cm}p{3.5cm}p{3.5cm}p{3.8cm}@{}}
+        \toprule
+        \textbf{Approach} & \textbf{Substrate} & \textbf{Training} & \textbf{Key Reference} \\
+        \midrule
+        Reaction-diffusion logic & BZ/palladium gel & Fixed geometry & Tóth \& Showalter \cite{toth1995logic}; Adamatzky \cite{adamatzky2002xor} \\
+        Modulated chemical soup & Gray-Scott CSTR & External modulation schedule & Egbert \etal\ \cite{egbert2019soup} \\
+        Chemical associative memory & BZ reaction-diffusion & Pattern-encoded initial conditions & Stovold \& O'Keefe \cite{stovold2016associative} \\
+        Bubble logic & Gas--liquid microchannels & Channel geometry & Prakash \& Gershenfeld \cite{prakash2007bubble} \\
+        Chemical reservoir & Formose CSTR & Linear readout only & Baltussen \etal\ \cite{baltussen2024chemical} \\
+        Neural CRN & Mass-action kinetics & Reaction rate constants & Nagipogu \& Reif \cite{nagipogu2025neural} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Identified Gaps}
+\label{subsec:gaps}
+
+Despite substantial progress, several gaps remain that the present project is positioned to address:
+
+\begin{enumerate}
+    \item \textbf{Trainable fluid architecture.} Existing chemical computers either fix the reaction network and train only a readout layer (reservoir computing), or fix the geometry and modulate external conditions (Egbert \etal). No existing system trains the \emph{hydrodynamic control parameters} (flow rates, mixing topology, inlet scheduling) to optimise computational performance. The present project proposes exactly this: using gradient-based or evolutionary optimisation to learn control policies that shape fluid mixing for parallel neural inference.
+    
+    \item \textbf{Parallel non-reactive inference.} Bubble logic and droplet microfluidics demonstrate spatial parallelism, but they implement Boolean operations rather than neural network inference. Chemical associative memories implement neural dynamics, but they are not inherently parallel across independent inputs. The present project seeks to combine the parallelism of microfluidic logic with the representational power of neural networks, using non-reactive fluid streams to isolate independent inference processes.
+    
+    \item \textbf{Controllable physical space with CFD-informed design.} Most experimental chemical computers rely on simplified geometries (Petri dishes, single CSTRs, straight microchannels). The present project will use computational fluid dynamics to design a spatially extended, controllable reactor whose internal flow fields are optimised for mixing, reaction, and readout. This CFD-first design approach is novel in the chemical computing literature.
+    
+    \item \textbf{Benchmarking against silicon.} Few studies systematically compare the inference latency, throughput, or energy efficiency of chemical/fluidic computers against silicon baselines. The present project's Phase 3 addresses this gap directly.
+\end{enumerate}
+
+\subsection{Position of This Study}
+\label{subsec:position}
+
+This project is positioned at the intersection of chemical reaction-diffusion computing, microfluidic logic, and optimal control. It extends the reaction-diffusion paradigm by introducing \emph{trainable hydrodynamic control} --- a middle ground between fixed-geometry chemical logic and fully programmable digital electronics. It extends the microfluidic logic paradigm by moving beyond Boolean operations to continuous-valued neural inference. And it extends the reservoir computing paradigm by proposing to train not only the readout but the internal fluid dynamics themselves.
+
+[\textbf{TODO: refine this paragraph once the specific reactor geometry and control mechanism are finalised.}]

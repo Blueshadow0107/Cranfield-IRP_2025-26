@@ -1,0 +1,452 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% THEME & COLOURS (matched to GDP PowerPoint)
+% ============================================================
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+% GDP PowerPoint colour palette
+\definecolor{gdpPurple}{HTML}{633E88}     % Main heading colour
+\definecolor{gdpDarkBlue}{HTML}{0C406D}   % Secondary / accent
+\definecolor{gdpNavy}{HTML}{091932}       % Very dark navy
+\definecolor{gdpOrange}{HTML}{DD7A0F}     % Accent / highlight
+\definecolor{gdpSlate}{HTML}{3B4950}      % Body text / muted
+\definecolor{gdpLightGray}{HTML}{E7E6E6}  % Table stripes
+\definecolor{gdpBurgundy}{HTML}{820E21}   % Occasional accent
+
+% Beamer colour assignments
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=gdpSlate}
+\setbeamercolor{frametitle}{fg=gdpPurple,bg=white}
+\setbeamercolor{framesubtitle}{fg=gdpDarkBlue,bg=white}
+\setbeamercolor{title}{fg=gdpPurple}
+\setbeamercolor{subtitle}{fg=gdpDarkBlue}
+\setbeamercolor{author}{fg=gdpSlate}
+\setbeamercolor{institute}{fg=gdpSlate}
+\setbeamercolor{date}{fg=gdpSlate}
+\setbeamercolor{item}{fg=gdpDarkBlue}
+\setbeamercolor{subitem}{fg=gdpPurple}
+\setbeamercolor{block title}{fg=white,bg=gdpDarkBlue}
+\setbeamercolor{block body}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{block title alerted}{fg=white,bg=gdpBurgundy}
+\setbeamercolor{block body alerted}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{footline}{fg=gdpSlate}
+
+% Table colours
+\setbeamercolor{headline}{fg=white,bg=gdpPurple}
+
+% ============================================================
+% FONTS (Arial via Helvetica)
+% ============================================================
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage{amsmath,amssymb,graphicx,booktabs,array}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+% ============================================================
+% GLOBAL SPACING TIGHTENING
+% ============================================================
+\setlength{\tabcolsep}{3pt}
+\setbeamertemplate{itemize/enumerate body begin}{\small}
+\setbeamertemplate{itemize/enumerate subbody begin}{\footnotesize}
+\addtolength{\leftmargini}{-0.3cm}
+\addtolength{\leftmarginii}{-0.2cm}
+
+% ============================================================
+% FRAMETITLE STYLE (underline bar like GDP template)
+% ============================================================
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2cm}
+  \textbf{\large\insertframetitle}
+  \vspace{0.05cm}
+  \par\textcolor{gdpDarkBlue}{\rule{\textwidth}{1.2pt}}
+  \vspace{-0.3cm}
+}
+
+% ============================================================
+% FOOTER (GDP style: Program | Group | Date)
+% ============================================================
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,leftskip=0.3cm]{footline}%
+      \insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,rightskip=0.3cm]{footline}%
+      \insertframenumber{}
+    \end{beamercolorbox}%
+  }%
+}
+
+% ============================================================
+% TITLE PAGE CUSTOMISATION
+% ============================================================
+\setbeamertemplate{title page}{
+  \vspace{1.5cm}
+  \begin{center}
+    {\Huge\bfseries\textcolor{gdpPurple}{\inserttitle}}\\[0.4cm]
+    {\Large\textcolor{gdpDarkBlue}{\insertsubtitle}}\\[1.2cm]
+    {\large\textcolor{gdpSlate}{\insertauthor}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertinstitute}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertdate}}
+  \end{center}
+}
+
+% ============================================================
+% DOCUMENT INFO
+% ============================================================
+\title{Literature Review: Neural Computation in Porous Media}
+\subtitle{From Chemical Computing to Wave-Based Physical Neural Networks}
+\author{MSc Individual Research Project}
+\institute{Cranfield University\hspace{0.3cm}|\hspace{0.3cm}Supervisors: Prof. Weisi Guo, Prof. Takis Tsoutsanis}
+\date{\today}
+
+\begin{document}
+
+% ============================================================
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ============================================================
+\begin{frame}{What We've Been Doing}
+  \textbf{Objective:} Map the full landscape of ``neural computation in porous media'' to find a defensible, feasible project direction.
+
+  \vspace{0.3cm}
+  \textbf{Search space covered (35+ papers):}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \footnotesize
+      \begin{enumerate}
+        \item Porous memristors \& neuromorphic substrates
+        \item Neural primitives in chemical media
+        \item Chemical computation \& reservoir computing
+        \item Fluidic logic \& parallelism
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \footnotesize
+      \begin{enumerate}
+        \setcounter{enumi}{4}
+        \item Reaction--diffusion foundations
+        \item Historical surveys \& transport physics
+        \item \textcolor{gdpDarkBlue}{\textbf{Wave-based physical neural networks}}
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  \textcolor{gdpSlate}{\small This presentation summarises what we found in each area and the thread that connects them.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Area 1: Porous Materials as Neuromorphic Substrates}
+  \textbf{Core finding:} 3D porous architectures can compute via ion transport, electroosmosis, and resistive switching --- but all are \textbf{electrically driven}, not flow-driven.
+
+  \vspace{0.2cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{2.8cm}>{\raggedright}p{4.8cm}>{\raggedright\arraybackslash}p{4.8cm}@{}}
+      \toprule
+      \textbf{Paper} & \textbf{What it does} & \textbf{Key insight} \\
+      \midrule
+      Jaafar et al.\ 2022 & Mesoporous silica memristors & 3D pore geometry $\to$ reservoir dynamics \\
+      Zhang et al.\ 2024 & Porosity-tunable memristors & Porosity controls time constants \\
+      Ding et al.\ 2023 & Porous crystalline review & Structural designability of pores \\
+      Geopolymer 2025 & Bulk porous ceramic memristors & \textbf{Fluid-filled pores} + ion transport \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  \textbf{Relevance to us:} Confirms that ``pore architecture controls computational dynamics.'' The gap: these systems use electricity, not acoustic waves or fluid flow, as the signal.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Area 2: Neural Primitives in Chemical Media}
+  \textbf{Core finding:} Chemistry can implement neurons, logic gates, associative memory, and even Turing machines --- but typically in \textbf{stirred tanks or gels}, not structured porous media.
+
+  \vspace{0.2cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3.2cm}>{\raggedright}p{5.8cm}c@{}}
+      \toprule
+      \textbf{Paper} & \textbf{What it does} & \textbf{Year} \\
+      \midrule
+      Hjelmfelt et al. & Chemical neural networks / Turing machines & 1991 \\
+      Magnasco & Chemical kinetics is Turing universal & 1997 \\
+      Gentili et al. & BZ ``chemical neuron'' as logic processor & 2012 \\
+      Stovold \& O'Keefe & Associative memory in reaction--diffusion & 2012--2017 \\
+      Nagipogu \& Reif & \textbf{Trainable} neural CRNs & 2025 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  \textbf{Relevance to us:} Proves neural computation is possible in physical (non-digital) media. Nagipogu 2025 is especially interesting: trainable chemical reaction networks. But still not in porous architectures.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Area 3: Fluidic Logic and Reaction--Diffusion}
+  \textbf{Core finding:} Fluid flow and chemical waves can do Boolean logic and parallel processing --- but geometries are usually \textbf{deterministic microchannels}, not trainable porous structures.
+
+  \vspace{0.15cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3.2cm}>{\raggedright}p{5.2cm}>{\raggedright\arraybackslash}p{3.5cm}@{}}
+      \toprule
+      \textbf{Paper} & \textbf{What it does} & \textbf{Note} \\
+      \midrule
+      Prakash \& Gershenfeld 2007 & Microfluidic bubble logic & \textbf{Parallel}, but Boolean only \\
+      Weaver et al.\ 2010 & Fluidic control circuits & Valves and switches \\
+      Kim et al.\ 2023 & MIMIC microfluidic platform & Real-time chemical processing \\
+      Steinbock et al.\ 1996 & BZ chemical wave logic gates & Printed catalyst patterns \\
+      Adamatzky 2002/2005 & Collision-based / RD computers & Comprehensive surveys \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  {\small \textbf{Relevance to us:} Bubble logic shows parallelism in fluid systems; BZ waves show computation in continuous media. Neither uses trainable pore geometry.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Area 4: Wave-Based Physical Neural Networks}
+  \textbf{Core finding (new direction):} Wave physics is mathematically equivalent to recurrent neural network computation. Physical systems that support waves can be \textbf{trained} to process signals.
+
+  \vspace{0.15cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3cm}>{\raggedright}p{5.8cm}c@{}}
+      \toprule
+      \textbf{Paper} & \textbf{Core Result} & \textbf{Domain} \\
+      \midrule
+      Hughes et al.\ 2019 & Wave equation $\equiv$ RNN & Acoustic / optical \\
+      Wright et al.\ 2022 & Deep physical NN, trained in-situ & Optical (diffractive) \\
+      Stern et al.\ 2020 & Mechanical networks learn physically & Springs / beams \\
+      Stern et al.\ 2021 & General theory of physical learning & Any free-energy system \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  {\small \textbf{Key insight from Hughes 2019:} Discretising the wave equation yields an update rule identical to an RNN. The ``weights'' are the spatial map of material properties.}
+
+  \vspace{0.05cm}
+  \textcolor{gdpDarkBlue}{\small \textbf{This connects directly to porous media:} porosity, permeability, and pore geometry determine local wave speed and attenuation --- i.e.\ the ``weights.''}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Core Physics: The Wave--RNN Mapping}
+  \textbf{Hughes et al.\ (2019) --- The Mathematical Link}
+  \vspace{0.2cm}
+
+  The scalar wave equation in an inhomogeneous medium:
+  \[
+    \nabla^2 u(\mathbf{r},t) - \frac{1}{c(\mathbf{r})^2}\frac{\partial^2 u}{\partial t^2} = s(\mathbf{r},t)
+  \]
+
+  Discretise in space (grid points $i = 1,\dots,N$) and time ($n$):
+  \[
+    \mathbf{u}^{(n+1)} = \mathbf{A}\,\mathbf{u}^{(n)} + \mathbf{B}\,\mathbf{u}^{(n-1)} + \mathbf{s}^{(n)}
+  \]
+
+  where $\mathbf{A}_{ij} \propto c_i^2$ depends on local material properties.
+
+  \vspace{0.2cm}
+  \textbf{This is structurally identical to an RNN:}
+  \[
+    \mathbf{h}^{(n+1)} = \sigma\bigl(\mathbf{W}\mathbf{h}^{(n)} + \mathbf{U}\mathbf{h}^{(n-1)} + \mathbf{x}^{(n)}\bigr)
+  \]
+
+  \textcolor{gdpDarkBlue}{\small The local wave speed $c(\mathbf{r})$ in a porous medium is set by porosity, fluid saturation, and bulk modulus --- our trainable parameters.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Area 5: Acoustic Metamaterial Computing}
+  \textbf{Core finding:} Engineered structures can manipulate acoustic waves to perform mathematical operations --- but designs are \textbf{deterministic}, not trainable, and usually 2D.
+
+  \vspace{0.15cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{2.8cm}>{\raggedright}p{5.2cm}>{\raggedright\arraybackslash}p{4cm}@{}}
+      \toprule
+      \textbf{Paper} & \textbf{What it does} & \textbf{Limitation} \\
+      \midrule
+      Silva et al.\ 2014 & Metamaterial math operations (Fourier optics) & EM only, 2D \\
+      Zuo et al.\ 2018 & Acoustic ODE solver (labyrinthine channels) & Deterministic geometry \\
+      Lin et al.\ 2018 & Diffractive deep NN (3D-printed layers) & Optical, not acoustic \\
+      Zangeneh-Nejad 2021 & \textit{Nat.\ Rev.\ Mater.}\ survey & Calls porous media ``underexplored'' \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  {\footnotesize \textbf{Relevance to us:} These prove wave-based analog computing works. The gap is that none use \textbf{3D porous media} with stochastic/trainable pore networks as the substrate.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Porous Media Angle: Biot Theory}
+  \textbf{Biot (1956) --- Waves in Fluid-Saturated Porous Solids}
+  \vspace{0.1cm}
+
+  {\small Unlike homogeneous media, porous media support \textbf{three} wave modes:}
+  \begin{enumerate}
+    \item {\small \textbf{Fast compressional wave} (Type I) --- in-phase motion; low loss}
+    \item {\small \textbf{Slow compressional wave} (Type II) --- out of phase; strongly attenuated}
+    \item {\small \textbf{Shear wave} --- transverse motion of solid matrix}
+  \end{enumerate}
+
+  \vspace{0.1cm}
+  {\small \textbf{Why this matters for computation:}}
+  \begin{itemize}
+    \item {\small Fast wave = signal carrier; Slow wave = nonlinear/memory effects}
+    \item {\small Frequency-dependent viscous coupling = \textbf{band-selective processing}}
+    \item {\small Three wave modes = more degrees of freedom than single-wave substrates}
+  \end{itemize}
+
+  \vspace{0.05cm}
+  \textcolor{gdpDarkBlue}{\small Biot theory gives us the physics model to simulate and design porous wave systems.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Synthesis: What the Landscape Looks Like}
+  \textbf{Every area we searched contributes a piece, but no one combines them all:}
+  \vspace{0.15cm}
+
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}lcccc@{}}
+      \toprule
+      & \textbf{Porous} & \textbf{Fluid} & \textbf{Parallel} & \textbf{Trainable} \\
+      \midrule
+      Porous memristors & \cmark & \cmark\ (ions) & \xmark & \xmark \\
+      Bubble logic & \xmark & \cmark & \cmark & \xmark \\
+      Chemical NNs & \xmark & \cmark & \xmark & \cmark \\
+      Acoustic metasurfaces & \xmark & \xmark & \xmark & \xmark \\
+      Diffractive optical NNs & \xmark & \xmark & \cmark & \cmark \\
+      \midrule
+      \textbf{Porous wave computing?} & \textbf{\cmark} & \textbf{?} & \textbf{\cmark} & \textbf{\cmark} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  {\small \textbf{The gap we see:} A trainable, 3D, porous substrate for acoustic/elastic wave computation. The physics (Biot + Hughes) says it should work. No one has done it.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Where We Might Go Next (Brief)}
+  \textbf{If we pursue the wave-computing direction, a possible path:}
+  \vspace{0.1cm}
+
+  {\small
+  \begin{enumerate}
+    \item \textbf{Simulation:} Biot equations in COMSOL/Python; dispersion curves; parameter sweep ($\phi$, $k$, $f$)
+    \item \textbf{Primitive design:} A ``porous neuron'' --- localised pore geometry that modulates phase/amplitude
+    \item \textbf{Train a layer:} Digital surrogate (auto-diff gradients, optimise geometry)
+    \item \textbf{Validate (optional):} 3D-printed specimen + speaker/microphone array
+  \end{enumerate}
+  }
+
+  \vspace{0.1cm}
+  {\small \textbf{Training options:}}
+  \begin{itemize}
+    \item {\small Digital surrogate (Lin 2018) --- fast, no hardware needed}
+    \item {\small In-situ backpropagation (Wright 2022) --- requires physical prototype}
+    \item {\small Equilibrium propagation (Stern 2020) --- requires tunable parameters}
+  \end{itemize}
+
+  \vspace{0.05cm}
+  \textcolor{gdpSlate}{\footnotesize This is a sketch --- not a commitment. We want your input before fleshing this out.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Points for Discussion}
+  \textbf{1. Direction confirmation}
+  \begin{itemize}
+    \item Does the wave-computing angle feel like the right primary focus?
+    \item Should we keep the fluid/chemical direction as a secondary thread?
+  \end{itemize}
+
+  \textbf{2. Physical system}
+  \begin{itemize}
+    \item Air-saturated rigid frame (simpler) vs.\ water-saturated elastic frame (richer physics)?
+    \item Ultrasonic ($10$--$100$ kHz, mm-scale pores) vs.\ higher frequency?
+  \end{itemize}
+
+  \textbf{3. Modelling platform}
+  \begin{itemize}
+    \item COMSOL (available, physics fidelity) vs.\ Python + PyTorch (custom, auto-diff) vs.\ hybrid?
+  \end{itemize}
+
+  \textbf{4. Scope realism}
+  \begin{itemize}
+    \item Simulation-only thesis, or should we plan for a simple experimental validation?
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Draft Timeline (Tentative)}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}lll@{}}
+      \toprule
+      \textbf{Phase} & \textbf{Weeks} & \textbf{Deliverable} \\
+      \midrule
+      Scope finalisation & 1--2 & Agreed direction, platform choice \\
+      Biot simulation & 3--6 & Dispersion curves, parameter sweep \\
+      Porous element design & 7--10 & Phase/amplitude modulation demo \\
+      Single-layer training & 11--14 & Trained classifier (simulation) \\
+      Write-up & 15--20 & Methods + results chapters \\
+      Validation* & 21--24 & Physical specimen (if approved) \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.1cm}
+  \textcolor{gdpSlate}{\small *Experimental work contingent on time, budget, and supervisor approval.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Summary}
+  \begin{itemize}
+    \item We surveyed 35+ papers across chemical computing, fluidic logic, porous memristors, and wave-based physical NNs
+    \item Porous memristors prove ``pore architecture $\to$ computation''; chemical NNs prove ``physical media can learn''
+    \item Hughes 2019 provides the theoretical bridge: wave physics $\equiv$ RNN
+    \item Biot theory provides the porous-media physics: three coupled wave modes
+    \item The gap: no one has combined trainable 3D porous substrates with acoustic wave computation
+    \item \textcolor{gdpDarkBlue}{\textbf{Next step:} Your input on direction, physical system, and platform}
+  \end{itemize}
+
+  \vspace{0.4cm}
+  \begin{center}
+    \Large\textbf{\textcolor{gdpPurple}{Questions / Discussion}}
+  \end{center}
+\end{frame}
+
+\end{document}
