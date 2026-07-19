@@ -1,0 +1,5056 @@
+## Preamble
+
+Noise-robust chemical reaction networks training
+artificial neural networks
+Sung-Hwa Kang*,
+Jinsu Kim†
+October 17, 2024
+
+---
+
+## Abstract
+
+Artificial neural networks (NNs) can be implemented using chemical reaction networks
+(CRNs), where the concentrations of species act as inputs and outputs. In such biochemical
+computing, noise-robust computing is crucial due to the intrinsic and extrinsic noise present
+in chemical reactions. Previously suggested CRNs for feed-forward networks often utilized
+the rectified linear unit (ReLU) or discrete activation functions. However, one concern in this
+case is the discontinuities of the derivatives of those non-smooth functions, which can cause
+significant noise disruption during backpropagation. In this study, we propose a CRN that
+performs both feed-forward and training processes using smooth activation functions to avoid
+discontinuities in the backpropagation. All reactions occur in a single pot, and the reactions
+for training are bimolecular. Our case studies on XOR, Iris, MNIST datasets, and a non-linear
+regression model demonstrate that computation via the CRN (i) maintains accuracy despite
+noise in the reaction rates and the concentration of species and (ii) is insensitive to the choice
+of the running time and the magnitude of the noise in comparison to NNs with a non-smooth
+activation function. This work presents a noise-robust CRN for full NN computation, including
+backpropagation, paving the way for more stable and efficient biochemical computing systems.
+Contents
+1
+
+---
+
+## Introduction
+
+This paper explores the use of chemical reaction networks (CRNs) for implementing neural net-
+works (NNs). In a broad sense, implementing NNs through biological systems represents a form of
+biological computing. Biological computers are designed using biologically derived objects such
+2
+
+
+as DNA and proteins to perform digital computations, which are typically carried out by silicon
+chip-based classical computers. Due to their parallel processing abilities and energy efficiency,
+biological computation has attracted significant interest [13]. Advances in synthesizing specific
+chemical reactions using DNA strands and enzymes have enabled the development of biological
+computers capable of handling more intricate tasks [26].
+Similar to programming languages used in classical computers, chemical reactions can act as
+programming languages in biological computing. Studies conducted both in simulation and in
+laboratory settings have demonstrated that chemical reaction networks (CRNs) can perform com-
+putations similar to those of artificial neural networks [15, 14, 2, 28, 18, 27, 20, 4, 23, 6]. In these
+studies, CRNs were designed to reach a unique stable steady state when the initial concentrations
+of certain chemical species are set as input, effectively producing the same output as neural net-
+works. The dynamics of these chemical species are governed by a system of ordinary differential
+equations (ODEs) of the form ˙x(t) = f(x(t); ˆx), where x(t) represents the concentrations of the
+species over time and ˆx is the input. This process can be viewed as a computing process, where
+setting the initial concentrations of certain species in the CRN to the input ˆx of the neural network
+leads to the concentrations of the other species converging to a specific steady state y(ˆx) as the
+desired output of the neural network.
+While most of the previously designed chemical reaction networks for neural network com-
+putation aimed at performing the feed-forward network, few works focused on the training neural
+network via chemical reactions [5, 4, 19]. In [5], it was shown that a learning algorithm for binary
+logic gates can be realized with chemical reactions that automatically update the weight parameters
+of neural networks based on the accuracy of the outputs. In [4], a chemical reaction network for
+supervised learning was proposed, where the hyperbolic tangent activation function was realized
+via chemical reactions and the networks are trained by a perturbation algorithm. In [19], the au-
+thors considered a NN with the leaky ReLU, a non-smooth activation function. The NN is trained
+via chemical reactions that compute the piecewise derivatives of the leaky ReLU.
+In previous research, activation functions like ReLU, leaky ReLU, and binary activation have
+been popular choices for chemical reaction computing due to their simple engineering. How-
+ever, using these activation functions in chemical reactions may lead to potential issues with noise
+robustness, particularly during backpropagation, as these functions have discontinuities in their
+derivatives. Unlike standard neural networks, chemical reactions can experience random fluctua-
+tions in reaction rate parameters due to changes in temperature, pressure, and other external distur-
+bances. These fluctuations can introduce small perturbations to each node of the neural network.
+If the activation function is non-smooth, these perturbations may amplify errors during backprop-
+agation due to the discontinuities in their derivatives. For example, the derivative σ′(z) of ReLU
+(σ(z) = z for z ≥0 and σ(z) = 0 otherwise) should be 1 when z = 0.01. However, even a small
+noise can change this value to be −0.01, resulting in a derivative of 0, and potentially leading to
+significant errors. While experimental results have validated the accuracy of chemical reactions in
+performing the feed-forward process of neural networks, the use of non-smooth activation func-
+tions raises concerns about noise robustness, especially if the entire neural network computation,
+including backpropagation, is carried out through chemical reactions.
+In a recent study, an interesting concept was proposed that involves using binary expression to
+represent the presence of species in a steady state, which determines the parameters of a neural
+network [27]. This method relies solely on the stoichiometric structures of the chemical reaction
+network, rather than the rate parameters. The study demonstrated that the weights of neural nodes
+3
+
+
+can be set as binary or rational numbers, and these weights are determined by the stoichiometric
+structures, independent of the reaction rates. Therefore, if the training process is also carried out
+using chemical reactions, the stoichiometric structures of the feed-forward network would need to
+be updated by chemical species. However, implementing such procedures in chemical engineering
+is likely to be challenging, and it remains uncertain how this method would perform in the presence
+of noise.
+The main goals of this paper is to provide a design of a chemical reaction network whose asso-
+ciated dynamical system trains a given artificial neural network equipped with smooth activation
+functions. This chemical reaction network is capable of performing full neural network computa-
+tions, including NN parameter training (Figure 1). The reactions take place in a single container,
+allowing for both feed-forward processing and training to occur simultaneously. We have utilized
+the CRN proposed in [2] for the feed-forward part of the NN. Additionally, we developed a new
+CRN specifically for the backpropagation process. This new network plays a crucial role in com-
+puting the derivatives of smooth activation functions. The essential role of this CRN is to compute
+the derivatives of a smooth activation function. The building blocks for our CRN are the chemical
+reactions proposed in [7] that compute basic arithmetic operations such as addition, subtraction,
+multiplication, and division.
+In our research, we conducted case studies using the propose CRNs for the XOR, Iris and
+MNIST datasets, as well as non-linear regression models. Our findings demonstrated that CRNs
+implementing a neural network with smooth activation functions are resilient to noise in the rate
+constants and the species corresponding to nodes. This resilience is also supported by theoreti-
+cal validation. In comparison, we have observed that CRNs implementing non-smooth activation
+functions can result in significant errors with small perturbations in the rate parameters due to
+the discontinuity of the derivatives of the non-smooth activation functions. Additionally, our re-
+search showed that our CRNs are more robust to variations in noise levels and the duration of the
+associated chemical reaction systems.
+𝑥ℓ𝑡= 𝑓𝑥, 𝑡; 𝑤, 𝑏
+𝑤, 𝑏
+𝑥ℓ
+Forward CRN
++
+Backward CRN
+∇𝐿𝑡= 𝑔𝑥, 𝑡; 𝑤, 𝑏
+𝜎′
+𝑥ℓ, 𝑤, 𝑏
+∇𝐿
++
+Update CRN
+𝑤
+𝑤−𝜂∇𝐿↦𝑤
+∇𝐿
+𝑥"
+𝑥# = 𝑦
+𝑦= 𝜙(𝑥; 𝑤, 𝑏)
+∇𝐿(𝑥; 𝑤, 𝑏)
+Update
+Output
+Traditional Neural network
+Neural network via CRNs
+𝑥ℓ"#
+One-pot 
+computing
+𝑥$
+𝑤−𝜂∇𝐿↦𝑤
+Separated
+cycle
+Figure 1: Abstract of our work.
+4
+
+
+2
+The key concepts
+In this paper, we used two different types of networks: chemical reaction networks and neural
+networks. To avoid confusion, we define them more precisely in this section.
+2.1
+Chemical reaction networks
+A chemical reaction network is a graph where the nodes represent complexes composed of com-
+binations of chemical species, and the edges are reactions between complexes. Figure 2 shows an
+example of chemical reaction networks.
+H
+X1 + H
+X2 + H
+2X1 + W
+W
+X1
+X1 + X2
+∅
+k2
+k1
+k3
+k4
+k5
+k6
+k7
+k8
+Figure 2: An example of chemical reaction networks
+A precise mathematical formulation is as follows.
+Definition 2.1. A chemical reaction network is given by finite sets (S, C, R, K) such that
+1. S = {S1, S2, · · · , Sd} is a set of d symbols, called the species of the network,
+2. C is a set of ν = Pd
+i=1 νiSi, a linear combinations of Si’s with (y)i ∈Z≥0 for each i, called
+complexes,
+3. R is a subset of C × C, whose elements (ν, ν′) are typically denoted by ν →ν′,
+4. K is a set of reaction rates {k1, . . . , k|R|}, where each ki is assigned to each reaction.
+νi’s in each complex ν = Pd
+i=1 νiSi are stoichiometric coefficients. The ‘zero’ complex ∅
+represents the external environment so that the birth and death of species are described as ∅→X
+and X →∅, respectively.
+In the case of the chemical systems being spatially well-mixed, the associated dynamics can
+be defined as a system of ODEs on Rd
+≥0, which models the time evolution of the concentrations
+of species in the chemical reaction network. The concentration of each species is modeled with
+x(t) = (x1(t), . . . , xd(t)) that is a solution to
+d
+dtx(t) =
+X
+ν→ν′∈R
+λν→ν′(x(t))ην→ν′.
+(1)
+The stoichiometric vector ην→ν′ gives the net gain of the reaction. For example, for the reaction net-
+work in Figure 2, the stoichiometric vector of 2X1 + W →W is (−2, 0, 0, 0)⊤as the system loses
+two X1 species via this reaction while other species are unchanged. While kinetics-independent
+5
+
+
+chemical reaction computing was suggested [27], our training processes via chemical reactions use
+mass-action,
+λν→ν′(x) = κν→ν′
+Y
+i=1
+xνi
+i ,
+(2)
+for the reaction rate κν→ν′ assigned to ν →ν′.
+To calculate derivatives of the activation function, our chemical computing uses catalytic reac-
+tions. Catalytic reactions are known to be required to compute non-linear functions [21]. For the
+sake of clarity, we define two classes of species as suggested in [2].
+Definition 2.2. For a reaction network (S, C, R, K), we define two mutually disjoint sets Sc and
+Sd such that
+1. S = Sc
+S Sd,
+2. for each Si ∈Sc, the i the component of each stoichiometric vector is zero, i.e. we have
+(ην→ν′)i = 0 for any ν →ν′ ∈R.
+We call species in Sc catalytic species and call species in Sd dynamics species.
+For example, in the reaction network (2), Sc = {W, H} and Sd = {X1, X2}. Note that the
+concentrations of catalytic species remain unchanged unlike dynamic species.
+Remark 2.1. The role of species in the CRN for the full neural network is interchangeable. The
+CRN consists of three sub-networks: (Sf, Cf, Rf, Kf), (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) im-
+plement the feed-forward neural network, the backpropagation, and updating the neural network
+parameters, respectively. In (Sf, Cf, Rf, Kf), we use the concentrations of the catalytic species
+for either the inputs or the parameters of the feed-forward neural network computation [2]. How-
+ever, in (Su, Cu, Ru, Ku), the species that were catalytic in the feed-forward sub-network become
+dynamic species, allowing the parameters in the feed-forward part to be updated for training the
+neural network.
+2.2
+Artificial neural networks
+In mathematical terms, a NN is a combination of a weighted sum, where each weighted sum is
+connected to an activation function. The feed-forward part of the NN computes the composition
+of activation functions with the weighted sum. Common activation functions include sigmoidal
+functions, hyperbolic tangent, and ReLU functions. This paper primarily uses the smoothed ReLU
+function as an activation function, which is defined as
+σ(z) = z +
+√
+z2 + 4h
+2
+,
+(3)
+where h determines the smoothness of σ(x) around x = 0 (Figure 3 A). Note that if h = 0, then σ
+is the standard ReLU function.
+The backpropagation process involves updating the weights of the feedforward part by using
+the gradient of the loss function with respect to the weights, based on the chain rule [24]. One of
+6
+
+
+the main results of this paper is the development of a CRN that implements the backpropagation
+algorithm for a NN with the smooth ReLU activation function. We will compare the performance
+of our CRN with the CRN that implements the backpropagation algorithm for a NN with the leaky
+ReLU activation function (Figure 3 B), defined as
+σLeaky(z) =
+(
+αz
+if z ≥0
+βz
+if z < 0,
+(4)
+where 0 < β ≪1. This activation function was utilized in [19] for training a NN via CRNs.
+We will start by providing precise notations for NNs used to explicitly describe the CRNs
+carrying out NNs in the later sections. Let G = (V, D) denote a NN, where V and D are the
+set of nodes and edges in the neural network, respectively. The concepts for feed-forward neural
+networks are illustrated below. Please refer to Figure 3 C for a graphical representation.
+1. The first and the last layers referred to as the input and output layers, respectively.Any layers
+in between are called hidden layers.
+2. The value assigned to the i th node (neuron) on the ℓth layer is denoted by xℓ
+i.
+3. The number of the nodes on the ℓth layer is denoted by M ℓ, which represents the width of
+the ℓth layer.
+4. We sometimes use a vector xℓ= (xℓ
+1, . . . , xℓ
+Mℓ) ∈RMℓ.
+5. The function σ : R →R denotes the activation function. Abusing a notation, we define a
+multi-variable function σ : Rm →Rm for m such that the i th component of σ(z) ∈Rm is
+σ(zi) ∈R for a z ∈Rm.
+6. Let wℓ∈RMℓ+1×Mℓdenote the weight matrix and let bℓ∈RMℓ+1 denote the bias vector.
+Then we define zℓ= wℓxℓ+bℓ∈RMℓ+1 and xℓ+1 = σ(zℓ) ∈RMℓ+1 for ℓ∈{0, 1, . . . , L−1},
+where σ(zℓ)i = σ(zℓ
+i) for i ∈{1, 2, . . . , M ℓ+1}.
+7. The elements of wℓand bℓare denoted by wℓ
+ij and bℓ
+i.
+8. The values x1
+i and xL
+i assigned to the i th node in the input layer V 1 and the output layer V L
+are specially denoted by ˆxi for i ∈{1, . . . , M 1} and yi for i ∈{1, . . . , M L}, respectively.
+Hence x1 = ˆx ∈RM1 and xL = y ∈RML.
+If we let xℓ+1 = ψℓ+1(xℓ) := σ(zℓ) for ℓ= 0, 1, . . . , L −1, the output of the neural network is
+simply written as
+y = ψL ◦ψL−1 ◦· · · ◦ψ3 ◦ψ2(a).
+For a given feed-forward neural network (V, D) with the input ˆx ∈RM1 and the output y ∈RML,
+for instance, a CRN (S, C, R, K) can be constructed so that the associated deterministic model
+x(t) = (xd(t), xe(t)) such that
+d
+dt
+
+xd(t)
+xc(t)
+!
+= f(xd(t), xc(t))
+satisfies lim
+t→∞xd(t) = y with xc(0) = ˆx, where xd and xc represent the concentrations of the
+dynamical and the catalytic species, respectively.
+7
+
+
+Smooth Relu
+Leaky Relu
+-10
+-5
+0
+5
+10
+0
+6
+12
+ℎ= 0.1
+ℎ= 0.5
+0
+10
+-10
+-5
+0
+5
+10
+𝑧
+5
+ℎ= 1
+ℎ= 3
+𝑧
+𝑥!
+"
+𝑥#
+"
+𝑥$
+"
+𝑥%
+"
+𝑥!
+!
+𝑥#
+!
+𝑥$
+!
+𝑥!
+#
+𝑥#
+#
+𝑥$
+#
+𝑥!
+$
+𝑥#
+$
+𝑥$
+$
+𝑥%
+$
+𝑤!, 𝑏!
+𝑤", 𝑏"
+𝑤#, 𝑏#
+𝑧ℓ= 𝑤ℓ𝑥ℓ+ 𝑏ℓ
+𝑥ℓ%" = 𝜎(𝑧ℓ)
+Neural network
+A
+B
+C
+Figure 3: A. The graph of the smooth ReLU with different smoothing parameters h. B. The graph
+of the leaky ReLU. C. An example of neural networks.
+2.2.1
+Gradient of the loss function and derivatives of smooth activation functions.
+Training NNs is a procedure to find a weight matrix and a bias vector that minimize the error of the
+feed-forward neural network. The error can be measured using a loss function. Throughout this
+manuscript, we define the loss function defined as L(y) = |y −ˆy|2, where y ∈RML is the output
+of the neural network and ˆy ∈RML is the output of the training data sets.
+When minimization is performed with the (stochastic) gradient descent algorithms, the main
+task is to compute the partial derivatives of the loss function L(y) = |y −ˆy|2 with respect to the
+parameters of the neural network wℓ
+ij’s and bℓ
+i’s. Backpropagation is typically initiated from the
+output layer ℓ= L. For suitable indices i and j we have that
+∂L
+∂xL
+i
+= ∂L
+∂yi
+= 2(yi −ˆyi),
+∂L
+∂zℓ
+i
+=
+X
+j
+∂L
+∂xℓ+1
+j
+∂xℓ+1
+j
+∂zℓ
+i
+and
+∂L
+∂xℓ
+i
+=
+X
+j
+∂L
+∂zℓ
+j
+∂zℓ
+j
+∂xℓ
+i
+=
+X
+j
+∂L
+∂zℓ
+j
+wℓ
+ji,
+(5)
+for ℓ∈{1, ..., L −1}. Then gradients of L can be recursively written as
+∇xℓL =
+
+W ℓT 
+∇xℓ+1L ⊙∇zℓxℓ+1
+=
+
+W ℓT
+(∇zℓL) ,
+(6)
+∇wℓL =
+
+∇xℓ+1L ⊙∇zℓxℓ+1 
+xℓT
+= (∇zℓL)
+
+xℓT
+,
+(7)
+∇bℓL =
+
+∇xℓ+1L ⊙∇zℓxℓ+1
+= ∇zℓL,
+(8)
+where ∇zℓxℓ+1 is a vector whose j th component is ∂σ(zℓ)j
+∂zℓ
+j
+, and ⊙is the Hadamard product [16],
+which stands for term-wise multiplication. Regarding the recursive relation (6)–(8), the key term
+of the backpropagation is ∇zℓxℓ+1 for each ℓ.
+8
+
+
+The derivative of the smoothed ReLU function σ(z) = z+
+√
+z2+4h
+2
+is
+σ′(z) = z +
+√
+z2 + 4h
+2
+√
+z2 + 4h
+= σ(z)2
+1
+√
+z2 + 4h
+2
+z +
+√
+z2 + 4h =
+σ(z)2
+σ(z)2 + h.
+(9)
+Then if xℓ+1
+j
+= σ(zℓ
+j) for each ℓand j, then
+∇zℓxℓ+1 =
+
+(xℓ+1
+1
+)2
+(xℓ+1
+1
+)2 + h, . . . ,
+(xℓ+1
+Mℓ)2
+(xℓ+1
+Mℓ)2 + h
+!
+Remarkably, these derivatives can be simply computed by addition and division of the nodes xℓ
+i’s
+that are computed in the feed-forward part of a NN.
+3
+CRNs for training
+In this section, we will discuss the construction of Chemical Reaction Networks (CRNs) used for
+computing the gradients of the loss function L(y) = |y −ˆy|2 and for updating the parameters
+accordingly. The CRNs responsible for computing gradients will be referred to as the ”backward
+CRN,” and those responsible for updating parameters as the ”update CRN.” We will denote the
+backward CRN and the update CRN by (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku), respectively. For the
+complete neural network computation, we will utilize the CRN provided in [2], which implements
+a feed-forward NN with the smooth ReLU function. This CRN will be referred to as the ”forward
+CRN” and will be denoted by (Sf, Cf, Rf, Kf). To maintain consistency, we will use capital letters
+to represent species and small letters to denote their concentrations. For example, the species
+corresponding to a node xℓi will be denoted by Xℓ
+i , and its concentration at time t will be denoted
+by xℓ
+i(t).
+3.1
+Backward CRN
+The derivative σ′ is the key term to calculate the loss function gradient. When smooth ReLU is
+used, the values in the nodes are positive as xℓ= σ(zℓ−1). Hence, for the derivative of the smooth
+ReLU given in (9), we employ the CRNs to calculate the addition and division of positive real
+numbers suggested in [7] without introducing dual rails.
+Let Xℓ
+i ∈Sf be the species corresponding to node xℓ
+i in the feed-forward network. Using this
+as an input, the CRN for computing ∂xℓ
+i
+∂zℓ−1
+i
+= σ′(zℓ−1
+i
+) is
+2Xℓ
+i
+κ1
+−→2Xℓ
+i + DXℓ
+i ,
+DXℓ
+i + Aℓ
+i
+κ2
+−→Aℓ
+i
+Aℓ
+i
+κ3
+−→∅,
+2Xℓ
+i
+κ4
+−→2Xℓ
+i + Aℓ
+i,
+H
+κ5
+−→H + Aℓ
+i.
+(10)
+If we set rate constants as κ5κ2
+κ3
+= κ4κ2
+κ3
+= κ1, then the concentration of DXℓ
+i , which repre-
+sents the derivative
+∂xℓ
+i
+∂zℓ−1
+i
+= σ′(zℓ−1
+i
+), convergences to
+(xℓ
+i)2
+(xℓ
+i)2 + h.
+That is, lim
+t→∞dxℓ+1
+i
+(t) =
+9
+
+
+lim
+t→∞
+(xℓ
+i)2(t)
+(xℓ
+i)2 + h =
+(xℓ
+i)2
+(xℓ
+i)2 + h. Aℓis a species computing the summation (xℓ
+i)2 + h, and species
+H used in (Sf, Cf, Rf, Kf) corresponds to the smoothness parameter h in (3).
+By multiplying and summing these derivative terms with wℓ
+ij and bℓ
+i’s, the gradients of L can be
+computed recursively from ℓ= L to ℓ= 1 as described in Section 2.2.1. Hence the full backward
+network consists of further sub-CRNs that compute multiplication and addition, and the W ℓ,±
+ij
+and
+Bℓ,±
+i
+species are used. It’s important to note that the weights and biases can be negative, so we use
+the dual rails W ℓ,±
+ij
+and Bℓ,±
+i
+to ensure that the differences of two non-negative values wℓ,+
+ij −wℓ,−
+ij
+and bℓ,+
+i
+−bℓ,−
+i
+can represent negative values. The terms such as ∂L
+∂xℓ
+i
+and ∂L
+∂wℓ
+ij
+that are computed
+with wℓ,±
+ij
+and bℓ,±
+i
+’s are also realized with dual rails. For example, for a simple two-layered NN
+illustrated in Figure 4, to compute ∂L
+∂x1
+1
+= ∂L
+∂z1
+1
+w1
+11, we use
+LX1,+
+1
+κ6
+−→∅,
+LZ1
+1 + W 1,+
+11
+κ7
+−→LZ1
+1 + W 1,+
+11 + LX1,+
+1
+LX1,−
+1
+κ8
+−→∅,
+LZ1
+1 + W 1,−
+11
+κ9
+−→LZ1
+1 + W 1,−
+11 + LX1,−
+1
+.
+If κi = 1 for i = 6, 7, 8, 9, then lim
+t→∞
+
+lx1,+
+1 (t) −lx1,−
+1 (t)
+
+= lim
+t→∞lz1
+1(t)(w1,+
+1
+(t) −w1,−
+1
+(t)) =
+∂L
+∂z1
+1
+w1
+1.
+To show an example of the full construction, we provide the list of reactions in (Sb, Cb, Rb, Kb)
+and (Su, Cu, Ru, Ku) for a simple two-layered NN in Section 3.4. We further visualize the archi-
+tecture of (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) in Figure 4.
+Remark 3.1. he arrows going into and out from a green box in Figure 4 represent the catalyst-
+product relation. In other words, the species at the incoming arrows act as the catalyst species,
+while the species at the outgoing arrow are the dynamic species. These arrows in the backward
+CRN are always one-sided, and this also applies to the forward CRN [2]. Essentially, this means
+that the combination of the forward and backward networks has a ’feedback-free’ structure. Specif-
+ically, if species S1 acts as the catalyst to produce S2, then S2 never serves as a catalyst to produce
+S1. This plays a crucial role in the convergence of the forward and backward networks, as well as
+in the noise analysis (See Section 3.3 and Section 5.1).
+In contrast, the update network gives a feedback loop to the forward network. We will slow
+down these feedback reactions to prevent disruption of the forward and backward CRNs (See
+Section 3.2).
+3.2
+Update network
+We continuously update the weights using the gradient of the loss function, rather than using
+the usual iterative update. Let W ℓ,+
+ij
+and W ℓ,−
+ij
+be species corresponding to the weight wℓ
+ij =
+wℓ,+
+ij
+−wℓ,−
+ij
+in the forward CRN (Sf, Cf, Rf, Kf). Then we build the update network using the
+following reactions
+LW ℓ,−
+ij
+η−→LW ℓ,−
+ij
++ W ℓ,+
+ij ,
+LW ℓ,+
+ij
+η−→LW ℓ,+
+ij
++ W ℓ,−
+ij ,
+(11)
+10
+
+
+𝑥!
+𝑥"
+"
+𝑥#
+"
+𝑥#
+= 𝑦
+𝑤""
+!,±, 
+𝑏"
+!,±
+𝑤#"
+!,±, 
+   𝑏#
+!,±. 
+𝑤""
+",±, 
+𝑏"
+",±
+𝑤"#
+",±, 
+𝑏"
+",±
+!!"
+!#" =
+"!!
+"
+"#!
+"
+𝑥# +
+$!"
+$#"
+𝑧!
+! = 𝑤!!
+! , 𝑤!"
+!
+𝑥!
+!
+𝑥"
+!
++ 𝑏!
+!
+𝑦$ 
+−
+×
++
+÷
+∇!!𝑦
+×
+∇!!𝐿
++
+÷
+∇!"𝑥%
+×
+×
+∇"!𝐿
+∇&!𝐿
+×
+∇!"𝐿
+×
+∇""𝐿
+∇'𝐿
+𝑤%
+𝑤#
+Forward CRN
+(𝒮#, 𝒞#, ℛ#, 𝒦#)
+backward CRN
+(𝒮$, 𝒞$, ℛ$, 𝒦$)
+Training data
+update CRN
+(𝒮%, 𝒞%, ℛ%, 𝒦%)
+backward CRN
+(𝒮$, 𝒞$, ℛ$, 𝒦$)
+Figure 4: Overall structure of the CRN implementing the backpropagation of a two-layered NN.
+The green boxes indicate a CRN that calculates the designated arithmetic operations. Each green
+box has two input species indicated by the incoming arrows. The outgoing arrows indicate the
+output species. The full lists of reactions for the backward and the update CRNs are provided in
+Section 3.4.
+where LW ℓ,±
+ij
+are the species that compute the gradient in the backward network (Sb, Cb, Rb, Kb)
+as
+lim
+t→∞
+
+lwℓ,+
+ij (t) −lwℓ,−
+ij (t)
+
+= ∂L
+∂wℓ
+ij
+.
+We have that from (11)
+d
+dt(wℓ,+
+ij −wℓ,+
+ij ) = −η
+
+lwℓ,+
+ij (t) −lwℓ,−
+ij (t)
+
+,
+(12)
+leading to the continuous update of wℓ
+ij with the drift given by lwℓ,+
+ij
+and lwℓ,−
+ij . This continuous
+update indeed mimics the usual iterative update in the following sense. The continuous update (12)
+yields that
+wℓ
+ij(T) = wℓ,+
+ij (T) −wℓ,−
+ij (T) =
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−η
+Z T
+0
+(lwℓ,+
+ij (s) −lwℓ,−
+ij (s))ds,
+(13)
+In Appendix A, we show that the species in the backward CRN including LW ℓ,±
+ij ’s converge ex-
+ponentially quickly to the steady state. Therefore for a large T and for a sufficiently small η, (13)
+11
+
+
+can be approximated as
+wℓ
+ij(T) = wℓ,+
+ij (T) −wℓ,−
+ij (T) ≈
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−ηT lim
+t→∞(lwℓ,+
+ij (T) −lwℓ,−
+ij (T))
+=
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−ηT ∂L
+∂wℓ
+ij
+.
+(14)
+(14) is equivalent to updating the parameters using the iterative update in the gradient descent
+scheme with the learning rate ηT.
+Similarly, we can update species Bℓ,+
+ij
+and Bℓ,−
+ij
+that represent the bias parameter bℓ
+ij using a
+species, namely LZℓ
+i , corresponding to
+∂L
+∂zℓ
+i =
+∂L
+∂bℓ
+i . In Section 3.3, the convergence of the full
+CRN and the update of the parameters in the manner of a one-pot computation are more precisely
+described.
+3.3
+One-pot computing and convergence
+The proposed CRN implements both the feed-forward and the training processes of a neural net-
+work in a single pot. This means that all reactions occur simultaneously without engineered circuits
+or oscillations that are used to run the forward and trainning parts separately. The previously pro-
+posed CRNs for trainning NNs use oscillatory clock-proteins to sequentially regulate reactions
+[5, 19] for interactive updates of the weights and biases of NNs. The main task of performing
+one-pot computing was to design the update network introduced in Section 3.2. This is because
+as the species in the update CRN gradually change, the convergence of the species in the forward
+and backward CRNs holds even when their reactions take place simultaneously. In this section, we
+will validate this.
+Although it is difficult to thoroughly validate the convergence of the one-pot computation, we
+can show the convergence of the leading-order term of the species using a perturbation analysis
+regarding η in (11) as a scaling parameter. We consider the system of differential equations for
+xℓ
+i, wℓ,±
+ij
+and bℓ,±
+i
+’s as a perturbed system by the updated network with the perturbation parameter
+η.
+To consider perturbed solutions, for t on a compact time interval [0, T], we decompose the
+concentrations of the species as
+xℓ
+i(t) = xℓ
+i,0(t) + ηxℓ
+i,1(t) + O(η2),
+wℓ,±
+ij (t) = wℓ,±
+ij,0(t) + ηwℓ,±
+ij,1(t) + O(η2), and
+bℓ,±
+i
+(t) = bℓ,±
+i,0 (t) + ηbℓ,±
+i,1 (t) + O(η2).
+Note that the concentration xℓ
+i(t) of the species corresponding to a node follows a differential equa-
+tion of the form d
+dtxℓ
+i(t) = f ℓ
+i (x, w+, w−, b+, b−) for some function f ℓ
+i , where x and b± denote
+matrices whose ℓi components are xℓ
+i and bℓ
+i, and the ℓij component of w± is wℓ,±
+ij , respectively.
+We similarly denote by xk and b±
+k the matrices whose ℓi components are xℓ
+i,0 and bℓ
+i,k, and we let
+the ℓij component of w±0 be wℓ,±
+ij,k, respectively, for k = 1, 2. Importantly, due to smoothness, f ℓ
+i
+can also be decomposed with the Talyor expansion as
+d
+dtxℓ
+i(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) + ∇f ℓ
+i ((x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )) · ∆+ O(η2)
+= f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) + η∇f ℓ
+i ((x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) · (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2),
+12
+
+
+= 0
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ0 , 𝑤!#
+ℓ0 )
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Quick convergence
+Slow evolution 
+with −𝜂∇!ℓℒ
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ0 , 𝑤!#
+ℓ0 )
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Noise of size 𝜖will alter the convergence by order of 
+𝑂𝜖
+= 0
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Quick convergence
+Slow evolution 
+with −𝜂∇!ℓℒ
+(𝑥!
+ℓ2𝑇, 𝑤!#
+ℓ2𝑇)
+Randomly change the input 𝑥(
+New differential equation with the new input
+A
+B
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+𝑦)(𝑡)
+𝑤))
+) (𝑡)
+𝐷𝑌*(𝑡)
+𝐷𝑋+
+)(𝑡)
+C
+𝑂𝜖
+Figure 5: A and B. A schematic description of the convergence of the backward and the update
+networks without noise (A) and with noise (B). C. The time evolutions of the species. The vertical
+dotted lines indicate the times when the input of the NN is changed randomly. In particular, the
+concentration w1
+11(t) of the species W 1
+11 corresponding to a weight parameter evolves slowly.
+where ∆= (x, w+, w−, b+, b−)⊤−(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤= η(x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+O(η2).
+Note that the differential equations for species W ℓ,±
+ij
+and Bℓ,±
+i
+are evolving with catalysts LW ℓ,±
+ij
+and LBℓ,±
+i
+as shown in (11), where LW ℓ,±
+ij
+and LBℓ,±
+i
+correspond to the derivatives ∂L
+∂wℓ
+ij
+and ∂L
+∂bℓ
+i
+.
+These are represented as summation, product, and division (with strictly positive denominators)
+of xℓ
+i, wℓ,±
+ij
+and bℓ,±
+i
+by the backward CRN (Section 3.1). Hence we can view wℓ,±
+ij
+and bℓ,±
+i
+as the
+solutions of
+d
+dtwℓ,±
+ij (t) = −η × lwℓ,∓
+ij (t) := ηgℓ,±
+ij (x, w+, w−, b+, b−)
+d
+dtbℓ,±
+i
+(t) = −η × lzℓ,∓
+i
+(t) := ηqℓ,±
+i
+(x, w+, w−, b+, b−),
+where the functions gℓ,±
+ij
+and qℓ,±
+i
+are smooth with respect to x, w+, w−, b+, and b−. Then by the
+Taylor expansion we get that
+d
+dtwℓ,±
+ij (t) = η
+
+gℓ,±
+ij (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤+ η∇gℓ,±
+ij
+· (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2)
+
+d
+dtbℓ,±
+i
+(t) = η
+
+qℓ,±
+i
+(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤+ η∇qℓ,±
+i
+· (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2)
+ (15)
+13
+
+
+By matching the orders with respect to η, we have
+d
+dtxℓ
+i,0(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ),
+d
+dtwℓ,±
+ij,0(t) = 0, and
+d
+dtbℓ,±
+i,0 (t) = 0,
+and hence the leading order term xℓ
+i,0(t) follows the dynamics governed by f ℓ
+i while the leading
+order term wℓ,±
+ij,0 and bℓ,±
+i,0 are fixed at the initial condition. Furthermore, the convergence speed of
+the system
+d
+dtxℓ
+i,0(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) is exponential in time (Appendix A). Therefore
+xℓ
+i,0(T) will closely approximate its steady state for a large T. After this convergence is approx-
+imately made, the dynamics of the system can be demonstrated with the evolution of the second
+leading terms of order η. Matching the order in (15), we find that wℓ,±
+ij,1 and bℓ,±
+i,1 follow
+d
+dtwℓ,±
+ij,1 = gℓ,∓
+ij (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) ≈
+∂L
+∂wℓ,±
+ij
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+d
+dtbℓ,±
+i,1 = qℓ,∓
+i
+(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) ≈∂L
+∂bℓ,±
+i
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+where x0(∞) := limt→∞x0. In this approximation, we used the exponentially quick convergence
+of xℓ
+i’s. Hence, we get the desired gradient descent as
+wℓ,±
+ij (T) ≈wℓ,±
+ij,0(0) + ηT ∂L
+∂wℓ,±
+ij
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+bℓ,±
+i
+≈bℓ,±
+i,0 (0) + ηT ∂L
+∂bℓ,±
+i
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)).
+(16)
+This process is repeated with random changes of the inputs ˆx. The convergence of the backward
+and the update network is schematically described in Figure 5 A. We also provided schematic the
+convergence when noise of reaction rate constants exists in Figure 5 B. The time evolutions of
+species in our CRN implementing a NN are displayed in Figures 5 C.
+3.4
+An example of the the backward and the update network
+Here we provide a complete list of reactions in (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) to implement
+the backward network of a simple two-layered NN described in Figure 4.
+In Table 1, w presents the CRN that calculates the derivative of L with respect to the output
+layer parameters. The concentration of a species is denoted by lowercase letters. Unless specified,
+the rate parameters are assumed to be 1 and are omitted. Note that we do not need to compute
+∂L
+∂b1
+1 separately as it is equal to
+∂L
+∂z1
+1 . The CRN that computes the derivative of L with respect
+to the parameters of the first layer is shown in Table 2. Similarly, we do not need to compute
+∂L
+∂b0
+i separately as it is equal to
+∂L
+∂z0
+i for each i = 1, 2. The overall architecture of the backward
+network is illustrated in Figure 4. Finally, we provide reactions in the update CRN in Table 3. The
+construction of the forward network follows the previous work [2].
+14
+
+
+sub-CRNs to compute ∇w1L and ∇b1L
+Goal
+2Y →2Y + DY,
+DY + A2 →A2
+A2 →∅,
+2Y →2Y + A2,
+H →H + A2
+lim
+t→∞dy(t) =
+y2
+y2 + h = ∂y
+∂z1
+1
+Y
+2−→LY + Y,
+ˆY
+2−→LY + ˆY ,
+LY →∅
+lim
+t→∞ly(t) = 2(y −ˆy) = ∂L
+∂y
+LZ1
+1 →∅,
+LY + DY →LY + DY + LZ0
+1
+lim
+t→∞lz1
+1(t) = 2(y −ˆy) ∂y
+∂z1
+1
+= ∂L
+∂z1
+1
+LW 1
+11 →∅,
+LZ1
+1 + X1
+1 →LZ1
+1 + X1
+1 + LW 0
+11
+LW 1
+12 →∅,
+LZ1
+1 + X1
+2 →LZ1
+1 + X1
+2 + LW 0
+12
+lim
+t→∞lw1
+11(t) = ∂L
+∂z1
+1
+∂z1
+1
+∂w1
+11
+= ∂L
+∂w1
+11
+lim
+t→∞lw1
+12(t) = ∂L
+∂z1
+1
+∂z1
+1
+∂w1
+12
+= ∂L
+∂w1
+12
+Table 1: An example of a sub-CRN in (Sb, Cb, Rb, Kb) that computes ∇w1L and ∇b1L.
+sub-CRNs to compute ∇w0L and ∇b0L
+Goal
+2X1
+1 →2X1
+1 + DX1
+1,
+DX1
+1 + A1
+1 →A1
+1
+A1
+1 →∅,
+2X1
+1 →2X1
+1 + A1
+1,
+H →H + A1
+1
+lim
+t→∞dx1
+1(t) =
+(x1
+1)2
+(x1
+1)2 + h = ∂x1
+1
+∂z0
+1
+LX1,±
+1
+→∅,
+LZ1
+1 + W 1,±
+11
+→LZ1
+1 + W 1,±
+11 + LX1,±
+1
+lim
+t→∞(lx1,+
+1 (t) −lx1,−
+1 (t)) = ∂L
+∂x1
+1
+LZ0,±
+1
+→∅,
+LX1,±
+1
++ DX1
+1 →LX1,±
+1
++ DX1
+1 + LZ0,±
+1
+lim
+t→∞(lz0,+
+1
+(t) −lz0,−
+1
+(t)) = ∂L
+∂z0
+1
+LW 0,±
+11
+→∅,
+LZ0,±
+1
++ X0 →LZ0,±
+1
++ X0 + LW 0,±
+11
+lim
+t→∞(lw0,+
+11 (t) −lw0,−
+11 (t)) = ∂L
+∂w0
+11
+2X1
+2 →2X1
+2 + DX1
+2,
+DX1
+2 + A1
+2 →A1
+2
+A1
+2 →∅,
+2X1
+2 →2X1
+2 + A1
+2,
+H →H + A1
+2
+lim
+t→∞dx1
+2(t) =
+(x1
+2)2
+(x1
+2)2 + h = ∂x1
+2
+∂z0
+2
+LX1,±
+2
+→∅,
+LZ1
+1 + W 1,±
+12
+→LZ1
+1 + W 1,±
+12 + LX1,±
+2
+lim
+t→∞(lx1,+
+2 (t) −lx1,−
+2 (t)) = ∂L
+∂x1
+2
+LZ0,±
+2
+→∅,
+LX1,±
+2
++ DX1
+2 →LX1,±
+2
++ DX1
+2 + LZ0,±
+2
+lim
+t→∞(lz0,+
+2
+(t) −lz0,−
+2
+(t)) = ∂L
+∂z0
+2
+LW 0,±
+21
+→∅,
+LZ0,±
+2
++ X0 →LZ0,±
+2
++ X0 + LW 0,±
+21
+lim
+t→∞(lw0,+
+21 (t) −lw0,−
+21 (t)) = ∂L
+∂w0
+21
+Table 2: An example of a sub-CRN in (Sb, Cb, Rb, Kb) that computes ∇w0L and ∇b0L.
+4
+Applications to data sets
+In this section, we applied the complete CRN, which includes the forward, backward, and update
+CRNs, to implement neural networks on various datasets. The forward network used is the same
+as in [2], while the backward and update networks are constructed as proposed in Section 3.1
+and Section 3.2. The datasets used include XOR, Iris, and MNIST, which are typical examples
+of classification problems in machine learning. More detailed descriptions of the datasets are
+provided in Appendix D. For these datasets, we utilized a two-layered neural network consisting
+of the input layer, a single hidden layer, and the output layer, implemented with the proposed
+CRNs. We regard running our CRN over an interval [(k −1)T, kT) for each k as a single iteration.
+After each iteration, we randomly changed the input ˆx. We let the CRN run for [0, KT), where K
+15
+
+
+Update network
+Goal
+LW 1,∓
+11
+η−→LW 1,∓
+11 + W 1,±
+11
+w1
+11 ←[ w1
+11 −ηT
+∂L
+∂w1
+11
+LW 1,∓
+12
+η−→LW 1,∓
+12 + W 1,±
+12
+w1
+12 ←[ w1
+12 −ηT
+∂L
+∂w1
+12
+LW 0,∓
+11
+η−→LW 0,∓
+11 + W 0,±
+11
+w0
+11 ←[ w0
+11 −ηT
+∂L
+∂w0
+11
+LW 0,∓
+21
+η−→LW 0,∓
+21 + W 0,±
+21
+w0
+21 ←[ w0
+21 −ηT
+∂L
+∂w0
+21
+Table 3: An example of (Su, Cu, Ru, Ku)
+means the total number of iterations.
+We used an error rate function to measure the performance of our CRN. Here, the error rate
+E(t) is the average of the mean squared error (MSE) across the entire dataset at time t. More
+precisely,
+E(t) = 1
+N
+N
+X
+n=1
+∥yn(t) −ˆyn∥2
+L2,
+(17)
+where yn(t) = (yn,1(t), . . . , yn,ML(t)) is the vector of the concentration of the species correspond-
+ing to the output layer with n th input data. Importantly when evaluating yn(t), we used the weights
+wℓ
+ij(t)’s and biases bℓ
+i(t) to measure the evolution of the error. ˆyn is the training data for the n th
+input data. Here, N is the number of total data sets. That is, E(t) measures the average error of the
+neural network at time t using the weights and biases that have been updated through the backward
+and the updated CRNs up to time t.
+With four XOR data points, we trained the forward CRN using the backward and update CRNs
+proposed in Section 3.1 and 3.2. We plotted the time evolution of the error and the accuracy of the
+NN implemented by the CRN (Figure 6 A left). The graphs of the fitted functions are displayed in
+Figure 6 A right. For the Iris data sets, we plotted the time evolutions of the error functions and
+the accuracy (Figure 6 B top) and also provided the pair plots (Figure 6 B bottom).
+For MNIST data sets, each input data point is a 8×8 pixel representing an image of a handwrit-
+ten digit. In addition to the error and accuracy functions ((Figure 6 C top), we also displayed the
+classification of the input data points that are embedded in a plane through principal component
+analysis (PCA) (Figure 6 C bottom). The classification by our CRN is nearly the same as the clas-
+sification by a traditional NN. Note that for the Iris and MNIST data sets, we splitted the original
+data sets into training and validation data sets. When ˆyn comes from the training (validation) data
+sets, we call E(t) the training (validation) error.
+For each simulation, all reaction rate constants within the forward and backward CRNs were
+assigned a value of 1, with the exception of those related to division, such as κ1 and κ2 in (10).
+These division-related rate constants were deliberately set to be large to enhance the speed of the
+reactions, as they tend to occur at a slow rate. Conversely, a small reaction rate constant η was
+utilized for the update CRN.
+See Appendix D for the details of these experiments and the data sets.
+16
+
+
+A 
+B
+Iris data classification
+C
+MNIST data classification
+XOR data classification
+Training loss with ℎ= 3
+Time
+0
+25
+50
+75
+×10!
+Time
+0
+25
+50
+75
+×10!
+Accuracy with ℎ= 3
+Regression at 𝑡= 25×10!
+Regression at 𝑡= 80×10!
+Accuracy with ℎ= 4
+Accuracy with ℎ= 4
+Time
+Time
+Traditional NN
+CRN
+Traditional NN
+CRN
+Error with ℎ= 4
+Time
+Validation error
+Training error
+Validation error
+Training error
+Error with ℎ= 4
+Time
+Figure 6: The time evolutions of the error and the accuracy functions for the XOR (A left), the Iris
+(B top), and the MNIST (C top) data sets. A right. The regression of the XOR data sets after 100
+and 10000 iterations. B bottom. The pair plots for the Iris data sets (See Appnedix D.2 C bottom.
+Classification of the MNIST input data sets by the outputs obtained with a standard NN and our
+CRN. The input data points are embedded on a 2d plane via the principal component analysis. See
+Table 4 in Supplementary material for the parameters used for these simulations.
+17
+
+
+5
+Robustness to noisy reaction rates
+In reality, the reaction timing is affected by the fluctuation of temperature, pressure, and other
+external disturbances. This means that the rates of the reactions are inherently random. Due to
+intrinsic noise of the system, the concentrations of species can also fluctuate around the exact
+values modeled by the differential equations.
+These random fluctuations in either the reaction rate parameters or the concentration of the
+species will subsequently cause noise in the gradient of the loss function and eventually make the
+gradient descent process noisy. Recent studies have examined the effect of noise in stochastic
+gradient descent processes. Surprisingly, noise can regularize the optimization process and help
+find flatter local minima [29]. However, a large variance of noise in the gradient descent processes
+can significantly distort optimization and slow down the convergence speed. Thus noise reduction
+methods have been developed in previous studies [17] where the variance of Gaussian noise is set
+to be a decreasing function of either time or the number of parameters. To robustly implement NNs
+against noisy parameters and species via the CRNs, therefore, it is critical to minimize fluctuations
+in the gradient descent process.
+In this section, we proved that the smoothness of the activation function ensures that the size
+of the fluctuation in our CRN remains at most of order ϵ when both the extrinsic and the intrinsic
+noise are of order ϵ.
+5.1
+Noisy gradient descent processes induced by fluctuations in the CRN
+We will begin by mathematically formulating the impact of noise from both the forward and back-
+ward CRNs on the update CRN. Since the input of the neural network is updated at t = kT for
+each k = 1, 2, . . . for some T, we will analyze the noise effect on t ∈[0, T].
+We define the noisy rate parameters as follows. Let κj(t; ϵ) represent the noisy rate parameter
+of the j th reaction. We assume that κj(t; ϵ) = |κj + ϵξj(t)|, where ϵ is the noise magnitude. The
+noise terms ξj(t) follow independent standard normal distributions N(0, 12). For some t0 and t1,
+they are re-sampled at each t = kt0 and remain constant for t1 for each k = 1, 2, . . . (see Figure 7
+A). That is, for each j,
+ξj(t) =
+
+
+
+Zj,k
+i.i.d.
+∼N(0, 12)
+if t ∈[kt0, kt0 + t1) for some k.
+0
+otherwise,
+(18)
+where κj’s are the exact noise-free rate parameters. As mentioned before we use identical rate
+parameters to compute desired outcomes so that we set κj = 1 for each j. Let (S, C, R, Kϵ) repre-
+sent the union of the forward CRN (employed from [2]) and the backward CRN that implements
+a NN with the smooth ReLU activation function (3). Here Kϵ is the set of the noisy rate parame-
+ters κj(t; ϵ)’s. Let (S, C, R, K) be the same CRN as (S, C, R, Kϵ) but with noise-free parameters,
+where the reaction rate parameters are all equal to 1 in K.
+Now we investigate the variation of the concentrations of the species by the noisy rate param-
+eters. Let xℓ
+i(t; ϵ) and xℓ
+i(t) be the concentration of species Xℓ
+i of (S, C, R, Kϵ) and (S, C, R, K),
+respectively, that are corresponding to the i th nodes on the ℓth layer. Due to the structure of the
+18
+
+
+forward network proposed in [2], the governing equation of xℓ
+j(t; ϵ) is written as
+d
+dtxℓ
+i(t; ϵ) = h + xℓ
+i(t; ϵ)
+X
+j
+ρℓ−1
+j,ϵ (xℓ−1
+j
+(t; ϵ)) −(1 + ϵξk(t))(xℓ
+i(t; ϵ))2,
+(19)
+d
+dtxℓ
+i(t) = h + xℓ
+i(t)
+X
+j
+ρℓ−1
+j,0 (xℓ−1
+j
+(t)) −(xℓ
+i(t))2,
+(20)
+where
+ρℓ
+i,ϵ(z) =
+Mℓ
+X
+j=1
+
+(1 + ϵξℓ,+
+ij )wℓ,+
+ij −(1 + ϵξℓ,−
+ij )wℓ,−
+ij
+
+z + (1 + ϵξℓ,−
+i
+)bℓ,+
+i
+−(1 + ϵξℓ,−
+i
+)bℓ,−
+i
+,
+and ξℓ,±
+ij , ξℓ,±
+i
+and ξℓ
+i are independent standard normals defined in (18) (here we suitably re-
+enumerated ηj in (18)). As shown in Section 3.3, due to the difference of the time scale between
+the dynamics of xℓ
+i’s and the parameters wℓ
+ij’s and bℓ
+i’s, we assume that wℓ
+ij’s and bℓ
+i’s are fixed for
+t ∈[0, T]. Using the feedback-free structure considered in Remark 3.1, we can inductively prove
+the following proposition for the variation of the species xℓ
+i(t; ϵ)’s from the noise. See Appendix
+B for the proof.
+Proposition 5.1. Under the above setting, there exists a finite random variable Θ such that for
+each ℓand for i, supt∈[0,T] |xℓ
+i(t; ϵ) −xℓ
+i(t)| ≤ϵΘ, where
+Θ = Θ(L, max
+ℓ
+M ℓ, h, max
+ℓ,i,j wℓ,±
+ij , max
+ℓ,i bℓ,±
+i
+, sup
+ℓ,i,j
+sup
+t∈]0,T]
+(|ξℓ,±
+ij | + |ξℓ,±
+i
+| + |ξℓ
+i|)).
+Using the result of Proposition 5.1, we can similarly obtain the deviation of the backward CRN.
+Let LW ℓ,±
+ij
+and let LBℓ,±
+i
+be the species corresponding to
+∂L
+∂wℓ
+ij and ∂L
+∂bℓ
+i in the dual rail manner,
+respectively. We denote their concentrations by lwℓ,±
+ij (t; ϵ) and lbℓ,±
+i
+(t; ϵ) for (S, C, R, Kϵ), and we
+also denote their concentrations by lwℓ,±
+ij (t) and lbℓ,±
+i
+(t) for (S, C, R, K).
+Proposition 5.2. Under the same setting for Proposition 5.1, there exists a finite random variable
+¯Θ such that for each combination of indices ℓ, i, j,
+sup
+t∈[0,T]
+(|lwℓ
+ij(t; ϵ) −lwℓ
+ij(t)| + |lbℓ
+i(t; ϵ) −lbℓ
+i(t)|) ≤ϵ¯Θ,
+where ¯Θ = ¯Θ(Θ, L, maxℓM ℓ, h, maxℓ,i,j wℓ,±
+ij , maxℓ,i bℓ,±
+i
+).
+5.2
+Comparison to CRNs implementing NNs with non-smooth activation
+functions
+In this section, we demonstrated that usage of smoothed activation functions can make CRNs
+implementing NNs more robust to noise compared to CRNs implementing NNs with non-smooth
+activation functions such as the leaky ReLU. Specifically, the gradient of a non-smooth activation
+function has discrete jumps, which can lead to significant errors.
+19
+
+
+0
+0.5
+1
+1.5
+2
+2.5
+3
+3.5
+4
+4.5
+5
+1.88
+1.92
+1.96
+2
+2.04
+2.08
+2.12
+Noisy rate constant
+Time
+𝜖𝒩(0,1!)
+-10
+-5
+0
+5
+10
+0
+1
+10
+-10
+-5
+0
+5
+0
+1
+Derivative of leaky ReLU
+Derivative of smooth ReLU
+0.5
+0.5
+𝑧
+𝑧
+Time
+Time
+Time
+Time
+Leaky ReLU activation function
+Smooth ReLU activation function
+𝑤!!
+" (𝑡)
+𝑤!!
+" (𝑡)
+𝑦!(𝑡)
+0.05
+without noise
+with noise
+4
+0
+-4
+4
+0
+-4
+𝑦!(𝑡)
+0.05
+#$
+%&!  with noise
+A 
+B 
+C 
+D
+#$
+%&!  without noise
+Time
+Time
+#$
+%&!  with noise
+#$
+%&!  without noise
+Time
+Time
+Error
+Accuracy
+Error
+Accuracy
+Validation error
+Training error
+Validation error
+Training error
+without noise
+with noise
+without noise
+with noise
+without noise
+with noise
+Time
+Time
+Time
+Time
+Figure 7: A. Time evolution of the noisy rate constant. B. The derivatives of the activation func-
+tions. C. The time evolution of the training and the validation error functions and the accuracy
+functions obtained by a CRN for a NN with the leaky ReLU (the first and second panels) and a
+CRN for a NN with the smooth ReLU (the third and fourth panels). D. The time evolutions of the
+weight and the output obtained by a CRN for a NN with the leaky ReLU (the first and second pan-
+els) and a CRN for a NN with the smooth ReLU (the third and fourth panels). E. The derivatives
+of the activation functions with noise and without noise. The first two panels are derivatives of the
+leaky ReLU and the others are the derivatives of the smooth ReLU. See Table 4 in Supplementary
+material for the parameters used for these simulations.
+20
+
+
+We built two CRNs implementing NNs whose activation functions are the leaky ReLU and
+the smooth ReLU with h = 4, respectively. To build a NN equipped with the leaky ReLU, we
+also used the CRNs for the arithematic operations proposed in [7]. In contrast to the approach in
+[19], where clock proteins were used to achieve the leaky ReLU function, we opted for using built-
+in characteristic functions for simplicity. This means that the leaky ReLU is computed without
+involving chemical species in this paper.
+For this comparison, we used MNIST data sets. The rate constants in backward CRNs fluctuate
+with the independent noise described in (18) (Figure 7 A). We chose t0 = 0.05 and t1 = 0.005. To
+realize intrinsic noise, we also added the same independent noise to the nodes in the hidden and
+the output layers on each interval [kt0, kt0 + t1) for k = 0, 1, . . . ,.
+Figure 7 C and D displayed the fluctuation of the error and the accuracy functions. Due to
+noise, a long simulation may end up blow-up. Hence, to avoid blow-up, we ran both CRNs until
+time 50 × 2000, which is equivalent to 2000 iterations with randomly changed inputs. We set the
+noise size ϵ = 0.01. The training error, validation error and accuracy displayed higher fluctuations
+in the NN with the leaky ReLU. Furthermore, we compare the time evolution of the species w2
+11(t)
+and y1(t) for the two CRNs under the noisy rate constants to those without noise (Figure 7 C and
+D middle). We use a single input and run both CRNs for [0, 50), which is an enough time for
+convergence for both CRNs. The time trajectories of those species in the CRN implementing the
+leaky ReLU fluctuate more than the trajectories of the CRN implementing the smooth ReLU. For
+these plots, we used a noise size ϵ = 0.1 to clearly visualize the differences in dynamics.
+In Figure 9, we provided additional comparisons of the time evolutions of the error to support
+the noise-robustness of our CRN.
+5.3
+Sensitivity to noise level and the running time
+We here examined how the performance of the CRNs implementing a NN changes with different
+noise levels and the running time for each iteration. We found that a NN with the leaky ReLU is
+more sensitive to the noise level and the running time than a NN with the smooth ReLU. For both
+CRNs the train error function oscillates due to noise (Figure 7), and hence to clear comparison we
+use an average train error defined as
+1
+10
+9
+X
+i=0
+E((K −i)t),
+rather than the train error at a single time point KT. Recall that T is the running time of a single
+iteration and the K is the total number of iterations.
+The same noise as in (18) was added to each the rate constants of the backward CRN (Sb, Cb, Rb, Kb)
+and species Xℓ
+i ’s of the forward CRN (Sf, Cf, Rf, Kf) for both the CRNs implementing NNs with
+the leaky ReLU and the smooth ReLU. We chose ϵ ∈{0, 0.02, 0.04, . . . , 0.1, 0.12}. The MNIST
+data set was employed for this test. For each ϵ, the running time for each iteration is 50. We
+measured the training error and the validation error by four independent experiments. To avoid po-
+tential blow-up especially for the case of a high noise level, we iterated the CRNs only 200 times.
+The running time T for each iteration is 50. Figure 8 shows that the NN with the smooth ReLU is
+much more robust to different noise levels that the NN with the leaky ReLU.
+21
+
+
+We used non-linear regression data fitting to test sensitivity to noise levels. We used training
+data points {(xi, sin(xi))}13
+i=1 for xi ∈[0, π) to fit the sine curve using CRNs implementing NNs
+with leaky ReLU and smooth ReLU, respectively. The four independent training errors demon-
+strate the robustness of the CRN implementing the smooth ReLU (Figure 8). We used 1300 itera-
+tions, with each iteration taking 50 units of running time. Due to the small number of data points,
+we did not separately use validation data points.
+Next, we tested the robustness to the choice of the running time for each iteration. In the
+absence of noise, it is obvious that the accuracy increases as the running time increases, since the
+species of the CRNs have enough time to converge to their steady state. However, when noise
+exists, the accuracy may suffer from a long running time as the effect of noise can accumulate over
+time. Since users, especially wet lab experimentalists, might not know the optimal running time
+in advance, it is crucial to develop a CRN that is robust to running time variations. By varying the
+running times, we measured the training error and the validation error of the CRNs implementing
+NNs with the leaky ReLU and the smooth ReLU for MINST data sets. Figure 8 C shows that the
+CRN for the smooth ReLU is much more robust to the running time than the CRN for the leaky
+ReLU. We used 200 iterations. As previously, we also used the sine curve regression to compare
+two CRNs, and the error turned out less sensitive for the case of the smooth ReLU (Figure 8 D). In
+this experiment, 1300 iterations was used. The training error for the CRN calculating the smooth
+ReLU is more robust than that of the CRN calculating the leaky ReLU, while the training error is
+relatively high with the running time of 10.
+5.4
+Tuning the smoothing parameter to enhance robustness
+The value of h in the smooth ReLU function affects the change in slope around the origin. When h
+is large, the activation function and its derivative are less affected by noise. We tested the accuracy
+of the proposed CRN for implementing a neural network to classify MNIST datasets (see Figure
+8 D). The training error fluctuates less for higher values of h. However, this comes at the cost of
+slower convergence, as the function’s less dramatic changes near the origin can limit its activation
+power. Due to its reduced activation for larger h values, the smooth ReLU may struggle to adapt
+to significant input changes, even without noise. As demonstrated in Figure S, the smooth ReLU
+with h = 1 outperformed h = 4 on the MNIST data. Therefore, when dealing with potentially
+dramatic input variations, carefully adjusting h can be needed for a better performance.
+Remark 5.1. While adjusting the leaky ReLU’s slopes can theoretically enhance smoothness, this
+approach is overly drastic. Altering α and β in (4) uniformly impacts the behavior of the function
+on all large |x|, potentially hindering activation and performance (Figure 11). In contrast, the
+smooth asymptotic slopes of ReLU remain consistent for large |x|, ensuring a more balanced and
+effective activation (i.e. limx→∞
+σ(x)
+x
+= 1 and limx→−∞
+σ(x)
+x
+= 0).
+6
+
+---
+
+## Discussion
+
+We have seen that chemical reactions can be used to mimic artificial NNs, but we need better
+methods for dealing with the external and internal noise of these reactions when using them for
+22
+
+
+0
+0.02 0.04 0.06 0.08 0.1
+0.12
+0
+5
+10
+15
+20
+25
+0
+0.02 0.04 0.06 0.08
+0.1
+0.12
+0
+1
+2
+3
+4
+5
+30
+40
+50
+60
+70
+80
+0
+2
+4
+6
+8
+10
+0
+2
+4
+6
+8
+10
+30
+40
+50
+60
+70
+80
+MNIST classification
+Sine curve fitting
+Leaky ReLU
+Smooth ReLU
+Leaky ReLU
+Smooth ReLU
+Running time
+Noise level, ϵ
+0
+0.02 0.04 0.06 0.08 0.1
+0.12
+0
+0.05
+0.1
+0.15
+0.2
+0
+0.02 0.04 0.06 0.08
+0.1
+0.12
+0
+0.05
+0.1
+0.15
+0.2
+10
+30
+50
+70
+90
+0
+0.05
+0.1
+0.15
+0.2
+10
+30
+50
+70
+90
+0
+0.05
+0.1
+0.15
+0.2
+Leaky ReLU
+Smooth ReLU
+Leaky ReLU
+Smooth ReLU
+Running time
+Noise level, ϵ
+Training error
+Validation error
+A 
+B 
+C 
+D 
+D 
+Error, ℎ= 0.05
+Error, ℎ= 4
+Error, ℎ= 0.05
+Error without noise
+Error with noise
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+Time
+Time
+Time
+Figure 8: Sensitivity to the noise level (A and B) and the running time (C and D) of the Leaky
+ReLU and Smooth ReLU measured with the MNIST data set and the sine curve fitting. D. The
+time evolution of the error with the different values of h. See Table 4 in Supplementary material
+for the parameters used for these simulations.
+neural network computing and training. In our research, we proposed that creating smooth ac-
+tivation functions using these chemical reactions could improve the reliability of neural network
+computations.
+We have developed bimolecular CRNs that can compute the gradients of loss functions when
+the activation functions are smooth functions of the nodes. Instead of discrete iterations, the pa-
+rameters are continuously updated, allowing for one-pot computing with the entire CRN. We have
+proved the exponential convergence of the proposed CRN. Simulations have demonstrated that
+our CRN is more robust to noise in the rate parameters and inputs compared to another CRN that
+implements neural networks with non-smooth activation functions.
+Interesting ideas about rate-independent chemical reaction networks for a feed-forward NN
+were introduced suggesting that fine-tuning of the reaction rates is not necessary [25, 27]. This
+means that the fluctuation of the reaction rates does not alter the chemical computations for feed-
+forward NNs leading to a ideal solution for noise-robust biochemical computations. However,
+23
+
+
+this type of biochemical computing can only realize semilinear functions [10, 8, 9]. Hence noise-
+robustness is unclear for the rate-independent chemical reaction networks if the backpropagation,
+which often requires non-linear functions, is also implemented by chemical reactions. Nonetheless,
+there is potential for improvement in robustness by partially employing such rate-independent
+computation. The addition, subtraction, minimum, and maximum functions are realized by rate-
+independent steady states of some CRNs [10]. We can replace some sub-CRNs of our CRN, whose
+steady states are rate-dependent, by the CRNs suggested by [10] to enhance robustness to noise
+within the rate parameters.
+The convergence rate is another aspect that needs improvement. Currently, while the conver-
+gence of the species in the forward and backward CRNs is exponentially fast in time, the conver-
+gence speed can be delayed by many system components such as the reaction rates and the initial
+amounts of the species. In particular, the initial amount of the species can be controlled, but it is
+uncertain which initial conditions can minimize the convergence time. A recently suggested study
+[1] proposed new CRN structures for initial amount-independent convergence. This idea has the
+potential to improve the robustness of the convergence speed of the CRNs used for computing and
+training neural networks.
+The future aim will be to move beyond computer simulations and actually create the proposed
+chemical reaction network in a laboratory setting and within living organisms. To use CRNs to
+carry out deep neural networks effectively, we may need to simplify the structure of the chemical
+reaction network. Currently, the number of reactions and species required to calculate the gradient
+of the smooth activation functions is not small. One potential solution is to use the matrix mul-
+tiplication with DNA suggested in [22]. In our CRN, the matrix multiplication for the weighted
+sum wx + b was computed directly using reactions for the arithmetic operations. However a more
+refined approach for matrix multiplications would be used to reduce the number of reactions.
+
+---
+
+## Introduction
+
+This paper explores the use of chemical reaction networks (CRNs) for implementing neural net-
+works (NNs). In a broad sense, implementing NNs through biological systems represents a form of
+biological computing. Biological computers are designed using biologically derived objects such
+2
+
+
+as DNA and proteins to perform digital computations, which are typically carried out by silicon
+chip-based classical computers. Due to their parallel processing abilities and energy efficiency,
+biological computation has attracted significant interest [13]. Advances in synthesizing specific
+chemical reactions using DNA strands and enzymes have enabled the development of biological
+computers capable of handling more intricate tasks [26].
+Similar to programming languages used in classical computers, chemical reactions can act as
+programming languages in biological computing. Studies conducted both in simulation and in
+laboratory settings have demonstrated that chemical reaction networks (CRNs) can perform com-
+putations similar to those of artificial neural networks [15, 14, 2, 28, 18, 27, 20, 4, 23, 6]. In these
+studies, CRNs were designed to reach a unique stable steady state when the initial concentrations
+of certain chemical species are set as input, effectively producing the same output as neural net-
+works. The dynamics of these chemical species are governed by a system of ordinary differential
+equations (ODEs) of the form ˙x(t) = f(x(t); ˆx), where x(t) represents the concentrations of the
+species over time and ˆx is the input. This process can be viewed as a computing process, where
+setting the initial concentrations of certain species in the CRN to the input ˆx of the neural network
+leads to the concentrations of the other species converging to a specific steady state y(ˆx) as the
+desired output of the neural network.
+While most of the previously designed chemical reaction networks for neural network com-
+putation aimed at performing the feed-forward network, few works focused on the training neural
+network via chemical reactions [5, 4, 19]. In [5], it was shown that a learning algorithm for binary
+logic gates can be realized with chemical reactions that automatically update the weight parameters
+of neural networks based on the accuracy of the outputs. In [4], a chemical reaction network for
+supervised learning was proposed, where the hyperbolic tangent activation function was realized
+via chemical reactions and the networks are trained by a perturbation algorithm. In [19], the au-
+thors considered a NN with the leaky ReLU, a non-smooth activation function. The NN is trained
+via chemical reactions that compute the piecewise derivatives of the leaky ReLU.
+In previous research, activation functions like ReLU, leaky ReLU, and binary activation have
+been popular choices for chemical reaction computing due to their simple engineering. How-
+ever, using these activation functions in chemical reactions may lead to potential issues with noise
+robustness, particularly during backpropagation, as these functions have discontinuities in their
+derivatives. Unlike standard neural networks, chemical reactions can experience random fluctua-
+tions in reaction rate parameters due to changes in temperature, pressure, and other external distur-
+bances. These fluctuations can introduce small perturbations to each node of the neural network.
+If the activation function is non-smooth, these perturbations may amplify errors during backprop-
+agation due to the discontinuities in their derivatives. For example, the derivative σ′(z) of ReLU
+(σ(z) = z for z ≥0 and σ(z) = 0 otherwise) should be 1 when z = 0.01. However, even a small
+noise can change this value to be −0.01, resulting in a derivative of 0, and potentially leading to
+significant errors. While experimental results have validated the accuracy of chemical reactions in
+performing the feed-forward process of neural networks, the use of non-smooth activation func-
+tions raises concerns about noise robustness, especially if the entire neural network computation,
+including backpropagation, is carried out through chemical reactions.
+In a recent study, an interesting concept was proposed that involves using binary expression to
+represent the presence of species in a steady state, which determines the parameters of a neural
+network [27]. This method relies solely on the stoichiometric structures of the chemical reaction
+network, rather than the rate parameters. The study demonstrated that the weights of neural nodes
+3
+
+
+can be set as binary or rational numbers, and these weights are determined by the stoichiometric
+structures, independent of the reaction rates. Therefore, if the training process is also carried out
+using chemical reactions, the stoichiometric structures of the feed-forward network would need to
+be updated by chemical species. However, implementing such procedures in chemical engineering
+is likely to be challenging, and it remains uncertain how this method would perform in the presence
+of noise.
+The main goals of this paper is to provide a design of a chemical reaction network whose asso-
+ciated dynamical system trains a given artificial neural network equipped with smooth activation
+functions. This chemical reaction network is capable of performing full neural network computa-
+tions, including NN parameter training (Figure 1). The reactions take place in a single container,
+allowing for both feed-forward processing and training to occur simultaneously. We have utilized
+the CRN proposed in [2] for the feed-forward part of the NN. Additionally, we developed a new
+CRN specifically for the backpropagation process. This new network plays a crucial role in com-
+puting the derivatives of smooth activation functions. The essential role of this CRN is to compute
+the derivatives of a smooth activation function. The building blocks for our CRN are the chemical
+reactions proposed in [7] that compute basic arithmetic operations such as addition, subtraction,
+multiplication, and division.
+In our research, we conducted case studies using the propose CRNs for the XOR, Iris and
+MNIST datasets, as well as non-linear regression models. Our findings demonstrated that CRNs
+implementing a neural network with smooth activation functions are resilient to noise in the rate
+constants and the species corresponding to nodes. This resilience is also supported by theoreti-
+cal validation. In comparison, we have observed that CRNs implementing non-smooth activation
+functions can result in significant errors with small perturbations in the rate parameters due to
+the discontinuity of the derivatives of the non-smooth activation functions. Additionally, our re-
+search showed that our CRNs are more robust to variations in noise levels and the duration of the
+associated chemical reaction systems.
+𝑥ℓ𝑡= 𝑓𝑥, 𝑡; 𝑤, 𝑏
+𝑤, 𝑏
+𝑥ℓ
+Forward CRN
++
+Backward CRN
+∇𝐿𝑡= 𝑔𝑥, 𝑡; 𝑤, 𝑏
+𝜎′
+𝑥ℓ, 𝑤, 𝑏
+∇𝐿
++
+Update CRN
+𝑤
+𝑤−𝜂∇𝐿↦𝑤
+∇𝐿
+𝑥"
+𝑥# = 𝑦
+𝑦= 𝜙(𝑥; 𝑤, 𝑏)
+∇𝐿(𝑥; 𝑤, 𝑏)
+Update
+Output
+Traditional Neural network
+Neural network via CRNs
+𝑥ℓ"#
+One-pot 
+computing
+𝑥$
+𝑤−𝜂∇𝐿↦𝑤
+Separated
+cycle
+Figure 1: Abstract of our work.
+4
+
+
+2
+The key concepts
+In this paper, we used two different types of networks: chemical reaction networks and neural
+networks. To avoid confusion, we define them more precisely in this section.
+2.1
+Chemical reaction networks
+A chemical reaction network is a graph where the nodes represent complexes composed of com-
+binations of chemical species, and the edges are reactions between complexes. Figure 2 shows an
+example of chemical reaction networks.
+H
+X1 + H
+X2 + H
+2X1 + W
+W
+X1
+X1 + X2
+∅
+k2
+k1
+k3
+k4
+k5
+k6
+k7
+k8
+Figure 2: An example of chemical reaction networks
+A precise mathematical formulation is as follows.
+Definition 2.1. A chemical reaction network is given by finite sets (S, C, R, K) such that
+1. S = {S1, S2, · · · , Sd} is a set of d symbols, called the species of the network,
+2. C is a set of ν = Pd
+i=1 νiSi, a linear combinations of Si’s with (y)i ∈Z≥0 for each i, called
+complexes,
+3. R is a subset of C × C, whose elements (ν, ν′) are typically denoted by ν →ν′,
+4. K is a set of reaction rates {k1, . . . , k|R|}, where each ki is assigned to each reaction.
+νi’s in each complex ν = Pd
+i=1 νiSi are stoichiometric coefficients. The ‘zero’ complex ∅
+represents the external environment so that the birth and death of species are described as ∅→X
+and X →∅, respectively.
+In the case of the chemical systems being spatially well-mixed, the associated dynamics can
+be defined as a system of ODEs on Rd
+≥0, which models the time evolution of the concentrations
+of species in the chemical reaction network. The concentration of each species is modeled with
+x(t) = (x1(t), . . . , xd(t)) that is a solution to
+d
+dtx(t) =
+X
+ν→ν′∈R
+λν→ν′(x(t))ην→ν′.
+(1)
+The stoichiometric vector ην→ν′ gives the net gain of the reaction. For example, for the reaction net-
+work in Figure 2, the stoichiometric vector of 2X1 + W →W is (−2, 0, 0, 0)⊤as the system loses
+two X1 species via this reaction while other species are unchanged. While kinetics-independent
+5
+
+
+chemical reaction computing was suggested [27], our training processes via chemical reactions use
+mass-action,
+λν→ν′(x) = κν→ν′
+Y
+i=1
+xνi
+i ,
+(2)
+for the reaction rate κν→ν′ assigned to ν →ν′.
+To calculate derivatives of the activation function, our chemical computing uses catalytic reac-
+tions. Catalytic reactions are known to be required to compute non-linear functions [21]. For the
+sake of clarity, we define two classes of species as suggested in [2].
+Definition 2.2. For a reaction network (S, C, R, K), we define two mutually disjoint sets Sc and
+Sd such that
+1. S = Sc
+S Sd,
+2. for each Si ∈Sc, the i the component of each stoichiometric vector is zero, i.e. we have
+(ην→ν′)i = 0 for any ν →ν′ ∈R.
+We call species in Sc catalytic species and call species in Sd dynamics species.
+For example, in the reaction network (2), Sc = {W, H} and Sd = {X1, X2}. Note that the
+concentrations of catalytic species remain unchanged unlike dynamic species.
+Remark 2.1. The role of species in the CRN for the full neural network is interchangeable. The
+CRN consists of three sub-networks: (Sf, Cf, Rf, Kf), (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) im-
+plement the feed-forward neural network, the backpropagation, and updating the neural network
+parameters, respectively. In (Sf, Cf, Rf, Kf), we use the concentrations of the catalytic species
+for either the inputs or the parameters of the feed-forward neural network computation [2]. How-
+ever, in (Su, Cu, Ru, Ku), the species that were catalytic in the feed-forward sub-network become
+dynamic species, allowing the parameters in the feed-forward part to be updated for training the
+neural network.
+2.2
+Artificial neural networks
+In mathematical terms, a NN is a combination of a weighted sum, where each weighted sum is
+connected to an activation function. The feed-forward part of the NN computes the composition
+of activation functions with the weighted sum. Common activation functions include sigmoidal
+functions, hyperbolic tangent, and ReLU functions. This paper primarily uses the smoothed ReLU
+function as an activation function, which is defined as
+σ(z) = z +
+√
+z2 + 4h
+2
+,
+(3)
+where h determines the smoothness of σ(x) around x = 0 (Figure 3 A). Note that if h = 0, then σ
+is the standard ReLU function.
+The backpropagation process involves updating the weights of the feedforward part by using
+the gradient of the loss function with respect to the weights, based on the chain rule [24]. One of
+6
+
+
+the main results of this paper is the development of a CRN that implements the backpropagation
+algorithm for a NN with the smooth ReLU activation function. We will compare the performance
+of our CRN with the CRN that implements the backpropagation algorithm for a NN with the leaky
+ReLU activation function (Figure 3 B), defined as
+σLeaky(z) =
+(
+αz
+if z ≥0
+βz
+if z < 0,
+(4)
+where 0 < β ≪1. This activation function was utilized in [19] for training a NN via CRNs.
+We will start by providing precise notations for NNs used to explicitly describe the CRNs
+carrying out NNs in the later sections. Let G = (V, D) denote a NN, where V and D are the
+set of nodes and edges in the neural network, respectively. The concepts for feed-forward neural
+networks are illustrated below. Please refer to Figure 3 C for a graphical representation.
+1. The first and the last layers referred to as the input and output layers, respectively.Any layers
+in between are called hidden layers.
+2. The value assigned to the i th node (neuron) on the ℓth layer is denoted by xℓ
+i.
+3. The number of the nodes on the ℓth layer is denoted by M ℓ, which represents the width of
+the ℓth layer.
+4. We sometimes use a vector xℓ= (xℓ
+1, . . . , xℓ
+Mℓ) ∈RMℓ.
+5. The function σ : R →R denotes the activation function. Abusing a notation, we define a
+multi-variable function σ : Rm →Rm for m such that the i th component of σ(z) ∈Rm is
+σ(zi) ∈R for a z ∈Rm.
+6. Let wℓ∈RMℓ+1×Mℓdenote the weight matrix and let bℓ∈RMℓ+1 denote the bias vector.
+Then we define zℓ= wℓxℓ+bℓ∈RMℓ+1 and xℓ+1 = σ(zℓ) ∈RMℓ+1 for ℓ∈{0, 1, . . . , L−1},
+where σ(zℓ)i = σ(zℓ
+i) for i ∈{1, 2, . . . , M ℓ+1}.
+7. The elements of wℓand bℓare denoted by wℓ
+ij and bℓ
+i.
+8. The values x1
+i and xL
+i assigned to the i th node in the input layer V 1 and the output layer V L
+are specially denoted by ˆxi for i ∈{1, . . . , M 1} and yi for i ∈{1, . . . , M L}, respectively.
+Hence x1 = ˆx ∈RM1 and xL = y ∈RML.
+If we let xℓ+1 = ψℓ+1(xℓ) := σ(zℓ) for ℓ= 0, 1, . . . , L −1, the output of the neural network is
+simply written as
+y = ψL ◦ψL−1 ◦· · · ◦ψ3 ◦ψ2(a).
+For a given feed-forward neural network (V, D) with the input ˆx ∈RM1 and the output y ∈RML,
+for instance, a CRN (S, C, R, K) can be constructed so that the associated deterministic model
+x(t) = (xd(t), xe(t)) such that
+d
+dt
+
+xd(t)
+xc(t)
+!
+= f(xd(t), xc(t))
+satisfies lim
+t→∞xd(t) = y with xc(0) = ˆx, where xd and xc represent the concentrations of the
+dynamical and the catalytic species, respectively.
+7
+
+
+Smooth Relu
+Leaky Relu
+-10
+-5
+0
+5
+10
+0
+6
+12
+ℎ= 0.1
+ℎ= 0.5
+0
+10
+-10
+-5
+0
+5
+10
+𝑧
+5
+ℎ= 1
+ℎ= 3
+𝑧
+𝑥!
+"
+𝑥#
+"
+𝑥$
+"
+𝑥%
+"
+𝑥!
+!
+𝑥#
+!
+𝑥$
+!
+𝑥!
+#
+𝑥#
+#
+𝑥$
+#
+𝑥!
+$
+𝑥#
+$
+𝑥$
+$
+𝑥%
+$
+𝑤!, 𝑏!
+𝑤", 𝑏"
+𝑤#, 𝑏#
+𝑧ℓ= 𝑤ℓ𝑥ℓ+ 𝑏ℓ
+𝑥ℓ%" = 𝜎(𝑧ℓ)
+Neural network
+A
+B
+C
+Figure 3: A. The graph of the smooth ReLU with different smoothing parameters h. B. The graph
+of the leaky ReLU. C. An example of neural networks.
+2.2.1
+Gradient of the loss function and derivatives of smooth activation functions.
+Training NNs is a procedure to find a weight matrix and a bias vector that minimize the error of the
+feed-forward neural network. The error can be measured using a loss function. Throughout this
+manuscript, we define the loss function defined as L(y) = |y −ˆy|2, where y ∈RML is the output
+of the neural network and ˆy ∈RML is the output of the training data sets.
+When minimization is performed with the (stochastic) gradient descent algorithms, the main
+task is to compute the partial derivatives of the loss function L(y) = |y −ˆy|2 with respect to the
+parameters of the neural network wℓ
+ij’s and bℓ
+i’s. Backpropagation is typically initiated from the
+output layer ℓ= L. For suitable indices i and j we have that
+∂L
+∂xL
+i
+= ∂L
+∂yi
+= 2(yi −ˆyi),
+∂L
+∂zℓ
+i
+=
+X
+j
+∂L
+∂xℓ+1
+j
+∂xℓ+1
+j
+∂zℓ
+i
+and
+∂L
+∂xℓ
+i
+=
+X
+j
+∂L
+∂zℓ
+j
+∂zℓ
+j
+∂xℓ
+i
+=
+X
+j
+∂L
+∂zℓ
+j
+wℓ
+ji,
+(5)
+for ℓ∈{1, ..., L −1}. Then gradients of L can be recursively written as
+∇xℓL =
+
+W ℓT 
+∇xℓ+1L ⊙∇zℓxℓ+1
+=
+
+W ℓT
+(∇zℓL) ,
+(6)
+∇wℓL =
+
+∇xℓ+1L ⊙∇zℓxℓ+1 
+xℓT
+= (∇zℓL)
+
+xℓT
+,
+(7)
+∇bℓL =
+
+∇xℓ+1L ⊙∇zℓxℓ+1
+= ∇zℓL,
+(8)
+where ∇zℓxℓ+1 is a vector whose j th component is ∂σ(zℓ)j
+∂zℓ
+j
+, and ⊙is the Hadamard product [16],
+which stands for term-wise multiplication. Regarding the recursive relation (6)–(8), the key term
+of the backpropagation is ∇zℓxℓ+1 for each ℓ.
+8
+
+
+The derivative of the smoothed ReLU function σ(z) = z+
+√
+z2+4h
+2
+is
+σ′(z) = z +
+√
+z2 + 4h
+2
+√
+z2 + 4h
+= σ(z)2
+1
+√
+z2 + 4h
+2
+z +
+√
+z2 + 4h =
+σ(z)2
+σ(z)2 + h.
+(9)
+Then if xℓ+1
+j
+= σ(zℓ
+j) for each ℓand j, then
+∇zℓxℓ+1 =
+
+(xℓ+1
+1
+)2
+(xℓ+1
+1
+)2 + h, . . . ,
+(xℓ+1
+Mℓ)2
+(xℓ+1
+Mℓ)2 + h
+!
+Remarkably, these derivatives can be simply computed by addition and division of the nodes xℓ
+i’s
+that are computed in the feed-forward part of a NN.
+3
+CRNs for training
+In this section, we will discuss the construction of Chemical Reaction Networks (CRNs) used for
+computing the gradients of the loss function L(y) = |y −ˆy|2 and for updating the parameters
+accordingly. The CRNs responsible for computing gradients will be referred to as the ”backward
+CRN,” and those responsible for updating parameters as the ”update CRN.” We will denote the
+backward CRN and the update CRN by (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku), respectively. For the
+complete neural network computation, we will utilize the CRN provided in [2], which implements
+a feed-forward NN with the smooth ReLU function. This CRN will be referred to as the ”forward
+CRN” and will be denoted by (Sf, Cf, Rf, Kf). To maintain consistency, we will use capital letters
+to represent species and small letters to denote their concentrations. For example, the species
+corresponding to a node xℓi will be denoted by Xℓ
+i , and its concentration at time t will be denoted
+by xℓ
+i(t).
+3.1
+Backward CRN
+The derivative σ′ is the key term to calculate the loss function gradient. When smooth ReLU is
+used, the values in the nodes are positive as xℓ= σ(zℓ−1). Hence, for the derivative of the smooth
+ReLU given in (9), we employ the CRNs to calculate the addition and division of positive real
+numbers suggested in [7] without introducing dual rails.
+Let Xℓ
+i ∈Sf be the species corresponding to node xℓ
+i in the feed-forward network. Using this
+as an input, the CRN for computing ∂xℓ
+i
+∂zℓ−1
+i
+= σ′(zℓ−1
+i
+) is
+2Xℓ
+i
+κ1
+−→2Xℓ
+i + DXℓ
+i ,
+DXℓ
+i + Aℓ
+i
+κ2
+−→Aℓ
+i
+Aℓ
+i
+κ3
+−→∅,
+2Xℓ
+i
+κ4
+−→2Xℓ
+i + Aℓ
+i,
+H
+κ5
+−→H + Aℓ
+i.
+(10)
+If we set rate constants as κ5κ2
+κ3
+= κ4κ2
+κ3
+= κ1, then the concentration of DXℓ
+i , which repre-
+sents the derivative
+∂xℓ
+i
+∂zℓ−1
+i
+= σ′(zℓ−1
+i
+), convergences to
+(xℓ
+i)2
+(xℓ
+i)2 + h.
+That is, lim
+t→∞dxℓ+1
+i
+(t) =
+9
+
+
+lim
+t→∞
+(xℓ
+i)2(t)
+(xℓ
+i)2 + h =
+(xℓ
+i)2
+(xℓ
+i)2 + h. Aℓis a species computing the summation (xℓ
+i)2 + h, and species
+H used in (Sf, Cf, Rf, Kf) corresponds to the smoothness parameter h in (3).
+By multiplying and summing these derivative terms with wℓ
+ij and bℓ
+i’s, the gradients of L can be
+computed recursively from ℓ= L to ℓ= 1 as described in Section 2.2.1. Hence the full backward
+network consists of further sub-CRNs that compute multiplication and addition, and the W ℓ,±
+ij
+and
+Bℓ,±
+i
+species are used. It’s important to note that the weights and biases can be negative, so we use
+the dual rails W ℓ,±
+ij
+and Bℓ,±
+i
+to ensure that the differences of two non-negative values wℓ,+
+ij −wℓ,−
+ij
+and bℓ,+
+i
+−bℓ,−
+i
+can represent negative values. The terms such as ∂L
+∂xℓ
+i
+and ∂L
+∂wℓ
+ij
+that are computed
+with wℓ,±
+ij
+and bℓ,±
+i
+’s are also realized with dual rails. For example, for a simple two-layered NN
+illustrated in Figure 4, to compute ∂L
+∂x1
+1
+= ∂L
+∂z1
+1
+w1
+11, we use
+LX1,+
+1
+κ6
+−→∅,
+LZ1
+1 + W 1,+
+11
+κ7
+−→LZ1
+1 + W 1,+
+11 + LX1,+
+1
+LX1,−
+1
+κ8
+−→∅,
+LZ1
+1 + W 1,−
+11
+κ9
+−→LZ1
+1 + W 1,−
+11 + LX1,−
+1
+.
+If κi = 1 for i = 6, 7, 8, 9, then lim
+t→∞
+
+lx1,+
+1 (t) −lx1,−
+1 (t)
+
+= lim
+t→∞lz1
+1(t)(w1,+
+1
+(t) −w1,−
+1
+(t)) =
+∂L
+∂z1
+1
+w1
+1.
+To show an example of the full construction, we provide the list of reactions in (Sb, Cb, Rb, Kb)
+and (Su, Cu, Ru, Ku) for a simple two-layered NN in Section 3.4. We further visualize the archi-
+tecture of (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) in Figure 4.
+Remark 3.1. he arrows going into and out from a green box in Figure 4 represent the catalyst-
+product relation. In other words, the species at the incoming arrows act as the catalyst species,
+while the species at the outgoing arrow are the dynamic species. These arrows in the backward
+CRN are always one-sided, and this also applies to the forward CRN [2]. Essentially, this means
+that the combination of the forward and backward networks has a ’feedback-free’ structure. Specif-
+ically, if species S1 acts as the catalyst to produce S2, then S2 never serves as a catalyst to produce
+S1. This plays a crucial role in the convergence of the forward and backward networks, as well as
+in the noise analysis (See Section 3.3 and Section 5.1).
+In contrast, the update network gives a feedback loop to the forward network. We will slow
+down these feedback reactions to prevent disruption of the forward and backward CRNs (See
+Section 3.2).
+3.2
+Update network
+We continuously update the weights using the gradient of the loss function, rather than using
+the usual iterative update. Let W ℓ,+
+ij
+and W ℓ,−
+ij
+be species corresponding to the weight wℓ
+ij =
+wℓ,+
+ij
+−wℓ,−
+ij
+in the forward CRN (Sf, Cf, Rf, Kf). Then we build the update network using the
+following reactions
+LW ℓ,−
+ij
+η−→LW ℓ,−
+ij
++ W ℓ,+
+ij ,
+LW ℓ,+
+ij
+η−→LW ℓ,+
+ij
++ W ℓ,−
+ij ,
+(11)
+10
+
+
+𝑥!
+𝑥"
+"
+𝑥#
+"
+𝑥#
+= 𝑦
+𝑤""
+!,±, 
+𝑏"
+!,±
+𝑤#"
+!,±, 
+   𝑏#
+!,±. 
+𝑤""
+",±, 
+𝑏"
+",±
+𝑤"#
+",±, 
+𝑏"
+",±
+!!"
+!#" =
+"!!
+"
+"#!
+"
+𝑥# +
+$!"
+$#"
+𝑧!
+! = 𝑤!!
+! , 𝑤!"
+!
+𝑥!
+!
+𝑥"
+!
++ 𝑏!
+!
+𝑦$ 
+−
+×
++
+÷
+∇!!𝑦
+×
+∇!!𝐿
++
+÷
+∇!"𝑥%
+×
+×
+∇"!𝐿
+∇&!𝐿
+×
+∇!"𝐿
+×
+∇""𝐿
+∇'𝐿
+𝑤%
+𝑤#
+Forward CRN
+(𝒮#, 𝒞#, ℛ#, 𝒦#)
+backward CRN
+(𝒮$, 𝒞$, ℛ$, 𝒦$)
+Training data
+update CRN
+(𝒮%, 𝒞%, ℛ%, 𝒦%)
+backward CRN
+(𝒮$, 𝒞$, ℛ$, 𝒦$)
+Figure 4: Overall structure of the CRN implementing the backpropagation of a two-layered NN.
+The green boxes indicate a CRN that calculates the designated arithmetic operations. Each green
+box has two input species indicated by the incoming arrows. The outgoing arrows indicate the
+output species. The full lists of reactions for the backward and the update CRNs are provided in
+Section 3.4.
+where LW ℓ,±
+ij
+are the species that compute the gradient in the backward network (Sb, Cb, Rb, Kb)
+as
+lim
+t→∞
+
+lwℓ,+
+ij (t) −lwℓ,−
+ij (t)
+
+= ∂L
+∂wℓ
+ij
+.
+We have that from (11)
+d
+dt(wℓ,+
+ij −wℓ,+
+ij ) = −η
+
+lwℓ,+
+ij (t) −lwℓ,−
+ij (t)
+
+,
+(12)
+leading to the continuous update of wℓ
+ij with the drift given by lwℓ,+
+ij
+and lwℓ,−
+ij . This continuous
+update indeed mimics the usual iterative update in the following sense. The continuous update (12)
+yields that
+wℓ
+ij(T) = wℓ,+
+ij (T) −wℓ,−
+ij (T) =
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−η
+Z T
+0
+(lwℓ,+
+ij (s) −lwℓ,−
+ij (s))ds,
+(13)
+In Appendix A, we show that the species in the backward CRN including LW ℓ,±
+ij ’s converge ex-
+ponentially quickly to the steady state. Therefore for a large T and for a sufficiently small η, (13)
+11
+
+
+can be approximated as
+wℓ
+ij(T) = wℓ,+
+ij (T) −wℓ,−
+ij (T) ≈
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−ηT lim
+t→∞(lwℓ,+
+ij (T) −lwℓ,−
+ij (T))
+=
+
+wℓ,+
+ij (0) −wℓ,−
+ij (0)
+
+−ηT ∂L
+∂wℓ
+ij
+.
+(14)
+(14) is equivalent to updating the parameters using the iterative update in the gradient descent
+scheme with the learning rate ηT.
+Similarly, we can update species Bℓ,+
+ij
+and Bℓ,−
+ij
+that represent the bias parameter bℓ
+ij using a
+species, namely LZℓ
+i , corresponding to
+∂L
+∂zℓ
+i =
+∂L
+∂bℓ
+i . In Section 3.3, the convergence of the full
+CRN and the update of the parameters in the manner of a one-pot computation are more precisely
+described.
+3.3
+One-pot computing and convergence
+The proposed CRN implements both the feed-forward and the training processes of a neural net-
+work in a single pot. This means that all reactions occur simultaneously without engineered circuits
+or oscillations that are used to run the forward and trainning parts separately. The previously pro-
+posed CRNs for trainning NNs use oscillatory clock-proteins to sequentially regulate reactions
+[5, 19] for interactive updates of the weights and biases of NNs. The main task of performing
+one-pot computing was to design the update network introduced in Section 3.2. This is because
+as the species in the update CRN gradually change, the convergence of the species in the forward
+and backward CRNs holds even when their reactions take place simultaneously. In this section, we
+will validate this.
+Although it is difficult to thoroughly validate the convergence of the one-pot computation, we
+can show the convergence of the leading-order term of the species using a perturbation analysis
+regarding η in (11) as a scaling parameter. We consider the system of differential equations for
+xℓ
+i, wℓ,±
+ij
+and bℓ,±
+i
+’s as a perturbed system by the updated network with the perturbation parameter
+η.
+To consider perturbed solutions, for t on a compact time interval [0, T], we decompose the
+concentrations of the species as
+xℓ
+i(t) = xℓ
+i,0(t) + ηxℓ
+i,1(t) + O(η2),
+wℓ,±
+ij (t) = wℓ,±
+ij,0(t) + ηwℓ,±
+ij,1(t) + O(η2), and
+bℓ,±
+i
+(t) = bℓ,±
+i,0 (t) + ηbℓ,±
+i,1 (t) + O(η2).
+Note that the concentration xℓ
+i(t) of the species corresponding to a node follows a differential equa-
+tion of the form d
+dtxℓ
+i(t) = f ℓ
+i (x, w+, w−, b+, b−) for some function f ℓ
+i , where x and b± denote
+matrices whose ℓi components are xℓ
+i and bℓ
+i, and the ℓij component of w± is wℓ,±
+ij , respectively.
+We similarly denote by xk and b±
+k the matrices whose ℓi components are xℓ
+i,0 and bℓ
+i,k, and we let
+the ℓij component of w±0 be wℓ,±
+ij,k, respectively, for k = 1, 2. Importantly, due to smoothness, f ℓ
+i
+can also be decomposed with the Talyor expansion as
+d
+dtxℓ
+i(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) + ∇f ℓ
+i ((x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )) · ∆+ O(η2)
+= f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) + η∇f ℓ
+i ((x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) · (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2),
+12
+
+
+= 0
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ0 , 𝑤!#
+ℓ0 )
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Quick convergence
+Slow evolution 
+with −𝜂∇!ℓℒ
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ0 , 𝑤!#
+ℓ0 )
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Noise of size 𝜖will alter the convergence by order of 
+𝑂𝜖
+= 0
+𝑥!
+ℓ
+𝑤!#
+ℓ
+(𝑥!
+ℓ𝑇, 𝑤!#
+ℓ𝑇)
+Quick convergence
+Slow evolution 
+with −𝜂∇!ℓℒ
+(𝑥!
+ℓ2𝑇, 𝑤!#
+ℓ2𝑇)
+Randomly change the input 𝑥(
+New differential equation with the new input
+A
+B
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+0                 50               100              150              200 
+Time
+𝑦)(𝑡)
+𝑤))
+) (𝑡)
+𝐷𝑌*(𝑡)
+𝐷𝑋+
+)(𝑡)
+C
+𝑂𝜖
+Figure 5: A and B. A schematic description of the convergence of the backward and the update
+networks without noise (A) and with noise (B). C. The time evolutions of the species. The vertical
+dotted lines indicate the times when the input of the NN is changed randomly. In particular, the
+concentration w1
+11(t) of the species W 1
+11 corresponding to a weight parameter evolves slowly.
+where ∆= (x, w+, w−, b+, b−)⊤−(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤= η(x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+O(η2).
+Note that the differential equations for species W ℓ,±
+ij
+and Bℓ,±
+i
+are evolving with catalysts LW ℓ,±
+ij
+and LBℓ,±
+i
+as shown in (11), where LW ℓ,±
+ij
+and LBℓ,±
+i
+correspond to the derivatives ∂L
+∂wℓ
+ij
+and ∂L
+∂bℓ
+i
+.
+These are represented as summation, product, and division (with strictly positive denominators)
+of xℓ
+i, wℓ,±
+ij
+and bℓ,±
+i
+by the backward CRN (Section 3.1). Hence we can view wℓ,±
+ij
+and bℓ,±
+i
+as the
+solutions of
+d
+dtwℓ,±
+ij (t) = −η × lwℓ,∓
+ij (t) := ηgℓ,±
+ij (x, w+, w−, b+, b−)
+d
+dtbℓ,±
+i
+(t) = −η × lzℓ,∓
+i
+(t) := ηqℓ,±
+i
+(x, w+, w−, b+, b−),
+where the functions gℓ,±
+ij
+and qℓ,±
+i
+are smooth with respect to x, w+, w−, b+, and b−. Then by the
+Taylor expansion we get that
+d
+dtwℓ,±
+ij (t) = η
+
+gℓ,±
+ij (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤+ η∇gℓ,±
+ij
+· (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2)
+
+d
+dtbℓ,±
+i
+(t) = η
+
+qℓ,±
+i
+(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 )⊤+ η∇qℓ,±
+i
+· (x1, w+
+1 , w−
+1 , b+
+1 , b−
+1 )⊤+ O(η2)
+ (15)
+13
+
+
+By matching the orders with respect to η, we have
+d
+dtxℓ
+i,0(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ),
+d
+dtwℓ,±
+ij,0(t) = 0, and
+d
+dtbℓ,±
+i,0 (t) = 0,
+and hence the leading order term xℓ
+i,0(t) follows the dynamics governed by f ℓ
+i while the leading
+order term wℓ,±
+ij,0 and bℓ,±
+i,0 are fixed at the initial condition. Furthermore, the convergence speed of
+the system
+d
+dtxℓ
+i,0(t) = f ℓ
+i (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) is exponential in time (Appendix A). Therefore
+xℓ
+i,0(T) will closely approximate its steady state for a large T. After this convergence is approx-
+imately made, the dynamics of the system can be demonstrated with the evolution of the second
+leading terms of order η. Matching the order in (15), we find that wℓ,±
+ij,1 and bℓ,±
+i,1 follow
+d
+dtwℓ,±
+ij,1 = gℓ,∓
+ij (x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) ≈
+∂L
+∂wℓ,±
+ij
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+d
+dtbℓ,±
+i,1 = qℓ,∓
+i
+(x0, w+
+0 , w−
+0 , b+
+0 , b−
+0 ) ≈∂L
+∂bℓ,±
+i
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+where x0(∞) := limt→∞x0. In this approximation, we used the exponentially quick convergence
+of xℓ
+i’s. Hence, we get the desired gradient descent as
+wℓ,±
+ij (T) ≈wℓ,±
+ij,0(0) + ηT ∂L
+∂wℓ,±
+ij
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)),
+bℓ,±
+i
+≈bℓ,±
+i,0 (0) + ηT ∂L
+∂bℓ,±
+i
+(x0(∞), w+
+0 (0), w−
+0 (0), b+
+0 (0), b−
+0 (0)).
+(16)
+This process is repeated with random changes of the inputs ˆx. The convergence of the backward
+and the update network is schematically described in Figure 5 A. We also provided schematic the
+convergence when noise of reaction rate constants exists in Figure 5 B. The time evolutions of
+species in our CRN implementing a NN are displayed in Figures 5 C.
+3.4
+An example of the the backward and the update network
+Here we provide a complete list of reactions in (Sb, Cb, Rb, Kb) and (Su, Cu, Ru, Ku) to implement
+the backward network of a simple two-layered NN described in Figure 4.
+In Table 1, w presents the CRN that calculates the derivative of L with respect to the output
+layer parameters. The concentration of a species is denoted by lowercase letters. Unless specified,
+the rate parameters are assumed to be 1 and are omitted. Note that we do not need to compute
+∂L
+∂b1
+1 separately as it is equal to
+∂L
+∂z1
+1 . The CRN that computes the derivative of L with respect
+to the parameters of the first layer is shown in Table 2. Similarly, we do not need to compute
+∂L
+∂b0
+i separately as it is equal to
+∂L
+∂z0
+i for each i = 1, 2. The overall architecture of the backward
+network is illustrated in Figure 4. Finally, we provide reactions in the update CRN in Table 3. The
+construction of the forward network follows the previous work [2].
+14
+
+
+sub-CRNs to compute ∇w1L and ∇b1L
+Goal
+2Y →2Y + DY,
+DY + A2 →A2
+A2 →∅,
+2Y →2Y + A2,
+H →H + A2
+lim
+t→∞dy(t) =
+y2
+y2 + h = ∂y
+∂z1
+1
+Y
+2−→LY + Y,
+ˆY
+2−→LY + ˆY ,
+LY →∅
+lim
+t→∞ly(t) = 2(y −ˆy) = ∂L
+∂y
+LZ1
+1 →∅,
+LY + DY →LY + DY + LZ0
+1
+lim
+t→∞lz1
+1(t) = 2(y −ˆy) ∂y
+∂z1
+1
+= ∂L
+∂z1
+1
+LW 1
+11 →∅,
+LZ1
+1 + X1
+1 →LZ1
+1 + X1
+1 + LW 0
+11
+LW 1
+12 →∅,
+LZ1
+1 + X1
+2 →LZ1
+1 + X1
+2 + LW 0
+12
+lim
+t→∞lw1
+11(t) = ∂L
+∂z1
+1
+∂z1
+1
+∂w1
+11
+= ∂L
+∂w1
+11
+lim
+t→∞lw1
+12(t) = ∂L
+∂z1
+1
+∂z1
+1
+∂w1
+12
+= ∂L
+∂w1
+12
+Table 1: An example of a sub-CRN in (Sb, Cb, Rb, Kb) that computes ∇w1L and ∇b1L.
+sub-CRNs to compute ∇w0L and ∇b0L
+Goal
+2X1
+1 →2X1
+1 + DX1
+1,
+DX1
+1 + A1
+1 →A1
+1
+A1
+1 →∅,
+2X1
+1 →2X1
+1 + A1
+1,
+H →H + A1
+1
+lim
+t→∞dx1
+1(t) =
+(x1
+1)2
+(x1
+1)2 + h = ∂x1
+1
+∂z0
+1
+LX1,±
+1
+→∅,
+LZ1
+1 + W 1,±
+11
+→LZ1
+1 + W 1,±
+11 + LX1,±
+1
+lim
+t→∞(lx1,+
+1 (t) −lx1,−
+1 (t)) = ∂L
+∂x1
+1
+LZ0,±
+1
+→∅,
+LX1,±
+1
++ DX1
+1 →LX1,±
+1
++ DX1
+1 + LZ0,±
+1
+lim
+t→∞(lz0,+
+1
+(t) −lz0,−
+1
+(t)) = ∂L
+∂z0
+1
+LW 0,±
+11
+→∅,
+LZ0,±
+1
++ X0 →LZ0,±
+1
++ X0 + LW 0,±
+11
+lim
+t→∞(lw0,+
+11 (t) −lw0,−
+11 (t)) = ∂L
+∂w0
+11
+2X1
+2 →2X1
+2 + DX1
+2,
+DX1
+2 + A1
+2 →A1
+2
+A1
+2 →∅,
+2X1
+2 →2X1
+2 + A1
+2,
+H →H + A1
+2
+lim
+t→∞dx1
+2(t) =
+(x1
+2)2
+(x1
+2)2 + h = ∂x1
+2
+∂z0
+2
+LX1,±
+2
+→∅,
+LZ1
+1 + W 1,±
+12
+→LZ1
+1 + W 1,±
+12 + LX1,±
+2
+lim
+t→∞(lx1,+
+2 (t) −lx1,−
+2 (t)) = ∂L
+∂x1
+2
+LZ0,±
+2
+→∅,
+LX1,±
+2
++ DX1
+2 →LX1,±
+2
++ DX1
+2 + LZ0,±
+2
+lim
+t→∞(lz0,+
+2
+(t) −lz0,−
+2
+(t)) = ∂L
+∂z0
+2
+LW 0,±
+21
+→∅,
+LZ0,±
+2
++ X0 →LZ0,±
+2
++ X0 + LW 0,±
+21
+lim
+t→∞(lw0,+
+21 (t) −lw0,−
+21 (t)) = ∂L
+∂w0
+21
+Table 2: An example of a sub-CRN in (Sb, Cb, Rb, Kb) that computes ∇w0L and ∇b0L.
+4
+Applications to data sets
+In this section, we applied the complete CRN, which includes the forward, backward, and update
+CRNs, to implement neural networks on various datasets. The forward network used is the same
+as in [2], while the backward and update networks are constructed as proposed in Section 3.1
+and Section 3.2. The datasets used include XOR, Iris, and MNIST, which are typical examples
+of classification problems in machine learning. More detailed descriptions of the datasets are
+provided in Appendix D. For these datasets, we utilized a two-layered neural network consisting
+of the input layer, a single hidden layer, and the output layer, implemented with the proposed
+CRNs. We regard running our CRN over an interval [(k −1)T, kT) for each k as a single iteration.
+After each iteration, we randomly changed the input ˆx. We let the CRN run for [0, KT), where K
+15
+
+
+Update network
+Goal
+LW 1,∓
+11
+η−→LW 1,∓
+11 + W 1,±
+11
+w1
+11 ←[ w1
+11 −ηT
+∂L
+∂w1
+11
+LW 1,∓
+12
+η−→LW 1,∓
+12 + W 1,±
+12
+w1
+12 ←[ w1
+12 −ηT
+∂L
+∂w1
+12
+LW 0,∓
+11
+η−→LW 0,∓
+11 + W 0,±
+11
+w0
+11 ←[ w0
+11 −ηT
+∂L
+∂w0
+11
+LW 0,∓
+21
+η−→LW 0,∓
+21 + W 0,±
+21
+w0
+21 ←[ w0
+21 −ηT
+∂L
+∂w0
+21
+Table 3: An example of (Su, Cu, Ru, Ku)
+means the total number of iterations.
+We used an error rate function to measure the performance of our CRN. Here, the error rate
+E(t) is the average of the mean squared error (MSE) across the entire dataset at time t. More
+precisely,
+E(t) = 1
+N
+N
+X
+n=1
+∥yn(t) −ˆyn∥2
+L2,
+(17)
+where yn(t) = (yn,1(t), . . . , yn,ML(t)) is the vector of the concentration of the species correspond-
+ing to the output layer with n th input data. Importantly when evaluating yn(t), we used the weights
+wℓ
+ij(t)’s and biases bℓ
+i(t) to measure the evolution of the error. ˆyn is the training data for the n th
+input data. Here, N is the number of total data sets. That is, E(t) measures the average error of the
+neural network at time t using the weights and biases that have been updated through the backward
+and the updated CRNs up to time t.
+With four XOR data points, we trained the forward CRN using the backward and update CRNs
+proposed in Section 3.1 and 3.2. We plotted the time evolution of the error and the accuracy of the
+NN implemented by the CRN (Figure 6 A left). The graphs of the fitted functions are displayed in
+Figure 6 A right. For the Iris data sets, we plotted the time evolutions of the error functions and
+the accuracy (Figure 6 B top) and also provided the pair plots (Figure 6 B bottom).
+For MNIST data sets, each input data point is a 8×8 pixel representing an image of a handwrit-
+ten digit. In addition to the error and accuracy functions ((Figure 6 C top), we also displayed the
+classification of the input data points that are embedded in a plane through principal component
+analysis (PCA) (Figure 6 C bottom). The classification by our CRN is nearly the same as the clas-
+sification by a traditional NN. Note that for the Iris and MNIST data sets, we splitted the original
+data sets into training and validation data sets. When ˆyn comes from the training (validation) data
+sets, we call E(t) the training (validation) error.
+For each simulation, all reaction rate constants within the forward and backward CRNs were
+assigned a value of 1, with the exception of those related to division, such as κ1 and κ2 in (10).
+These division-related rate constants were deliberately set to be large to enhance the speed of the
+reactions, as they tend to occur at a slow rate. Conversely, a small reaction rate constant η was
+utilized for the update CRN.
+See Appendix D for the details of these experiments and the data sets.
+16
+
+
+A 
+B
+Iris data classification
+C
+MNIST data classification
+XOR data classification
+Training loss with ℎ= 3
+Time
+0
+25
+50
+75
+×10!
+Time
+0
+25
+50
+75
+×10!
+Accuracy with ℎ= 3
+Regression at 𝑡= 25×10!
+Regression at 𝑡= 80×10!
+Accuracy with ℎ= 4
+Accuracy with ℎ= 4
+Time
+Time
+Traditional NN
+CRN
+Traditional NN
+CRN
+Error with ℎ= 4
+Time
+Validation error
+Training error
+Validation error
+Training error
+Error with ℎ= 4
+Time
+Figure 6: The time evolutions of the error and the accuracy functions for the XOR (A left), the Iris
+(B top), and the MNIST (C top) data sets. A right. The regression of the XOR data sets after 100
+and 10000 iterations. B bottom. The pair plots for the Iris data sets (See Appnedix D.2 C bottom.
+Classification of the MNIST input data sets by the outputs obtained with a standard NN and our
+CRN. The input data points are embedded on a 2d plane via the principal component analysis. See
+Table 4 in Supplementary material for the parameters used for these simulations.
+17
+
+
+5
+Robustness to noisy reaction rates
+In reality, the reaction timing is affected by the fluctuation of temperature, pressure, and other
+external disturbances. This means that the rates of the reactions are inherently random. Due to
+intrinsic noise of the system, the concentrations of species can also fluctuate around the exact
+values modeled by the differential equations.
+These random fluctuations in either the reaction rate parameters or the concentration of the
+species will subsequently cause noise in the gradient of the loss function and eventually make the
+gradient descent process noisy. Recent studies have examined the effect of noise in stochastic
+gradient descent processes. Surprisingly, noise can regularize the optimization process and help
+find flatter local minima [29]. However, a large variance of noise in the gradient descent processes
+can significantly distort optimization and slow down the convergence speed. Thus noise reduction
+methods have been developed in previous studies [17] where the variance of Gaussian noise is set
+to be a decreasing function of either time or the number of parameters. To robustly implement NNs
+against noisy parameters and species via the CRNs, therefore, it is critical to minimize fluctuations
+in the gradient descent process.
+In this section, we proved that the smoothness of the activation function ensures that the size
+of the fluctuation in our CRN remains at most of order ϵ when both the extrinsic and the intrinsic
+noise are of order ϵ.
+5.1
+Noisy gradient descent processes induced by fluctuations in the CRN
+We will begin by mathematically formulating the impact of noise from both the forward and back-
+ward CRNs on the update CRN. Since the input of the neural network is updated at t = kT for
+each k = 1, 2, . . . for some T, we will analyze the noise effect on t ∈[0, T].
+We define the noisy rate parameters as follows. Let κj(t; ϵ) represent the noisy rate parameter
+of the j th reaction. We assume that κj(t; ϵ) = |κj + ϵξj(t)|, where ϵ is the noise magnitude. The
+noise terms ξj(t) follow independent standard normal distributions N(0, 12). For some t0 and t1,
+they are re-sampled at each t = kt0 and remain constant for t1 for each k = 1, 2, . . . (see Figure 7
+A). That is, for each j,
+ξj(t) =
+
+
+
+Zj,k
+i.i.d.
+∼N(0, 12)
+if t ∈[kt0, kt0 + t1) for some k.
+0
+otherwise,
+(18)
+where κj’s are the exact noise-free rate parameters. As mentioned before we use identical rate
+parameters to compute desired outcomes so that we set κj = 1 for each j. Let (S, C, R, Kϵ) repre-
+sent the union of the forward CRN (employed from [2]) and the backward CRN that implements
+a NN with the smooth ReLU activation function (3). Here Kϵ is the set of the noisy rate parame-
+ters κj(t; ϵ)’s. Let (S, C, R, K) be the same CRN as (S, C, R, Kϵ) but with noise-free parameters,
+where the reaction rate parameters are all equal to 1 in K.
+Now we investigate the variation of the concentrations of the species by the noisy rate param-
+eters. Let xℓ
+i(t; ϵ) and xℓ
+i(t) be the concentration of species Xℓ
+i of (S, C, R, Kϵ) and (S, C, R, K),
+respectively, that are corresponding to the i th nodes on the ℓth layer. Due to the structure of the
+18
+
+
+forward network proposed in [2], the governing equation of xℓ
+j(t; ϵ) is written as
+d
+dtxℓ
+i(t; ϵ) = h + xℓ
+i(t; ϵ)
+X
+j
+ρℓ−1
+j,ϵ (xℓ−1
+j
+(t; ϵ)) −(1 + ϵξk(t))(xℓ
+i(t; ϵ))2,
+(19)
+d
+dtxℓ
+i(t) = h + xℓ
+i(t)
+X
+j
+ρℓ−1
+j,0 (xℓ−1
+j
+(t)) −(xℓ
+i(t))2,
+(20)
+where
+ρℓ
+i,ϵ(z) =
+Mℓ
+X
+j=1
+
+(1 + ϵξℓ,+
+ij )wℓ,+
+ij −(1 + ϵξℓ,−
+ij )wℓ,−
+ij
+
+z + (1 + ϵξℓ,−
+i
+)bℓ,+
+i
+−(1 + ϵξℓ,−
+i
+)bℓ,−
+i
+,
+and ξℓ,±
+ij , ξℓ,±
+i
+and ξℓ
+i are independent standard normals defined in (18) (here we suitably re-
+enumerated ηj in (18)). As shown in Section 3.3, due to the difference of the time scale between
+the dynamics of xℓ
+i’s and the parameters wℓ
+ij’s and bℓ
+i’s, we assume that wℓ
+ij’s and bℓ
+i’s are fixed for
+t ∈[0, T]. Using the feedback-free structure considered in Remark 3.1, we can inductively prove
+the following proposition for the variation of the species xℓ
+i(t; ϵ)’s from the noise. See Appendix
+B for the proof.
+Proposition 5.1. Under the above setting, there exists a finite random variable Θ such that for
+each ℓand for i, supt∈[0,T] |xℓ
+i(t; ϵ) −xℓ
+i(t)| ≤ϵΘ, where
+Θ = Θ(L, max
+ℓ
+M ℓ, h, max
+ℓ,i,j wℓ,±
+ij , max
+ℓ,i bℓ,±
+i
+, sup
+ℓ,i,j
+sup
+t∈]0,T]
+(|ξℓ,±
+ij | + |ξℓ,±
+i
+| + |ξℓ
+i|)).
+Using the result of Proposition 5.1, we can similarly obtain the deviation of the backward CRN.
+Let LW ℓ,±
+ij
+and let LBℓ,±
+i
+be the species corresponding to
+∂L
+∂wℓ
+ij and ∂L
+∂bℓ
+i in the dual rail manner,
+respectively. We denote their concentrations by lwℓ,±
+ij (t; ϵ) and lbℓ,±
+i
+(t; ϵ) for (S, C, R, Kϵ), and we
+also denote their concentrations by lwℓ,±
+ij (t) and lbℓ,±
+i
+(t) for (S, C, R, K).
+Proposition 5.2. Under the same setting for Proposition 5.1, there exists a finite random variable
+¯Θ such that for each combination of indices ℓ, i, j,
+sup
+t∈[0,T]
+(|lwℓ
+ij(t; ϵ) −lwℓ
+ij(t)| + |lbℓ
+i(t; ϵ) −lbℓ
+i(t)|) ≤ϵ¯Θ,
+where ¯Θ = ¯Θ(Θ, L, maxℓM ℓ, h, maxℓ,i,j wℓ,±
+ij , maxℓ,i bℓ,±
+i
+).
+5.2
+Comparison to CRNs implementing NNs with non-smooth activation
+functions
+In this section, we demonstrated that usage of smoothed activation functions can make CRNs
+implementing NNs more robust to noise compared to CRNs implementing NNs with non-smooth
+activation functions such as the leaky ReLU. Specifically, the gradient of a non-smooth activation
+function has discrete jumps, which can lead to significant errors.
+19
+
+
+0
+0.5
+1
+1.5
+2
+2.5
+3
+3.5
+4
+4.5
+5
+1.88
+1.92
+1.96
+2
+2.04
+2.08
+2.12
+Noisy rate constant
+Time
+𝜖𝒩(0,1!)
+-10
+-5
+0
+5
+10
+0
+1
+10
+-10
+-5
+0
+5
+0
+1
+Derivative of leaky ReLU
+Derivative of smooth ReLU
+0.5
+0.5
+𝑧
+𝑧
+Time
+Time
+Time
+Time
+Leaky ReLU activation function
+Smooth ReLU activation function
+𝑤!!
+" (𝑡)
+𝑤!!
+" (𝑡)
+𝑦!(𝑡)
+0.05
+without noise
+with noise
+4
+0
+-4
+4
+0
+-4
+𝑦!(𝑡)
+0.05
+#$
+%&!  with noise
+A 
+B 
+C 
+D
+#$
+%&!  without noise
+Time
+Time
+#$
+%&!  with noise
+#$
+%&!  without noise
+Time
+Time
+Error
+Accuracy
+Error
+Accuracy
+Validation error
+Training error
+Validation error
+Training error
+without noise
+with noise
+without noise
+with noise
+without noise
+with noise
+Time
+Time
+Time
+Time
+Figure 7: A. Time evolution of the noisy rate constant. B. The derivatives of the activation func-
+tions. C. The time evolution of the training and the validation error functions and the accuracy
+functions obtained by a CRN for a NN with the leaky ReLU (the first and second panels) and a
+CRN for a NN with the smooth ReLU (the third and fourth panels). D. The time evolutions of the
+weight and the output obtained by a CRN for a NN with the leaky ReLU (the first and second pan-
+els) and a CRN for a NN with the smooth ReLU (the third and fourth panels). E. The derivatives
+of the activation functions with noise and without noise. The first two panels are derivatives of the
+leaky ReLU and the others are the derivatives of the smooth ReLU. See Table 4 in Supplementary
+material for the parameters used for these simulations.
+20
+
+
+We built two CRNs implementing NNs whose activation functions are the leaky ReLU and
+the smooth ReLU with h = 4, respectively. To build a NN equipped with the leaky ReLU, we
+also used the CRNs for the arithematic operations proposed in [7]. In contrast to the approach in
+[19], where clock proteins were used to achieve the leaky ReLU function, we opted for using built-
+in characteristic functions for simplicity. This means that the leaky ReLU is computed without
+involving chemical species in this paper.
+For this comparison, we used MNIST data sets. The rate constants in backward CRNs fluctuate
+with the independent noise described in (18) (Figure 7 A). We chose t0 = 0.05 and t1 = 0.005. To
+realize intrinsic noise, we also added the same independent noise to the nodes in the hidden and
+the output layers on each interval [kt0, kt0 + t1) for k = 0, 1, . . . ,.
+Figure 7 C and D displayed the fluctuation of the error and the accuracy functions. Due to
+noise, a long simulation may end up blow-up. Hence, to avoid blow-up, we ran both CRNs until
+time 50 × 2000, which is equivalent to 2000 iterations with randomly changed inputs. We set the
+noise size ϵ = 0.01. The training error, validation error and accuracy displayed higher fluctuations
+in the NN with the leaky ReLU. Furthermore, we compare the time evolution of the species w2
+11(t)
+and y1(t) for the two CRNs under the noisy rate constants to those without noise (Figure 7 C and
+D middle). We use a single input and run both CRNs for [0, 50), which is an enough time for
+convergence for both CRNs. The time trajectories of those species in the CRN implementing the
+leaky ReLU fluctuate more than the trajectories of the CRN implementing the smooth ReLU. For
+these plots, we used a noise size ϵ = 0.1 to clearly visualize the differences in dynamics.
+In Figure 9, we provided additional comparisons of the time evolutions of the error to support
+the noise-robustness of our CRN.
+5.3
+Sensitivity to noise level and the running time
+We here examined how the performance of the CRNs implementing a NN changes with different
+noise levels and the running time for each iteration. We found that a NN with the leaky ReLU is
+more sensitive to the noise level and the running time than a NN with the smooth ReLU. For both
+CRNs the train error function oscillates due to noise (Figure 7), and hence to clear comparison we
+use an average train error defined as
+1
+10
+9
+X
+i=0
+E((K −i)t),
+rather than the train error at a single time point KT. Recall that T is the running time of a single
+iteration and the K is the total number of iterations.
+The same noise as in (18) was added to each the rate constants of the backward CRN (Sb, Cb, Rb, Kb)
+and species Xℓ
+i ’s of the forward CRN (Sf, Cf, Rf, Kf) for both the CRNs implementing NNs with
+the leaky ReLU and the smooth ReLU. We chose ϵ ∈{0, 0.02, 0.04, . . . , 0.1, 0.12}. The MNIST
+data set was employed for this test. For each ϵ, the running time for each iteration is 50. We
+measured the training error and the validation error by four independent experiments. To avoid po-
+tential blow-up especially for the case of a high noise level, we iterated the CRNs only 200 times.
+The running time T for each iteration is 50. Figure 8 shows that the NN with the smooth ReLU is
+much more robust to different noise levels that the NN with the leaky ReLU.
+21
+
+
+We used non-linear regression data fitting to test sensitivity to noise levels. We used training
+data points {(xi, sin(xi))}13
+i=1 for xi ∈[0, π) to fit the sine curve using CRNs implementing NNs
+with leaky ReLU and smooth ReLU, respectively. The four independent training errors demon-
+strate the robustness of the CRN implementing the smooth ReLU (Figure 8). We used 1300 itera-
+tions, with each iteration taking 50 units of running time. Due to the small number of data points,
+we did not separately use validation data points.
+Next, we tested the robustness to the choice of the running time for each iteration. In the
+absence of noise, it is obvious that the accuracy increases as the running time increases, since the
+species of the CRNs have enough time to converge to their steady state. However, when noise
+exists, the accuracy may suffer from a long running time as the effect of noise can accumulate over
+time. Since users, especially wet lab experimentalists, might not know the optimal running time
+in advance, it is crucial to develop a CRN that is robust to running time variations. By varying the
+running times, we measured the training error and the validation error of the CRNs implementing
+NNs with the leaky ReLU and the smooth ReLU for MINST data sets. Figure 8 C shows that the
+CRN for the smooth ReLU is much more robust to the running time than the CRN for the leaky
+ReLU. We used 200 iterations. As previously, we also used the sine curve regression to compare
+two CRNs, and the error turned out less sensitive for the case of the smooth ReLU (Figure 8 D). In
+this experiment, 1300 iterations was used. The training error for the CRN calculating the smooth
+ReLU is more robust than that of the CRN calculating the leaky ReLU, while the training error is
+relatively high with the running time of 10.
+5.4
+Tuning the smoothing parameter to enhance robustness
+The value of h in the smooth ReLU function affects the change in slope around the origin. When h
+is large, the activation function and its derivative are less affected by noise. We tested the accuracy
+of the proposed CRN for implementing a neural network to classify MNIST datasets (see Figure
+8 D). The training error fluctuates less for higher values of h. However, this comes at the cost of
+slower convergence, as the function’s less dramatic changes near the origin can limit its activation
+power. Due to its reduced activation for larger h values, the smooth ReLU may struggle to adapt
+to significant input changes, even without noise. As demonstrated in Figure S, the smooth ReLU
+with h = 1 outperformed h = 4 on the MNIST data. Therefore, when dealing with potentially
+dramatic input variations, carefully adjusting h can be needed for a better performance.
+Remark 5.1. While adjusting the leaky ReLU’s slopes can theoretically enhance smoothness, this
+approach is overly drastic. Altering α and β in (4) uniformly impacts the behavior of the function
+on all large |x|, potentially hindering activation and performance (Figure 11). In contrast, the
+smooth asymptotic slopes of ReLU remain consistent for large |x|, ensuring a more balanced and
+effective activation (i.e. limx→∞
+σ(x)
+x
+= 1 and limx→−∞
+σ(x)
+x
+= 0).
+6
+
+---
+
+## Discussion
+
+We have seen that chemical reactions can be used to mimic artificial NNs, but we need better
+methods for dealing with the external and internal noise of these reactions when using them for
+22
+
+
+0
+0.02 0.04 0.06 0.08 0.1
+0.12
+0
+5
+10
+15
+20
+25
+0
+0.02 0.04 0.06 0.08
+0.1
+0.12
+0
+1
+2
+3
+4
+5
+30
+40
+50
+60
+70
+80
+0
+2
+4
+6
+8
+10
+0
+2
+4
+6
+8
+10
+30
+40
+50
+60
+70
+80
+MNIST classification
+Sine curve fitting
+Leaky ReLU
+Smooth ReLU
+Leaky ReLU
+Smooth ReLU
+Running time
+Noise level, ϵ
+0
+0.02 0.04 0.06 0.08 0.1
+0.12
+0
+0.05
+0.1
+0.15
+0.2
+0
+0.02 0.04 0.06 0.08
+0.1
+0.12
+0
+0.05
+0.1
+0.15
+0.2
+10
+30
+50
+70
+90
+0
+0.05
+0.1
+0.15
+0.2
+10
+30
+50
+70
+90
+0
+0.05
+0.1
+0.15
+0.2
+Leaky ReLU
+Smooth ReLU
+Leaky ReLU
+Smooth ReLU
+Running time
+Noise level, ϵ
+Training error
+Validation error
+A 
+B 
+C 
+D 
+D 
+Error, ℎ= 0.05
+Error, ℎ= 4
+Error, ℎ= 0.05
+Error without noise
+Error with noise
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+0
+5000
+10000
+15000
+0.05
+0.1
+0.15
+0.2
+0.25
+Time
+Time
+Time
+Figure 8: Sensitivity to the noise level (A and B) and the running time (C and D) of the Leaky
+ReLU and Smooth ReLU measured with the MNIST data set and the sine curve fitting. D. The
+time evolution of the error with the different values of h. See Table 4 in Supplementary material
+for the parameters used for these simulations.
+neural network computing and training. In our research, we proposed that creating smooth ac-
+tivation functions using these chemical reactions could improve the reliability of neural network
+computations.
+We have developed bimolecular CRNs that can compute the gradients of loss functions when
+the activation functions are smooth functions of the nodes. Instead of discrete iterations, the pa-
+rameters are continuously updated, allowing for one-pot computing with the entire CRN. We have
+proved the exponential convergence of the proposed CRN. Simulations have demonstrated that
+our CRN is more robust to noise in the rate parameters and inputs compared to another CRN that
+implements neural networks with non-smooth activation functions.
+Interesting ideas about rate-independent chemical reaction networks for a feed-forward NN
+were introduced suggesting that fine-tuning of the reaction rates is not necessary [25, 27]. This
+means that the fluctuation of the reaction rates does not alter the chemical computations for feed-
+forward NNs leading to a ideal solution for noise-robust biochemical computations. However,
+23
+
+
+this type of biochemical computing can only realize semilinear functions [10, 8, 9]. Hence noise-
+robustness is unclear for the rate-independent chemical reaction networks if the backpropagation,
+which often requires non-linear functions, is also implemented by chemical reactions. Nonetheless,
+there is potential for improvement in robustness by partially employing such rate-independent
+computation. The addition, subtraction, minimum, and maximum functions are realized by rate-
+independent steady states of some CRNs [10]. We can replace some sub-CRNs of our CRN, whose
+steady states are rate-dependent, by the CRNs suggested by [10] to enhance robustness to noise
+within the rate parameters.
+The convergence rate is another aspect that needs improvement. Currently, while the conver-
+gence of the species in the forward and backward CRNs is exponentially fast in time, the conver-
+gence speed can be delayed by many system components such as the reaction rates and the initial
+amounts of the species. In particular, the initial amount of the species can be controlled, but it is
+uncertain which initial conditions can minimize the convergence time. A recently suggested study
+[1] proposed new CRN structures for initial amount-independent convergence. This idea has the
+potential to improve the robustness of the convergence speed of the CRNs used for computing and
+training neural networks.
+The future aim will be to move beyond computer simulations and actually create the proposed
+chemical reaction network in a laboratory setting and within living organisms. To use CRNs to
+carry out deep neural networks effectively, we may need to simplify the structure of the chemical
+reaction network. Currently, the number of reactions and species required to calculate the gradient
+of the smooth activation functions is not small. One potential solution is to use the matrix mul-
+tiplication with DNA suggested in [22]. In our CRN, the matrix multiplication for the weighted
+sum wx + b was computed directly using reactions for the arithmetic operations. However a more
+refined approach for matrix multiplications would be used to reduce the number of reactions.
+
+---
+
+## References
+
+[1] David F Anderson and Badal Joshi. Chemical mass-action systems as analog computers:
+implementing arithmetic computations at specified speed. arXiv preprint arXiv:2404.04396,
+2024.
+[2] David F Anderson, Badal Joshi, and Abhishek Deshpande. On reaction network implemen-
+tations of neural networks. Journal of the Royal Society Interface, 18(177):20210031, 2021.
+[3] Edgar Anderson. The species problem in iris. Annals of the Missouri Botanical Garden,
+23(3):457–509, 1936.
+[4] David Arredondo and Matthew R Lakin.
+Supervised learning in a multilayer, nonlinear
+chemical neural network. IEEE Transactions on Neural Networks and Learning Systems,
+34(10):7734–7745, 2022.
+[5] Peter Banda, Christof Teuscher, and Matthew R Lakin. Online learning in a chemical percep-
+tron. Artificial life, 19(2):195–219, 2013.
+24
+
+
+[6] Drew Blount, Peter Banda, Christof Teuscher, and Darko Stefanovic. Feedforward chemical
+neural network: An in silico chemical system that learns xor. Artificial life, 23(3):295–317,
+2017.
+[7] HJ Buisman, Huub MM ten Eikelder, Peter AJ Hilbers, and Anthony ML Liekens. Computing
+algebraic functions with biochemical reaction networks. Artificial life, 15(1):5–19, 2009.
+[8] Ho-Lin Chen, David Doty, Wyatt Reeves, and David Soloveichik. Rate-independent compu-
+tation in continuous chemical reaction networks. Journal of the ACM, 70(3):1–61, 2023.
+[9] Ho-Lin Chen, David Doty, and David Soloveichik. Deterministic function computation with
+chemical reaction networks. Natural computing, 13:517–534, 2014.
+[10] Ho-Lin Chen, David Doty, and David Soloveichik. Rate-independent computation in con-
+tinuous chemical reaction networks. In Proceedings of the 5th conference on Innovations in
+theoretical computer science, pages 313–326, 2014.
+[11] Li Deng. The mnist database of handwritten digit images for machine learning research [best
+of the web]. IEEE Signal Processing Magazine, 29(6):141–142, 2012.
+[12] John W Emerson, Walton A Green, Barret Schloerke, Jason Crowley, Dianne Cook, Heike
+Hofmann, and Hadley Wickham. The generalized pairs plot. Journal of Computational and
+Graphical Statistics, 22(1):79–91, 2013.
+[13] Zoheir Ezziane. Dna computing: applications and challenges. Nanotechnology, 17(2):R27,
+2005.
+[14] Allen Hjelmfelt and John Ross. Chemical implementation and thermodynamics of collective
+neural networks. Proceedings of the National Academy of Sciences, 89(1):388–391, 1992.
+[15] Allen Hjelmfelt, Edward D Weinberger, and John Ross. Chemical implementation of neu-
+ral networks and turing machines.
+Proceedings of the National Academy of Sciences,
+88(24):10983–10987, 1991.
+[16] Roger A Horn. The hadamard product. In Proc. Symp. Appl. Math, volume 40, pages 87–169,
+1990.
+[17] Zhishen Huang and Stephen Becker. Stochastic gradient langevin dynamics with variance
+reduction. In 2021 International Joint Conference on Neural Networks (IJCNN), pages 1–8.
+IEEE, 2021.
+[18] Jongmin Kim, John Hopfield, and Erik Winfree. Neural network computation by in vitro
+transcriptional circuits. Advances in neural information processing systems, 17, 2004.
+[19] Matthew R Lakin. Design and simulation of a multilayer chemical neural network that learns
+via backpropagation. Artificial Life, pages 1–28, 2023.
+[20] Matthew R Lakin, Amanda Minnich, Terran Lane, and Darko Stefanovic. Design of a bio-
+chemical circuit motif for learning linear functions. Journal of the Royal Society Interface,
+11(101):20140902, 2014.
+25
+
+
+[21] Shu Okumura, Guillaume Gines, Nicolas Lobato-Dauzier, Alexandre Baccouche, Robin De-
+teix, Teruo Fujii, Yannick Rondelez, and Anthony J Genot. Nonlinear decision-making with
+enzymatic neural networks. Nature, 610(7932):496–501, 2022.
+[22] John S Oliver. Matrix multiplication with dna. Journal of Molecular Evolution, 45:161–167,
+1997.
+[23] Lulu Qian, Erik Winfree, and Jehoshua Bruck. Neural network computation with dna strand
+displacement cascades. nature, 475(7356):368–372, 2011.
+[24] David E Rumelhart, Geoffrey E Hinton, and Ronald J Williams. Learning representations by
+back-propagating errors. nature, 323(6088):533–536, 1986.
+[25] Phillip Senum and Marc Riedel. Rate-independent constructs for chemical computation. PloS
+one, 6(6):e21414, 2011.
+[26] David Soloveichik, Georg Seelig, and Erik Winfree. Dna as a universal substrate for chemical
+kinetics. Proceedings of the National Academy of Sciences, 107(12):5393–5398, 2010.
+[27] Marko Vasi´c, Cameron Chalk, Austin Luchsinger, Sarfraz Khurshid, and David Soloveichik.
+Programming and training rate-independent chemical reaction networks. Proceedings of the
+National Academy of Sciences, 119(24):e2111552119, 2022.
+[28] Xiewei Xiong, Tong Zhu, Yun Zhu, Mengyao Cao, Jin Xiao, Li Li, Fei Wang, Chunhai Fan,
+and Hao Pei. Molecular convolutional neural networks with dna regulatory circuits. Nature
+Machine Intelligence, 4(7):625–635, 2022.
+[29] Zhanxing Zhu, Jingfeng Wu, Bing Yu, Lei Wu, and Jinwen Ma. The anisotropic noise in
+stochastic gradient descent: Its behavior of escaping from sharp minima and regularization
+effects. arXiv preprint arXiv:1803.00195, 2018.
+A
+Speed of convergence
+In this section, we show that the dynamical system associated with the CRN implementing the
+backward network admits exponential convergence to its steady state provided that the concentra-
+tion of the species W ℓ,±
+ij
+and Bℓ,±
+i
+in the update network are fixed at constants.
+The forward and backward CRNs are made up of sub-CRNs, each of which is responsible for
+performing an arithmetic operation. Importantly, there are no feedback loops within the network
+(See Figure 4 and Remark 3.1). Therefore, the convergence of the species in the backward CRN
+does not impact the convergence of the species in the forward CRN. This is crucial for proving the
+convergence of the backward CRN, as previously shown in the convergence of the species in the
+forward CRN [2].
+We note that each species in the backward CRN (Sb, Cb, Rb, Kb), say R ∈Sb, is governed by
+a differential equation with some smooth functions ϕ : Rm
++ →R and ψ : R+ →R such that
+d
+dtr(t) = ϕ(s1(t), . . . , sm−1(t)) −ψ(sm(t))r(t),
+(21)
+26
+
+
+where m is some positive index, and si’s are the concentration of species whose exponential con-
+vergence to a positive steady state is already guaranteed. Furthermore it holds that
+lim
+t→∞ϕ(s1(t), . . . , sm−1(t)) > 0
+lim
+t→∞ψ(sm(t)) > 0.
+For example, from the reactions in Table 1, we can see that the concentration dy(t) of DY at time
+t follows
+d
+dtdy(t) = (y(t))2 −a2(t)dy(t),
+(22)
+where y(t) is the concentration of the species corresponding to the node in the output layer of the
+forward network, and a2(t) is the concentration of the auxiliary species A2 in Table 1. Both are
+feeding forward DY as catalysts. The exponential convergence of y(t) is shown in [2], and the
+exponential convergence of a2(t) (2 is a super index, not a power) can be shown by its differential
+equation
+d
+dta2(t) = (y(t))2 + h −a2(t),
+whose solution can be written as a2(t) = e−t R t
+0 es  (y(s))2 + h
+
+ds + a2(0)e−t. Similarly using
+the exponential convergence of y(t) and a2(t), we can obtain exponential convergence to a positive
+value for dy(t) from (22). We generalize this in the following lemma.
+Lemma A.1. Let r : [0, ∞) →R+ be a solution to (21). If for each i = 1, . . . , m, there exist
+positive constants si,∞and β > 0 such that |si(t) −si,∞| ≤e−βt for all t, where limt→∞si(t) :=
+si,∞. Then there exist α > 0, c > 0 and r∞> 0 such that |r(t) −r∞| ≤ce−αt for all t.
+Proof. For simplicity we denote ϕ(t) = ϕ(s1(t), . . . , sm−1(t)) and ψ(t) = ψ(sm(t)). We also
+denote ϕ∞= lim
+t→∞ϕ(s1(t), . . . , sm−1(t)) and ψ∞= lim
+t→∞ψ(sm(t)). These limits exist as ϕ and ψ
+are continuous functions. Letting V (t) = 1
+2(ϕ∞−ψ∞r(t))2, we have
+d
+dtV (t) = (ϕ∞−ψ∞r(t))(−ϕ(s1(t), . . . , sm−1(t)) + ψ(sm(t))r(t))
+= (ϕ∞−ψ∞r(t))
+ −(ϕ(t) −ϕ∞) + (ψ(t) −ψ∞)r(t) −ϕ∞+ ψ∞r(t)
+
+= −(ϕ∞−ψ∞r(t))2 +
+ −(ϕ(t) −ϕ∞) + (ψ(t) −ψ∞)r(t)
+
+.
+Note that due to the boundedness of r(t) given by (21) and the smoothness of ϕ and ϕ, we have
+C|(ϕ(t) −ϕ∞) + (ψ(t) −ψ∞)r(t)| ≤sup
+i
+|si(t) −si,∞| + |sm(t) −sm,∞|
+for some C. Here we applied the Mean value theorem to ϕ and ψ. Therefore there exists γ > 0
+such that (ψ(t) −ψ∞)r(t) ≤Ce−γt for all t by the exponential convergence of si’s. Thus V ′(t) ≤
+−2V (t)2 + e−γt. By a version of the Gronwall’s inequality [2], we have
+V (t) ≤V (0)e−2t + e−2t
+Z t
+0
+e2se−γsds,
+and note that the right-hand side converges to 0 exponentially fast. Therefore we can find c > 0
+and α > 0 such that |r(t) −r∞| ≤ce−αt, where r∞= ϕ∞
+ψ∞.
+27
+
+
+Hence by Lemma A.1, it is sufficient to show that the exponential convergence to positive
+steady states for the catalyst species corresponding to si’s in (21). The catalyst species si’s in the
+differential equations (21) for the dynamic species LY, DY, LW ℓ−1
+ij
+and LZℓ−1
+i
+in (Sb, Cb, Rb, Kb)
+are given by either from the forward networks or the auxiliary species such as Aℓ
+i’s in Table 1.
+The species from the forward network converge exponentially fast [2], and as shown above so the
+auxiliary species do. Recursively, the si’s in (21) when r is either DXℓ−1
+i
+or LXℓ−1,±
+i
+are also the
+nodes Xℓ−1 and Aℓ−1
+i
+, which converge exponentially as mentioned above. This leads that expo-
+nential convergence of DXℓ−1
+i
+’s and LXℓ−1,±
+i
+’s by Lemma A.1. Then we further recursively show
+that LW ℓ−2,±
+ij
+’s and LZℓ−2,±
+i
+converge exponentially using Lemma A.1 since the catalyst species
+are either the species from the forward network or the species DXℓ−1
+i
+’s and LXℓ−1,±
+i
+’s, whose
+exponential convergence is already guaranteed. Repeating this, we can show exponential conver-
+gence of all the species in (Sb, Cb, Rn, Kb). We highlight again that the feedback-free structure is
+the key to such a recursive argument.
+□
+Anderson and Joshi showed more delicate construction to control the convergence rates that
+can be independent to the initial condition [1]. We did not employ the construction as the proposed
+CRNs are not necessarily bimolecular.
+B
+Proof of Propositions in Section 5.1
+Throughout this section, the initial conditions for each species in (S, C, R, Kϵ) and (S, C, R, Kϵ)
+are identical. We also assume ϵ ∈(0, 1) sufficiently small.
+Lemma B.1. Under the same setting as Proposition 5.1, we have
+sup
+ℓ,i
+sup
+t∈[0,T]
+(xℓ
+i(t; ϵ) + xℓ(t)) := R < ∞
+and
+(23)
+inf
+ℓ,i
+inf
+t∈[0,T](xℓ
+i(t; ϵ) + xℓ(t)) := r > 0
+(24)
+Proof. Since the inputs ˆxi’s and the parameters wℓ,±
+ij
+and bℓ,±
+i
+are fixed, from (19)
+d
+dtx1
+i (t; ϵ) ≤c0 −2(x1
+i (t; ϵ))2 ≤c1 −c2x1
+i (t; ϵ)
+for some positive constants ci’s. Thus by Gronwall’s inequality supt∈[0,T] supi x1
+i (t; ϵ) < ∞. Then
+we can inductively have supt∈[0,T] supi x2
+i (t; ϵ) < ∞. When ϵ = 0, we can get the same result, and
+hence eventually we have (23). Furthermore, due to the term h in (19) and (20), both xℓ
+i(t; ϵ) and
+xℓ
+i(t) do not approach to zero. Hence (24) follows. Notably R = R(maxℓ,i,j wℓ,±
+ij , maxℓ,i bℓ,±
+i
+).
+Proof of Proposition 5.1 To prove the result inductively, assume that for a fixed ℓ, there exists
+Θℓ−1 such that for any i, we have that supt∈[0,T] |xℓ−1
+i
+(t; ϵ) −xℓ−1
+i
+(t)| ≤ϵΘℓ−1, where
+Θℓ−1 = Θℓ−1(L, max
+ℓ
+M m, h, max
+ℓ,i,j wm,±
+ij
+, max
+ℓ,i bm,±
+i
+, sup
+ℓ−1,i,j
+sup
+t∈]0,T]
+(|ξm,±
+ij
+| + |ξm,±
+i
+| + |ξm
+i |)).
+(25)
+28
+
+
+For small enough ϵ, by (19) and (20) we have
+d
+dt(xℓ
+i(t; ϵ) −xℓ
+i(t))
+(26)
+≤ϵ
+
+X
+j
+(wℓ−1,+
+ij
+−wℓ−1,−
+ij
+)(xℓ−1
+i
+(t; ϵ) −xℓ−1
+i
+(t)) + Cℓ−1
+1
+
+−((xℓ
+i(t; ϵ))2 −(xℓ
+i(t))2)
+≤ϵ
+
+Cℓ−1
+2
+Θℓ−1 + Cℓ−1
+2
+
+−(xℓ
+i(t; ϵ) + xℓ
+i(t))(xℓ
+i(t; ϵ) −xℓ
+i(t)),
+where the constants Cℓ−1
+1
+and Cℓ−1
+2
+have the same dependence as (25). Then
+d
+dt(xℓ(t; ϵ) −xℓ(t))2 = (xℓ(t; ϵ) −xℓ(t)) d
+dt(xℓ(t; ϵ) −xℓ(t))
+≤ϵR
+
+Cℓ−1
+2
+Θℓ−1 + Cℓ−1
+2
+
+−(xℓ
+i(t; ϵ) + xℓ
+i(t))(xℓ
+i(t; ϵ) −xℓ
+i(t))2
+≤ϵR
+
+Cℓ−1
+2
+Θℓ−1 + Cℓ−1
+2
+
+−r(xℓ
+i(t; ϵ) −xℓ
+i(t))2.
+(27)
+Thus by Gronwall’s inequality, we get |xℓ
+i(t; ϵ) −xℓ
+i(t)| ≤ϵΘℓwhere Θℓis a positive constant
+satiying the same dependent as (25). Therefore, it suffices to show the hypothesis |x1
+i (t; ϵ) −
+x1
+i (t)| ≤ϵΘ1 to finish the proof inductively. When ℓ= 1, by (19) and (20), we have
+d
+dt(x1(t; ϵ) −xℓ(t)) ≤C0 −(x1
+i (t; ϵ) + x1
+i (t))(x1
+i (t; ϵ) −x1
+i (t))
+where C0 is a positive constant solely depending on the inputs w0,±
+ij , b0,±
+i
+and the noise terms ξ0,±
+ij ,
+ξ0,±
+i
+and ξ0. As these are bounded (with probability 1), we can deduce |x1
+i (t; ϵ) −x1
+i (t)| ≤ϵΘ1
+using the same argument as (27) with Gronwall’s inequality.
+□
+The proof of Proposition 5.2 is basically the same as the proof of Proposition 5.1. The gradient
+∇wℓL and ∇bℓL are recursively obtained as (6)–(8). Due to the recursive relations, the fluctuation
+of the gradients can be quantified with the fluctuation of the terms ∂xℓ+1
+i
+∂zℓ
+i
+when wℓ,±
+ij
+and bℓ,±
+i
+’s are
+fixed. Furthermore, the fluctuation of the derivatives is completely computed by the fluctuation
+of xℓ
+i by (9), which is shown in Proposition 5.1. By smoothness of σ(z) with respect to z, the
+fluctuation of the ∂xℓ+1
+i
+∂zℓ
+i
+is obtained, and the eventually desired result in Proposition 5.2 follows. In
+this vein, ¯Θ in Proposition 5.2 depend on Θ, the number of layers and the fixed parameters of the
+weights and the biases.
+C
+Implement neural networks with general activation func-
+tions
+Our implementation of the backpropagation algorithm is not limited to the smoothed ReLU func-
+tion. It extends to accommodate various activation functions. In the context of a generic NN, the
+backpropagation process entails gradient calculation through arithmetic operations on the outputs.
+29
+
+
+Thus, as long as the forward network is implemented as a CRN, the entire learning process of
+the neural network can be realized by constructing a backward network that employs the appro-
+priate arithmetic operations based on the species containing value of output of neural network as
+suggested in this paper.
+For instance, consider a NN employing the sigmoid function σ(z) =
+1
+1+e−z as its activation
+function, implemented via a CRN. In this scenario, differentiation of the activation function yields
+that
+σ′(z) =
+e−z
+(1 + e−z)2 = 1 + e−z −1
+(1 + e−z)2 = σ(z) −σsig(z)2.
+Then if xℓ+1
+j
+= σ(zℓ
+j) for each ℓand j, then
+∇zℓxℓ+1 =
+
+xℓ+1
+1
+−(xℓ+1
+1
+)2, . . . , xℓ+1
+Cℓ−(xℓ+1
+Cℓ)2
+Thus the gradients are composed of arithmetic operations on the outputs, allowing us to construct
+another backward CRN using our method, utilizing the chemical species corresponding to the
+outputs.
+In [4] a CRN was built to calculate the hyperbolic tangent activation functions and to train
+a NN with the activation function. Note that it is challenging to directly compute exponential
+functions that are needed to compute tanh(z) =
+ez−e−z
+ez+e−z . However, the authors in [4] used the
+relation tanh′(z) = 1 −tanh2(z) to compute tanh(z) with clock proteins that are used to run
+sub-CRNs separately. Then for training, we can build a backward CRN similarly to calculate
+∇zℓxℓ+1 =
+
+1 −(xℓ+1
+1
+)2, . . . , 1 −(xℓ+1
+Cℓ)2
+.
+D
+Details of the data and simulations
+Here we give more details on the data sets we used in Section 4.
+D.1
+XOR
+Our objective is to construct an XOR classifier using a regression approach applied to the data set,
+which comprises tuples of the form {(ˆx, ˆy) : ((0, 0), 0), ((1, 0), 1), ((0, 1), 1), ((1, 1), 0)}. Here
+ˆx ∈{0, 1}2 is the input and ˆy ∈{0, 1} is the output. The neural network takes ˆx as input and
+produces y as the output. Subsequent to the training process, we determine whether the model’s
+output surpasses the threshold of 0.5 to classify the XOR operation correctly. To achieve this
+objective, we used the CRN that implements a two-layered NN with one hidden layer. The initial
+layer comprises two nodes, the subsequent hidden layer consists of 10 nodes, and the final output
+layer has a single node. That is, M = 3, C1 = 2, C2 = 10 and C3 = 1 in terms of the notations of
+Section 2.2.
+D.2
+Iris
+The Iris dataset stands as one of the most renowned datasets in the realm of machine learning [3].
+This dataset comprises four distinctive features related to iris flowers belonging to three distinct
+30
+
+
+species. In the context of our neural network architecture, the input is represented as a single vec-
+tor in R4, and the output is a single vector in R3. We employ one-hot encoding to facilitate the
+comparison between our network’s output and the ground truth data. Our neural network architec-
+ture has the initial layer consisting of four nodes, followed by a single hidden layer comprising 10
+nodes, and the output layer consisting of three nodes. 135 data points are used for training and a
+total 67500 iterations are used.
+We provided pair plots in Figure 6 B bottom. The off-diagonal plots provide the classification
+projected onto the plane defined by feature 1 on the x-axis and feature 2 on the y-axis. The diagonal
+plots show the distribution of the accumulated classification data over the same column, where the
+x-axis is feature 1 and the y-axis is the probability density (mass). See more details about the pair
+plots in [12].
+D.3
+MNIST
+The MNIST (Modified National Institute of Standards and Technology) dataset is one of the most
+well-known machine learning datasets, consisting of handwritten digit images [11]. For our exper-
+imental purposes, we utilized a downscaled version of subset of the MNIST dataset, comprising
+exclusively of images representing the digits 0 and 1. These images were resized to an 8x8 pixel
+square format. Our neural network architecture is designed with a configuration similar to that
+discussed in Section 3.1 Specifically, the initial layer consists of 64 nodes, followed by a hidden
+layer comprising 4 nodes, an an output layer consisting of two nodes. 1000 data points are used
+for training and 2000 iterations were used.
+D.4
+Accuracy function
+The XOR, Iris, and MNIST data sets are for classification. For each output ˆy, let f(ˆy) be the
+classification. For the output of the XOR data point ˆy,
+f(ˆy) =
+(
+0
+if ˆy ∈{(0, 0), (1, 1)},
+1
+otherwise.
+With given input and output data points {(ˆxn, ˆyn)}N
+n=1, the accuracy is given by
+A(t) = 1
+N
+N
+X
+n=1
+1|yn(t)−f(ˆyn)|≤1/2,
+where yn(t) is the output of the forward network with the n th input ˆxn. Where the output of the
+NN is calculated with the weight and bias wℓ
+ij(t) and bℓ
+i(t), which are the time evolutions given
+by the backward and the update networks with the training data. As 1yn(t)−f(ˆyn) measures the
+accuracy of the classification of the CRN-implemented NN, A(t) is the average accuracy over N
+data points.
+For both the Iris and the MNIST cases, the accuracy was evaluated by one-hot encoding. That
+is, we compare the argmax of y and ˆy whether it coincides or not. For example, for an input ˆx that
+31
+
+
+represents versicolor, ˆy is (1, 0, 0). If our neural network output gives y = (0.9, 0.05, 0.1) from the
+input ˆx, then we will have 1{argmax{y(t)}=argmax{ˆy}} = 1{1=1} = 1. Thus the accuracy is defined as
+A(t) = 1
+N
+N
+X
+n=1
+1{argmax{yn(t)}=argmax{ˆyn}},
+where N is the number of the total input data set.
+The evaluation of accuracy was performed at each 100 th iteration.
+Parameters
+Figure 6A
+Figure 6B
+Figure 6C
+Figure 7CD
+Figure 8AC
+Figure 8 BC
+Figure 8D
+Learning rate
+η × T
+0.002 × 300
+0.00025 × 300
+0.0001 × 500
+0.0001 × 50
+0.0001 × 50
+0.0001 × 50
+0.001 × 50
+Number of
+iterations
+36000
+54000
+27560
+2000
+200
+1300
+650
+Number of
+training data sets
+4
+135
+13780
+1000
+100
+13
+13
+Number of
+validation data sets
+4
+15
+1000
+1000
+100
+None
+None
+Table 4: Parameters used for simulation.
+0              20000           40000         60000
+0              20000           40000         60000
+0              20000           40000         60000
+0              20000           40000         60000
+Time
+Time
+Time
+Time
+Sine curve fitting
+Leaky ReLU
+Error test 2
+Error test1
+Error test 2
+XOR data
+0                          50000                   100000
+0                          50000                   100000
+0                          50000                   100000
+Time
+Time
+Time
+Error test 1
+Smooth ReLU
+Leaky ReLU
+Error test 2
+Error test1
+Error test 1
+Smooth ReLU
+0                           50000                    100000
+Time
+Error test2
+A
+B
+Figure 9: Time evolution of the error functions (17) obtained by the CRNs implementing NNs with
+the leaky ReLU and the smooth ReLU. For the sine fitting (A), we used h = 4 and the noise level
+ϵ = 0.1. For the XOR data set (B), we used h = 3 and the noise level ϵ = 0.3.
+32
+
+
+0                                        50000                                 100000
+0                                         50000                                 100000
+0                                         50000                                 100000
+Time
+Time
+Time
+Error, h=0.05
+Error, h=1
+Error, h=4
+Error without noise
+Error with noise
+Figure 10: The time evolution of the error function (17) obtained by the CRN implementing a NN
+with the smooth ReLU with various values of the smoothing parameter h. We used the MNIST
+data set with the noise level ϵ = 0.1.
+0                                             7500                                        15000
+Time
+𝛼= 1, 𝛽= 0.3
+𝛼= 1, 𝛽= 0.7
+𝛼= 1, 𝛽= 0.5
+Accuracy with different slopes of the leaky ReLU
+Figure 11: Performance of the CRN implementing a NN using the leaky ReLU with varying the
+slopes α and β.
+33

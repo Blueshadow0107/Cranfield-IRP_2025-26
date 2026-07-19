@@ -1,0 +1,1919 @@
+ARTICLE
+Metabolic perceptrons for neural computing
+in biological systems
+Amir Pandi1,5, Mathilde Koch1,5, Peter L. Voyvodic2, Paul Soudier1,3, Jerome Bonnet
+2, Manish Kushwaha
+1 &
+Jean-Loup Faulon
+1,3,4
+Synthetic biological circuits are promising tools for developing sophisticated systems for
+medical, industrial, and environmental applications. So far, circuit implementations commonly
+rely on gene expression regulation for information processing using digital logic. Here, we
+present a different approach for biological computation through metabolic circuits designed
+by computer-aided tools, implemented in both whole-cell and cell-free systems. We ﬁrst
+combine metabolic transducers to build an analog adder, a device that sums up the con-
+centrations of multiple input metabolites. Next, we build a weighted adder where the con-
+tributions of the different metabolites to the sum can be adjusted. Using a computational
+model ﬁtted on experimental data, we ﬁnally implement two four-input perceptrons for
+desired binary classiﬁcation of metabolite combinations by applying model-predicted weights
+to the metabolic perceptron. The perceptron-mediated neural computing introduced here
+lays the groundwork for more advanced metabolic circuits for rapid and scalable multiplex
+sensing.
+https://doi.org/10.1038/s41467-019-11889-0
+OPEN
+1 Micalis Institute, INRA, AgroParisTech, Université Paris-Saclay, Jouy-en-Josas, France. 2 Centre de Biochimie Structurale, INSERM U1054, CNRS UMR 5048,
+University of Montpellier, Montpellier, France. 3 iSSB Laboratory, Génomique Métabolique, Genoscope, Institut François Jacob, CEA, CNRS, Univ Evry,
+Université Paris-Saclay, 91057 Evry, France. 4 SYNBIOCHEM Center, School of Chemistry, University of Manchester, Manchester, UK. 5These authors
+contributed equally: Amir Pandi, Mathilde Koch. Correspondence and requests for materials should be addressed to M.K. (email: manish.kushwaha@inra.fr)
+or to J.-L.F. (email: jean-loup.faulon@inra.fr)
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+1
+1234567890():,;
+
+
+L
+iving organisms are information-processing systems that
+integrate multiple input signals, perform computations on
+them, and trigger relevant outputs. The multidisciplinary
+ﬁeld of synthetic biology has combined their information-
+processing capabilities with modular and standardized engineer-
+ing approaches to design sophisticated sense-and-respond beha-
+viors1–3. Due to similarities in information ﬂow in living systems
+and electronic devices4, circuit design for these behaviors has
+often been inspired by electronic circuitry, with substantial efforts
+invested in implementing logic circuits in living cells4–6. Fur-
+thermore, synthetic biological circuits have been used for a
+range of applications including biosensors for detection of
+pollutants7,8
+and
+medically
+relevant
+biomarkers9,10,
+smart
+therapeutics11,12, and dynamic regulation and screening in
+metabolic engineering13,14.
+Synthetic circuits can be implemented at different layers of bio-
+logical information processing, such as: (i) the genetic layer com-
+prising transcription15 and translation16, (ii) the metabolic layer
+comprising enzymes17,18, and (iii) the signal transduction layer
+comprising small molecules and their receptors19,20. Most designs
+implemented so far have focused on the genetic layer, developing
+circuits that perform computations using elements such as feedback
+control21, memory systems22,23, ampliﬁers24,25, toehold switches26,
+or CRISPR machinery27,28. However, gene expression regulation is
+not the only way through which cells naturally perform computa-
+tion. In nature, cells carry out parts of their computation through
+metabolism, receiving multiple signals and distributing information
+ﬂuxes to metabolic, signaling, and regulatory pathways17,29,30.
+Integrating metabolism into synthetic circuit design can expand the
+range of input signals and communication wires used in biological
+circuits, while bypassing some limitations of temporal coordination
+of gene expression cascades31,32.
+The number of inputs processed by synthetic biological circuits
+has steadily increased over the years, including physical inputs
+like heat, light, and small molecules such as oxygen, IPTG, aTc,
+arabinose and others. However, most of these circuits process
+input signals using digital logic, which despite its ease of imple-
+mentation lacks the power that analog logic can offer1,33,34. The
+power of combining digital and analog processing is exempliﬁed
+by the perceptron, the basic block of artiﬁcial neural networks
+inspired by human neurons35 that can, for instance, be trained on
+labelled input datasets to perform binary classiﬁcation. After the
+training, the perceptron computes the weighted sum of input
+signals (analog computation) and makes the classiﬁcation deci-
+sion (digital computation) after processing it through an activa-
+tion function.
+Here we describe the development of complex metabolic cir-
+cuitry implemented using analog logic in whole-cell and cell-free
+systems by means of enzymatic reactions. For circuit design, we
+ﬁrst employ computational design tools, Retropath36 and Sensi-
+path37, that use biochemical retrosynthesis to predict metabolic
+pathways and biosensors. We then build and model three whole-
+cell metabolic transducers and an analog adder to combine their
+outputs. Next, we transfer our metabolic circuits to a cell-free
+system38,39 in order to take advantage of the higher tunability and
+the rapid characterization it offers40–42, expanding our system to
+include multiple weighted transducers and adders. Finally, using
+our integrated model ﬁtted on the cell-free metabolic circuits we
+build a more sophisticated device called the metabolic perceptron,
+which allows desired binary classiﬁcation of multi-input meta-
+bolite combinations by applying model-predicted weights on the
+input metabolites before analog addition, and demonstrate its
+utility through two examples of four-input binary classiﬁers.
+Altogether, in this work we demonstrate the potential of synthetic
+metabolic circuits, along with model-assisted design, to perform
+complex computations in biological systems.
+Results
+Whole-cell processing of multiple input metabolites. To iden-
+tify the metabolic circuits to build, we use our metabolic pathway
+design tools, Retropath36 and Sensipath37. These tools function
+using a set of sink compounds at the end of a metabolic pathway,
+here metabolites from a dataset of detectable compounds43, and a
+set of source compounds that can be used as desired inputs for
+the circuit. The tools then propose pathways and the enzymes
+that can catalyze the necessary reactions, allowing for pro-
+miscuity. Our metabolic circuit layers are organized according to
+the main processing functions: transduction and actuation (Fig.
+1a). Transducers are the simplest metabolic circuits that function
+as sensing enabling metabolic pathways (SEMP)44, consisting of
+one or more enzymes that transform an input metabolite into a
+transduced metabolite. The transduced molecule, in turn, is
+detected through an actuation function that is implemented using
+a transcriptional regulator.
+We used benzoate as our transduced metabolite, its associated
+transcriptional activator BenR, and the responsive promoter pBen
+to construct the actuator layer of our whole-cell metabolic
+circuits45. To compare the shape of the response curve, we
+constructed the actuator layer in two formats: (i) an open-loop
+circuit (Fig. 1b) and (ii) a feedback-loop circuit (Supplementary
+Fig. 1). When compared to the open-loop format, the feedback-
+loop circuit has previously been shown to exhibit a linear
+dose–response to input21,46. We found that while the feedback-
+loop format does linearize the actuator response curve, it also
+reduces its dynamic range (Supplementary Fig. 1). Furthermore,
+the growth inhibition observed at high concentrations makes it
+difﬁcult to recover the lost dynamic range by further addition of
+benzoate (Supplementary Fig. 6). Therefore, we selected the open-
+loop format due to its higher dynamic range of activation in the
+tested range of benzoate concentration (Fig. 1c), setting the
+maximum concentration of benzoate used in this work to the
+saturation point of this open-loop circuit.
+We have previously implemented sensing-enabling metabolic
+pathways in whole cells for detection of molecules like cocaine,
+hippurate, parathion and nitroglycerin44. Building on that work,
+here we implemented three upstream transducers that convert
+different input metabolites into benzoate for detection by the
+actuator
+layer
+already
+tested.
+The transducer
+layers
+were
+composed of enzymes HipO for hippurate (Fig. 1d), CocE for
+cocaine (Fig. 1e), and an amidase coded by vdh gene for
+benzaldehyde (Fig. 1f). Compared to the benzoate output signal,
+we found that the transduction capacities of the three transducers
+were 99.6%, 49.2%, and 77.8%, respectively (Supplementary
+Fig. 2), indicating a partial dissipation in signal.
+A whole-cell metabolic concentration adder. A metabolic con-
+centration adder is an analog device composed of more than one
+transducer that converts their respective input metabolites into a
+common transduced output metabolite. For our whole-cell con-
+centration adder, we combined two transducers to build a
+hippurate-benzaldehyde adder actuated by the benzoate circuit
+(Fig. 2a). Unlike digital bit-adders that exhibit an ON–OFF digital
+behavior, our metabolic adders exhibit a continuous analog
+behavior that is natural for metabolic signal conversion47 (Fig. 2b
+and Supplementary Fig. 3). Increasing the concentration of one of
+the inputs at any ﬁxed concentration of the other shows an
+increase in the output benzoate, and thus in the resulting ﬂuor-
+escence (Fig. 2b and Supplementary Fig. 3).
+The maximum output signal for our analog adder, when
+hippurate
+and
+benzaldehyde
+were both
+at
+the maximum
+concentration of 1000 µM, was lower than the maximum signal
+produced by hippurate and benzaldehyde transducers alone
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+2
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+(Supplementary Fig. 2). However, as seen above, the difference
+between the maximum signal of their transducers and the
+actuator was smaller. The dissipation in signal could either be
+because of resource competition (as a result of adding more
+genes) or because of enzyme efﬁciency (as a result of poorly
+balanced enzyme stoichiometries). To test these two hypotheses,
+we investigated the effect of the enzymes on cellular resource
+allocation. For this purpose, the cocaine transducer and the
+hippurate-benzaldehyde adder were characterized by adding
+benzoate to these circuits (Supplementary Figs. 4 and 5).
+Comparing the results of these characterizations with the
+benzoate actuator reveals that dissipation in signal from the
+transducers to the actuators is due to enzyme efﬁciency
+(Supplementary Fig. 4), whereas that from the adders to the
+actuators is due to resource competition (Supplementary Fig. 5).
+The effect of the metabolic circuits on cell physiology are
+presented as the speciﬁc growth rate (μ) of the cells harboring
+the circuits at different concentrations of inputs (Supplementary
+Figs. 6 and 7). Compared to the speciﬁc growth rate of cells
+containing empty plasmids (μ = 1.05 ± 0.32 h−1, the mean and
+standard deviation of three repeats), adding the metabolic circuits
+alone results only in a mild growth reduction. However, adding
+the metabolic circuits with their input metabolite(s) has a much
+more pronounced effect on growth reduction, particularly at high
+concentrations.
+In order to gain a quantitative understanding of the circuits’
+behavior, we empirically modeled their individual components to
+see if we were able to successfully capture their behavior. We ﬁrst
+modeled the actuator (gray curve in Fig. 1c) using Hill
+formalism48 as it is the component that is common to all of
+our outputs and therefore constrains the rest of our system. We
+then modeled our transducers, considering enzymes to be
+modules that convert their respective input metabolites into
+benzoate, which is then converted to the ﬂuorescence output
+already modeled above. This simple empirical modeling strategy
+would be able to explain our transducer data, including the effects
+of enzyme efﬁciency, but not to account for observations made in
+Supplementary Fig. 5, which is why we also included resource
+competition is our models to explain circuits with one or more
+transducers. To this end, we extended the Hill model to account
+for resource competition following previous works49,50, with a
+ﬁxed pool of available resources for enzyme and reporter protein
+production that is depleted by the transducers. This extension is
+further presented in the Methods section. We ﬁtted our model on
+all transducers, with and without resource competition (i.e.,
+individual transducers, or transducers where another enzyme
+Benzoate
+Hippurate
+3.5.1.32
+Benzoate
+3.1.1.84
+Benzoate
+1.2.3.9
+Cocaine
+Benzaldehyde
+d
+e
+f
+CocE
+iHipO
+vdh
+c
+b
+Actuator
+pBenGFP
+BenR
+Benzoate
+BenR
+Benzoate
+actuator
+Benzoate
+actuator
+Benzoate
+actuator
+Input 
+metabolites
+Transducer layer
+Actuator layer
+a
+0
+0
+1
+10
+100 1000
+0
+1 × 1003
+2 × 1003
+3 × 1003
+1 × 1003
+2 × 1003
+3 × 1003
+1 × 1003
+2 × 1003
+3 × 1003
+1 × 1003
+2 × 1003
+3 × 1003
+[Benzoate] μM
+0
+1
+10
+100
+1000
+0
+[Benzaldehyde] μM
+NC (no enzyme)
+Benzaldehyde transducer
+0
+1
+10
+100 1000
+0
+[Cocaine] μM
+NC (no enzyme)
+Cocaine transducer
+0
+1
+10
+100
+1000
+[Hippurate] μM
+NC (no enzyme)
+Hippurate transducer
+Fluorescence/OD (a.u.)
+Fluorescence/OD (a.u.)
+Fluorescence/OD (a.u.)
+Fluorescence/OD (a.u.)
+Fig. 1 Whole-cell actuator and metabolic transducers. a Designed synthetic metabolic circuits using Retropath36 or Sensipath37 consist of a transducer
+layer and an actuator layer. b Open-loop circuit construction of the benzoate actuator, which is used downstream of transducer metabolic circuits in this
+work. For the open-loop circuit, the gene encoding transcription factor (TF) is expressed constitutively under control of the promoter J23101 and RBS
+B0032. c Dose-response plot of the open-loop circuit for the benzoate actuator. The gray curve is a model-ﬁtted curve (see Methods section) for the open-
+loop circuit. d–f Whole-cell metabolic transducers for hippurate (d), cocaine (e) and benzaldehyde (f) represented in dose-response plots (orange circles)
+and their associated dose-response when there is no enzyme present (blue circles). The blue dotted lines refer to the maximum signal from the actuator
+(c). The transducer output, benzoate, is reported through the open-loop circuit actuator. The genes encoding the enzymes are expressed under constitutive
+promoter J23101 and RBS B0032. All data points and the error bars are the mean and standard deviation of normalized values from measurements taken
+from three different colonies on the same day. Source data are provided in the Source Data ﬁle
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+3
+
+
+competes for the resources). This model (presented in gray lines
+in Figs. 1d–f and 2c), which was not trained on adder data but
+only on actuator, transducer, and transducers with resource
+competition data, recapitulates it well. This indicates that the
+model accounts for all important effects underlying the data. The
+full training process is presented in the Methods section, and a
+table summarizing scores of estimated goodness of ﬁt of our
+model is presented in Supplementary Table 1.
+Cell-free processing of multiple metabolic inputs. Cell-free
+systems have recently emerged as a promising platform38 that
+provide rapid prototyping of large libraries by serving as an
+abiotic chassis with low susceptibility to toxicity. We took
+advantage of an E. coli cell-free system with the aim of increasing
+the computational potential of metabolic circuits in several ways
+(Fig. 3a). Firstly, a higher number of genes can be simultaneously
+and combinatorially used to increase the complexity and the
+number of inputs for our circuits. Secondly, the lower noise
+provided by the absence of cell growth and maintenance of cel-
+lular pathways51 improves the predictability and accuracy of the
+computation. Thirdly, having genes cloned in separate plasmids
+enables independent tunability of circuit behavior by varying the
+concentration of each part individually. Finally, cell-free systems
+are highly adjustable for different performance parameters and
+components. In all, these advantages of cell-free systems enable us
+to develop more complex computations than the whole-cell
+analog adder.
+Following from our recent work52, we ﬁrst characterized a cell-
+free benzoate actuator to be used downstream of other metabolic
+transducers. Figure 3a shows a schematic of the cell-free benzoate
+actuator composed of a plasmid encoding the BenR transcrip-
+tional activator and a second plasmid expressing sfGFP reporter
+gene under the control of a pBen promoter. This actuator showed
+a higher operational range than the whole-cell counterpart
+(Fig. 1c). The optimal concentration of the TF plasmid (30 nM)
+and the reporter plasmid (100 nM) were taken from our recent
+study52. Following successful implementation of the actuator, we
+proceeded to build ﬁve upstream cell-free transducers for
+hippurate, cocaine, benzaldehyde, benzamide, and biphenyl-2,3-
+diol (Fig. 3c–g) that convert these compounds to benzoate. Each
+of the ﬁve transducers used 10 nM of enzyme DNA per reaction,
+except the biphenyl-2,3-diol transducer that used two metabolic
+enzymes with 10 nM DNA each.
+Compared to its whole-cell counterpart (Fig. 1f), in the cell-free
+transducer reaction (Fig. 3e) benzaldehyde appears to sponta-
+neously oxidise to benzoate without the need of the transducer
+enzyme vdh. This behavioral difference between the whole-cell
+and cell-free setups could be due to the difference in redox states
+inside
+an
+intact
+cell
+and
+the
+cell-free
+reaction
+mix53,54.
+Furthermore,
+benzamide
+and
+biphenyl-2,3-diol
+transducers
+exhibit
+reduction
+in
+ﬂuorescence
+outputs
+at
+very
+high
+(1000 μM) input concentrations.
+Cell-free weighted transducers and adders. After characterizing
+different transducers in the cell-free system that enable building a
+multiple-input metabolic circuit, we sought to rationally tune the
+transducers. Cell-free systems allow independent tuning of each
+plasmid by pipetting different amounts of DNA. We applied this
+advantage to weight the ﬂux of enzymatic reactions in cell-free
+transducers (Fig. 4a). The concentration range we used was taken
+a
+HipO
+vdh
+Hippurate
+3.5.1.32
+Benzaldehyde
+1.2.3.9 Benzoate
+pBen
+BenR
+Benzoate
+GFP
+BenR
+E. coli
+Metabolic adder
+Actuator
+0
+1
+10
+20
+100
+500 1000
+0
+1
+10
+20
+100
+500 1000
+1000
+500
+100
+20
+10
+1
+0
+[Hippurate] μM
+[Benzaldehyde] μM
+Fluorescence/OD
+(a.u.)
+2.0 × 1002
+6.0 × 1002
+1.0 × 1003
+1.4 × 1003
+1000
+500
+100
+20
+10
+1
+0
+2 × 1002
+6 ×1002
+1 × 1003
+[Hippurate] μM
+[Benzaldehyde] μM
+Fluorescence/OD
+(a.u.)
+c
+b
+Fig. 2 Whole-cell metabolic adder of hippurate and benzaldehyde. a Hippurate and benzaldehyde transducers are combined to build a metabolic adder
+producing a common output, benzoate, which is reported through the benzoate actuator. The genes encoding the enzymes are expressed in one operon
+under control of constitutive promoter J23101 and RBSs B0032 for HipO and B0034 for vdh. b Heatmap representing the output of the adder while
+increasing the concentration of both inputs, hippurate and benzaldehyde. All data points are the mean of normalized values from measurements taken from
+three different colonies on the same day. c Model simulations for experimental conditions presented in b. The model was ﬁtted on transducer data and
+resource competition data. Source data are provided in the Source Data ﬁle
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+4
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+from our recent study52, in order to have an optimal expression
+with minimum resource competition. We built four weighted
+transducers for hippurate (Fig. 4b), cocaine (Fig. 4c), benza-
+mide (Fig. 4d) and biphenyl-2,3-diol (Fig. 4e). Increasing the
+concentration of the enzymes produces a higher amount of
+benzoate from the input metabolites, and hence higher GFP
+ﬂuorescence. Compared to the others, the hippurate transducer
+reached higher GFP production at a given concentration of the
+enzyme and the input, and biphenyl-2,3-diol reached the
+weakest signal. For the biphenyl-2,3-diol transducer built with
+two enzymes (Fig. 4e), both enzymes are added at the same
+concentration (e.g., 1 nM of enzyme DNA indicates 1 nM each
+of plasmids encoding enzymes bphC and bphD). For a given
+concentration of the input there is a range within which the
+concentration of the enzyme DNA(s) can be varied to tune the
+weight of the input (Supplementary Fig. 8).
+Data in Fig. 4 show that similar output levels can be achieved
+for different input concentrations, provided the appropriate
+transducer concentrations are used. In the next step, we applied
+this ﬁnding to build hippurate-cocaine weighted adders by
+altering
+either
+the
+concentration
+of
+the
+enzymes
+or
+the
+concentration of the inputs (Fig. 5a). The ﬁxed-input adder is
+an analog adder in which the concentration of inputs, hippurate
+and cocaine, are ﬁxed to 100 µM and the concentration of the
+enzymes is altered (top panel in Fig. 5b). In this device, the weight
+of
+the
+reaction
+ﬂuxes
+is
+continuously
+tunable.
+We
+then
+Metabolic transducer
+a
+Input metabolite(s)
+Reaction buffer
+Cell lysate
+DNA
+Actuator
+pBen
+BenR
+Benzoate
+GFP
+BenR
+Benzoate
+Cell-free 
+reaction
+Benzoate
+Hippurate
+3.5.1.32
+c
+HipO
+Benzoate
+3.7.1.8
+g
+Biphenyl-2,3-diol
+1.13.11.39
+bphC
+bphD
+Benzoate
+3.1.1.84
+Cocaine
+CocE
+Benzoate
+1.2.3.9
+Benzaldehyde
+vdh
+Benzoate
+3.5.1.4
+Benzamide
+Amidase
+e
+f
+d
+b
+0
+1
+10
+100
+1000
+0
+2
+4
+6
+[Benzoate] μM
+10
+100
+1000
+0
+2
+4
+6
+[Benzaldehyde] μM
+RFU
+No enzyme
+Benzaldehyde
+Transducer
+10
+100
+1000
+0
+2
+4
+6
+[Benzamide] μM
+RFU
+No enzyme
+Benzamide
+Transducer
+10
+100
+1000
+0
+2
+4
+6
+[Biphenyl-2,3-diol] μM
+RFU
+No enzyme
+Biphenyl-2,3-diol transducer
+Only 3.7.1.8
+Only 1.13.11.39
+10
+100
+1000
+0
+2
+4
+6
+[Cocaine] μM
+RFU
+No enzyme
+Cocaine
+transducer
+10
+100
+1000
+0
+2
+4
+6
+[Hippurate] μM
+RFU
+No enzyme
+Hippurate
+transducer
+0
+0
+0
+0
+0
+RFU
+Fig. 3 Cell-free actuator and metabolic transducers. a Implementing benzoate actuator and transducers in E. coli transcription/translation (TXTL) cell-free
+system. Cell-free reactions are composed of cell lysate, reaction buffer (energy source, tRNAs, amino acids, etc.) and DNA plasmids. b Dose–response plot
+of the benzoate actuator in the cell-free system with 30 nM of TF-plasmid (constitutively expressed BenR) and 100 nM of reporter plasmid (pBen-sfGFP)
+per reaction. The data points represent the dose–response of the actuator to different concentrations of benzoate and the gray curve is a model-ﬁtted curve
+on actuator data c–g. Cell-free transducers coupled with the benzoate actuator for hippurate (c), cocaine (d), benzaldehyde (e), benzamide (f), and
+biphenyl-2,3-diol (g), which is composed of two enzymes. All enzymes are cloned in a separate plasmid under the control of a constitutive promoter J23101
+and RBS B0032. 10 nM of each plasmid was added per reaction. The bars are the response of the circuits to different concentrations of input with
+(transducers, black bars) and without enzyme (red bars). All data are the mean and the error bars are the standard deviation of normalized values from
+measurements taken from three independent cell-free reactions on the same day (gray dots on each bar are individual values from which the mean and SD
+were calculated). (RFU relative ﬂuorescence unit). Source data are provided in the Source Data ﬁle
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+5
+
+
+characterized a ﬁxed-enzyme adder by ﬁxing the concentration of
+the enzymes’ DNA (1 nM for HipO, 3 nM for CocE; the cocaine
+signal is weaker, which is why a higher concentration of its
+enzyme is used) and varying the inputs, hippurate and cocaine
+(top panel in Fig. 5c). However, it is important to note that the
+observed GFP is not a direct output from the weighted adders.
+Instead, the adder output is transformed by the actuator to
+produce the GFP signal. Since the benzoate actuator has a
+sigmoidal response curve (Fig. 3b), the transformation by the
+actuator layer makes the visible output appear more switch-like
+(ON/OFF).
+In order to have the ability to build any weighted adder with
+predictable results, we developed a model that accounts for the
+previous data. We ﬁrst empirically modeled the actuator (gray
+curve in Fig. 3b) since all other functions are constrained by how
+the actuator converts metabolite data (benzoate) into a detectable
+signal (GFP). We then ﬁtted our model with individual weighted
+transducers (Supplementary Fig. 9) and predicted the behaviors
+of the weighted adders (bottom panel in Fig. 5b, c). The results
+shown in Fig. 5b, c indicate that our model describes the adders
+well, despite being ﬁtted only on transducer data. Supplementary
+Table 2 summarizes the different scores to estimate the goodness
+of ﬁt of our model. Brieﬂy, the model quantitatively captures the
+data but tends to overestimate values at intermediate enzyme
+concentration ranges and does not capture the inhibitory effect
+observed at the high concentration of benzamide or biphenyl-2,3-
+diol, as this was not accounted for in the model.
+Using the above strategy, we can build any weighted adder for
+which we have pre-calculated the weights using the model on
+weighted transducers. We use this ability in the following section
+to perform more sophisticated computation for a number of
+classiﬁcation problems.
+CocE
+HipO
+bphC
+bphD
+Amidase
+c
+b
+d
+e
+Weighted transducer
+Actuator
+a
+pBen
+BenR
+Benzoate
+GFP
+BenR
+Input metabolite(s)
+Reaction buffer
+Cell lysate
+DNA
+Cell-free 
+reaction
+Benzoate
+0
+10
+100
+1000
+10
+3
+1
+0.3
+0.1
+1
+2
+[Enzyme DNA] nM
+[Biphenyl-2,3-diol] μM
+RFU
+0
+10
+100
+1000
+10
+3
+1
+0.3
+0.1
+1
+2
+3
+[Enzyme DNA] nM
+[Benzamide] μM
+RFU
+0
+10
+100
+1000
+10
+3
+1
+0.3
+0.1
+1
+2
+3
+[Enzyme DNA] nM
+[Cocaine] μM
+RFU
+0
+10
+100
+1000
+10
+3
+1
+0.3
+0.1
+[Enzyme DNA] nM
+[Hippurate] μM
+RFU
+1
+2
+3
+4
+Fig. 4 Cell-free weighted transducers characterized by varying the concentration of the enzyme DNA. a In the cell-free system, the circuits can be tuned by
+varying the amount of each enzyme pipetted per reaction. Weighted transducers are characterized by varying the concentration of the enzymes in
+transducers which then are reported through the benzoate actuator. The range of the concentrations was varied to get optimal expression and minimum
+resource competition. b–e Heatmaps representing weighted transducers at different concentrations of input molecules and enzymes DNA for hippurate
+(b), cocaine (c), benzamide (d) and biphenyl-2,3-diol (e). For the biphenyl-2,3-diol weighted transducer (e), concentrations represent those of each
+metabolic plasmid (e.g., 1 nM of enzyme DNA refers to 1 nM of bphC plus 1 nM of bphD). See Supplementary Fig. 9 for model results of each weighted
+transducer. All data are the mean of normalized values from three measurements. (RFU relative ﬂuorescence unit). Source data are provided in the Source
+Data ﬁle
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+6
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+Cell-free perceptron for binary classiﬁcations. The perceptron
+algorithm was ﬁrst developed to computationally mimic the
+neuron’s ability to process information, learn, and make deci-
+sions55. Perceptrons are the basic blocks of artiﬁcial neural net-
+works enabling the learning of deep patterns in datasets by
+training the model’s input weights56. Like a neuron, the percep-
+tron receives multiple input signals (xi) and triggers an output
+depending on the weighted (wi) sum of the inputs35. A percep-
+tron can be used to classify a set of input combinations after it is
+trained on labeled data. In binary classiﬁcation, the weighted sum
+is ﬁrst calculated (Σwi.xi) and an activation function (f), coupled
+with a decision threshold d, ﬁnally makes the decision: ON if f
+(Σwi.xi) > d, OFF otherwise (Fig. 6a). The activation function can
+be linear or non-linear (Sigmoid, tanh, ReLU, etc.) depending on
+the problem57, although a sigmoid is generally used for
+classiﬁcation.
+Since our weighted transducer models have already been ﬁtted
+on the cell-free experimental data, we checked if we could use
+them to calculate the weights needed to classify different
+combinations of two inputs: hippurate and cocaine. We tested
+our model on ﬁve different 2-input binary classiﬁcation problems
+(Supplementary Fig. 10). For each problem, the two types of data
+were represented as a cluster of dots on the scatter plot, with the
+axes representing the two inputs. The ﬁtted model was then used
+to identify weights needed to be applied to the weighted
+transducers such that a decision threshold ‘d’ exists to classify
+Fixed-Input Adder
+b
+c
+a
+Weighted adder
+Hippurate
+3.5.1.32
+Cocaine
+3.1.1.84
+Benzoate
+Actuator
+pBen
+BenR
+Benzoate
+GFP
+BenR
+HipO
+CocE
+Input metabolite(s)
+Reaction buffer
+Cell lysate
+DNA
+Cell-free 
+reaction
+Fixed-Enzyme Adder
+0
+0.1
+0.3
+1
+3
+10
+10
+3
+1
+0.3
+0.1
+0
+RFU
+2
+4
+[HipO DNA] nM
+0
+0.1
+0.3
+1
+3
+10
+10
+3
+1
+0.3
+0.1
+0
+[HipO DNA] nM
+[CocE DNA] nM
+[Cocaine] μM
+[Cocaine] μM
+[CocE DNA] nM
+2
+4
+RFU
+0
+1
+10
+20
+100 500 1000
+1000
+500
+100
+20
+10
+1
+0
+2
+4
+[Hippurate] μM
+RFU
+0
+1
+10
+20
+100 500 1000
+1000
+500
+100
+20
+10
+1
+0
+[Hippurate] μM
+2
+4
+RFU
+Fig. 5 Multiple transducers are combined to shape an adder while weighting inputs or enzymes. a Cell-free adder characterization by varying the
+concentration of either inputs or enzymes producing different levels of ﬂuorescence through the actuator. b Heatmap showing ﬁxed-input adder in which
+the inputs, hippurate and cocaine, are ﬁxed to 100 µM and concentrations of associated enzyme are altered by altering the concentration of plasmid DNA
+encoding them. Top: cell-free experiment of hippurate-cocaine ﬁxed-input (weighted) adder. Bottom: model simulation (prediction) of hippurate-cocaine
+ﬁxed-input (weighted) adder. c Fixed-enzyme adder with ﬁxed concentrations of the enzymes’ DNA, 1 nM for HipO and 3 nM for CocE, and various
+concentrations of the inputs, hippurate and cocaine. Top: Cell-free experiment of hippurate-cocaine ﬁxed-enzyme adder. Bottom: model simulations
+(prediction) of hippurate-cocaine ﬁxed-enzyme adder. All data are the mean of normalized values from three measurements. (RFU relative ﬂuorescence
+unit). Source data are provided in the Source Data ﬁle
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+7
+
+
+the two clusters into red (ON, >d) or blue (OFF, ≤d). In each
+binary classiﬁcation, three iso-ﬂuorescence lines threshold the
+data into the binary categories: ON and OFF (Supplementary
+Fig. 10). These theoretical classiﬁcation problems demonstrate the
+ability of our perceptron model to successfully carry out binary
+classiﬁcation. It is worth noting that a binary classiﬁer whose
+input(s) and output are binary values can also be represented as a
+logic gate. Therefore, the theoretical classiﬁcation functions
+implemented here can also be interpreted as logic gate functions.
+For example, the third classiﬁer in the ﬁgure can also be
+represented
+as
+the
+equivalent
+logic
+function
+(H
+OR
+C)
+(Supplementary Fig. 10c).
+Using the integrated model from our weighted transducers and
+adders, we next sought to design four-input binary classiﬁers
+using a metabolic perceptron, and test them experimentally. Our
+metabolic perceptron is a device enabling signal integration of
+multiple inputs with associated weights, represented by enzyme
+DNA concentrations (Fig. 6b). The 4-input adder performs the
+weighted sum and the benzoate actuator acts as the activation
+function of the metabolic perceptron. Similar to the 2-input
+binary classiﬁcations above (Supplementary Fig. 10), the weights
+of the four inputs can be adjusted to implement different
+classiﬁcation functions. To illustrate the potential of building
+perceptrons with metabolic weighted adders, we computed adder
+.
+.
+Weighted 
+sum
+x1
+w1
+w2
+x2
+wn
+xn
+Activation
+function
+Out
+f
+
+a
+Hippurate
+Cocaine
+Benzamide
+Biphenyl-2,3-diol
+OFF
+ON
+Cocaine
+Benzamide
+Biphenyl-2,3-diol
+OFF
+ON
+Hippurate
+Benzoate
+Σ
+Full OR Classifier 
+Benzoate
+(C AND H) OR B OR F
+c
+d
+Metabolic perceptron
+Hippurate
+Cocaine
+Benzamide
+Biphenyl-
+2,3-diol
+Benzoate
+b
+i =1
+n
+Cell-free 
+reaction
+xi wi + b)
+Hippurate
+Cocaine
+Benzamide
+Biphenyl-
+2,3-diol
+Hippurate
+Cocaine
+Benzamide
+Biphenyl-
+2,3-diol
+OFF  OFF OFF
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+OFF
+ ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+ON
+…
+Actuator
+RFU
+5
+4
+3
+2
+1
+0
+RFU
+5
+4
+3
+2
+1
+0
+f (
+wi = [Enzyme DNA] 
+wi = [Enzyme DNA] nM 
+wi = [Enzyme DNA] nM 
+Σ
+Σ
+[10] [10]
+[10] [10]
+[0.03]
+[0.1]
+[1]
+[1]
+[1]
+[1]
+[100 μM]
+[100 μM]
+Fig. 6 Cell-free perceptron enabling development of classiﬁers. a A perceptron scheme showing the inputs and their associated weights, the computation
+core, and the output. The perceptron computes the weights and actuates the weighted sum through an activation function. b Metabolic perceptron
+integrating multiple inputs and actuating an output. The benzoate actuator acts as the activation function of the perceptron reporting the sum of benzoate
+produced by the metabolic perceptron. Hippurate, cocaine, benzamide, and biphenyl-2,3-diol are the inputs of the metabolic perceptron ﬁxed to 100 µM.
+The weights of the perceptron are the concentration of the enzymes calculated using the model made on weighted metabolic circuits (red circles). These
+weights are calculated to develop two classiﬁers using the metabolic perceptron and benzoate actuator. Full OR classiﬁer c, [cocaine (C) AND hippurate
+(H)] OR benzamide (B) OR biphenyl-2,3-diol (F) classiﬁer (d) are the two classiﬁers built using this metabolic perceptron. The Full OR classiﬁer (c)
+classiﬁes to OFF when none of the inputs is present and it passes an arbitrary threshold to ON when any of the inputs or their combinations are present.
+The second classiﬁer (d) performs a more complex computation. The shading represents the arbitrary threshold that allows for perceptron decision making
+and the panel of OFF and ON at the top of the bars are the expected output of the classiﬁers. All data are the mean and the error bars are the standard
+deviation of normalized values from three measurements and red circles are the model predictions (gray dots on each bar are individual values from which
+the mean and SD were calculated). (RFU relative ﬂuorescence unit). Source data are provided in the Source Data ﬁle
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+8
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+weights using our model for two different classiﬁers: a simple
+classiﬁer equivalent to a full OR gate (Fig. 6c), and a more
+complex classiﬁer. To deﬁne the second classiﬁer, we used our
+ﬁtted model to simulate with different weights various 4-input
+functions that combined AND and OR behaviors. Our simulation
+outcomes were most reliable for hippurate and cocaine inputs
+since we had previously veriﬁed our model predictions on the
+ﬁxed
+enzyme
+and
+ﬁxed
+input
+adders
+(Figs.
+4
+and
+5).
+Consequently, we decided to test the classiﬁcation function
+equivalent to a [cocaine AND hippurate] OR benzamide OR
+biphenyl-2,3-diol gate (Fig. 6d). Weight calculation methods are
+reported in the Methods section.
+Finally, we used the cell-free system to implement the
+classiﬁers using the calculated weights and to execute the
+computations. While our perceptrons are trained in silico, they
+are executed in the cell-free system to predict the outcome of a
+given set of input signals. This is comparable to how computa-
+tional perceptrons also proceed in the two phases of training and
+prediction. For the classiﬁers, the input metabolites are ﬁxed to
+100 µM, as it allows the best ON–OFF behavior for all inputs and
+weight-tuning according to model simulations. The model
+accurately predicted weights to obtain the simple full OR
+classiﬁer behavior (Fig. 6d), as well as cocaine, benzamide, and
+biphenyl-2,3-diol weights for the second complex classiﬁer. The
+initial weights computed by the model are presented in
+Supplementary Fig. 11. The optimal weight of HipO (hippurate
+transducing enzyme) was calculated to be 0.1 nM of its DNA
+plasmid, which leads to higher signals than predicted, particularly
+for the ON behavior with only hippurate. To further characterize
+the HipO weights at still lower concentrations of the enzyme, we
+performed an additional complementary characterization (Sup-
+plementary Fig. 12). Our aim here was to ﬁnd a weight for HipO
+through which a classiﬁer outputs a low signal (OFF) with only
+hippurate and high signal (ON) when coupled with other inputs.
+We arrived at 0.03 nM DNA for HipO enzyme which exhibited
+this shifting behavior between OFF and ON (Fig. 6d and
+Supplementary Fig. 12). Using our model-guided design and
+rapid cell-free prototyping on the HipO weight, we were able to
+design two 4-input binary classiﬁers. In Fig. 6c, d red circles are
+the weights predicted with 0.03 nM for HipO and the bars are
+experimental results. As noted earlier, the sigmoidal nature of the
+benzoate actuator’s response curve (Fig. 3b) is key to achieving
+the OFF and ON behavior exhibited by our binary classiﬁers. All
+actual values of the model and the experiments are provided in
+Supplementary Table 7.
+Discussion
+Computing in synthetic biological circuits has largely relied on
+digital logic-gate circuitry for almost two decades5,58, treating
+inputs as either absent (0) or present (1). While such digital
+abstraction of input signals provides conceptual modularity for
+circuit design, it is less compatible with the physical-world input
+signals that vary between low and high values on a continuum33.
+As a result, digital biological circuits must carefully match
+input–output dynamic ranges at each layer of signal transmission
+to ensure successful signal processing2,30. More recently, the
+higher efﬁciency of analog computation on continuous input has
+been recognized59, and some analog biological circuits have
+started emerging21. In this regard, using metabolic pathways for
+cellular computing seems like a natural progression for analog
+computation in biological systems21,30.
+In this study, we investigated the potential of metabolism to
+perform analog computations using synthetic metabolic circuits.
+To that end, we ﬁrst established a benzoate actuator to report the
+output from our metabolic circuits in both whole-cell and cell-
+free systems (Figs. 1c and 3b). Upstream of the actuator, we
+constructed hippurate, cocaine, and benzaldehyde transducers in
+the whole-cell system (Fig. 1d–f) and a metabolic analog adder by
+combining the benzaldehyde and hippurate transducers (Fig. 2).
+Similarly, we constructed hippurate, cocaine, benzaldehyde,
+benzamide, and biphenyl-2,3-diol transducers in the cell-free
+system (Fig. 3c–g) and weighted adders by combining them
+(Fig. 5). Compared to the numerous digital biological devices,
+which compute through multi-layered genetic logic circuits, the
+metabolic adder is a simple one-layered device with fast
+execution times.
+Our computational models ﬁtted only on the actuator and
+transducer data predicted adder behaviors with high accuracy
+(Supplementary Tables 1 and 2). This further enabled us to cal-
+culate the required weights for more complex metabolic percep-
+trons that compute weighted sums from multiple inputs and use
+them to classify the multi-input combinations in a binary manner
+(Fig. 6 and Supplementary Fig. 11). Although we used ﬁxed
+concentrations of inputs to demonstrate the ability of our per-
+ceptrons to classify, models ﬁtted on characterization data from
+weighted transducers should enable one to build classiﬁers for
+other concentrations in the operational range of the transducers
+(Supplementary Fig. 13). Indeed, as shown in Figs. 4 and 5, for
+different input concentrations in the operational range the weight
+of the input can be tuned through the concentration of the
+enzyme DNA. To the best of our knowledge, the metabolic adders
+and perceptrons presented in this work are the ﬁrst engineered
+biological circuits that use metabolism for analog computation.
+Unlike genetic circuits that experience expression delays2,
+metabolic circuits have the advantage of faster response times
+since the genes have already been expressed in the system. Yet,
+metabolic circuits can be connected with the other layers of cel-
+lular information processing (like genetic or signal transduction
+layers) when needed, to build more complex sense-and-respond
+behaviors. The actuator layer of our perceptrons is a good
+example of this, where the calculated weighted sum is converted
+to ﬂuorescence output via the genetic layer. In addition, we took
+advantage of the properties of cell-free systems, such as higher
+tunability and lack of toxicity52,60, to rapidly build and char-
+acterize multiple combinations of transducer–actuator circuits.
+Cell-free systems can be lyophilized on paper and stored at
+ambient temperature for <1 year for diagnostic applications16.
+This expands the potential scope of cell-free metabolic percep-
+trons for use in multiplex detection of metabolic proﬁles in
+medical or environmental samples16,52.
+Here, we have built a single-layer perceptron, with positive
+weights, that can classify different proﬁles of input metabolites by
+applying different weights to each transducer. In the future, by
+adding competing or attenuating reactions that reduce the con-
+centration of the transduced metabolite in response to an input, it
+may be possible to expand the training space by applying negative
+weights to certain inputs61. Furthermore, a single-layer percep-
+tron can only classify data that is linearly separable62, which
+means that it should be possible to draw a line between the two
+classes of data points in order for the perceptron to classify them
+(Supplementary Fig. 10). In contrast, multi-layer perceptrons can
+approximate any function63 and can be used for more complex
+pattern recognition tasks64. With the use of bioretrosynthesis-
+based computational tools for metabolic pathway design, like
+Retropath36 and Sensipath37, it is theoretically possible to build
+multi-layer metabolic perceptrons that can classify complex pat-
+terns of metabolic states in vivo, or identify different metabolite
+concentrations in analytical samples (Supplementary Fig. 14).
+Finally, it may also be possible to apply in situ learning (within
+the whole-cell or cell-free environment) by applying winner
+selection strategies on successful classiﬁers65.
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+9
+
+
+However, the use of the metabolic layer for biological com-
+puting is currently underexplored. To expand the computing
+potential of metabolic circuits, many more metabolic parts and
+devices (transducers, adders, and actuators) will need to be
+exhaustively characterised and databases built with descriptions
+of activities, dynamic ranges, cross-talk, chassis dependence, cell-
+free composition dependence, and other functional parameters.
+Here, we provide a detailed method for the identiﬁcation of novel
+parts and the step-wise building of new devices, and make our
+scripts available. These can form the stepping-stone for building a
+larger framework for fully automated design of metabolic circuits,
+similar to the Cello tool for automated genetic circuit design15.
+Methods
+Designing synthetic metabolic circuits. Retropath36 and Sensipath37 were used
+to design the metabolic circuits between potential input metabolites and detectable
+metabolites as outputs43. These tools function using a set of sink compounds, a set
+of source compounds, and a set of chemical rules43,66 implementing enzyme-
+mediated chemical transformations. They then use retrosynthesis to propose
+pathways and the enzymes that can catalyze the necessary reactions, allowing
+promiscuity, between compounds from the sink and compounds from the source.
+To design the adder, the Retropath software was used with a set of detectable
+compounds as the sink and the molecules we wish to use as circuit inputs as the
+source. The results were potential pathways and the associated enzymes, which
+were then analyzed for feasibility. The sequences of the enzymes were codon-
+optimized, synthesized and implemented in E. coli or taken from a previous study.
+Molecular biology. All plasmids were made using Golden Gate assembly in E. coli
+Mach1 chemically competent cells (strain W, genotype: F−φ80(lacZ)ΔM15
+ΔlacX74 hsdR(rK−mK+) ΔrecA1398 endA1 tonA). Whole-cell constructs were
+cloned in BioBrick standard vectors pSB1K3 (kanamycin resistance, pMB1 repli-
+cation origin, high-copy plasmid, ~32 plasmids per genome67) and pSB4C5
+(chloramphenicol resistance, pSC101 replication origin, low-copy plasmid, ~3.4
+plasmids per genome67) and the genes encoding TF and all the enzymes were
+expressed under constitutive promoter J23101 and RBS B0032. All cell-free plas-
+mids were cloned in pBEAST52 (a derived vector from pBEST68, ampicillin
+resistance, pMB1 replication origin, high-copy plasmid, ~32 plasmids per gen-
+ome67). BenR cell-free plasmid and its cognate responsive prompter, pBen,
+expressing super-folder GFP were taken from our recent work52. All other cell-free
+enzymes were cloned under constitutive promoter J23101 and RBS B0032.
+Sequence and source of all the genes and parts are available in Supplementary
+Table 5 and the plasmids used in this study (Addgene deposit) are listed in Sup-
+plementary Table 6. Synthetic sequences were provided by Twist Bioscience.
+Enzymes for cloning including Q5 DNA polymerase, BsaI, and T4 DNA ligase were
+purchased from New England Biolabs. DNA plasmids for cell-free reactions were
+prepared using the Macherey-Nagel maxiprep kit.
+Characterization of whole-cell circuits. For each circuit separate colonies of
+E. coli TOP10 (strain K-12, genotype: F−mcrA Δ(mrr-hsdRMS-mcrBC)
+φ80lacZΔM15 ΔlacX74 recA1 araD139 Δ(ara-leu)7697 galU galK rpsL (StrR)
+endA1 nupG) strains harboring the circuit plasmids were cultured overnight at
+37 °C in LB with appropriate antibiotic. The next day each culture was diluted 100×
+in LB with antibiotics. 95 µL of fresh cultures were distributed in 96-well plate
+(Corning 3603) and the plate was incubated to reach the OD600 ~ 0.1 in a plate
+reader (Biotek Synergy HTX). Then 5 µL of the input metabolites (100× ethanol
+solutions 5x diluted in LB) were added and the plate was incubated for 18 h at
+37 °C. During the incubation, the OD600 and GFP ﬂuorescence (gain: 35, ex:
+458 nm, em: 528 nm) were measured. Benzoate, hippurate, cocaine hydrochloride,
+benzaldehyde, benzamide and biphenyl-2,3-diol (2,3-dihydroxy-biphenyl) were
+purchased from Sigma-Aldrich. Permission to purchase cocaine hydrochloride was
+given by the French drug regulatory agency (Agence Nationale de Sécurité du
+Médicament et des Produits de Santé). For all chemicals, serial dilutions of
+100× concentrations were prepared in ethanol. The formula presenting the results
+of the circuits’ characterization is shown in data normalization section. The mean
+and standard deviation of all normalized data are provided in Supplementary
+Table 7.
+Cell-free extract and buffer preparation. Cell-free E. coli extract was produced
+using published methods52,69,70. Brieﬂy, an overnight culture of BL21 Star (DE3)::
+RF1-CBD3 E. coli was used to inoculate 4 L of 2xYT-P media in six 2 L ﬂasks at a
+dilution of 1:100. The cultures were grown at 37 °C with 220 rpm shaking for
+~3.5–4 h until the OD600 = 2–3. Cultures were centrifuged at 5000 × g at 4 °C for
+12 min. Cell pellets were washed twice with 200 mL S30A buffer (14 mM Mg-
+glutamate, 60 mM K-glutamate, 50 mM Tris, pH 7.7), centrifuging after each wash
+at 5000 × g at 4 °C for 12 min. Cell pellets were then resuspended in 40 mL S30A
+buffer and transferred to pre-weighed 50 mL Falcon conical tubes where they were
+centrifuged twice at 2000 × g at 4 °C for 8 and 2 min, respectively, removing the
+supernatant after each. Finally, the tubes were reweighed and ﬂash frozen in liquid
+nitrogen before storing at −80 °C.
+Cell pellets were thawed on ice and resuspended in 1 mL S30A buffer per gram
+of cell pellet. Cell suspensions were lysed via a single pass through a French press
+homogenizer (Avestin; Emulsiﬂex-C3) at 15,000–20,000 psi and then centrifuged at
+12,000 × g at 4 °C for 30 min to separate out cellular cytoplasm. After
+centrifugation, the supernatant was collected and incubated at 37 °C with 220 rpm
+shaking for 60 min. The extract was recentrifuged at 12,000 × g at 4 °C for 30 min,
+and the supernatant was transferred to 12–14 kDa MWCO dialysis tubing
+(Spectrum Labs; Spectra/Por4) and dialyzed against 2 L of S30B buffer (14 mM Mg-
+glutamate, 60 mM K-glutamate, ~5 mM Tris, pH 8.2) overnight at 4 °C. The
+following day, the extract was re-centrifuged one ﬁnal time at 12,000 × g at 4 °C for
+30 min, aliquoted, and ﬂash frozen in liquid nitrogen before storage at −80 °C.
+The buffer for cell-free reactions is composed such that ﬁnal reaction
+concentrations were as follows: 1.5 mM each amino acid except leucine, 1.25 mM
+leucine, 50 mM HEPES, 1.5 mM ATP and GTP, 0.9 mM CTP and UTP, 0.2 mg mL−1
+tRNA, 0.26 mM CoA, 0.33 mM NAD, 0.75 mM cAMP, 0.068 mM folinic acid, 1 mM
+spermidine, 30 mM 3-PGA, and 2% PEG-8000. Additionally, the Mg-glutamate (0–6
+mM), K-glutamate (20–140 mM), and DTT (0–3 mM) levels were serially calibrated
+for each batch of cell-extract for maximum signal. One batch of buffer was made for
+each batch of extract, aliquoted, and ﬂash frozen in liquid nitrogen before storage at
+−80 °C.
+Characterization of cell-free circuits. Cell-free reactions were performed in
+15.75 µL of the mixture of 33.3% cell extract, 41.7% buffer, and 25% plasmid DNA,
+input metabolites, and water. The reactions were prepared in PCR tubes on ice and
+15 µL of each was pipetted into 384-well plates (Thermo Scientiﬁc 242764). GFP
+ﬂuorescence out of each circuit was recorded in the plate reader at 30 °C (gain:
+50, ex: 458 nm, em: 528 nm). The background (cell-free reaction without any
+plasmid) corrected ﬂuorescence data were normalized by 20 ng µL−1 of a plasmid
+expressing strong constitutive sfGFP (under OR2-OR1-Pr promoter52) and were
+plotted after 8 h incubation. The mean and standard deviation of all normalized
+data are provided in Supplementary Table 7.
+Data normalization. For whole-cell data, we use the following normalization:
+Fluorescence input
+ð
+Þ ¼ GFP input
+ð
+Þ  GFPðLBÞ
+OD input
+ð
+Þ  ODðLBÞ  GFP empty plasmid
+ð
+Þ  GFPðLBÞ
+OD empty plasmid
+ð
+Þ  ODðLBÞ
+Reference: cells harboring empty plasmids
+For cell-free data, we consider relative ﬂuorescence unit (RFU):
+RFU input
+ð
+Þ ¼
+GFP input
+ð
+Þ  GFP extract
+ð
+Þ
+GFP reference
+ð
+Þ  GFP extract
+ð
+Þ
+Reference: 20 ngµL−1 of a plasmid expressing the constitutive sfGFP under OR2-
+OR1-Pr promoter52.
+Simulation tools and parameter ﬁtting. All data analysis and simulations were
+run on R (version 3.2.3). Dose–response curves were ﬁtted using ordinary least
+squares errors and the R optim function (from Package stats version 3.2.3, using
+the L-BFGS-B method implementing the Limited-memory Broyden Fletcher
+Goldfarb Shanno algorithm, which is a quasi-Newton method). For the random
+parameter sampling around the mean ﬁt, values were sampled from within
+±1.96 standard error of the mean of the parameter estimation. The seed was set so
+as to ensure reproducibility. All simulations were run in the Rstudio development
+environment.
+All parameters are presented in Supplementary Tables 3 and 4.
+Whole-cell model. The whole-cell model is composed of three parts: the actuator,
+the transducers (which all obey the same law) and the resource competition.
+Actuator total
+ð
+Þ ¼
+total
+ð
+Þhill a
+KM
+ð
+Þhill a þ total
+ð
+Þhill a ´ fc þ 1
+ 
+!
+´ basal
+where total is the concentration of the considered input (in µM), KM is the con-
+centration that allows for half-maximum induction (in µM), also termed IC50,
+hill_a is the Hill coefﬁcient that characterizes the cooperativity of the induction
+system, fc is the dynamic range (in AU) and basal is the basal GFP ﬂuorescence
+without input (benzoate).
+Transducer input
+ð
+Þ ¼ input ´ range enz
+Where input is the input concentration in µM and range_enz is a dimensionless
+number characterizing the capacity of the enzyme to transduce the signal. When
+combining transducers with the actuator, transducer results are added before being
+fed into the actuator equation, just as benzoate concentrations are added before
+being converted to a ﬂuorescent signal in the cell.
+To account for resource competition, given our experimental results where
+there is little competition with one enzyme and signiﬁcant competition with two,
+we used an equation including cooperativity of resource competition. This reduces
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+10
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+the fold change of the actuator as there are less resources available for producing
+transcription factors and GFP.
+Result out
+ð
+Þ ¼ rangeres ´ out ´
+E
+ð Þnr
+E
+ð Þnrþ coce þ benz þ ratio  hipo
+ð
+Þnr
+
+
+where out is the result of the actuator transfer function before accounting for
+resource competition, range_res, E, nr characterize the Hill function that accounts
+for competition, coce, benz and hipo are the enzyme plasmid concentrations. ratio
+accounts for the differences in burden from different enzymes, its value around 0.8
+is close to the ratio between enzyme lengths (1500 for benzaldehyde transducing
+enzyme and 1200 for HipO).
+Cell-free model. The model is composed of two parts: the actuator and the
+transducers.
+Actuator total
+ð
+Þ ¼
+total
+ð
+Þhill a
+KM
+ð
+Þhill aþ total
+ð
+Þhill a ´ fc þ 1
+ 
+!
+´ basal þ lin ´ 0:0001 ´ total
+where total is the concentration of the considered input metabolite (in µM), KM is
+the concentration that allows for half-maximum induction (in µM), also termed
+IC50, hill_a is the Hill coefﬁcient that characterizes the cooperativity of the
+induction system, fc is the dynamic range (in AU) and basal is the basal GFP
+ﬂuorescence without input (benzoate). Lin accounts for the linearity observed in
+the actuator behavior at concentrations saturating the Hill transfer function.
+Transducer input
+ð
+Þ ¼ rangeenzyme ´
+E
+ð ÞnE
+KE
+ð
+ÞnEþ E
+ð ÞnE
+
+
+
+´
+input
+ð
+Þninput
+KI
+ð
+Þninputþ input
+ð
+Þninput
+
+
+
+Where range_enzyme is a dimensionless number characterizing the capacity of the
+enzyme to transduce the signal. The activity of the enzyme is characterized by a
+Hill function as increasing concentrations do not lead to a linear increase but
+enzymes saturate (E is the enzyme quantity in nM, KE and nE are its Hill con-
+stants), and similarly, input is the input metabolite concentration in µM with KI
+and n_input as its Hill constants.
+When combining transducers, transducer results are added before being fed
+into the actuator equation, just as benzoate concentrations are added before being
+converted to the ﬂuorescent signal in the cell.
+Model parameters ﬁtting process. Our ﬁtting process is detailed in the Readme
+ﬁles supporting our modeling scripts provided in GitHub and is summarized here.
+It is done in the two steps presented here: ﬁrst ﬁtting of the actuator then ﬁtting of
+the transducers.
+As the ﬁrst step, the actuator transfer function model (benzoate transformed
+into ﬂuorescence) is ﬁtted 100 times on the actuator data (Figs. 1c and 3b), with all
+actuator parameters allowed to vary. The mean, standard deviation, standard error
+of the mean and conﬁdence interval were saved at 95% of the estimation of those
+parameters. For transducer ﬁtting (all transducers in cell-free and all except cocaine
+in whole-cell, data from Fig. 1d, f, resource competition from Figs. 2b, c and 4b–e),
+we constrained the actuator characteristics in the following way: upper and lower
+allowed values are within the 95% conﬁdence interval (or plus or minus one
+standard deviation from the mean for fold change and baseline in cell-free as it
+allowed a wider range, accounting for the decrease in actuator signal in transducer
+experiments without affecting the shape of the sigmoid). The initial values for the
+ﬁtting process were sampled from a Gaussian distribution centered on the mean
+parameter estimation and spread with a standard deviation equal to the standard
+error of this parameter estimation. We then allowed ﬁtting of all transducer
+parameters freely and of the actuator parameters within their 95% conﬁdence
+interval.
+Once this is done, all common parameters (actuator transfer function and
+resource competition) were sampled using the same procedure and ﬁtting on the
+cocaine transducer was performed. To show that parameters are well constrained
+(proving they minimally explain the data from Fig. 1e), Supplementary Figs. 15 and
+16 show results of sampling parameters from the ﬁnal parameters distribution
+(without ﬁtting at that stage) and how they compare to the data.
+Objective functions and model scoring. In order to evaluate and compare our
+models, we used the following functions.
+RMSD ¼
+ﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃ
+Pn
+1 ytrue
+i
+ ypred
+i
+
+2
+n
+v
+u
+u
+t
+It measures how close the model is to the experiments. It allows for comparison of
+different models on the same data, the one with the smaller RMSD being better, but
+does not allow comparison between experiments.
+R2 ¼ 1 
+Pn
+1 ytrue
+i
+ ypred
+i
+
+2
+Pn
+1 ytrue
+i
+ ytrue
+mean
+
+2
+R2 allows measuring the goodness of ﬁt. When the prediction is only around the
+sample mean, R2 = 0. When the predictions are close to the real experimental
+value, R2 gets closer to 1, whereas it can have important negative values when the
+model is really far off.
+Weighted R2 ¼ 1 
+Pn
+1
+ytrue
+i
+ypred
+i
+ð
+Þ
+2
+std2
+i
+Pn
+1
+ytrue
+i
+ytrue
+mean
+ð
+Þ
+2
+std2
+i
+:
+It is a variant of R2 that weights samples according to their experimental error,
+giving more weight or more certain samples. It otherwise has the same properties
+as R2.
+Error percentage ¼ abs ytrue
+i
+ ypred
+i
+ytrue
+i
+ 
+!
+´ 100
+This measures the percentage of error for each point. We present the average on all
+experiments in Supplementary Tables 1 and 2.
+Perceptron weights calculation. In order to calculate the weights for the classi-
+ﬁers presented in Fig. 6, we followed the following procedure. First, we deﬁned the
+expected results (expressed in OFFs and ONs). We also deﬁned a list of weights to
+test for each enzyme (here, between 0.1 and 10 nM, as tested in our weighted
+transducers). Then, for each combination of enzyme weights, we simulated the
+outcome of the classiﬁers for all possible input combinations using our previously
+ﬁtted model. We then tested various possible thresholds and kept the enzyme
+combinations for which a threshold exists that allows for the expected behavior. As
+the last step, we manually analyzed the classiﬁer to keep the ones both a high
+difference between ON and OFF, and a minimal enzyme weight to prevent
+resource competitions issues that could arise as we are adding more genes than
+previous experiments. In order to perform clusterings presented in Supplementary
+Fig. 11, we sampled values uniformly within the stated ranges ([0, 2 µM] for low
+values and [80, 100 µM] for high values). We then simulated the results to assess
+the robustness of our designs. The best set of weights from this procedure to
+achieve the desired classiﬁcation function (the ‘trained’ weights) are then used for
+the cell-free implementation.
+The difference between our metabolic perceptron and an in silico perceptron is
+that the latter exhibits a perfect activation behavior: digital (0/1), sigmoidal, ReLU,
+or another activation function; its weights can be tuned exactly as desired. In our
+implementation of the cell-free metabolic circuits, many biological details
+complicate the relationship between the inputs and the activator output. We
+therefore used more detailed step-wise empirical modeling to account for the
+biology in our system rather than an off-the-shelf perceptron code that would be
+unable to capture all the subtleties in our data.
+Binary clustering experiments. In order to perform the binary/2D clustering
+experiments, we sampled values uniformly within the stated ranges ([0, 2 µM] for
+low values and [80, 100 µM] for high values). For different weight (HipO and
+CocE) values, we simulated the ﬂuorescence output of each of those
+cocaine–hippurate combinations. Moreover, for different threshold values (3, 3.5
+and 4, as presented in Supplementary Fig. 10), we numerically solved for the
+benzoate concentration such that
+transfer benzoate
+ð
+Þ ¼ fluorescence threshold
+and then for values of cocaine and hippurate such that
+transducer cocaine
+ð
+Þ þ transducer hippurate
+ð
+Þ ¼ benzoate
+This equation with two unknowns gives us a curve of cocaine and hippurate values
+that would lie on our decided threshold for this set of weights. All combinations on
+the top right of that curve will be classiﬁed to ON and all combinations below will
+be classiﬁed as OFF.
+Biological and chemical identiﬁers. In order to allow easier parsing of our article
+by bioinformatics tools, we provide here the identiﬁers of our biological sequences
+and chemical compounds.
+Benzoate (Benzoic acid): InChI=1S/C7H6O2/c8-7(9)6-4-2-1-3-5-6/h1-5H,
+(H,8,9)
+Hippurate (Hippuric acid): InChI=1S/C9H9NO3/c11-8(12)6-10-9(13)7-4-2-1-
+3-5-7/h1-5H,6H2,(H,10,13)(H,11,12)
+Cocaine: InChI=1S/C17H21NO4/c1-18-12-8-9-13(18)15(17(20)21-2)14(10-
+12)22-16(19)11-6-4-3-5-7-11/h3-7,12-15H,8-10H2,1-2H3/t12-,13+,14-,15+/m0/
+s1
+Benzaldehyde: InChI=1S/C7H6O/c8-6-7-4-2-1-3-5-7/h1-6H
+Biphenyl-2,3-diol: InChI=1S/C12H10O2/c13-11-8-4-7-10(12(11)14)9-5-2-1-3-
+6-9/h1-8,13-14H
+Benzamide: InChI=1S/C7H7NO/c8-7(9)6-4-2-1-3-5-6/h1-5H,(H2,8,9)
+BenR (Benzoate sensitive transcription factor, Pseudomonas putida) identiﬁer:
+UniProtKB - Q9L7Y6
+HipO (Hippurate hydrolase (EC: 3.5.1.32), Campylobacter jejuni) identiﬁer:
+UniProtKB - P45493
+CocE (Cocaine esterase (EC: 3.1.1.84), Rhodococcus sp.) identiﬁer: UniProtKB
+- Q9L9D7
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+11
+
+
+vdh (Aryl-aldehyde oxidase (EC: 1.2.3.9), Acinetobacter johnsonii SH046)
+identiﬁer: UniProtKB - D0RZT4
+bphC (Biphenyl-2,3-diol 1,2-dioxygenase (EC: 1.13.11.39), Pseudomonas sp.)
+identiﬁer: UniProtKB - P17297
+bphD (2-Hydroxy-6-oxo-6-phenylhexa-2,4-dienoate hydrolase (EC: 3.7.1.8),
+Pseudomonas putida) identiﬁer: UniProtKB - Q52036
+Benzamide transforming enzyme (Amidase (EC: 3.5.1.4), Rhodococcus
+erythropolis) identiﬁer: UniProtKB - B4XEY3
+Sequence and source of all the genes and parts are available in Supplementary
+Table 5 and the plasmids used in this study (Addgene deposit) are listed in
+Supplementary Table 6 available at (https://www.addgene.org/browse/article/
+28203589/ and https://www.addgene.org/browse/article/28196338/).
+Reporting summary. Further information on research design is available in the
+Nature Research Reporting Summary linked to this article.
+Data availability
+The source data underlying Figs. 1c-f, 2b-c, 3c-g, 4b-e, 5b-c and 6c-d and Supplementary
+Figures 1–9, 12, and 13 are provided as a Source Data ﬁle. New plasmids built in this
+study are available from Addgene. Other raw data are available from the corresponding
+authors upon reasonable request.
+Code availability
+All scripts and data for generating results presented in this paper are available at https://
+github.com/brsynth/metabolic_perceptrons.
+Received: 4 May 2019 Accepted: 8 August 2019
+References
+1.
+Purcell, O. & Lu, T. K. Synthetic analog and digital circuits for cellular
+computation and memory. Curr. Opin. Biotechnol. 29, 146–155 (2014).
+2.
+Brophy, J. A. N. & Voigt, C. A. Principles of genetic circuit design. Nat.
+Methods 11, 508–520 (2014).
+3.
+Purnick, P. E. M. & Weiss, R. The second wave of synthetic biology: from
+modules to systems. Nat. Rev. Mol. Cell Biol. 10, 410–422 (2009).
+4.
+Selberg, J., Gomez, M. & Rolandi, M. The potential for convergence between
+synthetic biology and bioelectronics. Cell Syst. 7, 231–244 (2018).
+5.
+Moon, T. S., Lou, C., Tamsir, A., Stanton, B. C. & Voigt, C. A. Genetic
+programs constructed from layered logic gates in single cells. Nature 491,
+249–253 (2012).
+6.
+Shis, D. L., Hussain, F., Meinhardt, S., Swint-Kruse, L. & Bennett, M. R.
+Modular, multi-input transcriptional logic gating with orthogonal LacI/GalR
+family chimeras. ACS Synth. Biol. 3, 645–651 (2014).
+7.
+Bufﬁ, N. et al. Miniaturized bacterial biosensor system for arsenic detection
+holds great promise for making integrated measurement device. Bioeng. Bugs
+2, 296–298 (2011).
+8.
+Wan, X. et al. Cascaded amplifying circuits enable ultrasensitive cellular
+sensors for toxic metals. Nat. Chem. Biol. 15, 540 (2019).
+9.
+Courbet, A., Endy, D., Renard, E., Molina, F. & Bonnet, J. Detection of
+pathological biomarkers in human clinical samples via amplifying genetic
+switches and logic gates. Sci. Transl. Med. 7, 289ra83 (2015).
+10. Wen, K. Y. et al. A cell-free biosensor for detecting quorum sensing molecules
+in P. aeruginosa-infected respiratory samples. ACS Synth. Biol. 6, 2293–2301
+(2017).
+11. Kemmer, C. et al. Self-sufﬁcient control of urate homeostasis in mice by a
+synthetic circuit. Nat. Biotechnol. 28, 355–360 (2010).
+12. Isabella, V. M. et al. Development of a synthetic live bacterial therapeutic for
+the human metabolic disease phenylketonuria. Nat. Biotechnol. 36, 857–864
+(2018).
+13. Zhang, F., Carothers, J. M. & Keasling, J. D. Design of a dynamic sensor-
+regulator system for production of chemicals and fuels derived from fatty
+acids. Nat. Biotechnol. 30, 354–359 (2012).
+14. Koch, M., Pandi, A., Borkowski, O., Batista, A. C. & Faulon, J.-L. Custom-
+made transcriptional biosensors for metabolic engineering. Curr. Opin.
+Biotechnol. 59, 78–84 (2019).
+15. Nielsen, A. A. K. et al. Genetic circuit design automation. Science 352, aac7341
+(2016).
+16. Pardee, K. et al. Paper-based synthetic gene networks. Cell 159, 940–954
+(2014).
+17. Courbet, A., Amar, P., Fages, F., Renard, E. & Molina, F. Computer-aided
+biochemical programming of synthetic microreactors as diagnostic devices.
+Mol. Syst. Biol. 14, e8441 (2018).
+18. Katz, E. Enzyme-based logic gates and networks with output signals analyzed
+by various methods. Chemphyschem 18, 1688–1713 (2017).
+19. Kiel, C., Yus, E. & Serrano, L. Engineering signal transduction pathways. Cell
+140, 33–47 (2010).
+20. Shaw, W. M. et al. Engineering a model cell for rational tuning of GPCR
+signaling. Cell 177, 782–796 (2019).
+21. Daniel, R., Rubens, J. R., Sarpeshkar, R. & Lu, T. K. Synthetic analog
+computation in living cells. Nature 497, 619–623 (2013).
+22. Farzadfard, F. & Lu, T. K. Synthetic biology. Genomically encoded analog
+memory with precise in vivo DNA writing in living cell populations. Science
+346, 1256272 (2014).
+23. Bonnet, J., Subsoontorn, P. & Endy, D. Rewritable digital data storage in live
+cells via engineered control of recombination directionality. Proc. Natl Acad.
+Sci. USA 109, 8884–8889 (2012).
+24. Bonnet, J., Yin, P., Ortiz, M. E., Subsoontorn, P. & Endy, D. Amplifying
+genetic logic gates. Science 340, 599–603 (2013).
+25. Zeng, J. et al. A synthetic microbial operational ampliﬁer. ACS Synth. Biol. 7,
+2007–2013 (2018).
+26. Green, A. A., Silver, P. A., Collins, J. J. & Yin, P. Toehold switches: de-novo-
+designed regulators of gene expression. Cell 159, 925–939 (2014).
+27. Bikard, D. et al. Programmable repression and activation of bacterial gene
+expression using an engineered CRISPR-Cas system. Nucleic Acids Res. 41,
+7429–7437 (2013).
+28. Nielsen, A. A. K. & Voigt, C. A. Multi-input CRISPR/Cas genetic circuits that
+interface host regulatory networks. Mol. Syst. Biol. 10, 763 (2014).
+29. Silva-Rocha, R., Tamames, J., dos Santos, V. M. & de Lorenzo, V. The
+logicome of environmental bacteria: merging catabolic and regulatory events
+with Boolean formalisms. Environ. Microbiol. 13, 2389–2402 (2011).
+30. Goñi-Moreno, A. & Nikel, P. I. High-performance biocomputing in synthetic
+biology–integrated transcriptional and metabolic circuits. Front. Bioeng.
+Biotechnol. 7, 40 (2019).
+31. Prindle, A. et al. Rapid and tunable post-translational coupling of genetic
+circuits. Nature 508, 387–391 (2014).
+32. Cheng, Y.-Y., Hirning, A. J., Josić, K. & Bennett, M. R. The timing of
+transcriptional regulation in synthetic gene circuits. ACS Synth. Biol. 6,
+1996–2002 (2017).
+33. Sauro, H. M. & Kim, K. H. Synthetic biology: it’s an analog world. Nature 497,
+572–573 (2013).
+34. Daniel, R., Woo, S. S., Turicchia, L. & Sarpeshkar, R. Analog transistor models
+of bacterial genetic circuits. 2011 IEEE Biomedical Circuits and Systems
+Conference (BioCAS) 333–336 (IEEE, 2011).
+35. Rosenblatt, F. The perceptron: a probabilistic model for information storage
+and organization in the brain. Psychol. Rev. 65, 386–408 (1958).
+36. Delépine, B., Duigou, T., Carbonell, P. & Faulon, J.-L. RetroPath2.0: a
+retrosynthesis workﬂow for metabolic engineers. Metab. Eng. 45, 158–170
+(2018).
+37. Delépine, B., Libis, V., Carbonell, P. & Faulon, J.-L. SensiPath: computer-aided
+design of sensing-enabling metabolic pathways. Nucleic Acids Res. 44,
+W226–W231 (2016).
+38. Perez, J. G., Stark, J. C. & Jewett, M. C. Cell-free synthetic biology: engineering
+beyond the cell. Cold Spring Harb. Perspect. Biol. 8, a023853 (2016).
+39. Moore, S. J. et al. Rapid acquisition and model-based analysis of cell-free
+transcription-translation reactions from nonmodel bacteria. Proc. Natl Acad.
+Sci. USA 115, E4340–E4349 (2018).
+40. Karim, A. S., Heggestad, J. T., Crowe, S. A. & Jewett, M. C. Controlling cell-
+free metabolism through physiochemical perturbations. Metab. Eng. 45, 86–94
+(2018).
+41. de los Santos, E. L. C., Meyerowitz, J. T., Mayo, S. L. & Murray, R. M.
+Engineering transcriptional regulator effector speciﬁcity using computational
+design and in vitro rapid prototyping: developing a Vanillin sensor. ACS
+Synth. Biol. 5, 287–295 (2016).
+42. Swank, Z., Laohakunakorn, N. & Maerkl, S. J. Cell-free gene regulatory
+network engineering with synthetic transcription factors. Proc. Natl Acad. Sci.
+USA 116, 5892–5901 (2019).
+43. Koch, M., Pandi, A., Delépine, B. & Faulon, J.-L. A dataset of small molecules
+triggering transcriptional and translational cellular responses. Data Brief. 17,
+1374–1378 (2018).
+44. Libis, V., Delépine, B. & Faulon, J.-L. Expanding biosensing abilities through
+computer-aided design of metabolic pathways. ACS Synth. Biol. 5, 1076–1085
+(2016).
+45. Cowles, C. E., Nichols, N. N. & Harwood, C. S. BenR, a XylS homologue,
+regulates three different pathways of aromatic acid degradation in
+Pseudomonas putida. J. Bacteriol. 182, 6339–6346 (2000).
+46. Nevozhay, D., Adams, R. M., Murphy, K. F., Josic, K. & Balázsi, G. Negative
+autoregulation linearizes the dose-response and suppresses the heterogeneity
+of gene expression. Proc. Natl Acad. Sci. USA 106, 5123–5128 (2009).
+47. Roquet, N. & Lu, T. K. Digital and analog gene circuits for biotechnology.
+Biotechnol. J. 9, 597–608 (2014).
+ARTICLE
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+12
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+
+
+48. Weiss, J. N. The Hill equation revisited: uses and misuses. FASEB J. 11,
+835–841 (1997).
+49. Qian, Y., Huang, H.-H., Jiménez, J. I. & Del Vecchio, D. Resource competition
+shapes the response of genetic circuits. ACS Synth. Biol. 6, 1263–1272 (2017).
+50. Zucca, S., Pasotti, L., Mazzini, G., De Angelis, M. G. C. & Magni, P.
+Characterization of an inducible promoter in different DNA copy number
+conditions. BMC Bioinforma. 13(Suppl 4), S11 (2012).
+51. Karig, D. K., Iyer, S., Simpson, M. L. & Doktycz, M. J. Expression optimization
+and synthetic gene networks in cell-free systems. Nucleic Acids Res. 40,
+3763–3774 (2012).
+52. Voyvodic, P. L., Pandi, A., Koch, M., Faulon, J.-L. & Bonnet, J. Plug-and-play
+metabolic transducers expand the chemical detection space of cell-free
+biosensors. Nat. Commun. 10, 1697 (2019).
+53. Michel, E. & Wüthrich, K. Cell-free expression of disulﬁde-containing
+eukaryotic proteins for structural biology. FEBS J. 279, 3176–3184 (2012).
+54. Oh, I.-S., Kim, D.-M., Kim, T.-W., Park, C.-G. & Choi, C.-Y. Providing an
+oxidizing environment for the cell-free expression of disulﬁde-containing
+proteins by exhausting the reducing activity of Escherichia coli S30 extract.
+Biotechnol. Prog. 22, 1225–1228 (2006).
+55. Bishop, C. M. Pattern Recognition and Machine Learning (Springer, 2016).
+56. Haykin, S. O. Neural Networks and Learning Machines (Pearson Higher Ed,
+2011).
+57. Jain, A. K., Mao, J. & Mohiuddin, K. M. Artiﬁcial neural networks: a tutorial.
+Computer 29, 31–44 (1996).
+58. Weiss, R., Homsy, G. E. & Knight, T. F. in Evolution as Computation, Vol. 67,
+275–295 (eds Landweber, L. F. & Winfree, E.) (Springer, Berlin Heidelberg,
+2002).
+59. Sarpeshkar, R. Analog versus digital: extrapolating from electronics to
+neurobiology. Neural Comput. 10, 1601–1638 (1998).
+60. Lewis, D. D., Villarreal, F. D., Wu, F. & Tan, C. Synthetic biology outside the
+cell: linking computational tools to cell-free systems. Front Bioeng. Biotechnol.
+2, 66 (2014).
+61. Noriega, L. Multilayer Perceptron Tutorial (School of Computing,
+Staffordshire University, 2005).
+62. Haykin, S. S. Neural Networks: A Comprehensive Foundation (Prentice Hall,
+Upper Saddle River, 1999).
+63. Cybenko, G. Approximation by superpositions of a sigmoidal function. Math.
+Control Signals Syst. 2, 303–314 (1989).
+64. Rojas, R. Neural Networks: A Systematic Introduction (Springer Science &
+Business Media, 2013).
+65. Cherry, K. M. & Qian, L. Scaling up molecular pattern recognition with DNA-
+based winner-take-all neural networks. Nature 559, 370–376 (2018).
+66. Duigou, T., du Lac, M., Carbonell, P. & Faulon, J.-L. RetroRules: a database of
+reaction rules for engineering biology. Nucleic Acids Res. 47, D1229–D1235
+(2019).
+67. Jahn, M., Vorpahl, C., Hübschmann, T., Harms, H. & Müller, S. Copy number
+variability of expression plasmids determined by cell sorting and Droplet
+digital PCR. Microb. Cell Fact. 15, 211 (2016).
+68. Shin, J. & Noireaux, V. Efﬁcient cell-free expression with the endogenous E.
+Coli RNA polymerase and sigma factor 70. J. Biol. Eng. 4, 8 (2010).
+69. Sun, Z. Z. et al. Protocols for implementing an Escherichia coli based
+TX-TL cell-free expression system for synthetic biology. J. Vis. Exp. e50762
+(2013).
+70. Caschera, F. & Noireaux, V. Synthesis of 2.3 mg/ml of protein with an all
+Escherichia coli cell-free transcription-translation system. Biochimie 99,
+162–168 (2014).
+Acknowledgements
+We are grateful to Pau Bernado, Annika Urbanek, and Anna Morato for helpful dis-
+cussions on cell-free systems and extract preparation, and to Gottfried Otting for the
+BL21 Star (DE3)::RF1-CBD3 strain. A.P. is supported by INRA (French National Institute
+for Agricultural Research) and the idEx Paris-Saclay interdisciplinary doctoral fellowship.
+M.Ko. is supported by DGA (French Ministry of Defense) and Ecole Polytechnique. P.S.
+and J.L.F. are supported by ANR (grant number ANR-18-CE33-0015). J.L.F. acknowl-
+edges support from BBSRC/EPSRC (grant number BB/M017702/1).
+Author contributions
+A.P., M.Ko., M.Ku. and J.L.F. designed the project. A.P. designed and cloned the con-
+structs, and performed the whole-cell experiments. A.P., P.L.V. and J.B. designed cell-free
+experiment platform. A.P., P.L.V. and P.S. performed cell-free experiments. M.Ko.
+performed computational model simulations. All authors contributed to the manuscript
+write-up and approved the ﬁnal manuscript.
+Additional information
+Supplementary Information accompanies this paper at https://doi.org/10.1038/s41467-
+019-11889-0.
+Competing interests: The authors declare no competing interests.
+Reprints and permission information is available online at http://npg.nature.com/
+reprintsandpermissions/
+Peer review information: Nature Communications thanks Pablo Ivan Nikel and the
+other anonymous reviewer(s) for their contribution to the peer review of this work. Peer
+reviewer reports are available
+Publisher’s note: Springer Nature remains neutral with regard to jurisdictional claims in
+published maps and institutional afﬁliations.
+Open Access This article is licensed under a Creative Commons
+Attribution 4.0 International License, which permits use, sharing,
+adaptation, distribution and reproduction in any medium or format, as long as you give
+appropriate credit to the original author(s) and the source, provide a link to the Creative
+Commons license, and indicate if changes were made. The images or other third party
+material in this article are included in the article’s Creative Commons license, unless
+indicated otherwise in a credit line to the material. If material is not included in the
+article’s Creative Commons license and your intended use is not permitted by statutory
+regulation or exceeds the permitted use, you will need to obtain permission directly from
+the copyright holder. To view a copy of this license, visit http://creativecommons.org/
+licenses/by/4.0/.
+© The Author(s) 2019
+NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-019-11889-0
+ARTICLE
+NATURE COMMUNICATIONS |  (2019) 10:3880 | https://doi.org/10.1038/s41467-019-11889-0 | www.nature.com/naturecommunications
+13

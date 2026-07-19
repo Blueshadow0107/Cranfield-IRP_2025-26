@@ -1,22 +1,73 @@
 % Chapter: Results and Discussion
-% Skeleton — populate with your findings
+% Continuous Analog Wave Computation in Porous Media
 
 \section{Overview}
 \label{sec:res_overview}
 
-[Introduce the structure of the results chapter and any key findings upfront.]
+% NOTE: Brief roadmap of the chapter. Mention that validation comes first, then demonstrations.
 
-\section{[Result Set 1]}
-\label{sec:result1}
+[What this chapter contains.]
 
-[Present quantitative results with figures and tables.]
+\section{Helmholtz Solver Validation}
+\label{sec:validation}
 
-\section{[Result Set 2]}
-\label{sec:result2}
+% NOTE: This section proves your solver is correct. Use figures with captions that state
+% the expected value and the observed value. Quantify error.
 
-[Present additional results.]
+\subsection{Free-Air Propagation}
+% KEY POINTS: Inject a plane wave or point source in free air. Compare numerical phase speed
+% to c0. Plot real/imag pressure along a line. Error metric: relative phase speed error.
+[Compare numerical wave speed and phase against analytical solution.]
+
+\subsection{Hard-Wall Cavity Modes}
+% KEY POINTS: 2D rectangular cavity with hard walls. Compare numerical eigenfrequencies
+% to analytical f_mn. Table of modes vs error.
+[Compare resonant frequencies against analytical 2D cavity modes.]
+
+\subsection{Uniform Porous Slab}
+% KEY POINTS: A single uniform JCA slab in air. Compare transmission coefficient versus
+% frequency against TMM. This is the strongest validation for the porous model.
+[Compare transmission/reflection against transfer-matrix reference for a uniform JCA slab.]
+
+\section{Design-Region Demonstrations}
+\label{sec:demonstrations}
+
+% NOTE: This is where you show the actual wave-computing task. Be explicit about what
+% the task is and why it matters.
+
+\subsection{Task Definition}
+% KEY POINTS: Logic gate, frequency router, or binary classification? Input definition,
+% target output, loss function, probe placement.
+[Describe the chosen wave-computing task: e.g. two-frequency routing, logic gate, or binary classification.]
+
+\subsection{Baseline Designs}
+% KEY POINTS: Show results for a trivial design (all air, or uniform porous) and a simple
+% hand-designed structure. Establishes that optimisation is actually needed.
+[Results for homogeneous or simple periodic designs.]
+
+\subsection{Optimised Designs}
+% KEY POINTS: Convergence plot. Final block pattern visualised as a heatmap. Field snapshot
+% at a key frequency. Performance table: loss, accuracy, energy ratio, etc.
+[Convergence plots, final block patterns, field snapshots, performance metrics.]
+
+\section{Design-Space Ablations}
+\label{sec:ablations}
+
+% NOTE: This section answers the question "which design variables matter?" It is central
+% to the thesis contribution. Use a table comparing the three cases.
+% Metrics: final loss, number of variables, pattern complexity, physical interpretability,
+% training time.
+
+[Compare $\phi$-only, $\phi+\sigma$, and $\phi+\sigma+\alpha_\infty$ designs in terms of final loss, pattern complexity, and physical interpretability.]
 
 \section{Discussion}
 \label{sec:discussion}
 
-[Interpret the results in the context of the literature reviewed in \refchap{chap:literature_review}. Discuss limitations and sources of error.]
+% NOTE: Interpret the results. Do not just repeat numbers. Address:
+% - Why did the optimiser produce the patterns it did?
+% - What physical mechanism is being exploited (reflection, absorption, interference)?
+% - How sensitive are results to block count, bounds, frequency sampling?
+% - What are the main limitations?
+% Connect back to the literature review.
+
+[Interpret results, limitations, relation to literature.]

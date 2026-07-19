@@ -1,0 +1,1423 @@
+Implementation of Support Vector Machines using
+Chemical Reaction Networks
+Amey Choudhary1, Abhishek Deshpande2, and Jiaxin Jin3
+1,2Center for Computational Natural Sciences and Bioinformatics, International Institute of
+Information Technology, Hyderabad
+3Department of Mathematics, University of Louisiana at Lafayette
+April 2, 2026
+Abstract
+Can machine learning algorithms be implemented using chemistry? We demon-
+strate that this is possible in the case of support vector machines (SVMs). SVMs
+are powerful tools for data classification, leveraging Vapnik–Chervonenkis theory
+to handle high-dimensional data and small datasets effectively. In this work, we
+propose a chemical reaction network scheme for implementing SVMs, utilizing the
+steady-state behavior of reaction network dynamics to model key computational
+aspects of SVMs.
+This approach introduces a novel biochemical framework for
+implementing machine learning algorithms in non-traditional computational envi-
+ronments.
+1
+Introduction
+Living cells respond to external stimuli through mechanisms, such as gene regulatory
+networks. Chemical reaction network theory hopes to construct complex circuits, such
+as oscillators and switches, from simple building blocks. Recently, these designs have
+enabled the development of complicated biological circuits for real-world applications.
+Our work aims to enable computation in living environments, where modern computers
+are currently unable to operate.
+Chemical reaction networks provide a robust framework for biomolecular interac-
+tions and can be realized through DNA strand displacement reactions [19], providing
+a physical basis in cellular environments. This makes them a powerful “programming
+language” for molecular computation, benefiting from DNA’s sequence specificity and
+high-density information storage. However, programming reaction networks for more
+sophisticated tasks, such as training and testing, remains a significant challenge.
+The idea of using reaction networks for performing computation dates back to 1994,
+when Adleman solved a seven-node Hamiltonian path problem using DNA strands [1].
+1
+arXiv:2503.19115v2  [q-bio.MN]  1 Apr 2026
+
+
+Winfree and Qian later developed DNA strand displacement schemes capable of realizing
+increasingly complex molecular circuits [5, 18]. More recently, reaction networks have
+been used to implement various machine learning algorithms. In particular, Stojanovic
+et al.[14] constructed reaction networks for automating decision tree implementations,
+while Gopalkrishnan et al.[9, 24, 25] designed schemes for maximum likelihood estima-
+tion and Boltzmann machine simulation [15, 16, 17]. Reaction network implementations
+of neural network dynamics have also been demonstrated [2, 7, 12].
+In this paper, our focus is on Support Vector Machines (SVMs).
+Introduced by
+Vapnik and Chervonenkis in the 1960s, SVMs are supervised classification algorithms.
+The essential idea of SVM is to construct a hyperplane that maximally separates data
+points from different classes, creating the largest possible margin.
+While SVMs are
+highly effective for linearly separable data, nonlinear classification requires the use of
+kernel functions to map data onto higher-dimensional spaces. This is also called the
+kernel trick for SVM [11].
+We design a reaction network scheme to implement a soft-Margin SVM, leveraging
+biochemical processes for machine learning tasks. Our reaction network-based model
+is capable of (1) loading input data points in batches, (2) performing inference, (3)
+backpropagating the classification loss, and (4) updating weights via gradient descent.
+To ensure these operations are executed sequentially, we employ oscillating molecular
+species to achieve time-scale separation. We validate our design by simulating the reac-
+tion network on synthetic datasets using Python and demonstrate effective convergence,
+with weight updates closely matching those obtained from standard SVM implementa-
+tions. This work introduces a novel biochemical framework for executing machine learn-
+ing algorithms in non-traditional computational environments, broadening the scope of
+reaction network applications in synthetic biology.
+Structure of the paper:
+The paper is organized as follows. In Section 2, we intro-
+duce reaction networks and recall their properties. Section 3 introduces support vector
+machines and describes their functioning as an optimization problem. In Section 4, we
+introduce the concept of dual-rail encoding to handle negative weights and biases. Fur-
+ther, we describe basic modules like addition, subtraction, multiplication, comparison,
+and approximate majority that will be used as building blocks in the reaction network
+that simulates the SVM. In section 5, we describe our implementation of our molecular
+clock using Hopf reactions. In Section 6, we describe the assignment module that is
+used for loading training in batches. Sections 7 and 8 describe the reaction network that
+simulates the feedforward and backpropagation components of the SVM, respectively.
+In Section 9, we present and validate the results for our reaction network and compare
+the values of weights and biases obtained using reaction networks and those obtained
+using the traditional SVM implementations. To validate these results, we also compare
+their trajectories as a function of time (epochs in our case) and find that they are in
+close agreement. Section 10 summarizes our contributions and outlines directions for
+future work.
+2
+
+
+2
+Chemical Reaction Networks
+Definition 2.1 ([8]). A Chemical Reaction Network (reaction network) is a triple
+(S, C, R) consisting of a finite set of species S = {X1, . . . , Xn}, a set of complexes
+C = {C1, . . . , Cs}, and a set of reactions R = {R1, . . . , Rr}. Each reaction describes an
+interaction between species given by:
+Rj :
+n
+X
+i=1
+αijXi →
+n
+X
+i=1
+βijXi with j = 1, . . . , r,
+where the left-hand side (reactant complex) and the right-hand side (product complex)
+are linear combinations of species. For each reaction Rj, the non-negative integer coef-
+ficients αij and βij represent the stoichiometric coefficients of species Xi in the reactant
+and product complexes, respectively.
+Example 1. Consider the reaction network (S, C, R) shown in Figure 1. It consists of
+three species:
+S = {X1, X2, X3},
+three complexes:
+C = {X1 + X2, 2X2, X3},
+and four reactions:
+R = {X1 + X2 →X3,
+2X2 →X1 + X2,
+2X2 →X3,
+X3 →X1 + X2}.
+•
+•
+•
+X1 + X2
+2X2
+X3
+Figure 1: A reaction network (S, C, R) with three species, three complexes, and four
+reactions.
+One of the most widely used models in reaction network studies is based on mass-
+action kinetics [10]. In this framework, the reaction rate is determined by the product of
+the reactant concentrations, each raised to its corresponding stoichiometric coefficient.
+The detailed definition is provided below.
+3
+
+
+Definition 2.2 ([8]). Given a reaction network (S, C, R), each reaction Rj is assigned a
+positive constant kj (reaction rate constant) for 1 ≤j ≤r. Let k = (k1, . . . , kr) ∈Rr
+>0
+denote the reaction rate vector. The mass-action system generated by (S, C, R, k) is
+given by:
+dxi(t)
+dt
+=
+r
+X
+j=1
+kj
+n
+Y
+l=1
+xαlj
+l
+(βij −αij) with i = 1, . . . , n,
+where x(t) = (x1(t), . . . , xn(t)) represents the concentrations of species X1, . . . , Xn at
+time t.
+For example, recall the reaction network from Figure 1 (see Example 1). Given the
+reaction rate vector k = (k1, . . . , k4), the reaction rates are assigned as follows:
+X1 + X2
+k1
+−→X3
+2X2
+k2
+−→X1 + X2
+2X2
+k3
+−→X3
+X3
+k4
+−→X1 + X2
+Under mass-action kinetics, the associated dynamical system is
+dx
+dt = k1x1x2
+
+
+
+
+−1
+−1
+1
+
+
+
++ k2x2
+2
+
+
+
+
+1
+−1
+0
+
+
+
++ k3x2
+2
+
+
+
+
+0
+−2
+1
+
+
+
++ k4x3
+
+
+
+
+1
+1
+−1
+
+
+
+
+=
+
+
+
+
+−k1x1x2 + k2x2
+2 + k4x3
+−k1x1x2 + (k2 −2k3)x2
+2 + k4x3
+k1x1x2 + k3x2
+2 −k4x3
+
+
+
+.
+Reaction networks offer a robust framework for implementing molecular-level com-
+putations since the mass-action systems generated by them have polynomial right-hand
+sides.
+In the following, we introduce two key concepts in reaction networks: catalytic and
+non-catalytic species, which will be frequently used in Section 4.
+Definition 2.3 ([8]). Let (S, C, R) be a reaction network with reactions R1, . . . , Rr ∈R,
+where each reaction has the form
+Rj :
+n
+X
+i=1
+αijXi →
+n
+X
+i=1
+βijXi
+(a) A species Xi ∈S is said to be catalytic if the number of species Xi in the reactant
+and product complexes remains the same for every reaction. Specifically, Xi is a
+catalytic species if and only if αij = βij for every 1 ≤j ≤r.
+(b) A species Xi ∈S is said to be a non-catalytic species if it is not catalytic, that is,
+there exists a reaction Rj such that αij ̸= βij.
+4
+
+
+Example 2. Consider the following reaction network:
+∅→X1 + X2
+X1 + X3 →X3
+In this example, the reaction network consists of three species, S = {X1, X2, X3}.
+Among them, X1 and X2 are non-catalytic, while X3 is a catalytic species.
+3
+Support Vector Machines
+Support Vector Machines (SVMs) [6, 21] are supervised machine learning algorithms.
+SVMs have attracted widespread attention in machine learning, data mining, and pat-
+tern recognition tasks. In particular, they are particularly useful in binary classification
+problems.
+SVM works on the principle of generating a surface that separates data into classes by
+maximizing the distance between itself and the data points. In particular, SVM assigns
+the data points labels by finding the optimal hyperplane. This hyperplane corresponds
+to one that is at the maximum distance from the closest point of any class. Given
+a new data point, it can be classified and given labels according to which side of the
+hyperplane it will be in feature space.
+If the data cannot be separated by such a hyperplane, then the SVM finds the
+hyperplane as in the hard margin case, with the caveat that a penalty is added each
+time a point crosses the margin. These SVMs are referred to as soft margin SVMs.
+3.1
+Hard-Margin SVM Formulation
+Given a set of data points (which are feature vectors) that belong to either of the two
+classes, one needs to decide to which of the two classes a new data point belongs. More
+formally, given a dataset {(x(i), y(i))}N
+i=1, where x(i) ∈Rd are the feature vectors and
+y(i) ∈{1, −1} are the binary class labels, the goal is to find a weight vector w ∈Rd
+such that it maximizes the distance of its nearest point for each class and bias b ∈R
+such that:
+y(i)(w · x(i) + b) ≥1
+for all 1 ≤i ≤N.
+(1)
+The optimization problem for a hard-margin SVM is defined as:
+min
+w,b
+1
+2∥w∥2,
+(2)
+subject to the constraint that all training points satisfy Equation (1). This objective
+aims to maximize the margin, which is inversely proportional to ∥w∥.
+Figure 2 shows a hard-margin SVM for a two-dimensional input and class label
+taking values −1 and 1.
+5
+
+
+Figure 2: Visualization of Hard Margin SVM for two-dimensional input and class label
+∈{1, −1}; red points denote class 1 and blue points denote class −1.
+3.2
+Theoretical Justification
+While the hard-margin SVM provides an ideal formulation for linearly separable data,
+directly solving this constrained optimization problem can be complex. In practice,
+we adopt an unconstrained formulation using hinge loss and L2 regularization, which
+corresponds to a soft-margin SVM :
+min
+w,b
+λ
+2 ∥w∥2 +
+N
+X
+i=1
+max(0, 1 −y(i)(w · x(i) + b)),
+where λ > 0 is the regularization parameter. This soft-margin approach is more robust
+as it allows for margin violations, penalizing them through the hinge loss. A key insight
+is that when the data is linearly separable, the hinge loss term becomes zero for all
+training points, effectively reducing the soft-margin objective back to the original hard-
+margin problem in Equation (2).
+The iterative training algorithm we employ is a form of gradient descent derived
+directly from this soft-margin SVM formulation. For a single training example (x, y),
+let f(x) = w · x + b. The hinge loss for this example is
+Loss(w, b) = max(0, 1 −yf(x)).
+6
+
+
+The subgradients of this loss with respect to w and b are:
+∂Loss
+∂w
+=
+
+
+
+λw −yx
+if yf(x) < 1,
+λw
+otherwise,
+∂Loss
+∂b
+=
+
+
+
+−y
+if yf(x) < 1,
+0
+otherwise.
+These subgradients form the basis for our iterative update rules.
+3.3
+Iterative Training Algorithm
+In this section, we give an iterative procedure to train the SVM by adjusting the weight
+vector w and the bias b according to an iterative training algorithm.
+Given data points {(x(i), y(i))}N
+i=1, a regularization parameter λ, and a learning rate
+η > 0, the weight w and the bias b are updated as follows:
+1. Initialize w = 0 and b = 0.
+2. For each data point (x(i), y(i)) in the dataset:
+• Compute the decision function: f(x(i)) = w · x(i) + b.
+• If there is a misclassification or margin violation (y(i)f(x(i)) < 1), then
+w ←w −η(λw −y(i)x(i))
+b ←b + ηy(i)
+(3)
+• If there is no misclassification (y(i)f(x(i)) ≥1), then
+w ←w −ηλw
+b ←b
+(4)
+3. Repeat this process for multiple epochs until convergence or a set number of
+iterations is reached.
+This iterative process adjusts w and b in the direction that minimizes the regularized
+hinge loss, effectively moving the hyperplane to reduce errors for misclassified points.
+The learning rate η controls the step size of these updates, influencing the convergence
+rate. In the separable case, these updates converge toward the maximum-margin hyper-
+plane of SVMs. This approach provides a computationally efficient method for training
+SVMs, particularly beneficial in online or large-scale learning scenarios.
+To implement batch processing in SVM, we modify the update rule. The modi-
+fication applies specifically to Equation (3) and (4). The input-dependent parameter
+updates are aggregated across a batch size nbatch−size, and then we perform a single
+update. For each sample in the batch, we define
+w(i)
+upd =
+(
+ηy(i)x(i),
+if y(i)f(x(i)) < 1,
+0,
+otherwise,
+b(i)
+upd =
+(
+ηy(i),
+if y(i)f(x(i)) < 1,
+0,
+otherwise.
+7
+
+
+The batch update is given by
+w ←w −ηλw +
+1
+nbatch−size
+nbatch−size
+X
+i=1
+w(i)
+upd,
+b ←b +
+1
+nbatch−size
+nbatch−size
+X
+i=1
+b(i)
+upd.
+(5)
+3.4
+Decision Rule
+After training, the classification decision for a new data point ˆx ∈Rd is determined by
+f(ˆx) = w · ˆx + b,
+and the predicted class is given by
+ˆy =
+
+
+
+1
+if f(ˆx) ≥0,
+−1
+otherwise.
+This iterative approach, while not the standard quadratic programming formula-
+tion of SVM, provides a computationally efficient method for training SVMs and is
+particularly useful in online or large-scale learning scenarios.
+4
+Operation Modules
+In this section, we develop the reaction network scheme for the individual submodules
+that will be used for implementing the feedforward and backpropagation steps in Sections
+7 and 8. To this end, we note that when dealing with weights and biases, negative values
+may arise, and a mechanism is required to accommodate them. This issue is addressed
+in the next subsection on dual-rail encoding.
+4.1
+Dual-rail Encoding
+In a physical setting, the concentration of species is always non-negative.
+As data
+points and weights can be negative, we use the dual-rail encoding [22]. Specifically, for
+any variable ζ ∈R, we take two species ζ+ and ζ−with non-negative concentrations
+ζ+(t) ≥0 and ζ−(t) ≥0. For all t ≥0, the difference between ζ+(t) −ζ−(t) represents
+the real value ζ.
+Here, we list some basic modules from [23]. that will be used in the implementation
+of the feedforward and backpropagation modules. We begin by introducing notation
+that will be used throughout the remainder of this paper.
+8
+
+
+Notation:
+We denote by [X(t)] the concentration of species X at time t. If X is
+a catalyst, whose concentration remains constant for all t ≥0, we write [X]. Finally,
+[Xss] denotes the concentration of X at steady state.
+4.2
+Addition Module
+In order to add two numbers, we consider the following network:
+A
+1
+−→A + C
+B
+1
+−→B + C
+C
+1
+−→∅
+(6)
+In this network, the original input species A and B are catalysts, and thus their
+concentrations remain constant.
+The concentrations of species A and B are added,
+with the resulting value stored in the steady-state concentration of C. Let [A] = [A(0)]
+and [B] = [B(0)]. Then the dynamics associated with the network (6) is given by
+d[C(t)]
+dt
+= [A] + [B] −[C(t)].
+The steady-state concentration of C is given by
+[Css] = [A] + [B].
+4.3
+Multiplication Module
+In order to multiply, we consider the following network:
+A + B
+1
+−→A + B + C
+C
+1
+−→∅
+(7)
+In this network, the species A and B are catalysts. The concentrations of species A
+and B are multiplied, with the resulting value stored in the steady-state concentration
+of C.
+Let [A] = [A(0)] and [B] = [B(0)].
+Then the dynamics associated with the
+network (7) is given by
+d[C(t)]
+dt
+= [A][B] −[C(t)].
+The steady-state concentration of C is given by
+[Css] = [A][B].
+9
+
+
+4.3.1
+Dual Rail Encoding in Multiplication Module
+We now demonstrate how dual-rail encoding is performed in the multiplication module.
+Similar mechanisms will hold for other modules in this paper.
+Let Ap, An and Bp, Bn be the dual-rail species corresponding to signed quantities A
+and B, respectively, such that
+A = [Ap] −[An],
+B = [Bp] −[Bn].
+The objective is to compute the product C = A·B using dual-rail encoding. Towards
+this, we have
+C = A·B = (Ap−An)·(Bp−Bn) = ApBp+AnBn−ApBn−AnBp = (ApBp+AnBn)−(ApBn+AnBp)
+In the dual-rail form, we introduce species Cp and Cn so that
+C = [Cp] −[Cn],
+where
+[Cp] = ApBp + AnBn,
+[Cn] = ApBn + AnBp.
+We implement [Cp] and [Cn] using the multiplication module (7). The corresponding
+reaction network is given by:
+Ap + Bp →Ap + Bp + Cp
+An + Bn →An + Bn + Cp
+Ap + Bn →Ap + Bn + Cn
+An + Bp →An + Bp + Cn
+Cp →∅
+Cn →∅
+The dynamics of the system give
+[Css
+p ] = ApBp + AnBn,
+[Css
+n ] = ApBn + AnBp,
+thereby correctly encoding the signed product C = A · B in dual-rail form.
+4.4
+Comparison and Approximate Majority Modules
+Our module is designed to compare the concentrations of species and set the correspond-
+ing flags. This functionality is achieved using a comparison module and an approximate
+majority module, triggered one after another.
+10
+
+
+Comparison Module
+In the comparison module, the inputs X and Y are assigned to flag species XgY and
+XlY in a normalized fashion. The network for implementing this is given by
+XgY + Y
+1
+−→XlY + Y
+XlY + X
+1
+−→XgY + X
+(8)
+In this network, the species X and Y are catalysts. Let [X] = [X(0)] and [Y ] =
+[Y (0)]. To normalize the values within the range [0, 1], we set the initial concentrations
+of XgY and XlY such that
+[XgY (0)] + [XlY (0)] = 1.
+The dynamical system corresponding to the network (8) is given by
+d[XgY (t)]
+dt
+= −[XgY (t)][Y ] + [XlY (t)][X],
+d[XlY (t)]
+dt
+= [XgY (t)][Y ] −[XlY (t)][X].
+Adding the two equations above gives us that [XgY (t)] + [XlY (t)] is preserved for all
+time t ≥0. At steady state, we get
+[Xss
+gY ]
+[Xss
+lY ] = [X]
+[Y ] .
+Since [Xss
+lY ] + [Xss
+gY ] = [XgY (0)] + [XlY (0)] = 1, this implies that
+[Xss
+gY ] =
+[X]
+[X] + [Y ],
+[Xss
+lY ] =
+[Y ]
+[X] + [Y ].
+Moreover, by direct computation, we can derive that this steady state is globally at-
+tracting. For example, if [X] = 60 and [Y ] = 40, the flag species XgY and XlY will
+converge to 0.6 and 0.4, respectively.
+Approximate Majority Module
+We use the following network ([4]) to implement the approximate majority module:
+XgY + XlY
+1
+−→XlY + B
+B + XlY
+1
+−→XlY + XlY
+XlY + XgY
+1
+−→XgY + B
+B + XgY
+1
+−→XgY + XgY
+(9)
+where B is an intermediate species.
+11
+
+
+The dynamical system corresponding to the network (9) is given by
+d[XgY (t)]
+dt
+= −[XgY (t)][XlY (t)] + [B(t)][XgY (t)],
+d[XlY (t)]
+dt
+= −[XgY (t)][XlY (t)] + [B(t)][XlY (t)],
+d[B(t)]
+dt
+= −[B(t)][XlY (t)] −[B(t)][XgY (t)] + 2[XgY (t)][XlY (t)].
+Assuming that the normalization step in the comparison module has already been per-
+formed, the species (XgY (t), XlY (t), B(t)) will converge to the state (1, 0, 0) if XgY (0) >
+XlY (0), and to (0, 1, 0) if XgY (0) < XlY (0). For a proof of this result, please see [23].
+4.5
+Loading Module
+The loading module copies the concentration of A into B using the following network:
+A
+1
+−→A + B
+B
+1
+−→∅
+(10)
+In this network, the species A is a catalyst. Let [A] = [A(0)]. The dynamical system
+corresponding to the network (10) is given by
+d[B]
+dt
+= [A] −[B].
+At steady state, we get [Bss] = [A].
+4.6
+Subtraction Module
+We define a new species C, whose steady-state concentration will store the difference
+between the concentrations of two species A and B.
+In particular, the subtraction
+module will compute [Css] = max(0, A −B). The reaction network corresponding to
+this is given by:
+A
+1
+−→A + C
+B
+1
+−→B + H
+C
+1
+−→∅
+C + H
+1
+−→∅
+(11)
+In this network, the species A and B are catalysts. Let [A] = [A(0)] and [B] = [B(0)].
+Then the dynamics corresponding to network (11) is given by
+d[C(t)]
+dt
+= [A] −[C(t)][H(t)] −[C(t)],
+d[H(t)]
+dt
+= [B] −[C(t)][H(t)].
+12
+
+
+This implies that at steady state,
+[Css] =
+
+
+
+[A] −[B],
+if [A] > [B],
+0,
+if [A] ≤[B].
+5
+Oscillation Module
+In the oscillation module, we present a mechanism for time-scale separation using a clock
+derived from Hopf dynamics [13, 20]. The Hopf dynamics is turned into a discrete-time
+signal such that only one group of reactions is activated at a time.
+(see Oscillator
+semantics at the end of this section for a detailed explanation).
+Note that it is possible to use a standard oscillation module as in [23]. However,
+such oscillations are not guaranteed to maintain constant amplitude and may attenu-
+ate over time, leading to errors that accumulate. Consequently, the reaction network
+implementation may fail to accurately match the implementation of SVMs. To obtain
+oscillations with constant amplitude, we instead employ a Hopf oscillator, and assume
+the existence of an external readout that converts this dynamics into a clock signal
+controlling the sequential execution of reactions (see Remark 5.1 for details).
+The Hopf dynamical system [13, 20] is given by:
+d[X(t)]
+dt
+= µ[X(t)] −[X(t)]3 −[Z(t)]2[X(t)] −ω[Z(t)],
+d[Z(t)]
+dt
+= µ[Z(t)] −[Z(t)]3 −[X(t)]2[Z(t)] + ω[X(t)].
+(12)
+One can show that the trajectories of this dynamical system converge to a stable limit
+cycle of radius √µ and period T = 2π/ω. We also remark that Equation (12) can be
+realized via mass-action kinetics using dual-rail encoding.
+Given the oscillator dynamics, we obtain a discrete-time signal by computing a phase
+and then discretizing it as follows. We compute the current clock phase of the oscillator
+θ(t) by
+θ(t) = atan2([Z(t)], [X(t)]) mod 2π.
+(13)
+Here, the function atan2(z, x) returns the angle between the x-axis and the point (x, z).
+Next, we discretize the phase into nclock slots as follows:
+k(t) =
+jnclock
+2π
+θ(t)
+k
+mod nclock,
+(14)
+where k(t) denotes the active oscillator slot index. We then define O(t) ∈{0, 1}nclock by
+For i ∈{0, . . . , nclock −1},
+Oi(t) :=
+
+
+
+1,
+if i = k(t),
+0,
+otherwise.
+13
+
+
+Figure 3: Hopf oscillator dynamics for nclock = 6. The figure shows the time evolution
+of (i) [X(t)] and [Z(t)], (ii) the phase θ(t), (iii) the discrete index k(t), and (iv) the
+indicator variables Oi(t).
+Remark 5.1. The phase computation and discretization in Equations (13) and (14)
+are not part of the reaction dynamics, but rather constitute a readout operation applied
+to the observables x(t) and z(t). We do not implement this step chemically; instead, we
+assume the existence of an external measurement device capable of computing this clock
+signal. This distinction between intrinsic dynamics and external readouts is standard
+in bioengineering applications.
+Oscillator semantics:
+Every reaction in our SVM implementation is associated with
+an oscillator index i ∈{0, . . . , nclock −1}. If the intrinsic rate of a reaction r is ar(·),
+then its effective propensity in the oscillator molecules is given by
+aeff
+r
+(·, t) = Oi(t) ar(·) with i ∈{0, . . . , nclock −1}.
+14
+
+
+The oscillator species Oi acts as a binary gate for its associated reactions. At time
+t, when Oi(t) = 1, the corresponding reactions are active and proceed at rates, i.e.,
+aeff
+r
+(·, t) = ar(·). When Oi(t) = 0, the effective rate is zero and the reactions are inac-
+tive. In this way, the oscillator enforces a sequential execution of reactions according to
+the clock signal. Moreover, the oscillator molecule functions as a catalyst: it modulates
+the reaction rates without being altered by the reactions.
+6
+Assignment Module
+Inspired by [7], we develop the assignment module, which divides the input samples into
+batches and loads them into the input species set. This strategy allows us to parallelize
+our computation and allows faster execution of our program.
+To formulate this, assume we have p samples, each of dimension d. In each iteration,
+we aim to feed ˜p samples (typically ˜p divides p) into the input layer. We divide the p
+samples across ˜p parallel input lanes. For every lane l ∈{1, . . . , ˜p}, the eligible sample
+indices form the set
+Il := {l, ˜p + l, 2˜p + l, . . . p −˜p + l}.
+In every iteration, a sample is chosen from every lane. These samples are fed into the
+input layer. Over successive iterations, the active samples in each Il are shifted through
+to be chosen. After the last sample is chosen, we cycle back to the first sample and
+continue the process.
+For simplicity, we assume that all sample values are non-negative. We define
+• The sample species set: {Ii
+1, Ii
+2, Ii
+3}, where 1 ≤i ≤p, represents the set of input
+samples.
+• The input species set: {Xl
+1, Xl
+2, Y l}˜p
+l=1, where 1 ≤l ≤˜p, represents the set of
+input samples fed into the network at a time.
+• The order species set: {Cl
+i}, where 1 ≤i ≤p and 1 ≤l ≤˜p.
+• The auxiliary order species set: { ˜Cl
+i}, where 1 ≤i ≤p and 1 ≤l ≤˜p.
+These species support the assignment module, which operates in three phases. The
+reactions are
+O0 :
+Cl
+i + Ii
+q
+1−→Cl
+i + Ii
+q + Xl
+q
+Xl
+q
+1−→∅
+Cl
+i + Ii
+3
+1−→Cl
+i + Ii
+3 + Y l
+Y l 1−→∅
+O1 :
+Cl
+i
+k−→˜Cl
+i
+O2 :
+˜Cl
+o
+k−→Cl
+˜p+o
+˜Cl
+p−˜p+l
+k−→Cl
+l
+˜Cl
+j
+k−→Cl
+j
+where q ∈{1, 2}, o ∈I“l, with I“l := {l, ˜p + l, 2˜p + l, . . . , p −2˜p + l}, and j /∈Il.
+15
+
+
+To initialize the system, we set the initial concentrations of the order species {Cl
+i}
+as
+[Cl
+i(0)] =
+
+
+
+1,
+if l = i,
+0,
+otherwise,
+for every 1 ≤i ≤p and 1 ≤l ≤˜p.
+This means that for each lane index l ∈{1, . . . , ˜p}, only Cl
+l are active initially,
+while all other order species remain inactive. For the auxiliary order species { ˜Cl
+i}, all
+concentrations are initialized to zero as follows:
+[ ˜Cl
+i(0)] = 0 for every 1 ≤i ≤p and 1 ≤l ≤˜p.
+The concentrations of the input species {Y l} and {Xl
+q} (for q ∈{1, 2} and l ∈{1, . . . , ˜p})
+are initialized to arbitrary nonnegative values:
+[Y l(0)] ∪[Xl
+q(0)] ∈R≥0 for every 1 ≤q ≤3 and 1 ≤l ≤˜p.
+In Reaction Phase O0, the assignment operation is performed.
+Specifically, the
+reactions:
+Cl
+i + Ii
+q
+1−→Cl
+i + Ii
+q + Xl
+q
+Cl
+i + Ii
+3
+1−→Cl
+i + Ii
+3 + Y l
+Xl
+q
+1−→∅
+Y l 1−→∅
+This reaction network collectively stores the sum of the term-wise product of the order
+species concentration [Cl
+i] with the sample input species Ii
+1, Ii
+2 and Ii
+3 into the corre-
+sponding Xl
+1, Xl
+2 and Y l. Since the catalyst concentrations satisfy [Cl
+i] = 0 for all l ̸= i
+and [Cl
+l] = 1, the system effectively selects and loads only one active sample per lane
+during each iteration. Thus, ˜p samples are loaded into the input layer parallel.
+In the Phase O1, the active order species are copied into the auxiliary species via
+the reaction:
+Cl
+i
+k−→˜Cl
+i
+This mechanism preserves the current assignment state in preparation for the rotation
+of order species in the next iteration.
+In Reaction Phase O2, the system initiates a cyclic shift of the active samples across
+lanes. The reactions:
+˜Cl
+o
+k−→Cl
+˜p+o
+˜Cl
+p−˜p+l
+k−→Cl
+l
+˜Cl
+j
+k−→Cl
+j
+perform the following: the active block in each position is shifted forward by ˜p, going
+to the next element in their respective Il, except for the last element of the lane, which
+is cyclically wrapped around to the first position. Any remaining auxiliary species that
+do not participate in the cycle are transferred to their corresponding order species.
+16
+
+
+Remark 6.1. As per the above convention, reactions are formed for all pairs of (l, i).
+However, for a given l, only those i ∈Il have Cl
+i as active at some time during the
+network. Consequently, reactions involving those inactive indices will never contribute
+to the dynamics. In our Python implementation, we iterate only over those indices that
+can be active and skip inactive indices to reduce computational overhead.
+Together, these phases constitute an automated mechanism for batch-wise data
+assignment, ensuring that ˜p samples are loaded in parallel at each iteration and that
+the active sample in every lane evolves cyclically without external logic.
+7
+Encoding the Feedforward Module of SVM
+In the following sections, we describe the computation done for a single sample passing
+through the reaction network. We omit the lane indices used previously. The weights
+and biases are shared across lanes. But the input, and intermediate species are lane
+specific, unless stated otherwise.
+Given an input sample x = (x1, . . . , xd) ∈Rd with an associated label y ∈{−1, 1},
+a weight vector w = (w1, . . . , wd) ∈Rd, and a bias term b ∈R, our objective is to
+determine whether the classification is correct by evaluating y(w · x + b) against 1.
+In this section, we construct reaction networks that compute the products wixi,
+sum them together with the bias b, and then multiply the resulting sum by y (Steps
+1–3), allowing the resulting value to be compared with 1 (Steps 4–5). The complete
+computation is performed through a sequence of five steps, utilizing the oscillatory
+molecules O3, O4, O5, O6, O7 and O8.
+In Sections 7 and 8, we denote by Wi the species representing the weight wi, by Xi
+the species representing xi, by Y the species representing y, and by B representing the
+bias b.
+Step 1: We introduce the species WXi, whose steady state concentration will
+equal the product of Wi and Xi. Specifically, we use the multiplication module (7) and
+consider the following network:
+W1 + X1 + O3
+1
+−→W1 + X1 + WX1 + O3
+WX1 + O3
+1
+−→O3
+...
+Wd + Xd + O3
+1
+−→Wd + Xd + WXd + O3
+WXd + O3
+1
+−→O3
+(15)
+In this network, the species Wi, Xi are catalysts. Let [Wi] = [Wi(0)] and [Xi] =
+17
+
+
+[Xi(0)]. The dynamical system corresponding to the network (15) is given by
+d[WXi(t)]
+dt
+= [Wi][Xi][O3] −[WXi(t)][O3] for every 1 ≤i ≤d.
+At steady state, we get [WXiss] = [Wi][Xi].
+Step 2: We introduce a new species P, whose steady-state concentration represents
+the sum of all WXi plus B. In particular, we use the addition module (6) and consider
+the following network:
+WX1 + O4
+1
+−→WX1 + P + O4
+...
+WXd + O4
+1
+−→WXd + P + O4
+B + O4
+1
+−→B + P + O4
+P + O4
+1
+−→O4
+(16)
+In this network, the species WXi, B are catalysts.
+Let [WXi] = [WXi(0)] and
+[B] = [B(0)]. The dynamical system corresponding to the network (16) is given by
+d[P(t)]
+dt
+=
+d
+X
+i=1
+[WXi][O4] + [B][O4] −[P(t)][O4].
+At steady state, we get [P ss] =
+d
+X
+i=1
+[WXi] + [B].
+Step 3: We introduce the species Q, whose steady-state concentration corresponds
+to the product of P and Y .
+Specifically, we use the multiplication module (7) and
+consider the following network:
+P + Y + O5
+1
+−→P + Y + Q + O5
+Q + O5
+1
+−→O5
+(17)
+In this network, the species P, Y are catalysts. Let [P] = [P(0)] and [Y ] = [Y (0)].
+The dynamical system corresponding to network (17) is
+d[Q(t)]
+dt
+= [P][Y ][O5] −[Q(t)][O5].
+At steady state, we get [Qss] = [P][Y ]. Combining this with the results from Steps 1
+and 2, it follows that
+[Qss] =
+ N
+X
+i=1
+[WXi] + [B]
+
+[Y ].
+18
+
+
+Next, we compare the value stored in Q with 1. Depending on whether the associated
+label is correct (i.e., whether the concentration of Q is greater or less than 1), the
+concentration of one of the two flag species (KlQ and KgQ) converges to 1, while the
+concentration of the other species converges to 0.
+We divide this process into two sequential steps: Step 4, which normalizes the
+flag species, and Step 5, which performs the comparison. To ensure these steps occur
+sequentially, we employ oscillatory molecules. Oscillation molecule O7 is used in Step
+4, while O8 is used in Step 5. This guarantees that the reactions in Step 4 complete
+before those in Step 5 begin.
+We employ dual-rail encoding to ensure that all species concentrations remain non-
+negative.
+Since the quantity Q can take negative values, we compute it using the
+subtraction module (Equation (11) ), which produces an effective concentration propor-
+tional to max(Q+ −Q−, 0). This introduces a rectification that clamps negative values
+of Q to zero. However, this does not affect correctness, as the subsequent comparison
+only depends on whether Q exceeds the threshold; if Q were negative, clamping it to
+zero preserves the outcome of the comparison. We utilise O6 molecule in this step.
+Step 4: We introduce a catalytic species K along with the flag species KlQ and
+KgQ. We set the concentration of K to 1, i.e., [K] = [K(0)] = 1, and designate KlQ
+and KgQ as flag species, with the sum of their initial concentrations equal to 1. Using
+the comparison module (8), the network implementing this comparison is given by
+Q + KgQ + O7
+1
+−→KlQ + Q + O7
+KlQ + K + O7
+1
+−→KgQ + K + O7
+(18)
+In this network, the species Q is a catalyst. Let [Q] = [Q(0)] and let [KlQ(0)] +
+[KgQ(0)] = 1. The dynamical system corresponding to network (18) is given by
+d[KlQ(t)]
+dt
+= [Q][KgQ(t)][O7] −[KlQ(t)][K][O7],
+d[KgQ(t)]
+dt
+= −[Q][KgQ(t)][O7] + [KlQ(t)][K][O7].
+Adding the two equations above gives us that [KlQ(t)] + [KgQ(t)] is preserved for all
+time t ≥0. Consequently, the steady-state concentrations of KlQ and KgQ will be set
+as follows:
+[Kss
+lQ] =
+[Q]
+[Q] + [K] =
+[Q]
+[Q] + 1,
+[Kss
+gQ] =
+[K]
+[Q] + [K] =
+1
+[Q] + 1.
+Step 5: We compare Q and K by using the approximate majority algorithm (see
+Section 4.4).
+Specifically, the flag species KlQ and KgQ are set such that, if [Q] >
+[K] = 1, KlQ converges to 1 and KgQ converges to 0; conversely, if [Q] < [K] = 1, KlQ
+converges to 0 and KgQ converges to 1. Using the approximate majority module (9),
+19
+
+
+the network that implements this behavior is given by
+KgQ + KlQ + O8
+1
+−→KlQ + U + O8
+U + KlQ + O8
+1
+−→2KlQ + O8
+KlQ + KgQ + O8
+1
+−→KgQ + U + O8
+U + KgQ + O8
+1
+−→2KgQ + O8
+(19)
+The dynamical system corresponding to network (19) is given by
+d[KlQ(t)]
+dt
+= −[KgQ(t)][KlQ(t)][O8] + [U(t)][KlQ(t)][O8],
+d[KgQ(t)]
+dt
+= −[KgQ(t)][KlQ(t)][O8] + [U(t)][KgQ(t)][O8],
+d[U(t)]
+dt
+= [KgQ(t)][KlQ(t)][O8] −[U(t)][KgQ(t)][O8] + [KlQ(t)][KgQ(t)][O8]
+−[U(t)][KgQ(t)][O8].
+The analysis of this dynamical system follows the discussion in Section 4.4.
+In
+conclusion, if KlQ(t) converges to 1 and KgQ(t) converges to 0, this indicates that
+[Q] > [K] and the associated label is correct. Conversely, if KlQ(t) converges to 0 and
+KgQ(t) converges to 1, this indicates that [Q] < [K] and the associated label is incorrect.
+8
+Backpropagation Module of SVM using Gradient De-
+scent
+In this section, we construct reaction networks corresponding to the backpropagation
+component of the SVM, that is, the adjustment of the weight vector w and the bias b
+via gradient descent.
+Recall from Section 7 that we determined whether a given input sample x with
+label y is correctly classified under w and b. Given a regularization parameter λ and
+a learning rate η > 0, the reaction networks implemented here realize Equations (3)
+and (4) from the iterative training algorithm, given by:
+• Misclassification case (y(w · x + b) < 1):
+w ←w −η(λw −yx)
+b ←b + ηy
+• No misclassification case (y(w · x + b) ≥1):
+w ←w −ηλw
+b ←b
+20
+
+
+We first compute the scaled weight (1 −ηλ)w (Step 1), since this term appears in
+both cases regardless of classification outcome. Next, we compute the products ηy and
+ηyx, which are required only in the misclassification case (Step 2). Finally, we apply
+the updates to the bias and the weight vector (Step 3). The complete computation is
+performed in two phases, utilizing the oscillatory molecules O9 and O10.
+Step 1: We introduce the species Ri, whose steady state concentration will equal
+the product of Wi and α = 1 −ηλ (update for the weight). Specifically, we we use the
+multiplication module (7) and consider the following network:
+O9 + α + W1 →O9 + η + λα + W1 + R1
+R1 + O9 →O9
+...
+O9 + α + Wd →O9 + η + λα + Wd + Rd
+Rd + O9 →O9
+(20)
+In this network, the species Wi is a catalyst. Let [Wi] = [Wi(0)]. The dynamical
+system corresponding to the network (20) is given by
+d[Ri(t)]
+dt
+= α[Wi][O9] −[Ri(t)][O9].
+At steady state, we get [Rss
+i ] = α[Wi] = (1 −ηλ)[Wi].
+Next, we load the bias. We introduce the species Z, whose steady-state concentration
+B. Using the loading module (10), the reaction network implementing this operation is
+given by:
+B + O9 →O9 + B + Z
+Z + O9 →O9
+In this network, the species B is catalyst. Let [B] = [B(0)]. The dynamical system
+corresponding to this network is
+d[Z(t)]
+dt
+= [B][O9] −[Z(t)][O9].
+At steady state, we get [Zss] = [B].
+Note that both the species, Ri and Z are common to all the lanes.
+Step 2: We introduce two species XYi and Sb, whose steady-state concentrations
+represent the quantities ηKgQXiY (update for the weight) and ηKgQY (update for the
+bias), respectively. In particular, we use the multiplication module (7) and consider the
+21
+
+
+following network:
+O9 + η + Y + X1 + KgQ →O9 + η + Y + X1 + XY1 + KgQ
+XY1 + O9 →O9
+...
+O9 + η + Y + Xd + KgQ →O9 + η + Y + Xd + XYd + KgQ
+XYd + O9 →O9
+O9 + η + Y + KgQ →O9 + η + Y + Sb + KgQ
+Sb + O9 →O9
+In this network, the species Xi, Y, KgQ are catalysts.
+Let [Xi] = [Xi(0)], [Y ] =
+[Y (0)], and [KgQ] = KgQ(0). The dynamical system corresponding to this network is
+d[XYi(t)]
+dt
+= η[KgQ(t)][Xi][Y ][O9] −[XYi(t)][O9],
+d[Sb(t)]
+dt
+= η[KgQ(t)][Y ][O9] −[Sb(t)][O9].
+At steady state, we get [XY ss
+i ] = η[KgQ][Xi][Y ] and [Sbss] = η[KgQ][Y ]. Note that the
+catalyst species KgQ acts as a switch: it takes the value [KgQ] = 1 in the misclassification
+case and [KgQ] = 0 in the no-misclassification case, thereby enabling or preventing
+weight updates.
+Note that the species XYi and Sb are shared across lanes, but each lane contributes
+to their production independently. In particular, each lane computes its local update
+term, and these contributions are accumulated into the shared species through reactions
+whose rate constants are scaled by 1/˜p. At steady state, the accumulated quantities
+correspond to the mean over the ˜p samples processed in parallel. Thus,
+[XY ss
+i ] = 1
+˜p
+P˜p
+l=1 η[K(l)
+gQ][X(l)
+i ][Y (l)],
+[Sbss] = 1
+˜p
+P˜p
+l=1 η[K(l)
+gQ][Y (l)].
+Step 3: We now update the weight and the bias.
+First, we recall from Step 1 that the species Ri directly encodes the scaled weight
+(1 −ηλ)Wi. We directly use Ri as the base weight and add the correction term XYi
+corresponding to the hinge-loss update. We directly combine Ri and the correction term
+XYi to form the updated weight. To update the bias, we store the sum of Z and Sb
+into B The reaction network implementing this operation is given by:
+Ri + O10 →Ri + O10 + Wi
+XYi + O10 →XYi + O10 + Wi
+Z + O10 →Z + O10 + B
+Sb + O10 →Sb + O10 + B
+Wi + O10 →O10
+B + O10 →O10
+(21)
+22
+
+
+In this network, the species Ri, XYi, Sb and Z are catalysts. Let [Ri] = [Ri(0)],
+[XYi] = [XYi(0)], [Sb] = [Sb(0)] and [Z] = [Z(0)]. The dynamical system corresponding
+to this network is
+d[Wi(t)]
+dt
+= [Ri][O10] + [XYi][O10] −[Wi(t)][O10],
+d[B(t)]
+dt
+= [Z][O10] + [Sb][O10] −[B(t)][O10].
+At steady state, we obtain [W ss
+i ] = [Ri] + [XYi] and [Bss] = [Z] + [Sb]. As a result,
+Equations (3) and (4) from the iterative training algorithm are implemented (Equation
+(5) in our parallel batch setting). After the update is applied, all intermediate species
+are reset in O11 by using decay reactions, restoring the system to its initial state for the
+next iteration. This process is repeated across all batches until a predefined number of
+iterations is reached.
+9
+Results and Analysis
+In this section, we compare the actual and predicted values of the learned SVM param-
+eters across the reaction network.
+9.1
+Experimental Setup
+To validate the functionality of our reaction network, we perform simulations using a
+CRN-based SVM and compare its performance against a standard soft-margin SVM
+baseline, implemented in Python. We generate a two-dimensional linearly separable
+dataset using a random generator and introduce controlled noise. Each sample is as-
+signed a binary label in {+1, −1}.
+In our experimental setup, we consider p = 10 training samples (evenly divided
+between the two classes) and 4 test samples. We use a minibatch size of ˜p = 2 and train
+the model for 100 epochs.
+9.2
+Feedforward Network and Learning Module Simulation Results
+We compare the actual and predicted values of the learned SVM parameters. The table
+below presents a comparison of the true and computed values for weights and bias,
+along with their respective errors.
+The results indicate that the average error in predicting the parameters is approxi-
+mately 0.033%, demonstrating that the CRN-based approach closely approximates the
+standard SVM training process.
+To further validate these results, we visualize the evolution of the learned weights
+and bias throughout the training process. Figure 4 provides a consolidated view of the
+23
+
+
+Parameter
+Actual Value
+Net Predicted Value
+Absolute Error
+w1
+1.2548
+1.2548
+0.0
+w2
+-0.2598
+-0.2598
+0.0
+b
+-0.1
+-0.0999
+0.0001
+Average Absolute Error
+0.0001
+Table 1: Comparison of Actual and Predicted SVM Weights
+dynamics of the weight parameters, the bias term, and the comparison between the
+predicted and actual SVM hyperplanes. The plots illustrate how the model’s predicted
+values align with the actual values over the course of 100 training epochs.
+• Figure 4a and Figure 4b (Weight 1 and Weight 2): Initially, the weights exhibit a
+sharp incline and decline respectively, followed by stabilization after approximately
+20 epochs.This trend reflects the gradient-based optimization process, where rapid
+updates occur in the early stages, and convergence is reached as the learning
+progresses. The predicted values (orange dashed lines) closely track the actual
+values (solid blue lines), indicating strong predictive accuracy.
+• Figure 4c (Bias): The bias shows a similar pattern of rapid early changes before
+stabilizing. While slight deviations between the predicted and actual bias exist,
+the overall trend suggests effective approximation of the learning dynamics.
+• Figure 4d and Figure 4e (Hyperplane Comparison): The actual hyperplane from
+SVM (green solid line) is compared with the predicted hyperplane (black dashed
+line). In train as well as test case, the hyperplane is able to divide the samples into
+their respective classes. The CRN hyperplane also closely follows the traditional
+hyperplane. The overall similarity suggests that the model effectively captures
+the underlying decision boundary.
+The close alignment between predicted and actual values demonstrates the reliability
+of the CRN-based predictive model, while also suggesting potential areas for further
+refinement to enhance precision.
+10
+Discussion
+We have presented a reaction network–based framework for implementing soft-margin
+support vector machines (SVMs). The proposed method realizes both the feedforward
+and backpropagation modules of the SVM through a collection of submodules. Specif-
+ically, the design incorporates addition, subtraction, multiplication, comparison, and
+24
+
+
+(a) Weight 1 as a function of epochs
+(b) Weight 2 as a function of epochs
+(c) Bias as a function of epochs
+(d) Hyperplane on Train Data
+(e) Hyperplane on Test Data
+Figure 4: Representation of Parameter Evolution and Hyperplane
+approximate majority modules. Sequential execution of reactions is achieved via time-
+scale separation, and implemented using an Hopf oscillator. To handle the possibility
+of negative weights and biases, we utilize dual-rail encoding.
+Our work intersects with several other works that have used reaction networks to
+implement machine learning algorithms. Related approaches include the modeling of
+25
+
+
+neural networks through chemical reaction networks [2], the implementation of Boltz-
+mann machines [15, 16], and the computation of maximum likelihood estimates [9].
+The present study opens multiple avenues for further investigation. One direction
+is to rigorously analyze the computational complexity of our implementation, in terms
+of the number of molecular species, the number of reactions, and the convergence rates
+of the individual computation steps, as in [3]. Another direction involves the compu-
+tational optimality of our design in the sense of [2]. More specifically, if the reaction
+network is represented by the dynamical system
+˙x(t) = f(y, x(t)) with x(t) ∈Rn
+≥0,
+two key questions arise:
+1. Exponential reliability:
+Does there exist a function ζ : Rp
+>0 →R>0 such that
+|x(t) −ξ(y)| ≤|x(0) −ξ(y)|e−ζ(y)t,
+where lim
+t→∞x(t) = ξ(y)?
+2. Finite-time convergence to compact set:
+Do the trajectories converge to a com-
+pact set containing the equilibrium in finite time? That is, does there exist a
+compact set K ⊂Rn
+≥0 and a function T : Rp
+>0 →R>0 such that x(t) ∈K for all
+t ≥T(y) and x(0) ∈Rn
+≥0?
+Finally, it is natural to explore extensions of the proposed framework. Possible directions
+include adapting the scheme to incorporate the kernel trick to enable the classification
+of nonlinear data.
+11
+Data accessibility statement
+All relevant codes can be found here: https://github.com/AmeyChoudhary/svm-implementation-
+using-crn/tree/main
+References
+[1] L. Adleman, Molecular computation of solutions to combinatorial problems, Science
+(1994), 1021–1024.
+[2] D. Anderson, B. Joshi, and A. Deshpande, On reaction network implementations
+of neural networks, J. R. Soc. Interface 18 (2021), no. 177, 20210031.
+[3] D. F. Anderson and B. Joshi, Chemical mass-action systems as analog computers:
+Implementing arithmetic computations at specified speed, Theor. Comput. Sci. 1025
+(2025), 114983.
+26
+
+
+[4] L. Cardelli and A. Csik´asz-Nagy, The cell cycle switch computes approximate ma-
+jority, Scientific reports 2 (2012), no. 1, 656.
+[5] K. Cherry and L. Qian, Scaling up molecular pattern recognition with DNA-based
+winner-take-all neural networks, Nature 559 (2018), no. 7714, 370–376.
+[6] C. Cortes and V. Vapnik, Support-vector networks, Machine learning 20 (1995),
+no. 3, 273–297.
+[7] Y. Fan, X. Zhang, C. Gao, and D. Dochain, Automatic implementation of neural
+networks through reaction networks–part i: Circuit design and convergence analysis,
+arXiv preprint arXiv:2311.18313 (2023).
+[8] Martin Feinberg, Foundations of chemical reaction network theory, Applied Math-
+ematical Sciences, vol. 202, Springer, Cham, 2019.
+[9] M. Gopalkrishnan, A scheme for molecular computation of maximum likelihood es-
+timators for log-linear models, International Conference on DNA-Based Computers,
+Springer, 2016, pp. 3–18.
+[10] C. Guldberg and P. Waage, Studies Concerning Affinity, CM Forhandlinger:
+Videnskabs-Selskabet I Christiana 35 (1864), no. 1864, 1864.
+[11] I. Guyon, B. Boser, and V. Vapnik, Automatic capacity tuning of very large vc-
+dimension classifiers, Advances in neural information processing systems 5 (1992).
+[12] S. Kang and J. Kim, Noise-robust chemical reaction networks training artificial
+neural networks, arXiv preprint arXiv:2410.11919 (2024).
+[13] Yuri A. Kuznetsov, Elements of applied bifurcation theory, 3 ed., Springer, 2004.
+[14] R. Pei, E. Matamoros, M. Liu, D. Stefanovic, and M. Stojanovic, Training a molec-
+ular automaton to play a game, Nat. Nanotechnol. 5 (2010), no. 11, 773.
+[15] W. Poole, A. Ortiz-Munoz, A. Behera, N. Jones, T.E. Ouldridge, E. Winfree,
+and M. Gopalkrishnan, Chemical boltzmann machines, International Conference
+on DNA-Based Computers, Springer, 2017, pp. 210–231.
+[16] W. Poole, T. Ouldridge, and M. Gopalkrishnan, Autonomous learning of generative
+models with chemical reaction network ensembles, J. R. Soc. Interface 22 (2025),
+no. 222, 20240373.
+[17] W. Poole, T. Ouldridge, M. Gopalkrishnan, and E. Winfree, Detailed balanced
+chemical reaction networks as generalized boltzmann machines, arXiv preprint
+arXiv:2205.06313 (2022).
+[18] L. Qian, E. Winfree, and J. Bruck, Neural network computation with dna strand
+displacement cascades, Nature 475 (2011), no. 7356, 368–372.
+27
+
+
+[19] F. Simmel, B. Yurke, and H. Singh, Principles and applications of nucleic acid
+strand displacement reactions, Chem. Rev. 119 (2019), no. 10, 6326–6369.
+[20] Steven H. Strogatz, Nonlinear dynamics and chaos: With applications to physics,
+biology, chemistry, and engineering, Westview Press, 2001.
+[21] V. Vapnik, The support vector method, International conference on artificial neural
+networks, Springer, 1997, pp. 261–271.
+[22] M. Vasic, C. Chalk, S. Khurshid, and D. Soloveichik, Deep molecular programming:
+a natural implementation of binary-weight relu neural networks, International Con-
+ference on Machine Learning, PMLR, 2020, pp. 9701–9711.
+[23] M. Vasi´c, D. Soloveichik, and S. Khurshid, Crn++: Molecular programming lan-
+guage, Nat. Comput. 19 (2020), no. 2, 391–407.
+[24] V. Virinchi, A. Behera, and M. Gopalkrishnan, A stochastic molecular scheme for
+an artificial cell to infer its environment from partial observations, International
+Conference on DNA-Based Computers, Springer, 2017, pp. 82–97.
+[25]
+, A reaction network scheme which implements the EM algorithm, Inter-
+national Conference on DNA Computing and Molecular Programming, Springer,
+2018, pp. 189–207.
+28

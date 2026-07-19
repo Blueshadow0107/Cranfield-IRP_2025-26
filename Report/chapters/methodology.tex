@@ -1,35 +1,293 @@
 % Chapter: Methodology
-% Skeleton — populate with your methods
+% Continuous Analog Wave Computation in Porous Media
 
 \section{Overview}
 \label{sec:meth_overview}
 
-[Describe the overall methodological approach of your project.]
+The methodology follows a simulation-first pipeline. A two-dimensional acoustic source injects time-harmonic waves into a domain that contains a design region. The design region is parameterised by coarse blocks of porosity, flow resistivity, and high-frequency tortuosity, which are mapped smoothly onto the simulation grid. For each frequency of interest, the Helmholtz equation is solved with spatially varying Johnson-Champoux-Allard (JCA) effective properties. Probe pressures are extracted, and a gradient-free optimiser adjusts the block values to minimise a task-specific objective. The resulting designs are validated against analytical transfer-matrix predictions for uniform porous slabs. The overall workflow is shown in \reffig{fig:methodology_flowchart}.
 
-\section{Mathematical Framework}
-\label{sec:math_framework}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 0.9cm,
+    box/.style={rectangle, draw, rounded corners, fill=gray!10, text width=2.8cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={-{Stealth[length=2mm]}, thick}
+]
+\node[box] (vars) {Block design variables $(\phi, \sigma, \alpha_\infty)$};
+\node[box, right=of vars] (jca) {JCA effective properties};
+\node[box, right=of jca] (solve) {Helmholtz solve};
+\node[box, below=of solve] (probes) {Probe pressures};
+\node[box, below=of probes] (obj) {Objective function};
+\node[box, left=of obj] (opt) {Gradient-free optimiser};
 
-[If applicable, present the governing equations, loss functions, or theoretical framework here.]
+\draw[arrow] (vars) -- (jca);
+\draw[arrow] (jca) -- (solve);
+\draw[arrow] (solve) -- (probes);
+\draw[arrow] (probes) -- (obj);
+\draw[arrow] (obj) -- (opt);
+\draw[arrow] (opt) -- (vars);
+\end{tikzpicture}
+\caption{Simulation-first optimisation pipeline.}
+\label{fig:methodology_flowchart}
+\end{figure}
 
-\section{Implementation Details}
-\label{sec:implementation}
+\section{Computational Domain}
+\label{sec:domain}
 
-\subsection{Software and Hardware}
-\label{subsec:software}
+The computational domain is a bounded, connected region $\Omega \subset \mathbb{R}^2$ with boundary $\partial \Omega$. The boundary is partitioned into two disjoint subsets:
+\begin{itemize}
+    \item $\Gamma_\mathrm{abs}$: the absorbing boundary, where a PML mimics free-field radiation;
+    \item $\Gamma_\mathrm{wall}$: the hard-wall boundary, where the normal particle velocity vanishes.
+\end{itemize}
+Thus $\partial \Omega = \Gamma_\mathrm{abs} \cup \Gamma_\mathrm{wall}$ and the two subsets intersect only at corners. In a duct configuration the left and right ends are absorbing, while the top and bottom are hard walls. In a free-field configuration all four sides are absorbing. The duct configuration used in this work is illustrated in \reffig{fig:domain_sketch}.
 
-[List programming languages, libraries (PyTorch, TensorFlow, JAX, etc.), and hardware specifications.]
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.9]
+% Outer domain
+\draw[thick] (0,0) rectangle (10,4);
 
-\subsection{Dataset and Experimental Setup}
-\label{subsec:dataset}
+% PML layers
+%\fill[gray!20] (0,0) rectangle (1.5,4);
+%\fill[gray!20] (8.5,0) rectangle (10,4);
 
-[Describe datasets used, preprocessing steps, train/validation/test splits, etc.]
+% Design region
+\fill[blue!10] (3.5,0) rectangle (6.5,4);
+\draw[thick] (3.5,0) rectangle (6.5,4);
+\node[blue!60!black] at (5,2) {Design region};
 
-\section{Evaluation Metrics}
-\label{sec:metrics}
+% Source
+\fill[red] (2.2,2) circle (0.1);
+\node[red!70!black, above] at (2.2,2.1) {Source};
 
-[Define the quantitative metrics used to assess performance.]
+% Probes
+\fill[green!60!black] (7.8,1.2) circle (0.08);
+\fill[green!60!black] (7.8,2.8) circle (0.08);
+\node[green!40!black, right] at (7.9,2) {Probes};
 
-\section{Summary}
-\label{sec:meth_summary}
+% Labels
+%\node at (0.75,2) {\rotatebox{90}{PML}};
+%\node at (9.25,2) {\rotatebox{90}{PML}};
+\node[above] at (5,4) {Hard wall ($\partial p/\partial n = 0$)};
+\node[below] at (5,0) {Hard wall ($\partial p/\partial n = 0$)};
+\node[below left] at (0,0) {$\Gamma_\mathrm{abs}$};
+\node[below right] at (10,0) {$\Gamma_\mathrm{abs}$};
+\end{tikzpicture}
+\caption{Computational domain sketch for the duct configuration. The left and right ends are absorbing PMLs; the top and bottom boundaries are hard walls. The design region sits between the source and the probe array.}
+\label{fig:domain_sketch}
+\end{figure}
 
-[Brief recap of the methodology and transition to results.]
+Inside the domain lies the design region $\Omega_\mathrm{design} \subset \Omega$, a rectangular sub-domain in which the porous material properties may vary. The complement $\Omega \setminus \Omega_\mathrm{design}$ is filled with air, so that
+\begin{equation}
+    \phi(\mathbf{x}) = 1, \quad \sigma(\mathbf{x}) = 0, \quad \alpha_\infty(\mathbf{x}) = 1
+    \qquad \text{for } \mathbf{x} \in \Omega \setminus \Omega_\mathrm{design}.
+\end{equation}
+Within $\Omega_\mathrm{design}$ the fields are parameterised by coarse blocks as described in \refsec{sec:design_param}.
+
+The source is located a short distance inside the domain, at position $\mathbf{x}_s \in \Omega$, and is represented as a source term in the Helmholtz equation. A set of $N_p$ probe locations $\{ \mathbf{x}_p \}_{p=1}^{N_p}$ is fixed in $\Omega$. These probes record the complex pressure $p(\omega, \mathbf{x}_p)$ for each frequency. The source amplitude $S(\omega)$ is normalised so that the transfer function $H(\omega, \mathbf{x}_p) = p(\omega, \mathbf{x}_p) / S(\omega)$ is independent of source strength.
+
+\section{Governing Equations}
+\label{sec:governing_eqns}
+
+\subsection{Linear Acoustic Helmholtz Equation}
+\label{subsec:helmholtz}
+
+For time-harmonic acoustic pressure $p(\mathbf{x})$ at angular frequency $\omega$, the Helmholtz equation in an inhomogeneous effective fluid is
+\begin{equation}
+    \nabla \cdot \left( \frac{1}{\tilde{\rho}(\omega, \mathbf{x})} \nabla p \right) + \frac{\omega^2}{\tilde{K}(\omega, \mathbf{x})} p = S(\omega) \delta(\mathbf{x} - \mathbf{x}_s),
+\label{eq:helmholtz_general}
+\end{equation}
+where $\tilde{\rho}$ is the complex effective density, $\tilde{K}$ is the complex effective bulk modulus, and the right-hand side represents a point source at $\mathbf{x}_s$ with frequency-domain amplitude $S(\omega)$. When the coefficients vary with position they must remain inside the divergence operator; pulling them outside would neglect the gradient terms that arise at material interfaces.
+
+\subsection{Johnson-Champoux-Allard Effective Properties}
+\label{subsec:jca}
+
+The JCA model treats the air in a rigid-frame porous medium as an equivalent fluid with frequency-dependent complex properties. The effective density is
+\begin{equation}
+    \tilde{\rho}(\omega, \mathbf{x}) = \frac{\rho_0 \alpha_\infty(\mathbf{x})}{\phi(\mathbf{x})}
+    \left[
+        1 + \frac{\sigma(\mathbf{x}) \phi(\mathbf{x})}{j \omega \rho_0 \alpha_\infty(\mathbf{x})}
+        \sqrt{1 + j \frac{4 \alpha_\infty(\mathbf{x})^2 \eta \rho_0 \omega}{\sigma(\mathbf{x})^2 \phi(\mathbf{x})^2 \Lambda(\mathbf{x})^2}}
+    \right],
+\label{eq:jca_density}
+\end{equation}
+and the effective bulk modulus is
+\begin{equation}
+    \tilde{K}(\omega, \mathbf{x}) = \frac{\gamma P_0}{\phi(\mathbf{x})}
+    \left[
+        \gamma - \frac{\gamma - 1}{1 + \frac{8 \eta}{j \omega \rho_0 Pr \Lambda'(\mathbf{x})^2} \sqrt{1 + j \frac{\omega \rho_0 Pr \Lambda'(\mathbf{x})^2}{16 \eta}}}
+    \right]^{-1}.
+\label{eq:jca_bulk}
+\end{equation}
+
+The symbols in these equations are listed in \reftab{tab:jca_symbols}. The model assumes a rigid, motionless frame and cylindrical pore geometry. It is valid when the acoustic wavelength is much larger than the pore size, which holds comfortably for speech-band frequencies in air and pore scales of tens of micrometres.
+
+\begin{table}[htbp]
+\centering
+\caption{Symbols used in the Johnson-Champoux-Allard model.}
+\label{tab:jca_symbols}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Symbol & Meaning & Units \\
+\midrule
+$\rho_0$ & Ambient air density & kg~m$^{-3}$ \\
+$\eta$ & Dynamic viscosity of air & Pa~s \\
+$\gamma$ & Heat capacity ratio of air & -- \\
+$P_0$ & Ambient pressure & Pa \\
+$Pr$ & Prandtl number of air & -- \\
+$\phi$ & Porosity & -- \\
+$\sigma$ & Static flow resistivity & Pa~s~m$^{-2}$ \\
+$\alpha_\infty$ & High-frequency tortuosity & -- \\
+$\Lambda$ & Viscous characteristic length & m \\
+$\Lambda'$ & Thermal characteristic length & m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Zwikker-Kosten Simplification}
+\label{subsec:zk}
+
+The Zwikker-Kosten (ZK) model is the low-frequency limit of the JCA model, obtained when the viscous penetration depth is much larger than the pore size. In this limit the effective density and bulk modulus become real and frequency independent:
+\begin{align}
+    \rho_\mathrm{eff}(\mathbf{x}) &= \frac{\rho_0 \alpha_\infty(\mathbf{x})}{\phi(\mathbf{x})}, \\
+    K_\mathrm{eff}(\mathbf{x}) &= \frac{\rho_0 c_0^2}{\phi(\mathbf{x})},
+\end{align}
+where $c_0$ is the ambient sound speed. The corresponding time-domain equations are
+\begin{align}
+    \rho_\mathrm{eff} \frac{\partial \mathbf{u}}{\partial t} + \sigma \mathbf{u} &= -\nabla p, \\
+    \frac{1}{K_\mathrm{eff}} \frac{\partial p}{\partial t} &= -\nabla \cdot \mathbf{u}.
+\end{align}
+The ZK model is useful as a computationally inexpensive design tool because its time-domain finite-difference formulation avoids assembling and solving a complex sparse linear system at each frequency. It does not capture the frequency-dependent viscous and thermal losses of the full JCA model, and its validity should be checked against the JCA model for any design that is carried forward.
+
+\subsection{Complex Wavenumber and Characteristic Impedance}
+\label{subsec:wavenumber_impedance}
+
+From the effective density and bulk modulus, the complex wavenumber and characteristic impedance are
+\begin{align}
+    k(\omega, \mathbf{x}) &= \omega \sqrt{\frac{\tilde{\rho}(\omega, \mathbf{x})}{\tilde{K}(\omega, \mathbf{x})}}, \\
+    Z_c(\omega, \mathbf{x}) &= \sqrt{\tilde{\rho}(\omega, \mathbf{x}) \tilde{K}(\omega, \mathbf{x})}.
+\end{align}
+These quantities are used when comparing numerical results against analytical transfer-matrix predictions for uniform porous slabs.
+
+\section{Numerical Discretisation}
+\label{sec:numerical}
+
+\subsection{Spatial Discretisation and Boundary Conditions}
+
+The computational domain is a rectangular region in two dimensions, discretised on a structured Cartesian grid. The grid spacing is chosen to resolve the shortest wavelength of interest. At 4~kHz the acoustic wavelength in air is approximately 86~mm; a grid spacing of 2~mm gives more than forty points per wavelength, which is sufficient for the second-order finite-difference approximation used here.
+
+On the absorbing boundary $\Gamma_\mathrm{abs}$ a Robin-type Absorbing Boundary condition (might change to a perfectly matched layer) is used to mimic free-field radiation \cite{berenger1994perfectly}. The layer has a width of approximately one wavelength at the highest frequency of interest.  On the hard-wall boundary $\Gamma_\mathrm{wall}$ the normal particle velocity vanishes, which in pressure form is the Neumann condition $\partial p / \partial n = 0$.
+
+\subsection{Frequency-Domain Solver}
+
+For each frequency $\omega$ the Helmholtz equation \refeqn{eq:helmholtz_general} is assembled into a sparse linear system. The spatially varying coefficients $\tilde{\rho}(\omega, \mathbf{x})$ and $\tilde{K}(\omega, \mathbf{x})$ are evaluated at each grid point using the local block-interpolated values of $\phi$, $\sigma$, and $\alpha_\infty$. The system is solved with a direct sparse solver for small to moderate grid sizes, or with an iterative solver for larger problems. Direct solvers are preferred here because the number of frequency samples is modest and each solve must be reliable during optimisation.
+
+\subsection{Source Injection and Probe Readout}
+
+The source is a point source located inside the domain, represented by the delta-function term in \refeqn{eq:helmholtz_general}. For broadband signals the Helmholtz equation is solved at a set of discrete frequencies that span the signal bandwidth, and the probe responses are combined by inverse Fourier transform or convolution with the input spectrum. Probes record the complex pressure $p(\omega, \mathbf{x}_\mathrm{probe})$ at fixed locations. The time-domain probe signal $p(t, \mathbf{x}_\mathrm{probe})$ for an input $s(t)$ is obtained from
+\begin{equation}
+    p(t, \mathbf{x}_\mathrm{probe}) = \mathcal{F}^{-1} \left\{ H(\omega, \mathbf{x}_\mathrm{probe}) \, S(\omega) \right\},
+\label{eq:time_reconstruction}
+\end{equation}
+where $S(\omega)$ is the Fourier transform of the input, $H(\omega, \mathbf{x}_\mathrm{probe}) = p(\omega, \mathbf{x}_\mathrm{probe}) / p_\mathrm{source}(\omega)$ is the transfer function at the probe, and $\mathcal{F}^{-1}$ denotes the inverse Fourier transform. This frequency-domain superposition is valid because the JCA medium is linear and time-invariant.
+
+\section{Design Parameterisation}
+\label{sec:design_param}
+
+\subsection{Block-Based Design Variables}
+
+The design region is divided into $N_x \times N_y$ coarse rectangular blocks. Each block $b$ carries three design variables whose values are uniform within the block:
+\begin{itemize}
+    \item porosity $\phi_b \in [0.30, 0.95]$,
+    \item static flow resistivity $\sigma_b \in [0, 10^5]$ Pa~s~m$^{-2}$,
+    \item high-frequency tortuosity $\alpha_{\infty,b} \in [1.0, 2.5]$.
+\end{itemize}
+The bounds are chosen to keep the JCA equivalent-fluid model physically valid. The lower porosity bound ensures that the air-filled pore space remains connected enough for the equivalent-fluid assumption to hold, while the upper bound prevents the limit of pure air. The resistivity range spans from effectively lossless air to highly resistive porous materials typical of dense acoustic foams. The tortuosity range covers straight pores ($\alpha_\infty = 1$) to moderately tortuous pore networks.
+
+\subsection{Smooth Mapping to the Simulation Grid}
+
+Block-centred values are mapped onto the fine simulation grid by bilinear interpolation. Each fine-grid point receives a weighted average of the four nearest block values, so jumps between adjacent blocks become smooth ramps on the simulation grid. This parameterisation has three advantages. First, it reduces the number of optimisation variables from thousands of grid points to tens or hundreds of blocks. Second, it suppresses the small-scale checkerboard patterns that often appear in unrestricted topology optimisation. Third, it produces designs that are easier to interpret as a manufacturable arrangement of porous blocks.
+
+\subsection{Fixed Geometric Parameters}
+
+The viscous and thermal characteristic lengths are fixed throughout the domain at
+\begin{equation}
+    \Lambda = 30~\mu\mathrm{m}, \qquad \Lambda' = 60~\mu\mathrm{m},
+\end{equation}
+corresponding to a target pore scale of approximately 30~$\mu$m. In reality the viscous and thermal characteristic lengths are not independent of porosity and tortuosity; they are set by the microstructure. Fixing them here reduces the design space and avoids non-physical combinations of the five JCA parameters. The values are representative of sintered metals, foams, or 3D-printed lattices with a controllable pore size. A manufacturable interpretation of an optimised design therefore requires selecting a family of microstructures that realises the optimised $(\phi, \sigma, \alpha_\infty)$ at the fixed characteristic lengths. This is a deliberate simplification that treats the medium as an effective-fluid design space rather than as a family of real microstructures, and it limits the physical realism of the resulting designs.
+
+\section{Optimisation Framework}
+\label{sec:optimisation}
+
+\subsection{Wave-Computing Task}
+
+The demonstration task used in this work is a frequency binary classifier. Two pure-tone inputs, at frequencies $f_1$ and $f_2$, are injected from the same source location. The optimised medium should route acoustic energy so that one frequency produces a larger response at probe A and the other produces a larger response at probe B. The readout is therefore the complex pressure amplitude at two fixed probe locations. This task is chosen because it requires the medium to exploit frequency-dependent interference and damping, while remaining simple enough for a gradient-free optimiser to converge. Other tasks, such as spatial source classification or logic gates, can be addressed with the same forward model by changing only the objective function and the probe configuration.
+
+\subsection{Objective Function}
+
+For the frequency binary classifier the objective is the mean-squared error between the normalised probe energies and a target distribution. Let $P_A(\omega)$ and $P_B(\omega)$ be the complex pressures at probes A and B for input frequency $\omega$, and let $E_A = |P_A|^2$ and $E_B = |P_B|^2$ be the corresponding energies. The total energy is $E_\mathrm{tot} = E_A + E_B$. The target for frequency $f_1$ is that most of the energy arrives at probe A, while for $f_2$ most should arrive at probe B. The objective for a single frequency is
+\begin{equation}
+    \mathcal{L}(\omega) = \left( \frac{E_A}{E_\mathrm{tot}} - t_A(\omega) \right)^2 + \left( \frac{E_B}{E_\mathrm{tot}} - t_B(\omega) \right)^2,
+\end{equation}
+where $t_A(\omega)$ and $t_B(\omega)$ are the target energy fractions. The total objective is the sum over the two frequencies. The same forward model and solver are used for both frequencies; only the right-hand side source term changes.
+
+\subsection{Parameter Bounds and Transforms}
+
+During optimisation the block variables are kept within their bounds. One approach is to apply smooth parameter transforms, for example
+\begin{align}
+    \phi_b &= 0.30 + \frac{0.65}{1 + \exp(-u_b)}, \\
+    \sigma_b &= \sigma_\mathrm{min} \exp(v_b), \\
+    \alpha_{\infty,b} &= 1.0 + \mathrm{softplus}(w_b),
+\end{align}
+where $u_b$, $v_b$, and $w_b$ are the unconstrained optimisation variables. Alternatively, box constraints can be passed directly to the optimiser. The transform approach is more robust against boundary violations during line searches.
+
+\subsection{Optimisation Algorithm}
+
+Because the forward solver is not differentiated in this work, optimisation is performed with a gradient-free method. For the block-wise parameterisation considered here, with tens to hundreds of variables, differential evolution is the chosen algorithm. The objective landscape for porous block parameters is expected to be multimodal because small changes in geometry can create or destroy resonant paths, and differential evolution handles this better than local methods such as Nelder-Mead. The population size and number of generations are chosen to give the optimiser enough evaluations to converge while remaining within the computational budget. The run terminates when the objective function reaches a plateau or the budget is exhausted.
+
+%\subsection{Design-Space Reductions?}
+
+%To understand which design variables matter, three optimisation studies are carried out:
+%\begin{enumerate}
+%    \item Porosity only: $\phi$ varies, $\sigma = 0$, $\alpha_\infty = 1.0$.
+%    \item Porosity and resistivity: $\phi$ and $\sigma$ vary, $\alpha_\infty = 1.0$.
+%    \item Full set: $\phi$, $\sigma$, and $\alpha_\infty$ vary.
+%\end{enumerate}
+Comparing the final losses and optimised patterns answers whether adding flow resistivity and tortuosity improves the design.
+
+%\section{Validation Strategy}
+%\label{sec:validation_strategy}
+
+%\subsection{Free-Air Propagation}
+
+%In a homogeneous air-filled domain the numerical phase speed is compared against the analytical speed $c_0 = \sqrt{\gamma P_0 / \rho_0}$. A plane wave or point source is injected and the pressure phase along a line of probes is checked against the expected propagation delay.
+
+%\subsection{Hard-Wall Cavity Modes}
+
+%A two-dimensional rectangular cavity with hard walls supports analytical modal frequencies
+%\begin{equation}
+%    f_{mn} = \frac{c_0}{2} \sqrt{\left(\frac{m}{L_x}\right)^2 + \left(\frac{n}{L_y}\right)^2},
+%\end{equation}
+%where $m$ and $n$ are mode indices and $L_x$ and $L_y$ are the cavity dimensions. The numerical resonant frequencies are extracted from the pressure response and compared against these analytical values.
+
+%\subsection{Uniform Porous Slab}
+
+%A uniform JCA slab of thickness $d$ is placed in air. The transmission coefficient versus frequency is computed from the Helmholtz solver and compared against the transfer-matrix prediction. For a uniform layer the transfer matrix is
+%\begin{equation}
+%    \mathbf{T} =
+%    \begin{bmatrix}
+%        \cos(k_c d) & j Z_c \sin(k_c d) \\
+%       \frac{j}{Z_c}\sin(k_c d) & \cos(k_c d)
+%    \end{bmatrix},
+%\end{equation}
+%where $Z_c$ and $k_c$ are the characteristic impedance and wavenumber of the porous material. This test directly validates the JCA implementation in the solver.
+
+%\subsection{Convergence Checks}
+%\label{sec:convergence_checks}
+
+%Mesh refinement and frequency sampling are varied to ensure that the reported results are insensitive to these numerical choices. The PML width is increased until the probe pressures change by less than 1\%; this confirms that reflected energy from the absorbing boundary does not contaminate the readouts. A coarser grid or narrower PML is accepted only if the quantities of interest change by less than a specified tolerance.
+
+%\section{Summary}
+%\label{sec:meth_summary}
+
+%The methodology combines a frequency-domain JCA Helmholtz solver with a block-wise design parameterisation and gradient-free optimisation. The forward model captures the frequency-dependent damping and dispersion of sound in rigid-frame porous media, while the block parameterisation keeps the design space small and physically interpretable. Validation against analytical benchmarks ensures that the numerical implementation is reliable before optimisation is attempted.

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal: Real Temperature Equation + Arrhenius Viscosity</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --fg: #d8dee9;
+    --muted: #4c566a;
+    --accent: #88c0d0;
+    --accent2: #a3be8c;
+    --warn: #ebcb8b;
+    --danger: #bf616a;
+    --code-bg: #1e222a;
+    --border: #2e3440;
+    --table-head: #1e222a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.65;
+  }
+  .container { max-width: 920px; margin: 0 auto; padding: 2rem; }
+  h1 { color: var(--accent); border-bottom: 2px solid var(--border); padding-bottom: .5rem; }
+  h2 { color: var(--accent2); margin-top: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { color: var(--accent); margin-top: 2rem; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: .78rem; font-weight: 600; letter-spacing: .3px;
+  }
+  .badge-green { background: #2e3b2e; color: var(--accent2); }
+  .badge-amber { background: #3b3526; color: var(--warn); }
+  .badge-red   { background: #3b2626; color: var(--danger); }
+  .equation {
+    background: var(--code-bg); border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem; margin: 1rem 0; border-radius: 0 6px 6px 0;
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-size: 1.05rem; overflow-x: auto;
+  }
+  .note {
+    background: #1e222a; border-left: 3px solid var(--warn);
+    padding: .9rem 1.1rem; margin: 1rem 0; border-radius: 0 6px 6px 0;
+  }
+  .note strong { color: var(--warn); }
+  .danger {
+    background: #2a1e1e; border-left: 3px solid var(--danger);
+    padding: .9rem 1.1rem; margin: 1rem 0; border-radius: 0 6px 6px 0;
+  }
+  .danger strong { color: var(--danger); }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1rem 0;
+    font-size: .92rem;
+  }
+  th, td { padding: .6rem .8rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--table-head); color: var(--accent); font-weight: 600; }
+  tr:hover { background: rgba(136,192,208,.04); }
+  code {
+    background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+    font-family: 'Fira Code', Consolas, monospace; font-size: .88em;
+  }
+  pre {
+    background: var(--code-bg); padding: 1rem 1.2rem; border-radius: 6px;
+    overflow-x: auto; font-size: .88rem; line-height: 1.5;
+    border: 1px solid var(--border);
+  }
+  .toc {
+    background: var(--code-bg); padding: 1rem 1.5rem; border-radius: 8px;
+    margin-bottom: 2rem; border: 1px solid var(--border);
+  }
+  .toc ul { margin: .5rem 0; padding-left: 1.2rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .param-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  .param-card {
+    background: var(--code-bg); padding: 1rem; border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .param-card code { color: var(--accent2); }
+  @media (max-width: 600px) {
+    .param-grid { grid-template-columns: 1fr; }
+    .container { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Proposal: Real Temperature Equation + Arrhenius Viscosity</h1>
+<p style="color:var(--muted);">
+  Review document for adding a temperature transport PDE and a temperature-dependent viscosity law to <code>thermoviscous_channel.py</code>.
+  Read this, ask questions, then approve when ready.
+</p>
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ul>
+    <li><a href="#overview">Overview &mdash; What changes</a></li>
+    <li><a href="#governing">Governing Equations</a></li>
+    <li><a href="#arrhenius">Arrhenius Viscosity Law</a></li>
+    <li><a href="#stability">Stability Analysis</a></li>
+    <li><a href="#boundary">Boundary Conditions</a></li>
+    <li><a href="#discretization">Discretization Details</a></li>
+    <li><a href="#skeleton">Code Skeleton</a></li>
+    <li><a href="#coupling">Coupling Logic</a></li>
+    <li><a href="#open-questions">Open Questions</a></li>
+  </ul>
+</div>
+
+<!-- ================================================================ -->
+<section id="overview">
+  <h2>1. Overview &mdash; What changes</h2>
+  <p>Currently the code prescribes viscosity directly via <code>STRIP_NU_FRAC</code>. There is no temperature field. This proposal adds:</p>
+  <table>
+    <tr><th>What</th><th>Before</th><th>After</th></tr>
+    <tr>
+      <td>Viscosity model</td>
+      <td><code>nu = NU_COLD * frac</code> (prescribed)</td>
+      <td><code>nu = NU_COLD * exp[β(1/T − 1/T_cold)]</code></td>
+    </tr>
+    <tr>
+      <td>Temperature field</td>
+      <td>None</td>
+      <td><code>T(x,y,t)</code> solved via energy PDE</td>
+    </tr>
+    <tr>
+      <td>Heater control</td>
+      <td><code>STRIP_NU_FRAC</code> (direct)</td>
+      <td><code>STRIP_HEAT_SOURCE</code> [K/s] per strip</td>
+    </tr>
+    <tr>
+      <td>Vorticity diffusion</td>
+      <td><code>nu * ∇²ω</code></td>
+      <td><code>∇·(ν∇ω)</code> (conservative, face-flux)</td>
+    </tr>
+    <tr>
+      <td>Fields solved</td>
+      <td>ψ, ω</td>
+      <td>ψ, ω, <strong>T</strong></td>
+    </tr>
+  </table>
+
+  <div class="note">
+    <strong>Key reassurance:</strong> The Poisson matrix <strong>A</strong> for <code>∇²ψ = −ω</code> is completely unchanged. It knows nothing about temperature or viscosity. Your pre-factorised LU solve stays exactly as-is.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="governing">
+  <h2>2. Governing Equations</h2>
+
+  <h3>2.1 Energy equation (temperature transport)</h3>
+  <div class="equation">
+    ∂T/∂t + u ∂T/∂x + v ∂T/∂y = α (∂²T/∂x² + ∂²T/∂y²) + S_T(x,y)
+  </div>
+  <table>
+    <tr><th>Symbol</th><th>Meaning</th><th>Value / Unit</th></tr>
+    <tr><td><code>T</code></td><td>Temperature</td><td>[K]</td></tr>
+    <tr><td><code>u, v</code></td><td>Velocity from ψ</td><td>[m/s]</td></tr>
+    <tr><td><code>α</code></td><td>Thermal diffusivity = k/(ρc_p)</td><td>1.4 × 10⁻⁷ m²/s (water)</td></tr>
+    <tr><td><code>S_T</code></td><td>Volumetric heater source</td><td>[K/s] inside strips, 0 elsewhere</td></tr>
+  </table>
+
+  <h3>2.2 Vorticity equation (upgraded for variable ν)</h3>
+  <div class="equation">
+    ∂ω/∂t + u ∂ω/∂x + v ∂ω/∂y = ∇·(ν∇ω)
+  </div>
+  <p>The diffusion term is now the <strong>conservative divergence form</strong>. This is required because ν varies spatially (hot strips have lower ν, cold fluid has higher ν). The naive <code>ν∇²ω</code> would mishandle flux balance across strip edges.</p>
+
+  <div class="note">
+    <strong>Why conservative?</strong> Expanding ∇·(ν∇ω) gives ν∇²ω + ∇ν·∇ω. At a strip boundary where ν jumps by 5×, ∇ν is a delta function. The conservative discretisation handles this automatically via face fluxes. The extra term ∇ν·∇ω is included implicitly.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="arrhenius">
+  <h2>3. Arrhenius Viscosity Law</h2>
+
+  <h3>3.1 Formula</h3>
+  <div class="equation">
+    ν(T) = ν_cold · exp[ β (1/T − 1/T_cold) ]
+  </div>
+
+  <h3>3.2 Parameters</h3>
+  <div class="param-grid">
+    <div class="param-card">
+      <strong>T_cold</strong><br>
+      <code>300.0 K</code><br>
+      Baseline (room temp). Fresh inlet fluid, wall temperature.
+    </div>
+    <div class="param-card">
+      <strong>β (beta)</strong><br>
+      <code>1900.0 K</code><br>
+      Arrhenius sensitivity. Tunable. Higher = steeper viscosity drop per K.
+    </div>
+    <div class="param-card">
+      <strong>ν_cold</strong><br>
+      <code>1.0 × 10⁻⁶ m²/s</code><br>
+      Baseline kinematic viscosity. Fixed.
+    </div>
+    <div class="param-card">
+      <strong>ρ</strong><br>
+      <code>998.0 kg/m³</code><br>
+      Water density. Already in code.
+    </div>
+  </div>
+
+  <h3>3.3 Expected viscosity vs. temperature</h3>
+  <table>
+    <tr><th>T [K]</th><th>ΔT [K]</th><th>ν/ν_cold</th><th>Interpretation</th></tr>
+    <tr><td>300</td><td>0</td><td>1.000</td><td>Baseline (cold fluid)</td></tr>
+    <tr><td>310</td><td>+10</td><td>0.818</td><td>~18% drop</td></tr>
+    <tr><td>320</td><td>+20</td><td>0.670</td><td>~33% drop</td></tr>
+    <tr><td>330</td><td>+30</td><td>0.551</td><td>~45% drop</td></tr>
+    <tr><td>340</td><td>+40</td><td>0.456</td><td>~54% drop</td></tr>
+    <tr><td>360</td><td>+60</td><td>0.316</td><td>~68% drop</td></tr>
+  </table>
+  <p>With β = 1900 K, a strip heated to ~340 K gives roughly half the baseline viscosity. This is in the ballpark of water (which drops ~2× over 30–40 K).</p>
+
+  <div class="danger">
+    <strong>Warning:</strong> The Arrhenius law is strictly for <em>liquids</em>. For gases, viscosity <em>rises</em> with temperature (Sutherland's law). Since our channel is water-like, Arrhenius is correct.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="stability">
+  <h2>4. Stability Analysis</h2>
+
+  <p>We are adding explicit thermal diffusion. The timestep must satisfy both the viscous and thermal diffusion limits.</p>
+
+  <h3>4.1 Diffusion stability criteria</h3>
+  <table>
+    <tr><th>Mode</th><th>Formula</th><th>Limit with current grid</th><th>Current dt = 1e-4 s</th></tr>
+    <tr>
+      <td>Viscous</td>
+      <td>dt &lt; Δx² / (4 ν_max)</td>
+      <td>1.25 × 10⁻⁴ s (at ν_max = 5×10⁻⁶)</td>
+      <td><span class="badge badge-green">SAFE</span> (factor 1.25)</td>
+    </tr>
+    <tr>
+      <td>Thermal</td>
+      <td>dt &lt; Δx² / (4 α)</td>
+      <td>4.5 × 10⁻³ s</td>
+      <td><span class="badge badge-green">VERY SAFE</span> (factor 45)</td>
+    </tr>
+  </table>
+
+  <p><strong>Why is thermal so generous?</strong> Heat diffuses ~7× slower than momentum in water (Prandtl number Pr = ν/α ≈ 7). So the thermal limit is much weaker than the viscous limit. We are bottlenecked by viscosity, not temperature.</p>
+
+  <h3>4.2 Advection (CFL)</h3>
+  <p>Unchanged from before. CFL = U_max · dt / Δx ≈ 0.008. Safe.</p>
+
+  <h3>4.3 What if we need stronger heating?</h3>
+  <p>If <code>STRIP_HEAT_SOURCE</code> is very large, the temperature rises quickly but the explicit timestep is still limited by diffusion, not by the source term magnitude. The source term is explicit and local — it does not create a stability limit.</p>
+</section>
+
+<!-- ================================================================ -->
+<section id="boundary">
+  <h2>5. Boundary Conditions for Temperature</h2>
+
+  <table>
+    <tr><th>Boundary</th><th>Condition</th><th>Code</th><th>Physical reason</th></tr>
+    <tr>
+      <td>Inlet (x = 0)</td>
+      <td>Dirichlet: T = T_cold</td>
+      <td><code>T[0, :] = T_COLD</code></td>
+      <td>Fresh fluid at ambient temperature</td>
+    </tr>
+    <tr>
+      <td>Outlet (x = L)</td>
+      <td>Zero-gradient: ∂T/∂x = 0</td>
+      <td><code>T[-1, :] = T[-2, :]</code></td>
+      <td>Heat convected out, no back-diffusion</td>
+    </tr>
+    <tr>
+      <td>Bottom wall (y = 0)</td>
+      <td>Dirichlet: T = T_cold</td>
+      <td><code>T[:, 0] = T_COLD</code></td>
+      <td>Isothermal wall (good conduction to ambient)</td>
+    </tr>
+    <tr>
+      <td>Top wall (y = H)</td>
+      <td>Dirichlet: T = T_cold</td>
+      <td><code>T[:, -1] = T_COLD</code></td>
+      <td>Isothermal wall (good conduction to ambient)</td>
+    </tr>
+  </table>
+
+  <div class="note">
+    <strong>Why isothermal walls?</strong> In a microchannel, the channel material (glass, silicon, metal) is typically much more thermally conductive than the thin fluid layer. The walls act as heat sinks held at ambient temperature. This also prevents runaway heating and gives a bounded steady-state temperature.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="discretization">
+  <h2>6. Discretization Details</h2>
+
+  <h3>6.1 Temperature equation</h3>
+  <p>Same central-difference stencil as vorticity:</p>
+  <pre>
+adv = u * (T[2:, 1:-1] - T[:-2, 1:-1]) / (2*DX) \
+    + v * (T[1:-1, 2:] - T[1:-1, :-2]) / (2*DY)
+
+diff = ALPHA * (
+    (T[2:, 1:-1] - 2*T[1:-1, 1:-1] + T[:-2, 1:-1]) / DX**2 +
+    (T[1:-1, 2:] - 2*T[1:-1, 1:-1] + T[1:-1, :-2]) / DY**2
+)
+
+rhs = -adv + diff + heat_mask[1:-1, 1:-1]
+T[1:-1, 1:-1] += DT * rhs
+  </pre>
+
+  <h3>6.2 Conservative vorticity diffusion (∇·(ν∇ω))</h3>
+  <p>This is the tricky part. We compute fluxes across cell faces using face-averaged viscosity.</p>
+
+  <p><strong>X-direction fluxes:</strong></p>
+  <pre>
+nu_e = 0.5 * (nu[2:-1, 1:-1] + nu[1:-2, 1:-1])   # east face
+nu_w = 0.5 * (nu[1:-2, 1:-1] + nu[:-3,  1:-1])   # west face
+
+flux_e = nu_e * (omega[2:-1, 1:-1] - omega[1:-2, 1:-1]) / DX
+flux_w = nu_w * (omega[1:-2, 1:-1] - omega[:-3,  1:-1]) / DX
+
+diff_x = (flux_e - flux_w) / DX
+  </pre>
+
+  <p><strong>Y-direction fluxes (same pattern):</strong></p>
+  <pre>
+nu_n = 0.5 * (nu[1:-1, 2:-1] + nu[1:-1, 1:-2])
+nu_s = 0.5 * (nu[1:-1, 1:-2] + nu[1:-1, :-3])
+
+flux_n = nu_n * (omega[1:-1, 2:-1] - omega[1:-1, 1:-2]) / DY
+flux_s = nu_s * (omega[1:-1, 1:-2] - omega[1:-1, :-3]) / DY
+
+diff_y = (flux_n - flux_s) / DY
+  </pre>
+
+  <h3>6.3 The indexing problem</h3>
+  <p>Face averaging shrinks the valid domain by <strong>one extra node</strong> in each direction:</p>
+  <table>
+    <tr><th>Array slice</th><th>Valid x-range</th><th>Valid y-range</th></tr>
+    <tr><td><code>omega[1:-1, 1:-1]</code></td><td>1 … NX−1</td><td>1 … NY−1</td></tr>
+    <tr><td><code>omega[2:-1, 1:-1]</code> (east)</td><td>2 … NX−1</td><td>1 … NY−1</td></tr>
+    <tr><td><code>omega[:-3, 1:-1]</code> (west)</td><td>0 … NX−3</td><td>1 … NY−1</td></tr>
+    <tr><td><code>diff_x</code> result</td><td>1 … NX−2</td><td>1 … NY−1</td></tr>
+    <tr><td><code>diff_y</code> result</td><td>1 … NX−1</td><td>1 … NY−2</td></tr>
+    <tr><td><strong>Intersection</strong></td><td><strong>2 … NX−2</strong></td><td><strong>2 … NY−2</strong></td></tr>
+  </table>
+
+  <p>The final valid interior for the RHS is <code>[2:-2, 2:-2]</code> — two nodes away from every boundary. This means the outermost interior ring is <strong>not updated</strong> by the vorticity RHS; it is held by the boundary conditions.</p>
+
+  <div class="danger">
+    <strong>Trade-off:</strong> With NY = 50, <code>2:-2</code> gives 46 valid y-nodes. The two excluded rows near walls are handled by Thom's formula (wall vorticity) and zero-gradient open boundaries. For a 201×51 grid, losing 2 nodes in each direction is negligible for the physics.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="skeleton">
+  <h2>7. Code Skeleton</h2>
+
+  <h3>7.1 New parameters</h3>
+  <pre>
+# --- THERMAL PARAMETERS ---
+T_COLD = 300.0              # baseline temperature [K]
+ALPHA = 1.4e-7              # thermal diffusivity [m^2/s]
+BETA = 1900.0               # Arrhenius sensitivity [K]
+
+# Per-strip heater source [K/s]. 0 = off.
+STRIP_HEAT_SOURCE = [50.0, 50.0, 50.0, 50.0]
+  </pre>
+
+  <h3>7.2 New arrays & mask</h3>
+  <pre>
+T = np.ones((NX + 1, NY + 1)) * T_COLD
+nu = np.ones((NX + 1, NY + 1)) * NU_COLD   # will be updated each step
+
+# Build heater mask (same geometry as strips)
+heat_mask = np.zeros((NX + 1, NY + 1))
+for i, q in enumerate(STRIP_HEAT_SOURCE):
+    x0 = STRIP_X_STARTS[i]
+    heat_mask[x0:x0+STRIP_WIDTH+1,
+              STRIP_Y_START:STRIP_Y_START+STRIP_HEIGHT+1] = q
+  </pre>
+
+  <h3>7.3 New functions</h3>
+  <pre>
+def viscosity_from_temperature(T):
+    """Arrhenius: ν = ν_cold * exp[β(1/T - 1/T_cold)]"""
+    return NU_COLD * np.exp(BETA * (1.0 / T - 1.0 / T_COLD))
+
+def temperature_rhs(T, u, v):
+    """Compute dT/dt = -u·∇T + α∇²T + heat_source on interior."""
+    # Advection (central differences)
+    dTdx = (T[2:, 1:-1] - T[:-2, 1:-1]) / (2.0 * DX)
+    dTdy = (T[1:-1, 2:] - T[1:-1, :-2]) / (2.0 * DY)
+    adv = u * dTdx + v * dTdy
+
+    # Diffusion (5-point Laplacian)
+    diff = ALPHA * (
+        (T[2:, 1:-1] - 2*T[1:-1, 1:-1] + T[:-2, 1:-1]) / (DX*DX) +
+        (T[1:-1, 2:] - 2*T[1:-1, 1:-1] + T[1:-1, :-2]) / (DY*DY)
+    )
+
+    rhs = np.zeros_like(T)
+    rhs[1:-1, 1:-1] = -adv + diff + heat_mask[1:-1, 1:-1]
+    return rhs
+
+def vorticity_rhs_variable_nu(omega, psi, nu):
+    """Conservative ∇·(ν∇ω) diffusion + advection."""
+    # Velocities on interior
+    u = (psi[1:-1, 2:] - psi[1:-1, :-2]) / (2.0 * DY)
+    v = -(psi[2:, 1:-1] - psi[:-2, 1:-1]) / (2.0 * DX)
+
+    # Advection
+    dwdx = (omega[2:, 1:-1] - omega[:-2, 1:-1]) / (2.0 * DX)
+    dwdy = (omega[1:-1, 2:] - omega[1:-1, :-2]) / (2.0 * DY)
+    adv = u * dwdx + v * dwdy
+
+    # --- Conservative diffusion: ∇·(ν∇ω) ---
+    # X-face fluxes
+    nu_e = 0.5 * (nu[2:-1, 1:-1] + nu[1:-2, 1:-1])
+    nu_w = 0.5 * (nu[1:-2, 1:-1] + nu[:-3,  1:-1])
+    flux_e = nu_e * (omega[2:-1, 1:-1] - omega[1:-2, 1:-1]) / DX
+    flux_w = nu_w * (omega[1:-2, 1:-1] - omega[:-3,  1:-1]) / DX
+    diff_x = (flux_e - flux_w) / DX
+
+    # Y-face fluxes
+    nu_n = 0.5 * (nu[1:-1, 2:-1] + nu[1:-1, 1:-2])
+    nu_s = 0.5 * (nu[1:-1, 1:-2] + nu[1:-1, :-3])
+    flux_n = nu_n * (omega[1:-1, 2:-1] - omega[1:-1, 1:-2]) / DY
+    flux_s = nu_s * (omega[1:-1, 1:-2] - omega[1:-1, :-3]) / DY
+    diff_y = (flux_n - flux_s) / DY
+
+    rhs = np.zeros_like(omega)
+    # Valid region is [2:-2, 2:-2] due to face averaging
+    rhs[2:-2, 2:-2] = -adv[1:-1, 1:-1] + diff_x[1:-1, 1:-1] + diff_y[1:-1, 1:-1]
+    return rhs
+  </pre>
+
+  <h3>7.4 New time loop order</h3>
+  <pre>
+for n in range(NT):
+    t = n * DT
+
+    # --- 1. Inlet BCs ---
+    psi_in = inlet_psi_profile(t)
+    psi_bcs = {
+        'left': psi_in,
+        'right': psi_in,          # fully developed
+        'bottom': np.zeros(NX + 1),
+        'top': np.ones(NX + 1) * psi_in[-1]
+    }
+
+    # --- 2. Solve Poisson for ψ (LU factor, unchanged) ---
+    psi = solve_streamfunction(omega, psi_bcs)
+
+    # --- 3. Compute velocities ---
+    u = (psi[1:-1, 2:] - psi[1:-1, :-2]) / (2.0 * DY)
+    v = -(psi[2:, 1:-1] - psi[:-2, 1:-1]) / (2.0 * DX)
+
+    # --- 4. Update temperature ---
+    rhs_T = temperature_rhs(T, u, v)
+    T[1:-1, 1:-1] += DT * rhs_T[1:-1, 1:-1]
+    # Temperature BCs
+    T[0, :]  = T_COLD      # inlet
+    T[-1, :] = T[-2, :]    # outlet zero-gradient
+    T[:, 0]  = T_COLD      # bottom wall
+    T[:, -1] = T_COLD      # top wall
+
+    # --- 5. Update viscosity from temperature ---
+    nu = viscosity_from_temperature(T)
+
+    # --- 6. Wall vorticity (Thom's formula) ---
+    omega[:, 0]  = -2.0 * psi[:, 1] / (DY*DY)
+    omega[:, -1] = -2.0 * (psi[:, -2] - psi[:, -1]) / (DY*DY)
+
+    # --- 7. Open boundaries (zero-gradient) ---
+    omega[0, :]  = omega[1, :]
+    omega[-1, :] = omega[-2, :]
+
+    # --- 8. Update vorticity ---
+    rhs_omega = vorticity_rhs_variable_nu(omega, psi, nu)
+    omega[2:-2, 2:-2] += DT * rhs_omega[2:-2, 2:-2]
+  </pre>
+</section>
+
+<!-- ================================================================ -->
+<section id="coupling">
+  <h2>8. Coupling Logic</h2>
+
+  <p>The three fields are coupled in a <strong>one-way staggered cycle</strong> within each timestep:</p>
+
+  <div class="equation">
+    ω<sup>(n)</sup>  →  ∇²ψ<sup>(n+½)</sup> = −ω<sup>(n)</sup>  →  (u,v)<sup>(n+½)</sup><br><br>
+    (u,v)<sup>(n+½)</sup>  →  T<sup>(n+1)</sup> = T<sup>(n)</sup> + dt · RHS_T<br><br>
+    T<sup>(n+1)</sup>  →  ν<sup>(n+1)</sup> = f<sub>Arrhenius</sub>(T<sup>(n+1)</sup>)<br><br>
+    ν<sup>(n+1)</sup>  →  ω<sup>(n+1)</sup> = ω<sup>(n)</sup> + dt · RHS_ω(ν<sup>(n+1)</sup>)
+  </div>
+
+  <p>This is <strong>operator splitting</strong> — first-order accurate in time, consistent with the explicit Euler method. No simultaneous solve is needed.</p>
+
+  <div class="note">
+    <strong>Why is this valid?</strong> The physical timescales are well-separated:
+    <ul>
+      <li>Flow response (advection): τ_flow ≈ L/U ≈ 5 s</li>
+      <li>Thermal diffusion: τ_thermal ≈ H²/α ≈ 89 s</li>
+      <li>Viscous diffusion: τ_viscous ≈ H²/ν ≈ 6 s</li>
+    </ul>
+    With dt = 0.1 ms, we resolve all three processes. The splitting error is negligible compared to the first-order time integration.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="open-questions">
+  <h2>9. Open Questions for Your Approval</h2>
+
+  <table>
+    <tr><th>#</th><th>Question</th><th>Current proposal</th><th>Alternatives</th></tr>
+    <tr>
+      <td>1</td>
+      <td><strong>Arrhenius β</strong></td>
+      <td>1900 K (water-like)</td>
+      <td>Higher (more sensitive, e.g. 3000 K for glycerol-like)<br>Lower (less sensitive, e.g. 1000 K)</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Wall BC for T</strong></td>
+      <td>Dirichlet T_cold (isothermal)</td>
+      <td>Neumann ∂T/∂n = 0 (adiabatic)<br>Robin: −k∂T/∂n = h(T − T_ambient)</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Heat source units</strong></td>
+      <td>[K/s] (temperature rise rate)</td>
+      <td>[W/m³] (physical power density), divide by ρc_p in code</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Vorticity update region</strong></td>
+      <td>[2:-2, 2:-2] (lose 2 nodes per side)</td>
+      <td>Keep [1:-1, 1:-1] but use one-sided differences at faces (complex, fragile)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Post-processing</strong></td>
+      <td>Add T field plot, ν field plot, T cross-sections</td>
+      <td>Also add: heater power vs. ratio curve, steady-state T per strip</td>
+    </tr>
+  </table>
+
+  <div class="note">
+    <strong>My recommendation:</strong> β = 1900 K, isothermal walls, K/s units, [2:-2, 2:-2] update, add T and ν plots. This is the simplest physically defensible combination.
+  </div>
+
+  <h3>10. What happens after you approve</h3>
+  <ol>
+    <li>I write the full refactored <code>thermoviscous_channel.py</code></li>
+    <li>I run a test with <code>STRIP_HEAT_SOURCE = [50, 50, 50, 50]</code></li>
+    <li>I check that T stays bounded and ν drops as expected</li>
+    <li>I update <code>irp-code-study.html</code> with the new physics sections</li>
+  </ol>
+
+  <p style="margin-top:2rem; padding:1rem; background:#1a1e26; border-radius:6px; border:1px solid var(--border);">
+    <strong>Reply with:</strong> any changes to the 5 questions above, or just say <strong>"approved"</strong> and I'll start writing the code.
+  </p>
+</section>
+
+</div>
+</body>
+</html>

@@ -1,31 +1,57 @@
 % Chapter: Introduction
-% Project 11: Fluid Neural Networks — Computing over Continuous Reactions
+% Continuous Analog Wave Computation in Porous Media
+% SCOPE LOCKED PRE-SUPERVISOR MEETING: JCA Helmholtz forward model, phi/sigma/alpha_inf design variables.
 
 \section{Background and Motivation}
 \label{sec:background}
 
-Artificial neural networks have become the dominant paradigm for machine learning, yet their physical implementation remains tied to a single substrate: silicon-based digital electronics. In a conventional neural network, computation is discrete --- neurons apply activation functions at fixed time steps, weights are stored as static memory, and inference proceeds layer by layer in a strictly sequential manner \cite{chen2018neural}. This architectural choice, while enabling remarkable advances in pattern recognition and generative modelling, imposes fundamental constraints on throughput and scalability. When multiple users or processes request inference simultaneously, the system must queue requests and process them sequentially (or via batching), creating latency bottlenecks that drive demand for ever-larger investments in GPU and CPU infrastructure at the network edge.
+Artificial neural networks have become the dominant paradigm for tasks such as image classification, speech recognition, and scientific prediction, yet their deployment on conventional digital hardware faces growing constraints. Inference is discretised into clocked arithmetic operations, memory is physically separated from processing units, and high-throughput applications demand ever-larger allocations of power, chip area, and cooling. The resulting energy consumption, latency, and hardware cost motivate the search for alternative computational substrates that can perform inference directly in the physical domain, sidestepping the von Neumann bottleneck by allowing data to be processed ``in flight'' rather than shuttled between processor and memory.
 
-An alternative paradigm is emerging in which computation is performed not by electronic switches but by \emph{continuous physical processes}: chemical reactions, fluid flows, and reaction-diffusion waves that evolve in parallel across a spatial domain \cite{adamatzky2005reaction, prakash2007bubble}. In these ``unconventional'' or ``physical'' computers, information is encoded in concentration fields, pressure distributions, or wave phases; processing occurs through the intrinsic dynamics of the medium; and multiple computations can proceed simultaneously in different regions of the same physical space. The present project investigates whether such a fluid-based computational substrate can implement neural network inference, offering two potential advantages over silicon:
+The original motivation for this project was a broader class of \emph{fluid neural networks}, in which reaction, diffusion, and flow in a fluid medium would implement continuous, parallel computation. While chemically reacting flows offer a rich physical substrate, a tractable forward model that is both faithful to the chemistry and suitable for inverse design was not available within the MSc timeframe. This led to a more focused investigation of acoustic wave propagation in a structured fluid-saturated medium, where the governing physics is well described by the Helmholtz equation and the design space can be parameterised by measurable material properties. \refChap{chap:literature_review} reviews the wider field of physical neural networks and acoustic wave computing that motivates this choice.
 
-\begin{itemize}
-    \item \textbf{Continuity:} Mathematical processing occurs across the entire architecture space rather than at discrete nodes, potentially enabling representational capabilities beyond discrete neural networks (Point A).
-    \item \textbf{Parallelism:} Independent inference processes can be isolated in non-reactive fluid streams, reducing or eliminating the queueing delays inherent in sequential silicon inference (Point B).
-\end{itemize}
+This project investigates a specific class of acoustic physical neural network: a continuous analog wave computer implemented in a fluid-saturated porous medium. The substrate is a rigid-frame porous solid through which acoustic waves propagate; the pore architecture modulates the effective acoustic density and bulk modulus of the air inside the pores, and the spatial distribution of porosity, flow resistivity, and tortuosity therefore acts as the trainable ``weight'' field of the network. Compared with free-space or layered acoustic computers, a porous medium offers a compact, three-dimensional, manufacturable volume in which wave interference and viscous damping can be exploited for computation. An earlier exploration considered using temperature fields in air to modulate sound speed, but strong frequency selectivity required impractically large devices. The porous-medium direction was chosen because it offers stronger scattering and damping per wavelength, together with a direct set of trainable material parameters. Despite the maturity of equivalent-fluid porous models \cite{biot1956theory}, the use of spatially varying porous properties for analog inference remains largely unexplored.
 
-\section{Research Aim and Objectives}
+\section{Research Aim}
 \label{sec:aim}
 
-The aim of this project is to investigate the feasibility of a fluid-based neural computer --- a physical device in which controlled mixing of reactive fluids performs neural network inference in continuous time and parallel space.
+The aim of this project is to investigate whether a rigid-frame fluid-saturated porous medium can be designed, by spatial variation of its equivalent-fluid properties, to perform simple analog wave-computing tasks in the speech-frequency band.
+
+\section{Research Objectives}
+\label{sec:objectives}
 
 The specific objectives are:
 \begin{enumerate}
-    \item To design and computationally model a controllable physical space (reactor or microfluidic geometry) with input fluid streams and output detection of reaction products, capable of supporting controlled reactive mixing.
-    \item To develop and apply a training methodology for the hydrodynamic control parameters (flow rates, inlet scheduling, mixing topology) that encodes neural network functions for parallel inference tasks.
-    \item To benchmark the performance of the fluid neural network against equivalent silicon-based neural networks in terms of inference latency, throughput, and parallel capacity.
+    \item To formulate the acoustic wave equation in a rigid-frame porous medium using the Johnson-Champoux-Allard (JCA) equivalent-fluid model in the frequency domain.
+    \item To develop a Helmholtz solver that accepts spatially varying JCA parameters and reproduces analytical wave-propagation behaviour in free air and in uniform porous slabs.
+    \item To parameterise a design region by coarse blocks of porosity, flow resistivity, and high-frequency tortuosity, mapped smoothly onto the simulation grid.
+    \item To optimise the design-region parameters for a simple wave-computing task and compare design-space reductions (e.g. $\phi$-only, $\phi+\sigma$, and $\phi+\sigma+\alpha_\infty$).
+    %\item To validate the numerical implementation against analytical transfer-matrix predictions and to discuss the physical interpretation and manufacturability of the resulting designs.
 \end{enumerate}
+
+\section{Scope and Delimitations}
+\label{sec:scope}
+
+The project is deliberately scoped to remain feasible within an MSc timeframe while still addressing a research gap. The following aspects are in scope:
+\begin{itemize}
+    \item Two-dimensional, time-harmonic acoustic wave propagation in a rigid-frame porous medium.
+    \item The Johnson-Champoux-Allard equivalent-fluid model with spatially varying porosity, flow resistivity, and high-frequency tortuosity.
+    \item Frequency-domain Helmholtz solves over the speech-frequency band (approximately 300~Hz to 4~kHz).
+    \item A block-wise design parameterisation mapped smoothly onto the simulation grid.
+    \item Gradient-free optimisation of the block parameters for a simple wave-computing task.
+\end{itemize}
+
+The following aspects are outside the present scope:
+\begin{itemize}
+    \item Full poroelastic Biot theory; the porous frame is treated as rigid and motionless.
+    \item Direct pore-scale simulation; pores are modelled only through their effective macroscopic properties.
+    \item Time-domain transient effects; the formulation assumes linear, time-invariant steady-state response.
+    \item Nonlinear activation functions and recurrent time-domain dynamics; the present demonstration is a linear, frequency-domain processor.
+    \item Coupled microstructural modelling of the characteristic lengths $\Lambda$ and $\Lambda'$; these are fixed to representative values rather than derived from the block-wise porosity, resistivity, and tortuosity.
+    \item Adjoint-based or differentiable optimisation; the design space is small enough for gradient-free search.
+    %\item Experimental fabrication or OpenFOAM validation; numerical validation against analytical transfer-matrix theory is the primary check.
+\end{itemize}
 
 \section{Thesis Structure}
 \label{sec:structure}
 
-The remainder of this thesis is organised as follows. \refChap{chap:literature_review} reviews the theoretical and experimental foundations of chemical and fluidic computation, from reaction-diffusion logic gates and chemical associative memories to microfluidic bubble logic and trainable chemical reaction networks. \refChap{chap:methodology} describes the CFD-based reactor design, the mathematical formulation of fluid-coupled neural dynamics, and the control optimisation strategy. \refChap{chap:results} presents simulation results and comparative benchmarks. \refChap{chap:conclusions} draws conclusions and identifies directions for future experimental realisation.
+The remainder of this thesis is organised as follows. \refChap{chap:literature_review} reviews physical neural networks, acoustic analog computing, equivalent-fluid porous-media models, and inverse design methods. \refChap{chap:methodology} presents the JCA Helmholtz formulation, the block-based design parameterisation, the optimisation framework, and the validation strategy. \refChap{chap:results} reports solver validation, design-space reductions, and the optimised wave-computing demonstrations. \refChap{chap:conclusions} summarises the contributions, limitations, and future directions.

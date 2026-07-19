@@ -1,0 +1,448 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% THEME & COLOURS (matched to GDP PowerPoint)
+% ============================================================
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{gdpPurple}{HTML}{633E88}
+\definecolor{gdpDarkBlue}{HTML}{0C406D}
+\definecolor{gdpNavy}{HTML}{091932}
+\definecolor{gdpOrange}{HTML}{DD7A0F}
+\definecolor{gdpSlate}{HTML}{3B4950}
+\definecolor{gdpLightGray}{HTML}{E7E6E6}
+\definecolor{gdpBurgundy}{HTML}{820E21}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=gdpSlate}
+\setbeamercolor{frametitle}{fg=gdpPurple,bg=white}
+\setbeamercolor{framesubtitle}{fg=gdpDarkBlue,bg=white}
+\setbeamercolor{title}{fg=gdpPurple}
+\setbeamercolor{subtitle}{fg=gdpDarkBlue}
+\setbeamercolor{author}{fg=gdpSlate}
+\setbeamercolor{institute}{fg=gdpSlate}
+\setbeamercolor{date}{fg=gdpSlate}
+\setbeamercolor{item}{fg=gdpDarkBlue}
+\setbeamercolor{subitem}{fg=gdpPurple}
+\setbeamercolor{block title}{fg=white,bg=gdpDarkBlue}
+\setbeamercolor{block body}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{block title alerted}{fg=white,bg=gdpBurgundy}
+\setbeamercolor{block body alerted}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{footline}{fg=gdpSlate}
+\setbeamercolor{headline}{fg=white,bg=gdpPurple}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb,graphicx,booktabs,array}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\setlength{\tabcolsep}{3pt}
+\setbeamertemplate{itemize/enumerate body begin}{\small}
+\setbeamertemplate{itemize/enumerate subbody begin}{\footnotesize}
+\addtolength{\leftmargini}{-0.3cm}
+\addtolength{\leftmarginii}{-0.2cm}
+
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2cm}
+  \textbf{\large\insertframetitle}
+  \vspace{0.05cm}
+  \par\textcolor{gdpDarkBlue}{\rule{\textwidth}{1.2pt}}
+  \vspace{-0.3cm}
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,leftskip=0.3cm]{footline}%
+      \insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,rightskip=0.3cm]{footline}%
+      \insertframenumber{}
+    \end{beamercolorbox}%
+  }%
+}
+
+\setbeamertemplate{title page}{
+  \vspace{1.5cm}
+  \begin{center}
+    {\Huge\bfseries\textcolor{gdpPurple}{\inserttitle}}\\[0.4cm]
+    {\Large\textcolor{gdpDarkBlue}{\insertsubtitle}}\\[1.2cm]
+    {\large\textcolor{gdpSlate}{\insertauthor}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertinstitute}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertdate}}
+  \end{center}
+}
+
+\title{Wave Computing vs. CRN Computing}
+\subtitle{Energy, Physical Limits, and Information Capacity}
+\author{S. Venugopal}
+\institute{Cranfield University\hspace{0.3cm}|\hspace{0.3cm}Supervisors: Prof. Weisi Guo, Prof. Takis Tsoutsanis}
+\date{27 June 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ============================================================
+\begin{frame}{What we are comparing}
+  \small
+  Both approaches are continuous physical neural networks:
+  \begin{itemize}
+    \item \textbf{Acoustic wave computing:} input pressure waves, interference and scattering in a structured domain, output pressure at probes.
+    \item \textbf{Chemical reaction network (CRN) computing:} input concentration pulses, reaction-diffusion dynamics in a fluid domain, output concentration at probes.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  The question is not which is theoretically possible. Both are. The question is which is feasible for a thesis-scale project given energy, physical, and information limits.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Acoustic energy: basic estimate}
+  \small
+  For a 1 Pa RMS acoustic wave in air:
+  \[
+    I = \frac{p_{\text{rms}}^2}{\rho_0 c_0} = \frac{1^2}{1.225 \times 343} \approx 2.4\ \text{mW/m}^2
+  \]
+
+  For a 1 cm$^2$ cross-section and a 1 ms operation:
+  \[
+    E_{\text{op}} \approx I \, A \, t = 2.4\ \text{mW/m}^2 \times 10^{-4}\ \text{m}^2 \times 10^{-3}\ \text{s} \approx 2.4 \times 10^{-10}\ \text{J} = 0.24\ \text{nJ}
+  \]
+
+  \vspace{0.2cm}
+  \textbf{Caveat:} not all of this energy participates in the computation. Most of the wave propagates through the device; only the interference contrast at the probes carries useful information.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Acoustic energy: useful vs. total}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Total injected energy}
+      \begin{itemize}
+        \item 0.24 nJ per operation
+        \item This is what the source must supply
+        \item Independent of how much is useful
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Useful interference energy}
+      \begin{itemize}
+        \item Only the probe contrast matters
+        \item Optimistically 1--10\% of total
+        \item ~2--24 pJ per useful operation
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.4cm}
+  \begin{block}{Key point}
+    Even the optimistic useful-energy estimate is orders of magnitude above biological and digital baselines.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Energy comparison baselines}
+  \small
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lccl}
+      \toprule
+      System & Energy per op & Relative & Notes \\
+      \midrule
+      Landauer limit & $\sim$3 zJ & $10^{-12}$ & Thermodynamic floor \\
+      Biological synapse & $10^{-16}$--$10^{-15}$ J & $10^{-4}$--$10^{-3}$ & Nature's reference \\
+      Digital MAC (7 nm) & $10^{-15}$--$10^{-12}$ J & $10^{-3}$--1 & Silicon baseline \\
+      CRN, $10^6$ molecules & $\sim$4 fJ & $\sim$0.02 & Mass-action estimate \\
+      Acoustic useful contrast & $\sim$2--24 pJ & $10^2$--$10^4$ & Optimistic \\
+      Acoustic total injected & $\sim$0.24 nJ & $10^5$--$10^8$ & 1 Pa, 1 cm$^2$, 1 ms \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.2cm}
+  \textcolor{gdpSlate}{\footnotesize Normalised roughly to a 1 pJ digital MAC reference.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Why acoustic energy is fundamentally high}
+  \small
+  \begin{itemize}
+    \item Sound is a collective mechanical motion. You must move many air molecules to create even a weak pressure field.
+    \item A 1 Pa wave is already quiet. Reducing pressure reduces SNR, not just energy.
+    \item The device must be filled with wave energy to get a clean readout; you cannot localise computation to a small region.
+    \item Higher frequencies give shorter wavelengths but stronger attenuation in porous media, so they do not cleanly solve the problem.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \begin{block}{Conclusion}
+    Acoustic wave computing pays an inherent energy penalty because the information carrier is a macroscopic mechanical wave.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Physical limit 1: length scale}
+  \small
+  At 2 kHz in air:
+  \[
+    \lambda = \frac{c_0}{f} = \frac{343}{2000} \approx 0.17\ \text{m} = 17\ \text{cm}
+  \]
+
+  Simulation domain from the placeholder ZK model:
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lcc}
+      \toprule
+      Feature & Physical size & In wavelengths \\
+      \midrule
+      Full domain & 0.50 m & 2.9 $\lambda$ \\
+      Design region width & 0.20 m & 1.2 $\lambda$ \\
+      Each design block in x & 0.067 m & 0.39 $\lambda$ \\
+      Source-to-probe distance & 0.34 m & 2.0 $\lambda$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.2cm}
+  \textbf{Issue:} diffractive computing needs many wavelengths to accumulate useful phase shifts. The domain is only a few wavelengths long, and each block is nearly half a wavelength wide.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Physical limit 2: spatial degrees of freedom}
+  \small
+  The number of independent spatial modes scales roughly as the area measured in wavelengths:
+  \[
+    N_{\text{modes}} \sim \left( \frac{L}{\lambda} \right)^2 \approx \left( \frac{0.5}{0.17} \right)^2 \approx 9
+  \]
+
+  A tiny digital neural network can have hundreds to thousands of weights. A 2D acoustic device at 2 kHz has only a handful of independent spatial channels.
+
+  \vspace{0.3cm}
+  \textbf{Implications:}
+  \begin{itemize}
+    \item Low representational capacity
+    \item Limited number of parallel outputs
+    \item Little room for complex decision boundaries
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Physical limit 3: model path}
+  \small
+  The placeholder solver used Zwikker-Kosten (ZK) equations.
+
+  \vspace{0.2cm}
+  \textbf{Regime check:}
+  \[
+    Wo = \Lambda \sqrt{\frac{\rho_0 \omega}{\eta}} \approx 2.9\ \text{for}\ \Lambda = 100\ \mu\text{m pores at 2 kHz}
+  \]
+  ZK assumes $Wo \ll 1$. The proper model is Johnson-Champoux-Allard (JCA).
+
+  \vspace{0.3cm}
+  \textbf{This is not a dead end.} JCA is the correct next step. But JCA fixes the model validity; it does not fix wavelength or energy.
+\end{frame}
+
+% ============================================================
+\begin{frame}{What JCA does and does not solve}
+  \small
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lccc}
+      \toprule
+      Issue & ZK & JCA & Still a problem \\
+      \midrule
+      Regime validity at 2 kHz & \xmark & \cmark & No \\
+      Sound-speed transition & Abrupt & Smoother & Less severe \\
+      Long wavelength & Yes & Yes & Yes \\
+      High energy per op & Yes & Yes & Yes \\
+      Few spatial modes & Yes & Yes & Yes \\
+      Large device size & Yes & Yes & Yes \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.3cm}
+  \begin{block}{Conclusion}
+    The acoustic path has fundamental physical constraints that persist even after switching to the correct porous-acoustics model.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Physical feasibility summary: wave computing}
+  \small
+  \begin{itemize}
+    \item \textbf{Length:} 2 kHz in air gives 17 cm wavelengths, forcing a tens-of-cm device.
+    \item \textbf{Capacity:} only ~9 independent spatial modes in the planned domain.
+    \item \textbf{Model:} ZK is invalid; JCA is needed but does not solve the scale problem.
+    \item \textbf{Energy:} 0.24 nJ injected per op, with useful contrast maybe 2--24 pJ.
+    \item \textbf{Consequence:} uncompetitive with digital and with other physical substrates.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \begin{block}{Bottom line}
+    Wave computing in air at kHz frequencies is physically possible but not thesis-competitive for general neural computation.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{CRN energy}
+  \small
+  For a chemical transformation at 300 K:
+  \[
+    kT \approx 4 \times 10^{-21}\ \text{J}
+  \]
+
+  For $N$ molecules participating in the operation:
+  \[
+    E_{\text{op}} \approx N \times kT
+  \]
+
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{cc}
+      \toprule
+      Molecules per operation & Energy per operation \\
+      \midrule
+      1 & $\sim$4 zJ \\
+      $10^3$ & $\sim$4 aJ \\
+      $10^6$ & $\sim$4 fJ \\
+      $10^9$ & $\sim$4 pJ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.2cm}
+  A CRN operating with $10^6$--$10^7$ molecules per readout volume naturally sits at fJ scale, competitive with digital and far below acoustic.
+\end{frame}
+
+% ============================================================
+\begin{frame}{CRN physical limits}
+  \small
+  \begin{itemize}
+    \item \textbf{Size:} µL to mL reaction chambers; features from µm to mm.
+    \item \textbf{Speed:} set by reaction rates, typically ms to s.
+    \item \textbf{Readout:} concentration of reporter species; limited by molecule-count statistics.
+    \item \textbf{Parallelism:} independent chemical species can coexist if non-reactive, allowing parallel inference streams in the same volume.
+    \item \textbf{Model:} mass-action ODEs are mature and immediately implementable.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \begin{block}{Trade-off}
+    CRNs are slower than acoustic waves but use vastly less energy and fit in a much smaller volume.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Side-by-side comparison}
+  \small
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lcc}
+      \toprule
+      Metric & Acoustic porous & CRN / fluid \\
+      \midrule
+      Energy per op & 0.1--1 nJ & 1 fJ--1 pJ \\
+      Device size & 10 cm--1 m & µL--mL \\
+      Speed & ms & ms--s \\
+      Spatial modes / DOF & $\sim$10 & $\sim$10$^2$--10$^4$ \\
+      Model maturity & ZK placeholder / JCA needed & Mass-action ODEs mature \\
+      Parallelism & One wave field & Multiple orthogonal species \\
+      Experimental feasibility & Machined porous structure & Microfluidics / droplets \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Information capacity: short bonus}
+  \small
+  Physical readouts are analog, so precision is limited by noise.
+
+  \vspace{0.2cm}
+  \textbf{Acoustic probe:}
+  \begin{itemize}
+    \item Readout is pressure $p$ at a point.
+    \item Distinguishable levels limited by SNR and thermal noise.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textbf{Chemical probe:}
+  \begin{itemize}
+    \item Readout is molecule count $N$ in a volume.
+    \item Shot noise: $\Delta N \sim \sqrt{N}$.
+    \item Distinguishable levels $\sim \sqrt{N}$, so bits $\sim 0.5 \log_2(N)$.
+  \end{itemize}
+
+  \begin{block}{Takeaway}
+    Both are analog and noisy. The CRN advantage is not infinite precision; it is much lower energy per distinguishable state.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{What this means for the Fluid NN proposal}
+  \small
+  Prof. Guo's project description calls for a continuous, parallel neural network in a fluid/reactive medium.
+
+  \vspace{0.3cm}
+  \textbf{The acoustic path does not fit:}
+  \begin{itemize}
+    \item Continuous, yes, but physically too large and energy-hungry.
+    \item Parallelism is limited to one wave field.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textbf{The CRN / reactive-fluid path fits better:}
+  \begin{itemize}
+    \item Continuous computation across the whole domain.
+    \item Parallelism via orthogonal non-reactive species.
+    \item Energy and size are compatible with a thesis-scale simulation.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  Switching the medium from acoustic waves to reactive fluids keeps the Fluid NN concept but removes the fundamental length/energy barriers.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Salvageable from the acoustic work}
+  \small
+  The acoustic month is not wasted. The following transfer directly to a CRN / fluid project:
+  \begin{itemize}
+    \item Design-parameter abstraction: mapping a discrete grid to continuous physical parameters.
+    \item Forward-solver discipline: time integration, stability checks, boundary conditions.
+    \item Optimisation loop: grid search / random search / gradient-based tuning.
+    \item Readout abstraction: probe values at fixed locations and times.
+    \item Loss-function design: classification / regression objectives with regularisation.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  What changes is the physics inside the domain: from acoustic wave equations to reaction-diffusion or advection-reaction-diffusion equations.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Conclusion}
+  \small
+  \begin{block}{Finding}
+    Acoustic porous wave computing faces fundamental physical limits: long wavelengths, high energy, and few spatial modes. These limits persist even with the correct JCA model.
+  \end{block}
+
+  \vspace{0.2cm}
+  \begin{block}{Recommendation}
+    Pivot to a reactive-fluid / CRN implementation of the Fluid NN concept. It preserves the continuous, parallel vision while offering realistic energy, size, and trainability.
+  \end{block}
+
+  \vspace{0.2cm}
+  \begin{block}{Next step}
+    Define a minimal 2D reaction-diffusion or compartmental-CRN benchmark and agree the success criteria with the supervisors.
+  \end{block}
+\end{frame}
+
+\end{document}

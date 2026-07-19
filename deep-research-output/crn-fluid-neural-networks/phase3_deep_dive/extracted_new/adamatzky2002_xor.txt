@@ -1,0 +1,516 @@
+## Preamble
+
+Experimental logical gates in a reaction-diffusion medium: The XOR gate and beyond
+Andrew Adamatzky1 and Benjamin De Lacy Costello2
+1Faculty of Computing, Engineering and Mathematical Sciences, University of the West of England, Bristol BS16 1QY, United Kingdom
+2Faculty of Applied Sciences, University of the West of England, Bristol BS16 1QY, United Kingdom
+~Received 20 May 2002; published 14 October 2002!
+We exploit the particulars of diffusive wave front interactions in certain types of two-reactant reaction-
+diffusion medium to construct a laboratory prototype of an XOR gate. In the design, the values of the logic
+variables are represented by the presence or absence of a precipitate, ‘‘wires’’ are constructed of a substrate
+loaded gel, and the computation is based on diffusive wave dynamics. We also discuss implementation of AND
+gate and study a three-valued composition, derived from the gate dynamic, and discuss possible logics that
+could be derived from this composition.
+DOI: 10.1103/PhysRevE.66.046112
+PACS number~s!: 82.40.Ck, 89.75.Kd, 89.75.Fb, 89.20.Ff
+I. INTRODUCTION
+Reaction-diffusion processes in chemical media became a
+hot subject of investigation in the context of unconventional
+computing devices after the publication of the seminal paper
+by Kuhnert, Agladze, and Krinsky @1#, who demonstrated
+that it was possible to implement some basic operations of
+image
+processing
+using
+the
+light-sensitive
+Belousov-
+Zhabotinsky reaction. During the last decade experimental
+prototypes of reaction-diffusion computing devices were fab-
+ricated and applied to solve various problems of computer
+science, including image processing @1–4#, pattern recogni-
+tion @2,5–9#, path planning @10–13# and many more ~see
+overview in Ref. @14#!.
+Are similar reaction and diffusion based systems con-
+structed in chemical media capable of universal computa-
+tion? Yes, and this is demonstrated via the implementation of
+logical gates @5,7,13,15,16# and the simulation of ﬁnite au-
+tomata networks @17–20# in chemical and biochemical sys-
+tems. There are two ways to implement a logical operation in
+chemical systems: integral dynamic based and geometry, or
+wave interaction, based approaches.
+The ﬁrst approach is to exploit chemical kinetics in mass-
+coupled networks of chemical reactors @5,7,17,20#. Thus,
+e.g., Blittersdorf et al. @15# built Boolean logical gates from a
+network of three chemical reactors, where two of the reactors
+represent input variables and the third reactor is an output.
+Binary states of the reactors equate to the level of acidity in
+the reagent solutions. The computation is performed by set-
+ting up pH levels in the input reactor, adjusting the ﬂow rate
+between the reactors, and measuring pH in the output reac-
+tor. In a similar way an exclusive OR gate was realized in a
+controlled enzymatic dynamic by Zauner and Conrad
+@17,20#; this can be seen as a combination of mass-coupled
+computation and macro-molecular computing, as, e.g., real-
+ization of XOR operation in self-assembling of DNA mol-
+ecules @21#.
+The second approach, which is adopted in this paper, is
+based on wave front dynamics in a geometrically constrained
+media. A logical value is represented by the presence or ab-
+sence of a wave front at a speciﬁed location, a computation is
+performed when two or more wave fronts interact with other.
+For example a threshold of state switching, is employed in
+the design of chemical wave logical gates in Refs. @13,16#;
+there the computation is based on the fact that an excitable
+wave in the Belousov-Zhabotinsky reaction is generated only
+when a critical nucleation size is exceeded. Thus, two exci-
+tation waves ~input variables! facilitate formation of the third
+wave ~output variable!. Clearly, one can also design an XOR
+gate in some excitable media, where colliding waves annihi-
+late one another, e.g. in a neural dendritic tree @22#.
+The paper is structured as follows. In Sec. II we describe
+an experimental setup of the reaction-diffusion chemical pro-
+cessor. An implementation of exclusive OR logical gate is
+discussed in Sec. III. Some ideas on how to implement AND
+gate using instabilities in reaction-diffusion system are dis-
+cussed in Sec. IV. A three-valued binary composition, de-
+rived from extended interpretation of spatial states of the
+chemical processor, is introduced in Sec. V. The paper con-
+cludes by Sec. VI, where results on logical computation are
+considered in a wider context of general purpose computing.
+II. PALLADIUM PROCESSOR
+Our approach exploits the fact that in a reaction-diffusion
+processor two diffusive waves of the same reactant but initi-
+ated in separate locations form a distinctive pattern when
+they interact ~collide! with each other. The methodology for
+the production of such processors is originated in Refs.
+@23,24# and it gets a sophisticated development in recent pa-
+pers @2,10,25#.
+A reaction-diffusion logical gate based on palladium chlo-
+ride is designed as follows. A gel ~2% agar or agarose by
+weight! containing palladium chloride ~0.2% by weight! is
+prepared and allowed to set in Petri dishes or on acetate
+sheets to a thickness of 1 mm. Geometric structures, includ-
+ing T-shaped chambers and gate couples are cut from the gel
+ﬁlm. The gel ﬁlm forms an active substrate. The values of
+logical variables are represented by planar substrates soaked
+in a reactant solution of potassium iodide ~saturated at
+20 °C), at the input chambers @for example, the chambers x
+and y in Fig. 1~a!#.
+As the uncolored solution of the potassium iodide diffuses
+into the palladium chloride gel ~yellow! it reacts with the
+palladium chloride to form iodo-palladium species. Sites
+where reaction occurs change their coloration from yellow
+PHYSICAL REVIEW E 66, 046112 ~2002!
+1063-651X/2002/66~4!/046112~6!/$20.00
+©2002 The American Physical Society
+66 046112-1
+
+
+~at a PdCl2 concentration of 0.2%! to a dark brown ~iodo-
+palladium species formed!. It is assumed that the gel ﬁlm is
+homogeneous and uniform and thus wave fronts originating
+from separate sources travel with the same speed and there-
+fore the same distance to the point of collision. Sites of the
+substrate where two or more diffusive wave fronts meet ~col-
+lide! remain uncolored; a bisector is formed separating the
+two ~in this case! reactant sources. A more detailed treatment
+of the chemistry of this and other similar systems is available
+in previous publications @2,10,24,25#.
+There may be several reasons for the observed interac-
+tions of the wave fronts. It is likely that the mechanism is
+based on substrate competition between the advancing reac-
+tant wave fronts. As the diffusive wave fronts advance the
+speed of diffusion decreases. The fronts possess a chemical
+afﬁnity for the substrate that is maximal at the initiation
+point of the reaction. This afﬁnity decreases as diffusion
+speed decreases and the conversion of reactant 1 substrate
+to ﬁnal product in the post front reactive zone increases.
+However, the physical presence of the diffusing wave front
+also exerts an inﬂuence over the gel directly in advance of it.
+A combination of both chemical and physical mechanisms
+causes substrate to move from the gel towards the diffusing
+front. Where the speed of diffusion is high this effect is mini-
+mal, however, when the speed of diffusion drops appreciably
+a dynamic concentration gradient of the substrate in advance
+of the wave front is formed. The upshot of this is that palla-
+dium chloride would be leached from the gel a small ~but
+increasing proportional to reaction time—and therefore dis-
+tance separating reactant sources! distance in front of a trav-
+elling wave front. Therefore, the unreacted KI eventually dif-
+fuses into a zone of the agar gel near the collision point that
+is depleted in the substrate resulting in the formation of sub-
+stantially less PdI2; the gel remains uncolored. Thus the bi-
+sector forms a permanent record of the substrates concentra-
+tion gradient just prior to the collision of the fronts. Evidence
+for this mechanism comes from the bisector width which is
+proportional to the distance separating the reactant sources.
+If the sources are very close—no bisector or a diffuse bisec-
+tor is formed if the sources are close ~a few mm apart! then
+sharp thin bisectors are formed and if the sources are an
+appreciable distance apart wide more diffuse bisectors are
+formed ~with an obvious concentration gradient!.
+III. XOR GATE
+A T-shaped system of chambers comprises the gate: two
+horizontal chambers, x and y chambers, act as inputs and a
+vertical chamber, z chamber acts as an output. We measure
+the color of the input and output chambers in the sites shown
+in Fig. 1~a!. When we apply a drop of reactant at one of the
+horizontal chambers, e.g., the x chamber, the reactant dif-
+fuses and spans along two other chambers, y and z chambers.
+All chambers become ﬁlled with precipitate and thus colored
+@Figs. 1~b! and ~c!#. If two input chambers, are initiated via
+drops of the reactant @Fig. 1~d!# then the advancing wave
+fronts of the diffusing reactant interact at the intersection of
+the horizontal junctions and the vertical junction @Fig. 1~e!#.
+Thus an uncolored strip is formed between the two horizon-
+tal input chambers; this extends along the vertical section of
+the gate and corresponds to a ‘‘no precipitate’’ value at the
+measurement point of the output z chamber. The following
+mapping is implemented in the gate (P stands for precipitate,
+colored site and U stands for no precipitate, uncolored sites!:
+x chamber
+y chamber
+z chamber
+U
+U
+U
+U
+P
+P
+P
+U
+P
+P
+P
+U
+Assume a colored ~precipitate! site represents T ~TRUE! and
+an uncolored site ~no precipitate! F ~FALSE! logical values,
+then we ﬁnd that the gate realizes the function XOR: x XOR
+y5(¬x`y)~(x`¬y). A negation is trivially realized as T
+XOR x5¬x, where T is a constant truth.
+FIG. 1. Schematic action of the XOR gate. ~a! An architecture of the gate; sites where state of the reactor is measured are shown by dotted
+lines. ~b! One of the inputs gets a reactant, x5T, the reactant diffuses along the gate chambers and ~c! reaches an output, z5T. ~d! Both
+outputs get the reactant, x5y5T, two wave fronts of the reactant move towards one another, they interact and form an uncolored bisector
+~e!, z5F.
+ANDREW ADAMATZKY AND BENJAMIN De LACY COSTELLO
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-2
+
+---
+
+## Experiments
+
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-5
+
+
+the second gate will be double what it would have been if
+single input gates were utilized in the ﬁrst stage ~so effec-
+tively width of uncolored strip S equals half a width of pre-
+cipitate representation of P). Therefore, in this case the strip
+S formed at the second junction will be approximately twice
+as wide as if single input variable gates formed the inputs to
+this gate.
+Eventually reactant depletion will control the output vari-
+ables from these combined systems—and could be used to
+differentiate between distinct input histories. For example the
+combination of various two input gates will eventually pro-
+duce a precipitate ~output—albeit mediated by collisions!
+where single input gates have become totally depleted in
+substrate and thus produce no output.
+VI. CONCLUSION
+The paper uncovers ﬁndings in structured computing in
+reaction-diffusion media, where the results of computation
+are given as a stationary spatial distribution of precipitate
+concentration. The chemical processor, described in the pa-
+per, is a disposable device, it could not be re-used as is the
+case with gates operating in a conventional computer. This is
+a disadvantage of the palladium processor, particularly when
+we compare it with excitable chemical media. However, the
+stationary spatial conﬁguration of the processor could be in-
+terpreted as evolved hardware @27#; so, our results could be
+the ﬁrst step in designing evolving chemical processors.
+We discussed a laboratory prototype of a reaction-
+diffusion XOR gate. The XOR gate is employed in almost any
+ﬁeld of computer science: from real life circuits, self-testing
+
+---
+
+## Experiments
+
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-5
+
+
+the second gate will be double what it would have been if
+single input gates were utilized in the ﬁrst stage ~so effec-
+tively width of uncolored strip S equals half a width of pre-
+cipitate representation of P). Therefore, in this case the strip
+S formed at the second junction will be approximately twice
+as wide as if single input variable gates formed the inputs to
+this gate.
+Eventually reactant depletion will control the output vari-
+ables from these combined systems—and could be used to
+differentiate between distinct input histories. For example the
+combination of various two input gates will eventually pro-
+duce a precipitate ~output—albeit mediated by collisions!
+where single input gates have become totally depleted in
+substrate and thus produce no output.
+VI. CONCLUSION
+The paper uncovers ﬁndings in structured computing in
+reaction-diffusion media, where the results of computation
+are given as a stationary spatial distribution of precipitate
+concentration. The chemical processor, described in the pa-
+per, is a disposable device, it could not be re-used as is the
+case with gates operating in a conventional computer. This is
+a disadvantage of the palladium processor, particularly when
+we compare it with excitable chemical media. However, the
+stationary spatial conﬁguration of the processor could be in-
+terpreted as evolved hardware @27#; so, our results could be
+the ﬁrst step in designing evolving chemical processors.
+We discussed a laboratory prototype of a reaction-
+diffusion XOR gate. The XOR gate is employed in almost any
+ﬁeld of computer science: from real life circuits, self-testing
+
+---
+
+## Experiments
+
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-5
+
+
+the second gate will be double what it would have been if
+single input gates were utilized in the ﬁrst stage ~so effec-
+tively width of uncolored strip S equals half a width of pre-
+cipitate representation of P). Therefore, in this case the strip
+S formed at the second junction will be approximately twice
+as wide as if single input variable gates formed the inputs to
+this gate.
+Eventually reactant depletion will control the output vari-
+ables from these combined systems—and could be used to
+differentiate between distinct input histories. For example the
+combination of various two input gates will eventually pro-
+duce a precipitate ~output—albeit mediated by collisions!
+where single input gates have become totally depleted in
+substrate and thus produce no output.
+VI. CONCLUSION
+The paper uncovers ﬁndings in structured computing in
+reaction-diffusion media, where the results of computation
+are given as a stationary spatial distribution of precipitate
+concentration. The chemical processor, described in the pa-
+per, is a disposable device, it could not be re-used as is the
+case with gates operating in a conventional computer. This is
+a disadvantage of the palladium processor, particularly when
+we compare it with excitable chemical media. However, the
+stationary spatial conﬁguration of the processor could be in-
+terpreted as evolved hardware @27#; so, our results could be
+the ﬁrst step in designing evolving chemical processors.
+We discussed a laboratory prototype of a reaction-
+diffusion XOR gate. The XOR gate is employed in almost any
+ﬁeld of computer science: from real life circuits, self-testing
+
+---
+
+## Results
+
+tion of copper ~II! chloride ~60 mg/ml! gel and potassium
+hydroxide (8M)] working in some capacity. The single input
+variable at y does not maintain stability and does not even
+reach the intersection point and the opening of the output
+chamber. The input variables at both x and y maintain stabil-
+ity until near the point of contact and subsequently precipi-
+tation can be seen to extend into the vertical output chamber
+z. The reproducibility of this gate implementation is low and
+it is included merely to serve as an indicator of future areas
+for development in using this class of nonlinear reactions for
+universal computation.
+V. THREE-VALUED COMPOSITIONS
+If we arrange measurement sites across the chambers
+@Fig. 5~a!# then an uncolored strip, call it S, can be detected.
+In the preceding section we constructed a binary composi-
+tion, which happens to represent a logical XOR gate. What
+will
+be
+the
+structure
+of
+the
+algebraic
+
+---
+
+## Results
+
+tion of copper ~II! chloride ~60 mg/ml! gel and potassium
+hydroxide (8M)] working in some capacity. The single input
+variable at y does not maintain stability and does not even
+reach the intersection point and the opening of the output
+chamber. The input variables at both x and y maintain stabil-
+ity until near the point of contact and subsequently precipi-
+tation can be seen to extend into the vertical output chamber
+z. The reproducibility of this gate implementation is low and
+it is included merely to serve as an indicator of future areas
+for development in using this class of nonlinear reactions for
+universal computation.
+V. THREE-VALUED COMPOSITIONS
+If we arrange measurement sites across the chambers
+@Fig. 5~a!# then an uncolored strip, call it S, can be detected.
+In the preceding section we constructed a binary composi-
+tion, which happens to represent a logical XOR gate. What
+will
+be
+the
+structure
+of
+the
+algebraic
+
+---
+
+## Methods
+
+by J.F. Miller et al. ~Springer, Berlin!.
+FIG. 6. A chemical implementation of a three-valued logic
+SsS5S gate @see scheme in Figs. 5~d! and 5~e!# in palladium
+chloride reaction-diffusion processor. The analysis of the results is
+complicated but the main point is that it shows combinations of
+gates can be achieved in these real chemical systems. Some leach-
+ing of the product is apparent in the original gates due to the high
+relative concentrations of the reactant—however a bisector ~S! is
+still apparent in these original gates. A secondary bisector ~S! can
+also be observed in the third gate—the width and intensity of this
+bisector should give a measure of the original input states of gates
+the ﬁrst and the second gates.
+ANDREW ADAMATZKY AND BENJAMIN De LACY COSTELLO
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-6
+
+---
+
+## Experiments
+
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-5
+
+
+the second gate will be double what it would have been if
+single input gates were utilized in the ﬁrst stage ~so effec-
+tively width of uncolored strip S equals half a width of pre-
+cipitate representation of P). Therefore, in this case the strip
+S formed at the second junction will be approximately twice
+as wide as if single input variable gates formed the inputs to
+this gate.
+Eventually reactant depletion will control the output vari-
+ables from these combined systems—and could be used to
+differentiate between distinct input histories. For example the
+combination of various two input gates will eventually pro-
+duce a precipitate ~output—albeit mediated by collisions!
+where single input gates have become totally depleted in
+substrate and thus produce no output.
+VI. CONCLUSION
+The paper uncovers ﬁndings in structured computing in
+reaction-diffusion media, where the results of computation
+are given as a stationary spatial distribution of precipitate
+concentration. The chemical processor, described in the pa-
+per, is a disposable device, it could not be re-used as is the
+case with gates operating in a conventional computer. This is
+a disadvantage of the palladium processor, particularly when
+we compare it with excitable chemical media. However, the
+stationary spatial conﬁguration of the processor could be in-
+terpreted as evolved hardware @27#; so, our results could be
+the ﬁrst step in designing evolving chemical processors.
+We discussed a laboratory prototype of a reaction-
+diffusion XOR gate. The XOR gate is employed in almost any
+ﬁeld of computer science: from real life circuits, self-testing
+
+---
+
+## Methods
+
+by J.F. Miller et al. ~Springer, Berlin!.
+FIG. 6. A chemical implementation of a three-valued logic
+SsS5S gate @see scheme in Figs. 5~d! and 5~e!# in palladium
+chloride reaction-diffusion processor. The analysis of the results is
+complicated but the main point is that it shows combinations of
+gates can be achieved in these real chemical systems. Some leach-
+ing of the product is apparent in the original gates due to the high
+relative concentrations of the reactant—however a bisector ~S! is
+still apparent in these original gates. A secondary bisector ~S! can
+also be observed in the third gate—the width and intensity of this
+bisector should give a measure of the original input states of gates
+the ﬁrst and the second gates.
+ANDREW ADAMATZKY AND BENJAMIN De LACY COSTELLO
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-6
+
+---
+
+## Acknowledgements
+
+We acknowledge the support of the EPSRC ~Grant No.
+GR/R31225/01!.
+@1# L. Kuhnert, K.L. Agladze, and V.I. Krinsky, Nature ~London!
+337, 244 ~1989!.
+@2# A. Adamatzky and B. De Lacy Costello, Phys. Lett. A ~to be
+published!.
+@3# N.G. Rambidi, Supramol. Sci. 5, 765 ~1998!.
+@4# N.G. Rambidi, K.E. Shamayaev, and G.Yu. Peshkov ~unpub-
+lished!.
+@5# A. Hjelmfelt and J. Ross, J. Phys. Chem. 97, 7988 ~1993!.
+@6# A. Hjelmfelt, F.W. Schneider, and J. Ross, Science 260, 335
+~1993!.
+@7# A. Hjelmfelt and J. Ross, Physica D 84, 180 ~1995!.
+@8# K.-P. Zauner and M. Conrad, Naturwissenschaften 87, 360
+~2000!.
+@9# K.-P. Zauner and M. Conrad, Soft Computing 5, 39 ~2001!.
+@10# A. Adamatzky and B. De Lacy Costello ~unpublished!.
+@11# K. Agladze et al., Physica D 106, 247 ~1997!.
+@12# N.G. Rambidi and D. Yakovenchuk, Phys. Rev. E 63, 026607
+~2001!.
+@13# O. Steinbock, A. Toth, and K. Showalter, Science 267, 868
+~1995!.
+@14# A. Adamatzky, Computing in Nonlinear Media and Automata
+Collectives ~IOP, London, 2001!.
+@15# R. Blittersdorf, J. Mu¨ller, and F.M. Schneider, J. Chem. Educ.
+72, 760 ~1995!.
+@16# A. To´th and K. Showalter, J. Chem. Phys. 103, 2058 ~1995!.
+@17# M. Conrad and K.-P. Zauner, Commun. Korea Inf. Sci. Soc.
+18, 78 ~2000!.
+@18# A. Hjelmfelt, E.D. Weinberger, and J. Ross, Proc. Natl. Acad.
+Sci. U.S.A. 88, 10 983 ~1991!.
+@19# A. Hjelmfelt, E.D. Weinberger, and J. Ross, Proc. Natl. Acad.
+Sci. U.S.A. 89, 383 ~1992!.
+@20# K.-P. Zauner and M. Conrad, Biotechnol. Prog. 17, 553 ~2001!.
+@21# C. Mao, T.H. LaBean, J.H. Relf, and N.C. Seeman, Nature
+~London! 407, 493 ~2000!.
+@22# P. Fromherz and V. Gaede, Biol. Cybern. 69, 337 ~1993!.
+@23# A. Adamatzky and D. Tolmachiev, Adv. Mater. Opt. Electron.
+7, 135 ~1997!.
+@24# D. Tolmachev and A. Adamatzky, Adv. Mater. Opt. Electron. 6,
+191 ~1996!.
+@25# B. P. J. De Lacy Costello and A. I. Adamatzky, Int. J. Birfur-
+cation Chaos Appl. Sci. Eng ~to be published!.
+@26# P.J. Hantz, J. Phys. Chem. B 104, 4266 ~2000!.
+@27# Proceedings of the 3rd International Conference on Evolvable
+
+---
+
+## Methods
+
+by J.F. Miller et al. ~Springer, Berlin!.
+FIG. 6. A chemical implementation of a three-valued logic
+SsS5S gate @see scheme in Figs. 5~d! and 5~e!# in palladium
+chloride reaction-diffusion processor. The analysis of the results is
+complicated but the main point is that it shows combinations of
+gates can be achieved in these real chemical systems. Some leach-
+ing of the product is apparent in the original gates due to the high
+relative concentrations of the reactant—however a bisector ~S! is
+still apparent in these original gates. A secondary bisector ~S! can
+also be observed in the third gate—the width and intensity of this
+bisector should give a measure of the original input states of gates
+the ﬁrst and the second gates.
+ANDREW ADAMATZKY AND BENJAMIN De LACY COSTELLO
+PHYSICAL REVIEW E 66, 046112 ~2002!
+046112-6

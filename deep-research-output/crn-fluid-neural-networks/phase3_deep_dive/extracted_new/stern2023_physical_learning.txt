@@ -1,0 +1,1391 @@
+Learning without neurons
+in physical systems
+Menachem Stern,1 and Arvind Murugan2
+1Department of Physics and Astronomy, University of Pennsylvania,
+Philadelphia, PA 19104; email: nachis@sas.upenn.edu
+2Department of Physics, University of Chicago,
+Chicago, IL 60637; email: amurugan@uchicago.edu
+Keywords
+physical learning, learning theory, inverse design, metamaterials,
+machine learning, self-assembly, molecular computing
+Abstract
+Learning is traditionally studied in biological or computational systems.
+The power of learning frameworks in solving hard inverse-problems pro-
+vides an appealing case for the development of ‘physical learning’ in
+which physical systems adopt desirable properties on their own with-
+out computational design. It was recently realized that large classes of
+physical systems can physically learn through local learning rules, au-
+tonomously adapting their parameters in response to observed examples
+of use. We review recent work in the emerging ﬁeld of physical learn-
+ing, describing theoretical and experimental advances in areas ranging
+from molecular self-assembly to ﬂow networks and mechanical materi-
+als. Physical learning machines provide multiple practical advantages
+over computer designed ones, in particular by not requiring an accu-
+rate model of the system, and their ability to autonomously adapt to
+changing needs over time. As theoretical constructs, physical learning
+machines aﬀord a novel perspective on how physical constraints modify
+abstract learning theory.
+1
+arXiv:2206.05831v1  [cond-mat.dis-nn]  12 Jun 2022
+
+
+1. INTRODUCTION
+1.1. Physical learning
+When no oﬀ-the-shelf solutions are readily available, systems are often rationally designed
+to provide solutions to our everyday problems. Designing such a system is known as solving
+an “inverse problem” since one attempts to ﬁnd a system with a desired response to a per-
+turbation, in contrast to the “forward problem” of predicting responses of a given system to
+perturbations. To solve inverse problems, one must sift through possible systems by varying
+design parameters or design degrees of freedom (d.o.f). Solutions are typically sought using
+centralized, top-down approaches, where a designer can access and modify the elements of
+a system. Numerous computational algorithms have been developed for designing a wide
+range of physical systems ranging from materials to robots, including simulated annealing
+and genetic algorithms, that typically employ standard computers and may involve physical
+prototypes (Fig. 1A). Inverse problems are usually much more diﬃcult to solve compared
+to forward prediction problems, in particular because solutions are typically non-unique.
+Learning is an established bottom-up framework for solving inverse problems (1) with
+speciﬁc advantages. Learning has been explored in the biological context of the brain and
+in artiﬁcial neural networks. However, learning is a more broadly applicable framework
+in which a system is changed incrementally in a way that enables adoption of a desired
+behavior. These incremental changes are deﬁned as a function of the system’s response to
+external stimuli. A learning process consists of two major parts: (a) evaluating the system’s
+output for a given input, (b) modiﬁcation of the system based on the output. The system
+is ﬁrst evaluated by applying stimuli from a training set. Then, the response of the system
+to the stimuli drives the modiﬁcation of learning d.o.f, such that subsequent application of
+stimuli result in improved responses. This process is usually conducted iteratively until the
+system achieves satisfactory performance.
+Here, we explore the emerging area of physical learning in materials. Typically, no com-
+puters are involved in this approach. Instead, a material is physically subject to examples of
+the desired behavior. In response, elements of the material - the learning degrees of freedom
+(d.o.f) - change as described by a system-dependent dynamical process called a ‘learning
+rule’ (Fig. 1A), underpinning the bottom-up, distributed nature of learning. A physical
+learning system thus has the following ingredients:
+1. Physical d.o.f s that respond to external stimuli f by adopting a state or dynamic
+behavior s(f), a subset of which deﬁnes the desired behavior (i.e., output).
+2. Learning d.o.f wi that can modify how the physical d.o.f s(f; {wi}) respond to ex-
+ternal stimuli f.
+3. A learning rule, dwi = h(s(f; {wi}))dt, that modiﬁes the learning d.o.f wi based on
+the response of the physical d.o.f s to the stimuli f.
+Here, h is an arbitrary non-linear function.
+The quality of learning is evaluated by
+whether the system learns the desired behavior, often quantiﬁed by a learning cost function
+C(s(f; {wi})). Note that the dynamics of the physical system itself do not compute the
+cost function; instead, physical learning seeks to minimize this cost function through the
+learning rule and the choice of stimuli used for training.
+Broadly, we can divide physical learning into categories based on the amount of user
+input during training: 1) Physical unsupervised learning (Fig. 1B), where a physical system
+self-adapts to instances of external stimuli with no supervisor intervention, typically by a
+2
+Stern and Murugan
+
+
+Input
+Output
+Input
+Output
+Input
+Output
+(A)
+Computational design
+Iterative design
+Computational 
+parameter modification
+Manufacture
+Manual
+parameter modification
+Computational iteration
+Physical learning
+Autonomous
+parameter
+modification
+(B)
+Directed aging in elastic networks
+Hebbian growth of elastic networks
+Physical unsupervised Learning
+Thumbs up \ down training 
+of thin creased sheets
+Apply force
+folded structure
+if folded correctly
+otherwise
+Contrastive learning in flow networks
+Inputs
+Ouput
+Inputs
+Ouput
+Free State
+Clamped State
+Learning rule
+Physical supervised Learning
+(C)
+Spike-timing-dependent plasticity
+in memristor networks
+Hebbian molecular self-assembly
+Figure 1
+Physical learning vs computer-aided design (A) Materials are often computationally designed for
+particular properties or responses, either entirely on a computer or through an iterative
+design-build-test process. In contrast, given external stimuli, in physical learning, materials
+autonomously modify their parameters to adopt desired properties or functions. Such autonomous
+learning machines modify themselves based on their response to stimuli according to physical
+‘learning rules’, which can be classiﬁed by the level of supervision. (B) Physical unsupervised
+learning, e.g. Molecular self-assembly with Hebbian-learned interactions (3), Hebbian growth (4)
+and directed aging in elastic networks (5) (credit to N. Pashine). (C) Physical supervised learning,
+e.g. Thumbs up/down rules in creased sheets (6), contrastive learning in ﬂow networks (7) and
+Spike timing dependent plasticity in memristive neural nets, reproduced from (8) (CC BY 4.0).
+Hebbian-like process (2), and thereby learns to represent some aspect of these stimuli, 2)
+Physical supervised learning (Fig. 1C), where an error signal is provided by a supervisor
+comparing the obtained and desired physical outcome, so systems can learn to exhibit
+speciﬁc responses for speciﬁc stimuli.
+1.2. Why learn using a physical system?
+Physical learning blurs the boundary between structure and function; the physical elements
+responsible for material properties also perform the task of adapting those material prop-
+erties. Such a merger is motivated by both practical and theoretical considerations.
+At a practical level, physical learning can lead to a new generation of materials capa-
+ble of autonomous learning that oﬀer several advantages over computer design. 1) While
+silicon-based computing and learning is incredibly powerful, a physical system that learns
+Learning without neurons in physical systems
+3
+
+
+is more appropriate to perform tasks where the inputs and outputs are physical inﬂuences
+from or on the environment (e.g., forces, currents, molecule production) rather than sym-
+bolic information. 2) In this new framework, physical systems can learn from real examples
+of the desired behavior, so that the desired behaviors themselves do not need to be modeled
+on a computer. 3) Similarly, a detailed model of the physical system is not needed since the
+response of the real physical system, imperfections included, determines physical learning.
+In contrast, computer-aided design is only as good as the model of the material and the
+model of the desired behavior and environment in which the material will be used. 4) Phys-
+ical learning can allow systems to continually learn new behaviors in situ as requirements
+change. 5) Physical learning may be appropriate for applications with space, time or energy
+constraints or where robustness due to the distributed nature of learning and information
+processing (rather than in one electronic processor) is important.
+From a theoretical perspective, studying learning in physical systems may shed new
+light on the fundamental requirements and limitations of learning in the presence of physi-
+cal constraints. How can natural systems evolve the ability to learn? A theory of physical
+learning would expand our current modular conception of learning and memory in bio-
+logical systems; we often look for control units (e.g., the brain) separable from the parts
+being controlled (e.g., the muscle). For example, even in single celled organisms, we tend to
+look for a separate gene regulatory or protein interaction circuits that learn and make deci-
+sions which are then carried out downstream by, say, physical self-assembly or cytoskeletal
+processes (9). But the downstream “muscle” itself can potentially learn and make deci-
+sions, as known to be the case in organisms ranging from ciliates to fruit ﬂies and bee
+hives (10, 11, 12, 13). Physical learning could reveal the broader scope of such non-modular
+learning and information processing available for free in the “muscle” (14).
+Finally, this approach can provide a framework to understand atypical disordered sys-
+tems and how physical systems explore parameter space to arrive at such atypical points.
+While we have made much progress in studying typical disordered systems through ran-
+dom ensembles, many examples of disordered systems in nature are highly atypical, e.g.,
+due to evolution or other natural processes. Physical learning provides one framework for
+such atypical phenomena as the origin of structures and architectures (e.g. hierarchies) in
+networks (15) and the prevalent low-dimensionality of physical responses (16, 17).
+The framework outlined here also builds upon ideas previously explored in materials
+science where materials are subject to some conditions (e.g., compression, temperature
+changes) with the goal of internal rearrangements that enhanced desired properties. For
+example, metals have been hardened by thermomechanical protocols (18) which reshape
+grain size and distribution in a way that improves strength, which in turn is part of a long
+tradition of using annealing and ‘hot stamping’ protocols (19). Similar ideas apply to pro-
+cessing polymers by which the same polymer mixes can be ‘trained’ to rearrange molecules
+with diﬀerent resultant mechanical properties by e.g. diﬀerent extrusion protocols (20).
+The framework here goes beyond such processing techniques by expanding the space of
+behaviors training can be used for, including supervised learning for input-output responses
+and pattern recognition of spatial or temporal correlations in chemical and mechanical
+stimuli. The framework also signiﬁcantly expands the range of learning mechanisms be-
+yond molecular rearrangements to include growth and degradation, and active learning
+of molecular interactions. Many of the advances here are a conceptual synthesis between
+ideas in materials processing and ideas of learning in computer science. A closely related
+development is the idea of memory in materials (21), discussed later.
+4
+Stern and Murugan
+
+
+1.3. Challenge and opportunity: local learning rules
+Machine learning algorithms implemented on a computer typically compute a cost function
+C({wi}), a global quantity that reﬂects performance on a task at hand, and strives to
+minimize it, e.g., through gradient descent,
+dwi
+dt ∼−∇wiC({wj})
+(Non −local gradient descent).
+1.
+Gradient descent procedures are eﬃciently implemented on computers (especially
+GPUs), e.g. in artiﬁcial neural networks through back-propagation (22). Note that such a
+process is highly non-local when wi are interpreted as parts of a physical system: the change
+dwi in a given element wi depends in principle on the entire neural network, including e.g.,
+how a ‘distant’ neuron responded to stimuli.
+Such highly non-local changes cannot be realized in physical learning without eﬀectively
+mimicking a computer algorithm with physical components. Instead, we seek to understand
+to what extent physical systems can learn by exploiting typically local natural processes
+without any explicit cost function,
+dw[x, t]
+dt
+∼h(s(f; {w})[x, t])
+(Local learning rule).
+2.
+Here, the change in a learning degree of freedom w[x, t] located at a point x, t in the
+physical system is restricted to change only based on the state s[x, t] of the system at the
+same (or close vicinity) spacetime point (Here, h is an arbitrary local function).
+Note
+however, that the local state s(f; {w})[x, t] will generically depend on a stimulus f and
+learning d.o.f {w} of the entire system at distant points because of collective dynamics of
+the physical system; e.g., the way an elastic material deforms at point x due to a force f
+can depend on force components f(y) and on material properties at distant points y.
+Thus, there is no explicit cost function or global optimization involved in local rules in
+Eq. 2. However, if the local learning rule h and stimuli f are chosen correctly, the system
+can nevertheless minimize a cost function as the collective physical dynamics during the
+response to stimuli can encode global information in the local state s(f, {w})[x, t].
+Physical systems are in principle more constrained in their learning abilities than an in
+silico neural network (23). However, conceptually similar constraints also distinguish the
+brain from artiﬁcial neural networks; learning in the former is often constrained by locality
+(e.g., Hebb’s rule (2) or Spike-Timing-Dependent Plasticity, STDP (24)).
+Nevertheless,
+biologically plausible learning rules, simulated on computers, have proven successful (25),
+suggesting that physical learning has potential despite locality constraints (26). Further,
+locality provides beneﬁts as well, since learning can be desynchronous, more robust and
+scale better with system size since it does not rely on a central processor (27, 28).
+1.4. Relationship to machine learning, neuromorphic computing and physical
+computation
+There have been many threads of work related to physical learning over the previous years.
+The ﬁeld of neuromorphic computation (29, 30) is closely related to physical learning in
+that physical elements are modiﬁed so that the system adopts a desired computational
+ability. However, neuromorphic computers are often considered for a distinct objective - to
+compete with in silico machine learning (ML) in its domain of symbolic inputs and outputs.
+The physical learning machines explored here can deal with problems where the inputs and
+Learning without neurons in physical systems
+5
+
+
+outputs are physical (e.g., forces, molecular assemblies). Neuromorphic computing and in
+silico ML algorithms do not directly compete in this realm since they require translation
+of stimuli to electronic or other symbolic inputs.
+More saliently, these methods cannot
+directly display any physical output such as a elastic response or a self-assembled molecular
+structure in response to a stimulus.
+The ﬁelds of physical computation (31) and molecular computation (32, 33) explore how
+to implement ﬁxed computations with physical systems. The systems explored here build on
+these prior works by autonomously learning what computation (or more generally, physical
+behavior) needs to be carried out in the ﬁrst place by physically experiencing examples of
+the desired behavior. Another closely related physical computation framework is the ﬁeld
+of reservoir computing (34). Reservoir computing uses physical systems with such complex
+internal dynamics that no physical elements need to change during a learning process;
+instead, learning how to interface with a ﬁxed physical system can eﬀectively deﬁne inputs
+and outputs in a way that solves inverse problems. This interface can be learned using a
+computer as an output ﬁlter (35).
+In this review, we strive to showcase recent experimental and theoretical advances in
+the emerging ﬁeld of physical learning. The remainder of the review is organized as follows:
+In section 2, we feature examples of physical learning machines, emphasizing ways of ex-
+perimentally realizing physical learning. In section 3, we discuss the physically realizable
+learning rules powering learning machines, subdivided into unsupervised and supervised
+learning rules.
+In section 4, we describe practical aspects inherent to realizing learning
+machines in experiments. In section 5 we highlight some theoretical learning concepts and
+how they manifest in the framework of physical learning. Finally, section 6 focuses on how
+the physical properties of a system are modiﬁed as it undergoes physical learning.
+2. EXAMPLES OF PHYSICAL LEARNING MACHINES
+2.1. Elastic materials: networks and sheets
+Disordered elastic media and their abstractions, ranging from spring networks to creased
+sheets, have received much interest for their potential to mechanically respond in non-
+standard, desired ways (36, 37, 38). Recent works have explored the feasibility of physically
+learned behaviors in these systems (4, 5, 39, 40, 41). Here, the learning d.o.f wi generally
+involve either bond lengths or bond stiﬀnesses in elastic networks and crease stiﬀnesses in
+creased sheets. For example, auxetic materials (negative Poisson’s ratio, Fig. 1B, right)
+were trained by imposing the desired global deformation (the stimulus f) on a material
+(Fig. 2A), which leads to a pattern of local strain across the material (the response s(f)).
+A learning process, typical of these works, involves bond stiﬀnesses wi that change according
+to the strain in that bond (i.e., locally) according to rules such as dwi
+dt ∼−(straini)2.
+Physical learning can also train non-linear features like bifurcated folding pathways
+in mechanical systems (Fig. 1C, left). Origami and Kirigami sheets with disordered crease
+patterns have rich folding topologies (42), starting from 2d ﬂat sheets with creases and slits,
+and ending with various folded shapes in response to given force patterns. While the crease
+geometry is usually ﬁxed by fabrication, the bending stiﬀness of creases can serve as learning
+d.o.f wi and may change in response to folding strain. Theory and simulations have shown
+that folding pathways of such sheets can be trained for speciﬁc topologies with applications
+to dynamical control of folding
+(43), mitigation of misfolding pathways (44) and even
+classiﬁcation of mechanical force patterns, analogous to neural networks (6) (Fig. 2B).
+6
+Stern and Murugan
+
+
+2.2. Molecular systems and active matter
+Molecular systems with speciﬁc interactions show behaviors that deﬁne the complexity of
+life, ranging from computation and neural network-like information processing (32, 45, 46,
+47) to structural behaviors like self-assembly of complex and dynamic structures, targeted
+phase separation and active matter (48, 49, 50). While most work tends to assume ﬁxed
+interactions, several works have explored ways of treating molecular interactions as learning
+d.o.f wi and thus learning complex molecular behaviors.
+One broad learning mechanism involves creating new molecular species through lig-
+ation or polymerization (51, 52) or by preferential multiplication of molecules that bind
+input molecules tightly and discarding of those who do not bind (53, 54) (Fig. 2C).
+These new species then mediate new interactions wi contingent on the history of the sys-
+tem (55, 56). One recent example (3, 57) explores learning interactions needed for self-
+assembly using a Hebbian-inspired ‘localized together, wired together’ rule (Fig. 1B, left):
+dwij/dt = si(x, t)sj(x, t) where si(x, t) is the concentration of species i at x, t and wij is the
+interaction strength between species i, j. That is, species i, j whose concentrations are high
+in the same place and time start interacting more strongly. The collective nucleation dy-
+namics in such a system has been shown to be capable of pattern recognition by assembling
+diﬀerent structures in response to diﬀerent concentration patterns (57), with mathematical
+connections to Hopﬁeld’s associative memory (58).
+Similar ideas of learning in multi-component phase separation
+(59, 60), e,g., based
+on DNA nanostars (49), are likely to be realized in the coming years. All of these works
+suggest that inevitable physical processes (46) such as self-assembly, phase separation and
+nucleation can enable learning and perform pattern recognition, despite not being set up
+to mimic a neural network element by element (57) as in circuit approaches.
+Another important type of molecular learning involves growth. Molecular systems like
+hydrogels and DNA nanotubes can grow elements based on their current geometry (61, 62)
+and can potentially continually learn multi-stability (4). Some molecular systems such as
+crystals with defects are capable of rudimentary evolution through repeated fracture and
+growth; this aspect raises the intriguing possibility of learning through evolution in non-
+biological systems (63).
+Learning in well-mixed molecular circuits (as opposed to the structural processes above)
+has a larger literature, ranging from bio-inspired associative learning (64) to recent progress
+towards molecular neural networks (65, 47). Molecular systems can also exploit their in-
+trinsic stochasticity needed e.g., for Boltzmann machines (66).
+Active systems (e.g. self-propelled particles) can expend energy and perform actions
+on microscopic scales. Such systems are potentially capable of learning either by combin-
+ing synthetic active matter with DNA-based elements (67) and through rearrangement of
+nematic or polar ﬁlaments as in natural systems such as the cytoskeleton (68, 69). Re-
+lated ideas have been explored through simulations (70, 71, 72), though truly autonomous
+learning has yet to be demonstrated on the molecular scale. Autonomous learning can be
+realized more readily in macroscopic robotic swarms (73, 74) that demonstrate similar ac-
+tive matter phenomena. Similarly, tissue-level rearrangements through active adhesion and
+junction changes might also allow for training (75).
+Learning without neurons in physical systems
+7
+
+
+force pattern
+(A)
+(B)
+(D)
+(C)
+(E)
+(F)
+(G)
+Figure 2
+Examples of experimentally realized physical learning machines. (A) Elastic network, aged under
+stress, adapts non-generic auxetic responses, reproduced from (5) (CC BY 4.0). (B) Self-folding
+origami sheets trained to fold into desired shape in response to an input force pattern. (C)
+DNA-based molecular learning for handwritten digit classiﬁcation, reproduced from (54) (CC BY
+4.0). (D) Pinned P. polycephalum network changes its structure to memorize locations of food
+sources, reproduced from (76) (Published under PNAS license). (E) Optical diﬀractive neural
+network constructed to classify digits and fashion products, from (77). Reprinted with permission
+from AAAS. (F) Electric circuit with variable resistors performs supervised learning and is robust
+to damage to individual elements (28). (G) Mechanical, electronic and optical networks trained to
+classify handwritten digits using Physics-aware-training, reproduced from (78) (CC BY 4.0).
+2.3. Flow networks
+In both biological (e.g. vascular) and engineered (e.g. microﬂuidic) networks, transport of
+materials is often achieved via ﬂuid ﬂow. Properties of pipes in a ﬂow network, such as
+their radii, conductance or capacitance, determine the network’s ability to globally trans-
+port material from one point to another. While such optimization could be carried out
+on a computer, many natural systems appear to adjust individual elements based on lo-
+cal feedback. For example, ﬂow might couple to the mechanical properties of the pipes,
+constricting or expanding them to control ﬂow conductance and pipe capacitance locally.
+Such adaptation might allow the network to control the distribution of cargo. For example,
+8
+Stern and Murugan
+
+
+in Physarum polycephalum, the thickness of tubes controls the shape of the organism and
+allows it to move, forage and memorize features of its surrounding (11, 76, 79) (Fig. 2D).
+Similarly, adaptive processes in other natural ﬂow networks such as those in leaves and
+vasculature (80, 81) are thought to work through local rules, as there is no central controller.
+Theoretical work on such ﬂow networks has explored the ability to learn diﬀerent behaviors
+through local rules (Fig. 1C, right), including ML-like classiﬁcation of stimuli (7, 82).
+2.4. Neuromorphic computing
+A related but distinct thread of research is neuromorphic computation, which typically use
+solid state, electronic or optical elements to construct networks, inspired by neuronal or
+computational learning (29, 30). Promising implementations include crossbar arrays (83),
+spintronic tunnel junctions (84) and phase change materials (PCMs) in photonic systems
+(Fig. 2E). In these systems, elements might adapt their resistance (e.g., memristors, poten-
+tiometers) as part of learning.
+While past neuromorphic systems tried to implement non-local gradient descent (85)
+or biological learning rules (86) using complex elements, a new generation of neuromorphic
+implement simpler local learning rules based on contrastive learning (87, 88), allowing for
+regression and classiﬁcation (27, 28) (Fig. 2F). Neuromorphic computing seeks to compete
+in traditional machine learning (ML) domain on energy and robustness (89, 90). In contrast,
+the spirit of this review is to explore learning as a metaphor for how the response of atypical
+disordered physical systems to physical stimuli can change in functional ways; we do not
+seek to solve problems in the traditional ML domain with physical systems.
+A recent new approach goes beyond engineered neural network-like architectures, taking
+the power of backpropagation to exploit the dynamics of complex physical systems. In this
+approach (78), physical parameters of a mechanical, electronic or optical system are up-
+dated by a backpropagation algorithm that observes the response of the system to physical
+stimuli. Such training eﬀectively creates ‘deep physical networks’, i.e., physical systems, ca-
+pable of solving classiﬁcation problems (Fig. 2G). Computer-aided backpropagation in (78)
+is not a focus of this review; we focus on training that is potentially implementable through
+local rules in situ by physical dynamics, instead of computer-aided backpropagation.
+On the other hand, there are similarities. The goal of the molecular and mechanical
+systems reviewed here and the approach of (78) is to exploit the intrinsic dynamics of
+physical systems for learning and computation on physical stimuli, rather than force physical
+systems to mimic neural network architectures element by element.
+2.5. Reservoir computing: Training computational interfaces
+Physical computation approaches often use a physical system as a computational resource,
+and opt to only train an interface with that system. In reservoir computing, a complex
+dynamical network takes an external input and perform a generic high dimensional ‘com-
+putation’.
+A ﬁlter is then trained using a computer on the output of the system, such
+that a desired result is obtained (34). Diﬀerent types of physical systems were used in this
+way, including electronic, ﬂuidic, mechanical and biological systems, for a broad range of
+regression and classiﬁcation problems.
+Learning without neurons in physical systems
+9
+
+
+3. PHYSICAL LEARNING RULES
+In learning theory, learning problems are typically divided into conceptually distinct classes,
+unsupervised and supervised learning. A similar distinction is worth making in the mate-
+rials context since the classes correspond to potentially diﬀerent applications with diﬀerent
+physical training protocols.
+3.1. Unsupervised learning
+In unsupervised learning, the learning degrees of freedom are modiﬁed directly as a response
+to observed signals. A completely unsupervised physical learning rule is of the form,
+dwi
+dt = h(s(f; {wj}))
+(Unsupervised learning),
+3.
+where s(f; {wj}) is the conﬁguration the system adopts in response to an external
+stimulus f, assuming material parameters {wj}.
+h is an arbitrary non-linear function.
+Here, learning d.o.f wi adjust themselves based on the response s(f; {wj}). A paradigmatic
+example of such learning is directed aging in elastic systems. For example, elastic networks
+have been trained to be auxetic (5) by holding materials in the auxetic conﬁguration as
+strained bonds soften according to a learning rule (Eq. 3). In this case, aging reduces the
+energy of a system held at its desired state dwi
+dt ∼−
+∂
+∂wi E(˜s; wi), where E(˜s) is the energy
+of a desired state ˜s. Note that as the energy of elastic networks is a sum over individual
+bonds i, this is a local rule, where every bond i changes according to the stress (energy)
+it carries. Similarly, at the molecular scale, stabilizing elements can grow between parts
+of a material that stabilize conﬁgurations the material is held in. For example, learning
+rules have been demonstrated experimentally in hydrogels using polymerases (61) and DNA
+nanotubes (62, 91) (Fig. 3A) and theoretically modeled in (4) to continually store multiple
+conﬁgurations in one mechanical system, without overriding previous ones, and retrieve
+conﬁgurations based on partial prompts.
+Unsupervised learning can create new molecular interactions (Fig. 3B). For example,
+proximity-based ligation (51, 52) can create interaction mediating molecules for species i, j
+by creating a ligated i−j molecule; further, ligation is naturally localized in space and time
+by mass-action kinetics, resulting in a Hebbian-like learning rule:
+dwij
+dt
+∼si(x, t)sj(x, t)
+(Molecular Hebbian learning),
+4.
+where wij is the interaction strength between molecular species i and j with concentrations
+si(x, y), sj(x, t). Thus, spatial and temporal proximity during learning leads to changes in
+stronger or weaker binding interaction between diﬀerent species of molecules. Equivalent
+mechanisms include activation of inactive particles e.g., through strand displacement (51)
+or phosphorylation. Such learning was shown to allow
+(3, 57, 94) learning multiple self-
+assembly behaviors and recognize patterns through nucleation (see Fig.4D).
+Adaptation in ﬂow networks have also been modeled (11, 81) with unsupervised rules
+that only depend on the ﬂow through edges, proportional to a pressure drop sj −sk:
+dwij
+dt
+∼h(si −sj)
+(Flux −based rule),
+5.
+where wij is the conductance of an edge connecting nodes i and j. In P. polycephalum, the
+stimulus f might correspond to food sources. Edges that exhibit low eﬀective conductance
+are pruned, as observed in simulations and experiments (11) (Fig. 3C).
+10
+Stern and Murugan
+
+
+(A)
+faces
+(acrylic)
+crease
+reduced stiffness
+(wet) epoxy
+fold
+fold
+epoxy lost
+epoxy lost
+height h
+width w
+training 
+(fold and extrude epoxy)
+trained vertex
+(epoxy is set)
+Unsupervised learning rules
+(B)
+(C)
+Supervised learning rules
+(D)
+(E)
+(F)
+(G)
+(H)
+(I)
+Impose Inputs
+Measure
+Outputs
+Free Network
+ΔRi ={
++ δR if | ΔVC
+i | > | ΔVF
+i |
+−δR otherwise.
++ δR
+−δR
+Update Both Resistors Network 
+Impose 
+Outputs
+Clamped Network
+Impose Inputs
+VF
+VC
+Ri
+Activation
+Activation
+Figure 3
+Local unsupervised and supervised learning rules in various physical substrates. (A) DNA
+nanotubes self-assemble to reinforce connections between ‘seeds’ based their spatial proximity.
+Adapted with permission from (91). Copyright 2017 American Chemical Society. (B) Creation of
+interaction-mediating molecules based on spatio-temporal proximity of other molecular species;
+adapted from (51) (CC BY 4.0). (C) P. polycephalum adapts the radius of vascular tubes
+according the local ﬂow shear stress (11) (credit K. Alim). (D) Epoxy-ﬁlled creases in sheets
+extrude epoxy in response to folding strain during the epoxy setting (i.e., training) period;
+consequently, ﬁnal crease stiﬀnesses about the ﬂat state depend on history of folding. (E) Buﬀered
+DNA strand displacement circuit feeds back into the concentration of reactants to implement
+gradient descent in supervised learning. Adapted with permission from (65). Copyright 2016
+American Chemical Society. (F) Two coupled electronic circuits, a free and a clamped network,
+that change the resistance of variable resistors in response to local voltage drops (27). (G) Local
+contrastive learning applied manually by pruning bonds in experimental photoelastic networks
+with visual stress measurements. Reprinted ﬁgure with permission from (92). Copyright (2021) by
+the American Physical Society. (H) A spiking electronic circuit implementing the Equilibrium
+propagation learning rule to modify network synaptic weights according to temporal spiking
+patterns, reproduced from (88) (CC BY 4.0). (I) Optical transmissivity of elements in an optical
+neural network changes according to STDP, by feeding back optical signals into waveguides with
+phase change materials, reproduced from (93) (CC BY 4.0).
+Learning without neurons in physical systems
+11
+
+
+3.2. Supervised learning
+In machine learning (ML), supervised learning involves labeled training examples, e.g.,
+labeled images of cats and dogs. In the context of physical learning, supervised learning
+corresponds to training a material to show desired speciﬁc responses for all input stimuli
+f. A typical supervised learning task is classiﬁcation (e.g. the Iris dataset (95)), where
+a system is trained to produce a speciﬁc response sA(f) for all stimuli f ∈FA in class
+FA and a diﬀerent response sB(f) for stimuli f ∈FB in class FB. Here, FA and FB are
+user-speciﬁed sets of stimuli and the challenge is two-fold: the physical learning process
+must identify correlations or features that separate the stimuli in FA and FB and further,
+must result in a material that responds only to these features in a speciﬁed way (Fig. 4A).
+As in ML, one can evaluate learning performance by a cost function C({wi}) that is
+a measure of the number of stimuli f for which the system (with given {wi}) evokes an
+incorrect response. Then, the goal of physical supervised learning is for the material to
+naturally adapt wi such that the cost function C is minimized.
+To achieve such a goal in physical systems, one needs a ‘supervisor’ who makes the
+learning process contingent in some way on the response s(f) to stimuli f being ‘right’ or
+‘wrong’ (as deﬁned by the cost function).
+The simplest form of such supervision is a ‘thumbs up/thumbs down’ feedback in which
+the supervisor only decides the sign of the autonomous unsupervised rules described earlier:
+dwi
+dt =
+
+−h(s(f; {wi}))
+if s(f) is correct
++h(s(f; {wi}))
+otherwise
+(Thumbs up/Thumbs down rule)
+6.
+Such a rule was shown to be powerful enough to learn and classify subtle force correla-
+tions applied to disordered mechanical systems (6). In this theoretical study, spatial force
+patterns belonging to one of two sets FA, FB are applied to a disordered creased sheet; a
+supervisor decides whether the sheet is folded into a desired structure sA or sB for stimuli
+in FA or FB respectively. If the folded structure is correct for the stimuli, the supervisor
+lets creases soften according to their strain, say, by immersing the folded structure in one
+chemical environment. Otherwise, the supervisor immerses the folded structure in a diﬀer-
+ent environment that stiﬀens creases based on strain. A simpliﬁed version of this local rule
+was realized by letting a liquid glue ﬂow out of creases that signiﬁcantly fold in a desired
+conﬁguration in creased sheets (Fig. 3D).
+Similar supervised rules can be implemented in molecular systems, e.g., by controlled
+strand displacement (65) (Fig. 3E). Through such mechanisms, e.g., the unsupervised molec-
+ular Hebbian learning rule in Eq. 4 can be modiﬁed so that interactions between co-localized
+molecules are either strengthened or weakened depending on the judgement of a supervisor.
+3.2.1. Contrastive learning. A more powerful supervised learning framework, requiring
+greater supervision but promising better results, is inspired by contrastive Hebbian learn-
+ing (96). In contrastive learning, a system is trained by observing the contrast between its
+current responses to an input s(f) and a nudged ‘improved’ response ˆs(f). This nudging
+takes the form of additional (weak) forces or constraints, applied by the supervisor on the
+system, such that it better represents the desired conﬁguration (lowering the cost function).
+For physical systems that are deﬁned by an energy function E(s; wi), a simple contrastive
+learning rule takes the form
+12
+Stern and Murugan
+
+
+(A)
+2
+3
+4
+Sepal width
+5
+6
+7
+8
+Sepal length
+4
+6
+Petal length
+2
+3
+Sepal width
+1
+1.5
+2
+Petal width
+3
+4
+5
+6
+Petal length
+I. Virginica
+I. Versicolor
+2
+3
+4
+Sepal width
+5
+6
+7
+8
+Sepal length
+4
+6
+Petal length
+2
+3
+Sepal width
+1
+1.5
+2
+Petal width
+3
+4
+5
+6
+Petal length
+I. Virginica
+I. Versicolor
+Forces
+Untrained sheet
+homogeneous
+ stiffness
+heterogeneous
+stiffness
+Trained sheet
+0
+5
+10
+15
+20
+Epoch
+0
+0.2
+0.4
+0.6
+0.8
+1
+Accuracy
+Training
+Test
+Folding
+Folding
+Forces
+0 1 2 3 4 5
+Sepal Length (V)
+0
+1
+2
+3
+4
+5
+Petal Width (V)
+Step 1
+83%
+Step 50
+93%
+0 1 2 3 4 5
+Sepal Length (V)
+0
+1
+2
+3
+4
+5
+Petal Width (V)
+Step 300
+97%
+Errors
+0
+50
+100
+150
+200
+250
+300
+Training Steps
+0
+0.05
+0.1
+0.15
+0.2
+1 Epoch
+Training Steps
+Sepal Length (V)
+(B)
+(C)
+Untrained network
+Trained network
+(D)
+concentration input
+self-assembled output
+Figure 4
+Training physical learning machines for machine learning inspired tasks by mapping complex
+datasets to physical stimuli. (A) Data from the Iris ﬂowers (95) dataset is mapped to physical
+stimuli (here, force patterns) that are then used to train a creased thin sheet to show distinct
+responses for distinct classes of stimuli. Here, the sheet adopts a heterogeneous crease stiﬀness
+proﬁle through a local learning rule, and eventually correctly classiﬁes the input stimuli through
+folding responses (6). (B,C) Similar classiﬁcations be learned in ﬂow and electric networks by
+mapping the Iris data to input pressures or voltages at some nodes, and reading out the pressures
+or voltages at some other output nodes, in (B) simulations and (C) experiments (27). (D)
+2500-pixel images were mapped to concentration patterns of 2500 molecular species (grayscale
+value of pixel i = molecular concentration ai). Molecular interactions were trained by a Hebbian
+rule, so the molecular system classiﬁes diﬀerent (potentially distorted) stimuli by showing diﬀerent
+self-assembly behaviors in the non-equilibrium nucleation-dominated regime of self-assembly (57).
+dwi
+dt ∼
+∂
+∂wi [E(s(f)) −E(ˆs(f))]
+(Contrastive learning).
+7.
+While this approach is frequently used to train computational models (e.g. restricted
+Boltzmann machines (97)), it was shown to give rise to local, physically realizable learn-
+ing rules (98, 25). Furthermore, in certain limits contrastive learning well approximates
+the gradient of a global cost function (99), suggesting that physical local learning is not
+fundamentally limited in performance compared to global computational ML. Contrastive
+learning and its derivative approaches were shown to successfully train (in-silico) various
+physical models, including Hopﬁeld nets (99), ﬂow networks (87, 100) (Fig. 4B), mechanical
+spring networks (7), cell assemblies and photonic neural networks (101). Early experimental
+systems implementing contrastive learning in linear resistor and elastic networks (Fig. 3F,G)
+demonstrated the success of this approach (92, 27, 28), e.g. in classifying the Iris dataset
+(Fig. 4C). These experiments further hint at the potential scalability of physical contrastive
+learning to large networks and complex sets of tasks.
+A plausible generalization to systems without an energy function (i.e. non-symmetric
+dynamical systems) but still at steady state is given by spike-timing-dependent-plasticity
+(STDP (24))
+(102):
+dwij
+dt
+∼h(sj) ˙si where wij is the strength of a ‘synapse’ (coupling)
+connecting ‘neurons’ j to i, and h(·) a non-linear function. This learning rule was shown
+Learning without neurons in physical systems
+13
+
+
+computationally to enable learning in non-symmetric spiking recurrent neural networks
+(Fig. 3H) by continuously evaluating the activations of ‘pre-synaptic’ and ‘post-synaptic’
+nodes (88). Such rules have been implemented in physical memristive substrates (103, 104);
+e.g., optical transmissivity of chalcogenide phase change materials (PCM) changes as a
+function of the number of pulses applied to, aﬀording an approximate implementation of
+STDP in optical synapses (93) (Fig. 3I).
+4. CHALLENGES IN IMPLEMENTING PHYSICAL LEARNING
+4.1. Physical implementation of supervision
+The principal diﬃculty in realizing physical learning machines is the requirement that the
+underlying physics allows for a useful local learning rule.
+Many unsupervised rules explored here may be implemented by inevitable processes
+in natural systems.
+For example, directed aging in elastic systems (5, 39, 40) exploits
+inevitable aging processes in many materials. Similarly, growth-based rules in molecular
+systems naturally follow local geometry (4) while ﬂow networks in many natural systems can
+expand or constrict according to local ﬂow properties (11). Proximity-based ligation (51)
+allows for molecular interactions to increase based on spatial or temporal proximity, e.g.,
+enabling learning of self-assembly behaviors by simply co-localizing particles in the desired
+arrangement during a training period (3, 94).
+Supervised learning places greater demands on the material since it requires the same
+physical system to employ a learning rule with either sign, e.g., strengthening or weaken-
+ing interactions, depending on context. For example, thumbs-up-thumbs-down supervised
+learning in creased sheets (6) required the same elastic material to be capable of stiﬀening
+(thumbs down) or softening (thumbs up) due to strain, based on a thumbs-up-or-down ‘sig-
+nal’ from the supervisor. Such sign switching might be achieved by the supervisor placing
+the system in diﬀerent chemical environments (or at diﬀerent temperatures (5)) based on
+whether the system shows the right or wrong response to the a stimulus.
+Greater supervision like contrastive rules require more to realize their promise: in addi-
+tion to the sign problem, contrastive rules require two copies of the system and the ability
+to change learning d.o.f wi based on the quantitative diﬀerence between the systems. While
+such duplication might be possible in some cases (27), a more broadly relevant implementa-
+tion could apply the free and clamped conditions sequentially (99), if learning elements have
+a memory component. Another implementation might involve physical signals of multiple
+modalities to obtain the contrastive signal; e.g., in ﬂow networks, tracer particles could be
+injected at the output and advected by the ﬂow, carrying the error signal information to
+the learning d.o.f (82). Finally, approximations of idealized theoretical learning rules might
+suﬃce in real materials; e.g., correctly getting just the sign of change in wi based on change
+in energy might be suﬃcient for contrastive learning wi (27, 105).
+4.2. Locality in solid and liquid-like systems
+While physical learning rules need to be local, the nature of the locality requirement varies
+across systems.
+Solid-like systems, e.g., elastic networks and sheets and ﬂow networks,
+typically have ﬁxed neighborhood geometry. Each learning element wi has a ﬁxed location
+in space and time x, t and locality implies that wi can only change based on the state of
+the system s[x, t] in the vicinity.
+14
+Stern and Murugan
+
+
+Liquid-like systems, like molecular systems, have no ﬁxed neighbors in space, since
+components typically diﬀuse freely like in molecular systems or re-arrange in a more limited
+manner as in jammed packings (41). While training might seem diﬃcult in such liquid-like
+systems without ﬁxed neighbors, there are two ways forward. In molecular systems with
+many species of components (59, 60, 106), the learning d.o.f wij are interactions Jij between
+species i, j. The locality constraint dictates that Jij only change based on transient spatial
+or temporal coincidences of molecules i, j as in Eq. 4, e.g., as considered in proximity-based
+ligation and in Hebbian learning of self-assembly (3, 57). Note that the resulting learned
+interaction graph, encoded by Jij, has no real-space interpretation and does not need to be
+embeddable in 3 dimensions.
+A distinct challenge arises in liquid-like systems with only a few species or components,
+such as jammed sphere packings and actin or microtubule networks. Here, training often
+relies on the geometric arrangements, e.g., memories stored in cytoskeletal networks under
+shear (41, 69).
+The further extension of learning protocols to such liquid-like systems
+without ﬁxed neighbors is important to broaden the scope of physical learning to all scales.
+4.3. Exploiting noise
+Compared to computer algorithms, physical systems experience higher noise that might
+alter how they learn in response to external stimuli (107). Noise can aﬀect both the physical
+response s(f) to stimuli f and the consequent change in learning d.o.f wi.
+Such inevitable ﬂuctuations in physical systems can be a blessing since several learning
+tasks require randomness. For example, molecular systems with ﬁnite numbers of molecules
+can naturally act as ‘chemical Boltzmann machines’ needed for the unsupervised learning
+of probability distributions (66). Similarly, Ref. (57) shows how the intrinsically stochastic
+nature of nucleation of crystals can solve complex pattern recognition problems, much the
+way stochastic local search algorithms solve satisﬁability problems on a computer. Noise
+improves the robustness of encoded memories in disordered jammed packings (108). Noise
+during physical training might also be beneﬁcial for generalization, as often found with
+stochastic gradient descent in in silico ML (109). The physical learning rules discussed
+earlier have been shown to be generally robust to noise, with an error ﬂoor (27, 100).
+Potential mitigation strategies include modulating the learning rate and the magnitude of
+stimuli during training (Fig. 5A).
+The distributed nature of physical learning also intrinsically makes it robust to other
+noise sources, like malfunctioning learning elements or damage. Similarly, unlike in silico
+ML, physical learning is generally asynchronous since diﬀerent learning d.o.f wi are updated
+independently without a central clocked processor, which might be beneﬁcial for discrete
+learning d.o.f (28).
+4.4. Material constraints: dynamic range of weights w, over-training
+A signiﬁcant constraint on learning is the dynamic range of the learning d.o.f w achievable in
+real materials without other compromises. For example, interactions in molecular systems
+can vary over a ﬁnite range (relative to kBT) before associations become irreversible. Sim-
+ilarly, in mechanical systems, the range of bond stiﬀnesses might be limited, e.g., to avoid
+fracture. Such constraints might be overcome to some extent by choice of materials, such
+as shape memory polymers (110, 111), hydrogels and poly-carbonates (112, 113). Existing
+works (3, 6, 100) have found that requirements for tasks studied so far are within experi-
+Learning without neurons in physical systems
+15
+
+
+mentally available ranges. Another solution is through architecture - e.g., larger networks
+with more learning elements, each having a moderate dynamic range, might alleviate the
+need for larger dynamic ranges.
+Some learning d.o.f wi, such as stiﬀnesses, are constrained to be positive, an issue dis-
+cussed before for the brain (114). Solutions proposed in ML, like shifting the task to positive
+values (115), or decomposing negative weights as the diﬀerence of two positive weights (116),
+might have physical analogs as well. For example, positive molecular binding energies can
+be eﬀectively shifted to negative values by adjusting entropic costs of binding (3).
+Another failure mode for learning physical systems is overtraining (6, 117). In materials
+that lose the variability of the learning d.o.f, overtraining can result in a network that can
+no longer adapt to new tasks (118).
+5. PHYSICAL MANIFESTATIONS OF LEARNING CONCEPTS
+5.1. Memory, learning and generalization
+A closely related concept to learning is memory. In the materials context, memory has a
+longer history of research, especially in disordered mechanical systems, polymer melts and
+glasses (21). Examples include colloidal systems ‘remembering’ the amplitude of prior shear
+and glasses ‘remembering’ a temperature at which they were aged.
+What is the relationship between learning and memory? On one hand, memory is a
+manifest requirement for learning; the learning d.o.f wi must encode a memory of past
+stimuli f. On the other hand, successful learning places additional demands on the nature
+of memory. Learning requires that the memory have a speciﬁc physical retrieval mechanism,
+namely in response to stimuli for which a functional response is sought. Further, learning
+often allows physical systems to generalize and show the correct response to stimuli never
+seen before (3, 4, 6, 7, 47), much the way an in silico neural network can generalize to novel
+cat images in a test set not seen during training. Such generalization requires selective
+memory for informative features in the stimuli; complete memory of all features of the
+training stimuli (over-ﬁtting) would be counter-productive. In summary, learning requires
+selective and functional memory with a retrieval mechanism.
+5.2. Learning out of equilibrium
+Any learning process is associated with two distinct timescales: (1) a response timescale
+τresponse associated with the physical d.o.f responding to stimuli f, i.e., mapping inputs to
+outputs f →s(f, {w}), and (2) a learning timescale τlearn associated with updating the
+learning d.o.f wi based on the response, i.e., dwi/dt ∼
+1
+τlearn g(s(f, {w})). In silico ML has
+a clear separation between these timescales as the ﬁrst process is typically fully completed
+before weights are updated.
+In contrast, physical and biological systems might not have a clean separation between
+τlearn and τresponse; learning might eﬀectively occur out-of-equilibrium and not be separable
+from the physical dynamics of stimuli-response. However, learning can be successful despite
+the lack of separation of timescales, as investigated for neuronal networks (119, 120, 121,
+122) and tested recently for physical learning with contrastive rules (100). Even learning
+rates comparable to the physical response rate (τlearn ∼τresponse) have little eﬀect on the
+trained performance, though higher rates might lead to oscillations (Fig. 5B).
+16
+Stern and Murugan
+
+
+(A)
+(B)
+(C)
+(D)
+- 1.2
+- 1.0
+- 0.8
+- 0.6
+- 0.4
+- 0.2
+0.0
+2
+4
+6
+8
+10
+12
+14
+Error-time performance bound
+Minimal error 
+0
+-
+r
+r
+Learning rate
+Learning rate
+Molecular
+species
+Learning rate
+Noise amplitude
+Clamping amplitude
+Stored states m
+Critical load mc
+Figure 5
+Constraints on physical learning. (A) Noise in either the evaluation of the physical or learning
+d.o.f can impede learning, yet it can be mitigated by controlling physical hyper-parameters like
+the amplitude of clamping correction η, or the eﬀective learning rate α (7). (B) Physical learning
+can succeed beyond physical equilibrium with minor eﬀect as long as the learning rate does not
+exceed the physical dynamical rate R = 1. Far beyond equilibrium, under-damped learning
+oscillations appear, yet the system might still be able to learn (100). (C) Speed-accuracy trade-oﬀ
+in molecular systems trained to recognize patterns in molecular concentrations (57); higher
+temperatures lead to higher accuracy and higher complexity of patterns recognized but come at a
+price of slower computation through nucleation and growth. (D) Learning capacity scales as the
+square root of the number of distinct molecular species for 2-dim molecular self-assembly (3).
+5.3. Out of equilibrium eﬀects: Time reversal symmetry, steady states,
+non-reciprocal interactions
+Beyond the relative rate of learning and physical dynamics discussed above, there are two
+distinct notions of being out-of-equilibrium relevant for learning: (a) the non-equilibrium
+nature of the learning process, (b) the non-equilibrium nature of the underlying physical
+system (in the absence of learning).
+(a) The learning process: Successful learning is almost always out-of-equilibrium since it
+is irreversible; learning starts with a random set of learning d.o.f and ends with a distinct set
+of learning d.o.f wi from which it is likely impossible to reconstruct the initial wi exactly. As
+Landauer pointed out (123), such a many-to-one procedure in the space of weights wi can
+be interpreted as erasure and must consume free energy. Currently, it is unclear exactly how
+many-to-one this process is for diﬀerent materials and tasks. At a more practical level, the
+learning process is bound to be dissipative in nature. For example, the molecular versions
+might involve polymerization, ligation or strand displacement (65, 51, 54) while mechanical
+systems involve dissipative re-arrangements in foams and other complex materials (5). The
+theoretical and practical constraints on learning by dissipation deserve further study.
+(b) The underlying physical system can be characterized as being at equilibrium or
+not without accounting for the learning process itself; many open questions remain on the
+distinction between the two cases. For example, equilibrium systems with time-reversal
+symmetry can typically avail of more highly supervised protocols such as the contrastive
+Learning without neurons in physical systems
+17
+
+
+Hebbian rule and echo backpropagation (96, 101). Some of the systems studied here - e.g.,
+elastic and ﬂow networks - are often studied at steady state and preserve time-reversal
+symmetry. Consequently, inﬂuences can propagate from output to input as easily as input
+to output, enabling contrastive learning (Eq. 7). In systems without time-reversal symmetry
+- e.g., molecular systems that are not at steady state or are powered by molecular motors,
+a perturbation of the output may not aﬀect the input. Such systems can still be trained in
+an unsupervised way or through the thumbs-up-thumbs-down supervision described earlier.
+On the other hand, relaxing the constraint of being at equilibrium could potentially
+help learning. For example, the capacity of pattern recognition tasks in molecular systems
+may be improved using non-equilibrium nucleation-dominated self-assembly (57) and show
+associated trade-oﬀs between complexity of pattern recognition, accuracy and speed of
+recognition (Fig. 5C). Similarly, non-reciprocal interactions (124) should increase the range
+of learnable behaviors; for example, dynamic phases in Kuramoto-like networks of coupled
+oscillators could potentially be learned (125). An open question is whether non-equilibrium
+behaviors are also more learnable; e.g., these systems may be more expressive (94) or show
+greater degeneracy of parameters for a given behavior.
+5.4. Dynamic architectures, continual learning and forgetting
+Neural networks often have a ﬁxed architecture (e.g., 2d convolutional network) with learn-
+ing merely updating synaptic weights within that architecture. While some solid-state phys-
+ical systems might be similarly constrained, physical systems that learn through growth
+or molecular interactions, have a freedom in architecture not usually present in in silico
+ML. For example, growing networks of nanotubes or grown gels (62, 91) or learned self-
+assembly (3) can change topology, geometry and even dimensionality during training. It is
+possible that learning can construct networks with architectures compatible to performing
+desired tasks.
+Further, physical systems naturally ‘forget’ learned experiences, e.g., through degrada-
+tion. Such erasure and forgetting can allow physical systems to naturally learn new tasks
+or functions without exceeding any capacity set by the number of d.o.f (4, 126).
+5.5. Expressivity, capacity, and hidden nodes
+A key property of any learning system is its ‘expressivity’, i.e., the complexity of input-
+output relationships that can be modeled with the available learning d.o.f (127). A system
+with higher expressivity might also be easier to train. In fact, the success of ML is often
+attributed to overparameterization (128). A related quantiﬁcation is ‘capacity’ (58, 129),
+e.g., related to the largest number of distinct behaviors that can be learned simultaneously.
+As found for neural networks, both expressivity and capacity increase with the num-
+ber of d.o.f for physical learning (3) (Fig. 5D). Work in speciﬁc systems like learned self-
+assembly (3, 57, 130) shows that frustrated interactions and dimensionality of these d.o.f
+can dramatically increase expressivity and capacity. However, we do not yet have broad
+principles for controls expressivity are and what kinds of physical interactions increase it.
+Another way to increase expressivity and capacity is the introduction of hidden nodes
+that do not directly couple to input stimuli or the output behavior, as in restricted Boltz-
+mann machines (97). In the materials context, similar ideas might apply, e.g., applying
+force patterns to only boundary and not the bulk (131, 132) or mapping inputs only to
+some molecules (47, 57), might allow learning of more complex behaviors.
+18
+Stern and Murugan
+
+
+0
+20
+40
+60
+Epoch
+0.2
+0.4
+0.6
+0.8
+1
+1.2
+Normalized stiffness
+Untrained sheet
+homogeneous
+ stiffness
+heterogeneous
+stiffness
+Trained sheet
+Optimal Training
+(A)
+(B)
+(D)
+(C)
+Eigenvalue
+Task
+Figure 6
+Learning creates physical signatures in the substrate beyond the desired functionality. (A)
+Learning induces spatial heterogeneity in the physical substrate, here a self-folding sheet with stiﬀ
+creases (6). (B) System connectivity and topology may signiﬁcantly change, as learning eﬀectively
+prunes many unused or counterproductive edges in a network (7). (C) Physical learning creates
+soft modes in a system, so that most forces couple preferentially to these few modes, reducing the
+eﬀective response dimension D of the system. (D) Depending on the diﬃculty of the task, a
+learning system may trade oﬀperformance for energy. Here, a regression task performed by a ﬂow
+network shows such a trade-oﬀwhen a parameter r that regulates power consumption is varied.
+6. PHYSICAL SIGNATURES OF PAST LEARNING
+Physical learning leads to disorder as the learning d.o.f wi typically become heterogeneous
+during learning. However, while the usual approach to disordered systems averages over
+random ensembles (133), the learning process can lead to atypical instances of disorder.
+Here we discuss some signatures of learning in physical systems.
+We note that many of these learning signatures are analogous to signatures of evolution
+and evolvability (134). In both cases, functional systems are arrived at through an iterative
+procedure in parameter space wi. Hence learning (and evolved) systems may be highly
+atypical in the context of ‘random’ ensembles typically studied in statistical physics; instead,
+these systems occupy functional regions accessible by the dynamical learning process. The
+requirement of accessibility results in features that may be incidental or irrelevant to the
+task being trained or selected for; such features would not be present in random systems
+or systems designed by a highly non-local algorithm in parameter space. Much like with
+evolution, these signatures can be used to examine if a natural disordered system is the
+product of physical learning.
+Learning without neurons in physical systems
+19
+
+
+6.1. Network geometry and topology
+Heterogeneities: In solid-state systems such as elastic or ﬂow networks, a learning process
+can leave profound signatures on the real space architecture. For example, like with synaptic
+weights in a neural network, learning inevitably leads to spatial heterogeneity in local elastic
+moduli or tube radii (Fig. 6A), up to complete pruning of unused edges (Fig. 6B). In
+liquid-state systems, the learning process can create atypical patterns of heterogeneous and
+promiscuous molecular interactions in chemical space; while a naive analysis might suggest
+a lack of function due to non-speciﬁcity (135, 136), the learned interactions are actually
+structured so as to be functional as seen in learned and evolved systems (3, 137). Studying
+learning in relatively simple physical models may oﬀer new insights on when and why
+such atypical heterogeneities develop, including potentially network motifs or hierarchical
+structures found in natural networks (15, 138, 139).
+Adaptability: Systems alternately trained for multiple incompatible behaviors in an
+alternating sequence can discover rare but highly adaptive or ‘mutable’ networks for each
+task (140, 141, 142, 143); such adaptive networks are able to switch from one behavior to
+another with far fewer changes in parameters wi than would be typical for generic designed
+networks that perform those tasks.
+6.2. Network dynamics
+Not-so-glassy landscapes: Generic frustrated many-body systems tend to have glassy
+landscapes with many randomly placed minima. However, learning can lead to exponen-
+tially fewer minima that are not randomly placed. For example, when molecular interactions
+are learned in a Hebbian way to self-assemble one of many structures, the number of result-
+ing minima is exponentially fewer than naively expected (3). Further, when the number
+of minima do proliferate near capacity, they are not random; rather, they correspond to
+chimeric assemblies of structures at other minima, analogous to spurious states in Hopﬁeld
+associative memory. Similarly, jammed packings (41) can become ultra-stable by aging in
+that state while disordered creased sheets (6, 43, 44, 144), upon training, show exponentially
+fewer branches at the ﬂat state bifurcation point than expected of a random system.
+Soft modes: Trained systems often show ‘soft’ modes even if training did not explicitly
+seek such softness (16, 17, 145, 146). Soft modes correspond to normal modes with low
+energy eigenvalue in equilibrium systems, or more generally, a small Lyapunov exponent.
+Consequently, trained systems respond more strongly to random forces than a random
+system; responses to random forces are often low dimensional along these soft modes (147,
+148) (Fig. 6C). Furthermore, the energy required in ﬂow and resistor networks to actuate
+desired behaviors is often reduced by supervised learning (Fig. 6D).
+7. CONCLUSION
+In this review we discussed the general notions of autonomous physical learning machines,
+the physical constraints that aﬀect them, and how some of them can be overcome. While
+clearly inspired by neuroscience and machine learning, we attempted to convey that physi-
+cal learning is separate and unique: learning machines are physical, like biological learning
+networks, but can learn to solve inverse problems and produce responses that have no anal-
+ogy in biology or machine learning. Moreover, treating learning as a physical phenomenon
+encourages research on fundamental questions on physically realizable learning models, how
+20
+Stern and Murugan
+
+
+learning manifests as a collective behavior in systems with simple constituents, and how
+learning induces physical changes in these systems. We believe that such questions underlie
+a fundamental physical theory of learning, and that their answers may be independent of
+the speciﬁc details of implementation of the learning machine. Physical learning, both the-
+oretical and especially experimental, requires multidisciplinary approaches. We hope recent
+and upcoming research in this ﬁeld will interest not only condensed matter physicists, but
+computer scientists and neuroscientists as well.
+DISCLOSURE STATEMENT
+The authors are not aware of any aﬃliations, memberships, funding, or ﬁnancial holdings
+that might be perceived as aﬀecting the objectivity of this review.
+ACKNOWLEDGMENTS
+We thank Sam Dillavou, Constantine Evans, Martin Falk, Nidhi Pashine, Lulu Qian, Daniel
+Hexner, Shahar Yosha, Benjamin Scellier, Jason Rocks, Sid Nagel, Andrea Liu, Douglas
+Durian, Heinrich Jaeger and Erik Winfree for insightful discussions and suggestions. M. S.
+would like to acknowledge funding from the National Science Foundation via grant DMR-
+2005749 and from the National Institute of Health CRCNS via grant 1R01MH125544-01.
+This work was primarily supported by the University of Chicago Materials Research Science
+and Engineering Center, which is funded by National Science Foundation under award
+number DMR-2011854.
+LITERATURE CITED
+1. De Vito E, Rosasco L, Caponnetto A, De Giovannini U, Odone F, Bartlett P. 2005. Journal
+of Machine Learning Research 6(5)
+2. Hebb DO. 2005. The organization of behavior: A neuropsychological theory. Psychology Press
+3. Murugan A, Zeravcic Z, Brenner MP, Leibler S. 2015. Proceedings of the National Academy
+of Sciences 112(1):54–59
+4. Stern M, Pinson MB, Murugan A. 2020. Physical Review X 10(3):031044
+5. Pashine N, Hexner D, Liu AJ, Nagel SR. 2019. Science Advances 5(12):eaax4215
+6. Stern M, Arinze C, Perez L, Palmer SE, Murugan A. 2020. Proceedings of the National
+Academy of Sciences 117(26):14843–14850
+7. Stern M, Hexner D, Rocks JW, Liu AJ. 2021. Physical Review X 11(2):021045
+8. Pedretti G, Milo V, Ambrogio S, Carboni R, Bianchi S, et al. 2017. Scientiﬁc reports 7(1):1–10
+9. Micali G, Endres RG. 2016. Current opinion in microbiology 30:8–15
+10. Bull MS, Prakash VN, Prakash M. 2021. arXiv preprint arXiv:2107.02934
+11. Marbach S, Ziethen N, Bastin L, Baeuerle F, Alim K. 2021. bioRxiv
+12. Ristroph L, Ristroph G, Morozova S, Bergou AJ, Chang S, et al. 2013. Journal of The Royal
+Society Interface 10(85):20130237
+13. Peleg O, Peters JM, Salcedo MK, Mahadevan L. 2018. Nature Physics 14(12):1193–1198
+14. Braitenberg V. 1986. Vehicles: Experiments in synthetic psychology. MIT press
+15. Kanai R, Komura Y, Shipp S, Friston K. 2015. Philosophical Transactions of the Royal Society
+B: Biological Sciences 370(1668):20140169
+16. Tlusty T, Libchaber A, Eckmann JP. 2017. Physical Review X 7(2):021037
+17. Husain K, Murugan A. 2020. Molecular Biology and Evolution 37(10):2865–2874
+18. Wang Y, Chen M, Zhou F, Ma E. 2002. nature 419(6910):912–915
+Learning without neurons in physical systems
+21
+
+
+19. Karbasian H, Tekkaya AE. 2010. Journal of Materials Processing Technology 210(15):2103–
+2118
+20. Baird DG, Collias DI. 2014. Polymer processing: principles and design. John Wiley & Sons
+21. Keim NC, Paulsen JD, Zeravcic Z, Sastry S, Nagel SR. 2019. Reviews of Modern Physics
+91(3):035002
+22. Lillicrap TP, Santoro A, Marris L, Akerman CJ, Hinton G. 2020. Nature Reviews Neuroscience
+21(6):335–346
+23. Nemenman I. 2005. Neural computation 17(9):2006–2033
+24. Caporale N, Dan Y. 2008. Annu. Rev. Neurosci. 31:25–46
+25. Bengio Y, Lee DH, Bornschein J, Mesnard T, Lin Z. 2015. arXiv preprint arXiv:1502.04156
+26. Scellier B. 2021. arXiv preprint arXiv:2103.09985
+27. Dillavou S, Stern M, Liu AJ, Durian DJ. 2021. arXiv preprint arXiv:2108.00275
+28. WycoﬀJF, Dillavou S, Stern M, Liu AJ, Durian DJ. 2022. The Journal of Chemical Physics
+156(14):144903
+29. Burr GW, Shelby RM, Sebastian A, Kim S, Kim S, et al. 2017. Advances in Physics: X
+2(1):89–124
+30. Markovi´c D, Mizrahi A, Querlioz D, Grollier J. 2020. Nature Reviews Physics 2(9):499–510
+31. Piccinini G. 2015. Physical computation: A mechanistic account. OUP Oxford
+32. Adleman LM. 1994. science 266(5187):1021–1024
+33. Soloveichik D, Cook M, Winfree E, Bruck J. 2008. natural computing 7(4):615–633
+34. Tanaka G, Yamane T, H´eroux JB, Nakane R, Kanazawa N, et al. 2019. Neural Networks
+115:100–123
+35. Jaeger H, Haas H. 2004. Science 304(5667):78–80
+36. Silverberg JL, Evans AA, McLeod L, Hayward RC, Hull T, et al. 2014. science 345(6197):647–
+650
+37. Bertoldi K, Vitelli V, Christensen J, Van Hecke M. 2017. Nature Reviews Materials 2(11):1–11
+38. Rocks JW, Pashine N, Bischofberger I, Goodrich CP, Liu AJ, Nagel SR. 2017. Proceedings of
+the National Academy of Sciences 114(10):2520–2525
+39. Hexner D, Pashine N, Liu AJ, Nagel SR. 2020. Physical Review Research 2(4):043231
+40. Hexner D, Liu AJ, Nagel SR. 2020. Proceedings of the National Academy of Sciences
+117(50):31690–31695
+41. Hagh VF, Nagel SR, Liu AJ, Manning ML, Corwin EI. 2022. Proceedings of the National
+Academy of Sciences 119(19):e2117622119
+42. Dudte LH, Vouga E, Tachi T, Mahadevan L. 2016. Nature materials 15(5):583–588
+43. Stern M, Jayaram V, Murugan A. 2018. Nature communications 9(1):1–8
+44. Stern M, Pinson MB, Murugan A. 2017. Physical Review X 7(4):041070
+45. Bray D. 1995. Nature 376(6538):307–312
+46. Winfree E. 1998. Algorithmic self-assembly of dna. California Institute of Technology
+47. Cherry KM, Qian L. 2018. Nature 559(7714):370–376
+48. Zeravcic Z, Manoharan VN, Brenner MP. 2017. Reviews of Modern Physics 89(3):031001
+49. BiﬃS, Cerbino R, Bomboi F, Paraboschi EM, Asselta R, et al. 2013. Proceedings of the
+National Academy of Sciences 110(39):15633–15637
+50. Needleman D, Dogic Z. 2017. Nature reviews materials 2(9):1–14
+51. Schaus TE, Woo S, Xuan F, Chen X, Yin P. 2017. Nature communications 8(1):1–9
+52. Fredriksson S, Gullberg M, Jarvius J, Olsson C, Pietras K, et al. 2002. Nature biotechnology
+20(5):473–477
+53. Lee JH, Lee SH, Baek C, Chun H, Ryu Jh, et al. 2017. Biosystems 158:1–9
+54. Baek C, Lee SW, Lee BJ, Kwak DH, Zhang BT. 2019. Molecules 24(7):1409
+55. Baum EB. 1995. Science 268(5210):583–585
+56. Mills AP, Yurke B, Platzman PM. 1999. Biosystems 52(1):175–180
+57. Zhong W, Schwab DJ, Murugan A. 2017. Journal of Statistical Physics 167(3):806–826
+22
+Stern and Murugan
+
+
+58. Hopﬁeld JJ. 1982. Proceedings of the national academy of sciences 79(8):2554–2558
+59. Jacobs WM. 2021. Physical review letters 126(25):258101
+60. Shrinivas K, Brenner MP. 2021. Proceedings of the National Academy of Sciences 118(45)
+61. Lee JB, Peng S, Yang D, Roh YH, Funabashi H, et al. 2012. Nature nanotechnology 7(12):816–
+820
+62. Mohammed AM, ˇSulc P, Zenk J, Schulman R. 2017. Nat. Nanotechnol. 12(4):312–316
+63. Schulman R, Yurke B, Winfree E. 2012. Proceedings of the national academy of sciences
+109(17):6405–6410
+64. Gandhi N, Ashkenasy G, Tannenbaum E. 2007. Journal of theoretical biology 249(1):58–66
+65. Lakin MR, Stefanovic D. 2016. ACS Synthetic Biology 5(8):885–897
+66. Poole W, Ortiz-Munoz A, Behera A, Jones NS, Ouldridge TE, et al. 2017. In International
+Conference on DNA-Based Computers. Springer
+67. Tayar AM, Hagan MF, Dogic Z. 2021. Proceedings of the National Academy of Sciences
+118(30)
+68. Saha S, Nagy TL, Weiner OD. 2018. Philosophical Transactions of the Royal Society B: Bio-
+logical Sciences 373(1747):20170145
+69. Majumdar S, Foucard LC, Levine AJ, Gardel ML. 2018. Soft matter 14(11):2052–2058
+70. Li S, Batra R, Brown D, Chang HD, Ranganathan N, et al. 2019. Nature 567(7748):361–365
+71. Cichos F, Gustavsson K, Mehlig B, Volpe G. 2020. Nature Machine Intelligence 2(2):94–103
+72. Falk MJ, Alizadehyazdi V, Jaeger H, Murugan A. 2021. Physical Review Research 3(3):033291
+73. Rubenstein M, Cornejo A, Nagpal R. 2014. Science 345(6198):795–799
+74. Werfel J, Petersen K, Nagpal R. 2014. Science 343(6172):754–758
+75. Banerjee S, Gardel ML, Schwarz US. 2020. Annual review of condensed matter physics 11:421–
+439
+76. Kramar M, Alim K. 2021. Proceedings of the National Academy of Sciences 118(10)
+77. Lin X, Rivenson Y, Yardimci NT, Veli M, Luo Y, et al. 2018. Science 361(6406):1004–1008
+78. Wright LG, Onodera T, Stein MM, Wang T, Schachter DT, et al. 2022. Nature 601(7894):549–
+555
+79. Tero A, Takagi S, Saigusa T, Ito K, Bebber DP, et al. 2010. Science 327(5964):439–442
+80. Katifori E, Sz¨oll˝osi GJ, Magnasco MO. 2010. Physical review letters 104(4):048704
+81. Ronellenﬁtsch H, Katifori E. 2016. Physical review letters 117(13):138301
+82. Anisetti VR, Scellier B, Schwarz JM. 2022. arXiv preprint arXiv:220.312098
+83. Kim KH, Gaba S, Wheeler D, Cruz-Albrecht JM, Hussain T, et al. 2012. Nano letters
+12(1):389–395
+84. Grollier J, Querlioz D, Camsari K, Everschor-Sitte K, Fukami S, Stiles MD. 2020. Nature
+electronics 3(7):360–370
+85. Rosenthal E, Greshnikov S, Soudry D, Kvatinsky S. 2016. In 2016 IEEE international sym-
+posium on circuits and systems (ISCAS). IEEE
+86. Serrano-Gotarredona T, Masquelier T, Prodromakis T, Indiveri G, Linares-Barranco B. 2013.
+Frontiers in neuroscience 7:2
+87. Kendall J, Pantone R, Manickavasagam K, Bengio Y, Scellier B. 2020. arXiv preprint
+arXiv:2006.01981
+88. Martin E, Ernoult M, Laydevant J, Li S, Querlioz D, et al. 2021. Iscience 24(3):102222
+89. Sui X, Wu Q, Liu J, Chen Q, Gu G. 2020. IEEE Access 8:70773–70783
+90. Rajendran B, Sebastian A, Schmuker M, Srinivasa N, Eleftheriou E. 2019. IEEE Signal Pro-
+cessing Magazine 36(6):97–110
+91. Agrawal DK, Jiang R, Reinhart S, Mohammed AM, Jorgenson TD, Schulman R. 2017. ACS
+nano 11(10):9770–9779
+92. Pashine N. 2021. Physical Review Materials 5(6):065607
+93. Cheng Z, R´ıos C, Pernice WH, Wright CD, Bhaskaran H. 2017. Science advances 3(9):e1700160
+94. Bisker G, England JL. 2018. Proceedings of the National Academy of Sciences 115(45):E10531–
+Learning without neurons in physical systems
+23
+
+
+E10538
+95. Fisher RA. 1936. Annals of eugenics 7(2):179–188
+96. Movellan JR. 1991. In Connectionist models. Elsevier, 10–17
+97. Hinton GE, Osindero S, Teh YW. 2006. Neural computation 18(7):1527–1554
+98. Bengio Y, Fischer A, Mesnard T, Zhang S, Wu Y. 2015. In Deep Learning Workshop, Inter-
+national Conference on Machine Learning (ICML)
+99. Scellier B, Bengio Y. 2017. Frontiers in computational neuroscience 11:24
+100. Stern M, Dillavou S, Miskin MZ, Durian DJ, Liu AJ. 2022. Phys. Rev. Research 4(2):L022037
+101. Lopez-Pastor V, Marquardt F. 2021. arXiv preprint arXiv:2103.04992
+102. Scellier B, Goyal A, Binas J, Mesnard T, Bengio Y. 2018. arXiv preprint arXiv:1808.04873
+103. Kim S, Du C, Sheridan P, Ma W, Choi S, Lu WD. 2015. Nano letters 15(3):2203–2211
+104. Serb A, Bill J, Khiat A, Berdan R, Legenstein R, Prodromakis T. 2016. Nature communications
+7(1):1–9
+105. Bernstein J, Wang YX, Azizzadenesheli K, Anandkumar A. 2018. In International Conference
+on Machine Learning. PMLR
+106. Murugan A, Zou J, Brenner MP. 2015. Nature communications 6(1):1–10
+107. Ventriglia F, Di Maio V. 2002. Biosystems 67(1-3):287–294
+108. Keim NC, Nagel SR. 2011. Physical review letters 107(1):010603
+109. Bottou L. 2003. In Summer School on Machine Learning. Springer
+110. McKnight G, Henry C. 2005. In Smart Structures and Materials 2005: Active Materials:
+Behavior and Mechanics, vol. 5761. International Society for Optics and Photonics
+111. Lagoudas DC. 2008. Shape memory alloys: modeling and engineering applications. Springer
+112. Henke M, Gerlach G. 2014. Microsystem technologies 20(4-5):599–606
+113. Zhou Y, Duque CM, Santangelo CD, Hayward RC. 2019. Advanced Functional Materials
+29(48):1905273
+114. Sorscher B, Mel G, Ganguli S, Ocko S. 2019. Advances in neural information processing
+systems 32
+115. Hu M, Strachan JP, Li Z, Grafals EM, Davila N, et al. 2016. In 2016 53nd ACM/EDAC/IEEE
+Design Automation Conference (DAC). IEEE
+116. Wang Z, Li C, Song W, Rao M, Belkin D, et al. 2019. Nature electronics 2(3):115–124
+117. Amari Si, Murata N, M¨uller KR, Finke M, Yang H. 1995. Advances in neural information
+processing systems 8
+118. Hexner D. 2022. arXiv preprint arXiv:2203.03468
+119. Zucker RS, Regehr WG. 2002. Annual review of physiology 64(1):355–405
+120. Marom S. 2010. Progress in neurobiology 90(1):16–28
+121. Ernoult M, Grollier J, Querlioz D, Bengio Y, Scellier B. 2019. Advances in Neural Information
+Processing Systems 32:7081–7091
+122. Bartunov S, Santoro A, Richards B, Marris L, Hinton GE, Lillicrap T. 2018. In Advances in
+Neural Information Processing Systems
+123. Landauer R. 1961. IBM journal of research and development 5(3):183–191
+124. Fruchart M, Hanai R, Littlewood PB, Vitelli V. 2021. Nature 592(7854):363–369
+125. Seliger P, Young SC, Tsimring LS. 2002. Physical Review E 65(4):041906
+126. French RM. 1999. Trends in cognitive sciences 3(4):128–135
+127. Bahri Y, Kadmon J, Pennington J, Schoenholz SS, Sohl-Dickstein J, Ganguli S. 2020. Annual
+Review of Condensed Matter Physics 11:501–528
+128. Rocks JW, Mehta P. 2022. Physical Review Research 4(1):013201
+129. Hertz J, Krogh A, Palmer RG. 2018. Introduction to the theory of neural computation. CRC
+Press
+130. Fink TM, Ball RC. 2001. Physical review letters 87(19):198103
+131. Coulais C, Teomy E, De Reus K, Shokef Y, Van Hecke M. 2016. Nature 535(7613):529–532
+132. Pinson MB, Witten TA. 2016. Journal of Physics: Condensed Matter 28(49):495102
+24
+Stern and Murugan
+
+
+133. M´ezard M, Parisi G, Virasoro MA. 1987. Spin glass theory and beyond: An introduction to
+the replica method and its applications. vol. 9. World Scientiﬁc Publishing Company
+134. Wagner GP, Altenberg L. 1996. Evolution 50(3):967–976
+135. Johnson ME, Hummer G. 2011. Proceedings of the National Academy of Sciences 108(2):603–
+608
+136. Huntley MH, Murugan A, Brenner MP. 2016. Proceedings of the National Academy of Sciences
+113(21):5841–5846
+137. Su CJ, Murugan A, Linton JM, Yeluri A, Bois J, et al. 2022. Cell Systems
+138. Alon U. 2007. Nature Reviews Genetics 8(6):450–461
+139. Modes CD, Magnasco MO, Katifori E. 2016. Physical Review X 6(3):031009
+140. Kashtan N, Alon U. 2005. Proceedings of the National Academy of Sciences 102(39):13773–
+13778
+141. Hemery M, Rivoire O. 2015. Physical review E 91(4):042704
+142. Bloom JD, Labthavikul ST, Otey CR, Arnold FH. 2006. Proceedings of the National Academy
+of Sciences 103(15):5869–5874
+143. Murugan A, Jaeger HM. 2019. MRS Bulletin 44(2):96–105
+144. Pinson MB, Stern M, Carruthers Ferrero A, Witten TA, Chen E, Murugan A. 2017. Nature
+communications 8(1):1–8
+145. Yan L, Ravasio R, Brito C, Wyart M. 2018. Biophysical journal 114(12):2787–2798
+146. Recanatesi S, Farrell M, Lajoie G, Deneve S, Rigotti M, Shea-Brown E. 2021. Nature commu-
+nications 12(1):1–13
+147. Kaneko K, Tsuda I. 2003. Chaos:
+An Interdisciplinary Journal of Nonlinear Science
+13(3):926–936
+148. Transtrum MK, Machta BB, Brown KS, Daniels BC, Myers CR, Sethna JP. 2015. The Journal
+of chemical physics 143(1):07B201 1
+Learning without neurons in physical systems
+25

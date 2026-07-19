@@ -1,0 +1,3470 @@
+Recurrent neural chemical reaction networks that
+approximate arbitrary dynamics
+Alexander Dack*,1
+Benjamin Qureshi1
+Thomas E. Ouldridge1
+Tomislav Plesa*,2
+Keywords: Chemical Reaction Networks;
+Artificial Neural Networks;
+Dynamical Systems
+Abstract: Many important phenomena in biochemistry and biology exploit dynamical features
+such as multi-stability, oscillations, and chaos. Construction of novel chemical systems with such
+rich dynamics is a challenging problem central to the fields of synthetic biology and molecular
+nanotechnology. In this paper, we address this problem by putting forward a molecular version
+of a recurrent artificial neural network, which we call recurrent neural chemical reaction network
+(RNCRN). The RNCRN uses a modular architecture – a network of chemical neurons – to approximate
+arbitrary dynamics. We first prove that with sufficiently many chemical neurons and suitably fast
+reactions, the RNCRN can be systematically trained to achieve any dynamics. RNCRNs with
+relatively small number of chemical neurons and a moderate range of reaction rates are then trained
+to display a variety of biologically-important dynamical features. We also demonstrate that such
+RNCRNs are experimentally implementable with DNA-strand-displacement technologies.
+1
+Introduction
+Artificial neural networks (ANNs) are a set of algorithms, inspired by the structure and function
+of the brain, that are commonly implemented on electronic machines [1]. Owing to their powerful
+function approximating abilities [2–4], ANNs have been used to solve a range of data-driven problems
+involving identification, prediction and classification of patterns, e.g. in text, speech and image
+analysis [5]. These networks, and particularly their recurrent counterparts [6–8], have also been
+embedded into dynamical systems [9] to learn arbitrary dynamical behaviors [10, 11], including
+oscillations [12] and chaos [13,14].
+ANNs implemented on electronic machines can be challenging to interface with chemical and
+biological systems. To address this issue, as done with some other chemically-realized systems [15–21],
+there has been substantial interest in directly embedding ANNs into chemical reaction networks
+(CRNs) - a mathematical framework used for modelling (bio)chemical processes [22]. In this paper,
+such CRNs, that execute ANN algorithms, are said to be neural. Current literature has focused on
+designing neural CRNs to solve various pattern-recognition problems [23–38], with applications to
+e.g. virus detection [27] and disease diagnostics [38], with successful experimental implementations
+using substrates such as nucleic acids and microorganisms [38–42]. Particular focus has been placed
+on both theoretical investigations [27,29,37,42] and experimental implementations [36,42] of neural
+CRNs based on the classical architecture consisting of layers of perceptrons - processing units whose
+outputs are non-linear functions of weighted sum of their inputs [43].
+The neural CRNs put forward in the literature for molecular pattern-recognition problems
+take an input set of chemical concentrations and produce in the long-run static (equilibrium)
+* Email of co-corresponding authours: alex.dack14@imperial.ac.uk or tp525@cam.ac.uk.
+1Department of Bioengineering and Imperial College Centre for Synthetic Biology, Imperial College London,
+Exhibition Road, London, SW7 2AZ, UK.
+2Department of Applied Mathematics and Theoretical Physics, University of Cambridge, Centre for Mathematical
+Sciences, Wilberforce Road, Cambridge, CB3 0WA, UK.
+1
+arXiv:2406.03456v2  [q-bio.MN]  5 Jun 2025
+
+
+concentrations as the output. As such, these CRNs cannot in general be trained to produce a
+predefined dynamical (non-equilibrium) output. However, it is precisely the dynamical signals that
+can communicate important messages in biology. In particular, the time-evolution of (bio)chemical
+species concentrations can be modelled as a dynamical system [9,22], and the detailed information
+enconded in this time-evolution can play important roles in biology [44]. For example, fundamental
+processes such as cellular differentiation, circadian clocks and DNA repair have been modelled as
+dynamical systems that exhibit features such as coexistence of multiple favorable states (multi-
+stability) and oscillations [45–47]. Furthermore, chaotic dynamical systems have been used to explain
+survival advantage of cellular populations [48], and heterogeneity in bacterial responses to stress [49].
+Aside from occurring in native (bio)chemical systems, such dynamical features have also been encoded
+in a variety of experimentally-built synthetic ones. Examples include DNA-strand-displacement
+systems that display oscillations [50] and process temporal information [51], enzyme-aided DNA
+systems displaying oscillations, chaos, spiking, and molecular event recording [52–54], synthetic gene-
+regulatory networks displaying oscillations [55], all the way to multi-stable synthetic bacteria [56].
+One class of neural systems, which can be suitable for dynamical problems, are chemical reservoir
+computers [57,58]. These chemical-electronic hybrid systems consist of a suitable CRN (called the
+chemical reservoir) which is coupled to a single layer implemented on an electronic computer. The
+authors from [58] choose a particular CRN with rich dynamics, and demonstrate that the chemical
+reservoir computer can then solve a number of computational problems, including emulating and
+predicting dynamical systems. To achieve these tasks, only a single layer is trained, which is less
+computationally intensive than the classical training of ANNs. However, these chemical reservoir
+computers have not been shown to possess the ability to replicate arbitrary dynamical behaviors
+and, furthermore, they are not purely chemical, relying on an electronic computer.
+To bridge the gap, in this paper we introduce a family of novel (purely chemical) neural CRNs
+that can replicate arbitrary dynamical behaviors. These CRNs embed suitable perceptron-based
+recurrent ANNs, and are called recurrent neural chemical reaction networks (RNCRNs).
+The
+RNCRNs contain two types of chemical species: the executive species, that execute the desired
+dynamics, and chemical analogues of perceptrons [29], called the chemical perceptrons, that fine-tune
+the dynamics of the executive species in a recurrent-neural-network fashion; see Figure 1 for a
+schematic representation. By exploiting the universal approximation abilities of ANNs, we prove that
+RNCRNs can be systematically trained to achieve dynamics of any well-behaved target dynamical
+system, provided that there are sufficiently many chemical perceptrons, and provided that these
+species are governed by sufficiently fast reactions. We show that non-trivial dynamical behaviors
+can be replicated with relatively few and only moderately fast chemical perceptrons. Furthermore,
+we demonstrate that RNCRN-based systems can be implemented under experimentally-feasible
+conditions using DNA-strand-displacement technologies.
+The paper is organized as follows. In Section 2, we present background theory on CRNs and
+ANNs. In Section 3, we introduce RNCRNs, and outline their universal approximation abilities, which
+are rigorously proved in Appendix A. In Section 4, we present an algorithm for training RNCRNs
+as Algorithm 1, which we apply to obtain relatively simple RNCRNs displaying multi-stability,
+oscillations, and chaos; more details about the examples can be found in Appendix B, while the
+pseudocode for Algorithm 1 in Appendix F. In addition, in Appendices C and D, we study some
+experimentally-important properties of some of the example systems. Finally, we provide a summary
+and discussion in Section 5; some further details can be found in Appendix E.
+2
+
+
+𝜃𝑗> 0
+𝛾> 0
+𝜔𝑗,𝑖< 0
+𝛽𝑖≥0
+𝑌1
+𝑌𝑀
+…
+…
+𝑌𝑗
+𝑋1
+𝑋𝑁
+…
+𝑋𝑖
+…
+∅
+𝛽𝑖
+𝑋𝑖
+∅
+1/𝜇
+𝛾/𝜇
+𝑌𝑗
+𝑌𝑗
+𝑋𝑖
+|𝛼𝑖,𝑗|
+𝑌𝑗
+∅
+∅
+𝜔𝑗,𝑖/𝜇
++
+𝑌𝑗
+𝑋𝑖
+𝑌𝑗
+∅
++
+𝑌𝑗
+𝑋𝑖
+𝑋𝑖
+𝛼𝑖,𝑗
+∅
+𝑌𝑗
+𝑌𝑗
+𝜃𝑗/𝜇
+∅
+𝑌𝑗
+|𝜃𝑗|/𝜇
+𝑋𝑖
+|𝜔𝑗,𝑖|/𝜇
+𝑌𝑗
+∅
+𝜔𝑗,𝑖> 0
+𝛼𝑖,𝑗> 0
+𝛼𝑖,𝑗< 0
+𝜃𝑗< 0
+Figure 1: A visualization of an RNCRN with executive species X1, X2, . . . , XN, and a single
+layer of chemical perceptrons Y1, Y2, . . . , YM. The interaction between the executive species and
+chemical perceptrons is outlined in the center via arrows, while the surrounding boxes display more
+details. In particular, the purple box on the left displays chemical reactions that involve only the
+executive species; similarly, the yellow boxes on the right show reactions only involving the chemical
+perceptrons; here, black curved arrows indicate catalysis. On the other hand, the boxes on the top
+and bottom display reactions that involve both types of species; these interactions are catalytic in
+nature. In particular, shown in blue on the top are the reactions affecting the executive species,
+where the chemical perceptrons are catalysts; on the other hand, the orange boxes on the bottom
+display reactions which affect the chemical perceptrons, with executive species being catalysts. The
+corresponding chemical reaction network is given by (14) in Appendix A; see also Table 1.
+2
+Background theory
+In this section, we present some theory of chemical reaction networks and artificial neural networks.
+Throughout the paper, we assume that all the variables are dimensionless, unless stated otherwise.
+2.1
+Chemical reaction networks (CRNs)
+Consider a system of two ordinary-differential equations (ODEs) given by
+dx
+dt = β + αxy,
+dy
+dt = γ + θy + ωxy −y2.
+(1)
+Let us assume that the real (dimensionless) parameters β, γ > 0 are positive, while α, θ, ω ∈R can
+be either positive or negative. Then, dynamical system (1) is an example of reaction-rate equations
+3
+
+
+(RREs) - ODEs that model time-evolution of concentrations of chemical species under suitable
+conditions [22]. In particular, x = x(t) ≥0 and y = y(t) ≥0 satisfying RREs (1) can be interpreted
+as (dimensionless) concentrations of some chemical species X and Y at time t ≥0, respectively.
+Chemical reactions. Each term on the right-hand side of the RREs (1) can be interpreted
+as the rate of a chemical reaction, which we summarize in Table 1. For example, the term β > 0
+from (1) can be interpreted as the rate of the reaction ∅
+β−→X, which describes a production of
+species X from some species which we do not explicitly model, and denote by ∅. On the other hand,
+no chemical reaction can be associated to the term β < 0 [59]. This information is summarized in
+the first row of Table 1. Similarly, in the second row and second column, it is shown that the term
+αxy from (1) can be interpreted as the rate of X +Y
+α−→2X +Y if α > 0. According to this reaction,
+when species X and Y react, one molecule of X is produced. Since then the molecular count of Y
+remains unchanged, we say that Y is a catalyst in the reaction. On the other hand, as presented in
+the second row and third column of Table 1, when α < 0, the term αxy can be interpreted as the
+rate of X + Y
+|α|
+−→Y , where |α| denotes the absolute value of α. According to this reaction, when X
+and Y react, one molecule of X is degraded with Y being a catalyst.
+Table 1: Chemical reactions induced by RREs (1).
+Term in RREs (1)
+Reaction for positive term
+Reaction for negative term
+β
+∅
+β−→X
+Never negative
+αxy
+X + Y
+α−→2X + Y
+X + Y
+|α|
+−→Y
+γ
+∅
+γ−→Y
+Never negative
+θy
+Y
+θ−→2Y
+Y
+|θ|
+−→∅
+ωxy
+X + Y
+ω−→X + 2Y
+X + Y
+|ω|
+−→X
+−y2
+Never positive
+2Y
+1−→Y
+The correspondence between RREs (1) and the chemical reactions, shown in Table 1, is called
+mass-action kinetics [22]: the rate of a reaction is given by the product of the concentrations
+of the reactants (species on the left-hand side of the reaction) multiplied by the rate coefficient
+- the positive number displayed above the reaction arrow. Let us note that the rate coefficient
+in −y2 from (1) is fixed to 1, and this term is never positive, as summarized in the final row of
+Table 1. Systems of chemical reactions, such as those presented in Table 1, are called chemical
+reaction networks (CRNs) under mass-action kinetics [22]. In this paper, we denote the chemical
+species by X1, X2, . . . , Y1, Y2, . . ., their concentrations by respectively x1, x2, . . . , y1, y2, . . ., and the
+rate coefficients of the underlying reactions by α, β, γ, θ, ω with appropriate subscripts; additional
+symbols are introduced when we consider experimental implementations of CRNs.
+Experimental implementation. In this paper, we focus on the mass-action chemical reactions
+of the form given in Table 1. All of these reactions have at most two reactants; consequently,
+the induced RREs have quadratic polynomials on the right-hand side, as in (1). However, let us
+stress that the abstract reactions from Table 1 cannot be experimentally implemented in their
+original form; for example, ∅−→X1 cannot be implemented as it contains a non-specific species ∅,
+while X + Y −→2X + Y cannot be implemented as it describes a catalytic production as a single
+chemical step. Nevertheless, CRNs consisting of any number of the abstract reactions from Table 1,
+including reactions that have the same reactants, but different products, such as X + Y −→2X + Y
+and X + Y −→Y , can be approximated by experimentally implementable CRNs [60–64]. This
+4
+
+
+approximation is achieved by introducing into the abstract CRNs suitable additional chemical species
+and reactions. In particular, one possible implementation is via DNA strand-displacement [62,63],
+or enzyme-aided DNA systems [64]. For more details, see Section 4.1 and Appendix C.
+2.2
+Artificial neural networks (ANNs)
+Artificial neural networks (ANNs) are systems of connected processing units called artificial neurons.
+In this paper, we consider a particular type of artificial neurons called the perceptron [43]. Given a
+set of inputs, a perceptron first applies an affine function, followed by a suitable non-linear function,
+called the activation function, to produce a single output. More precisely, reusing some of the
+symbols from Section 2.1, let x1, x2, . . . , xN ∈R be the input values, ω1, ω2, . . . , ωN ∈R the weights,
+θ ∈R a bias, and σ : R →R a suitable non-linear function. Then, the perceptron is a function
+y : RN →R defined as
+y(x1, . . . , xN) = σ
+
+
+N
+X
+j=1
+ωjxj + θ
+
+.
+(2)
+Chemical perceptron. A natural question arises: is there a CRN with single species Y such
+that its RRE has a unique stable equilibrium of the form (2)? Such an RRE has been put forward
+and analysed in [29], and is given by
+dy
+dt = γ +
+
+
+N
+X
+j=1
+ωjxj + θ
+
+y −y2,
+(3)
+where x1, x2, . . . , xN are parameters. Since PN
+j=1 ωjxj + θ has a fixed sign, one can readily use
+Table 1 to write down a CRN corresponding to (3). We call the species Y with concentration y
+satisfying (3) a chemical perceptron. Setting the left-hand side in (3) to zero, one finds that the
+perceptron concentration has a globally stable equilibrium y∗, given by
+y∗= σγ
+
+
+N
+X
+j=1
+ωjxj + θ
+
+≡1
+2
+
+
+
+
+N
+X
+j=1
+ωjxj + θ
+
++
+v
+u
+u
+u
+t
+
+
+N
+X
+j=1
+ωjxj + θ
+
+
+2
++ 4γ
+
+.
+(4)
+We call σγ with γ > 0 a chemical activation function. In this paper, we allow any γ > 0, but
+note that σγ approaches the rectified linear unit (ReLU) activation function in the special case as
+γ →0 [29], which is a common choice in the ANN literature [5].
+3
+Recurrent neural chemical reaction networks (RNCRNs)
+Let us consider a target ODE system with initial conditions, given by
+d¯xi
+dt = fi(¯x1, . . . , ¯xN),
+¯xi(0) = ai ≥0,
+for i = 1, 2, . . . , N.
+(5)
+In what follows, we call the ODE right-hand side (f1, f2, . . . , fN) a vector field, which we assume
+is sufficiently smooth. Without loss of generality, we assume that (5) has desirable dynamical
+features in the positive orthant RN
+>. If such features are located elsewhere, a suitable affine change
+of coordinates can be used to move these features to the positive orthant [59].
+5
+
+
+We wish to find a neural CRN with some chemical species X1, . . . , XN whose concentrations
+approximate the solutions of the target ODEs (5). Inspired by the chemical perceptron (3), let us
+consider the RREs and initial conditions given by
+dxi
+dt = βi + xi
+M
+X
+j=1
+αi,jyj,
+xi(0) = ai,
+for i = 1, 2, . . . , N,
+dyj
+dt = γ
+µ + θj
+µ yj +
+ N
+X
+i=1
+ωj,i
+µ xi
+!
+yj −1
+µy2
+j ,
+yj(0) = bj,
+for j = 1, 2, . . . , M.
+(6)
+We call the CRN corresponding to the RREs (6) a recurrent neural chemical reaction network
+(RNCRN), and display it schematically in Figure 1. The RNCRN consists of two sub-networks:
+the executive system and the neural system. The executive system contains chemical reactions
+which directly change the executive species X1, X2, . . . , XN. Note that the initial conditions for the
+executive species from (6) match the target initial conditions from (5). On the other hand, the
+neural system contains the reactions which directly influence the auxiliary species Y1, Y2, . . . , YM,
+for which we allow arbitrary initial conditions b1, b2, . . . , bM ≥0. These species can be formally
+identified as chemical perceptrons, see (3). However, let us stress that the RRE (3) depends on the
+parameters x1, x2, . . . , xN. In contrast, the concentrations of chemical perceptrons from the RNCRN
+depend on the time-dependent executive variables x1(t), x2(t), . . . , xN(t), which in turn depend on
+the perceptron concentrations y1(t), y2(t), . . . , yM(t). In other words, there is a feedback between the
+executive and neural systems, giving the RNCRN a recurrent character. This feedback is catalytic in
+nature: the chemical perceptrons are catalysts in the executive system; similarly, executive species
+are catalysts in the neural system.
+Main result: Universal approximation. We now wish to choose the parameters in the
+RNCRN so that the concentrations of the executive species xi(t) from (6) are close to the target
+variables ¯xi(t) from (5). Key to achieving this match is the parameter µ > 0, which sets the speed
+at which the perceptrons equilibrate relative to the executive system. This speed can be formally set
+to be infinite by multiplying the RREs for the perceptrons in (6) by µ and then fixing µ = 0. These
+RREs then become algebraic equations, whose solutions are given by y∗
+j = σγ(PN
+i=1 ωj,ixi + θj),
+where σγ is of the form (4). We then say that the chemical perceptrons are in the quasi-static state.
+In this case, the executive species are governed by the reduced ODEs, given by
+d˜xi
+dt = gi(˜x1, . . . , ˜xN) = βi + ˜xi
+M
+X
+j=1
+αi,jσγ
+ N
+X
+k=1
+ωj,k˜xk + θj
+!
+, ˜xi(0) = ai, for i = 1, 2, . . . , N. (7)
+This reduced system allows us to prove that the RNCRN can in principle be fine-tuned to execute
+the target dynamics arbitrarily closely. In particular, to achieve this task, we follow two steps.
+Firstly, we assume that the chemical perceptrons are in the quasi-static state, i.e. we consider
+the reduced system (7). Using the classical (static) theory from ANNs, it follows that the rate
+coefficients from the RNCRN can be fine-tuned so that the vector field from the reduced system (7)
+is close to that of the target system (5). To ensure a good vector field match, one in general requires
+sufficiently many chemical perceptrons. We call this first step the quasi-static approximation.
+Secondly, we disregard the assumption that the chemical perceptrons are in the quasi-static
+state, i.e. we consider the full system (6). Nevertheless, we substitute into the full system the rate
+coefficients found in the first step. Using perturbation theory, it follows that, under this parameter
+choice, the concentrations of the executive species from the full system (6) approximate the dependent
+6
+
+
+variables from the target system (5) arbitrarily closely, provided that the chemical perceptrons fire
+sufficiently (but finitely) fast. We call this second step the dynamical approximation.
+In summary, the RNCRN induced by (6) with sufficiently many chemical perceptrons (M ≥1
+large enough) which act sufficiently fast (µ > 0 small enough) can execute any target dynamics.
+This universal approximation result is stated rigorously and proved in Appendix A.
+4
+Examples
+In Section 3, we have outlined a two-step procedure used to prove that RNCRNs can theoretically
+execute any desired dynamics. Aside from being of theoretical value, these two steps also form a
+basis for a practical method to train RNCRNs, which is presented as Algorithm 1. In this section, we
+show that Algorithm 1 can be used to train RNCRNs with a relatively small number of perceptrons
+M and moderate perceptron speed µ to achieve predefined multi-stability, oscillations, and chaos.
+Fix a target system (5) and target compact sets K1, K2, . . . , KN ⊂(0, +∞). Fix also the rate
+coefficients β1, β2, . . . , βN ≥0 and γ > 0 in the RNCRN system (6).
+(a) Quasi-static approximation. Fix a tolerance ε > 0. Fix also the number of perceptrons M ≥
+1. Using the backpropagation algorithm [65], find the coefficients α∗
+i,j, θ∗
+j, ω∗
+j,i for i = 1, 2, . . . , N,
+j = 1, 2, . . . , M, such that (mean-square) distance between (fi(x1, x2, . . . , xN) −βi)/xi and
+PM
+j=1 α∗
+i,jσγ
+PN
+k=1 ω∗
+j,kxk + θ∗
+j
+
+is within the tolerance for (x1, x2, . . . , xN) ∈K1 × K2 × . . . ×
+KN. If the tolerance ε is not met, then repeat step (a) with M + 1.
+(b) Dynamical approximation. Substitute αi,j = α∗
+i,j, θj = θ∗
+j, ωj,i = ω∗
+j,i into the RNCRN (6).
+Fix the initial conditions a1, a2, . . . , aM ≥0, b1, b2, . . . , bM ≥0, and time T > 0. Fix also the
+speed 0 < µ ≪1 of the perceptrons. Numerically solve the target system (5) and the RNCRN
+system (6) over the desired interval [0, T]. Time T > 0 must be such that ¯xi(t), xi(t) ∈Ki for
+all t ∈[0, T] for i = 1, 2, . . . , N. If ¯xi(t) and xi(t) are sufficiently close according to a desired
+criterion for all i, then terminate the algorithm. Otherwise, repeat step (b) with a smaller µ.
+If no desirable µ is found, then go back to step (a) and choose a smaller ε.
+Algorithm 1: Two-step algorithm for training the RNCRN. See Appendix F for pseudocode.
+4.1
+Multi-stability
+Let us consider the one-variable target ODE
+d¯x1
+dt = f1(¯x1) = sin(¯x1),
+¯x1(0) = a1 ≥0.
+(8)
+This system has infinitely many equilibria, which are given by ¯x∗
+1 = nπ for integer values of n. The
+equilibria with even n are unstable, while those with odd n are stable.
+Bi-stability. Let us now apply Algorithm 1 on the target system (8), in order to find an
+associated bi-stable RNCRN. In particular, let us choose the target region to be K1 = [1, 12], which
+includes two stable equilibria, π and 3π, and one unstable equilibrium, 2π. We arbitrarily fix the
+free rate coefficients to β1 = 0 and γ = 1.
+7
+
+
+(a) Quasi-static approximation. Let us apply the first step from Algorithm 1. We find that the
+tolerance ε ≈10−3 can be met with M = 3 chemical perceptrons, if the rate coefficients α1,j, θj, ωj,1
+in the reduced ODE (7) are chosen as follows:
+d˜x1
+dt = g1(˜x1) = −0.983σ1 (−1.167˜x1 + 7.789) ˜x1
+−0.050σ1 (0.994˜x1 −1.918) ˜x1
++ 2.398σ1 (−0.730˜x1 + 3.574) ˜x1.
+(9)
+In Figure 2(a), we display the vector fields of the target (8) and reduced system (9). One can
+notice an overall good match within the desired set K1 = [1, 12], shown as the unshaded region. As
+expected, the approximation is poor outside of K1; furthermore, for the given tolerance, the accuracy
+is also reduced near the right end-point of the target set.
+0
+π
+2π
+3π
+4π
+5π
+6π
+7π
+8π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(a)
+Bi-stable dynamics
+f(x1)
+g(x1)
+0
+1
+2
+3
+4
+5
+Time t
+0
+π
+2π
+3π
+4π
+5π
+6π
+7π
+8π
+x1(t)
+(b)
+Bi-stable trajectories
+¯x1(t)
+x1(t)
+0
+π
+2π
+3π
+4π
+5π
+6π
+7π
+8π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(c)
+Tri-stable dynamics
+f(x1)
+g(x1)
+0
+1
+2
+3
+4
+5
+Time t
+0
+π
+2π
+3π
+4π
+5π
+6π
+7π
+8π
+x1(t)
+(d)
+Tri-stable trajectories
+¯x1(t)
+x1(t)
+Figure 2: RNCRN approximations of the multi-stable target system (8). (a) The vector field of
+the target system (8) and reduced bi-stable system (9) when K1 = [1, 12]. (b) Solutions ¯x1(t) of
+the target system (8), and x1(t) of the full system (10) with µ = 0.01. Analogous plots are shown
+in panels (c) and (d) for the tri-stable RNCRN over K1 = [1, 18] presented in Appendix B.1, with
+reduced and full ODEs given respectively by (27) and (28), with coefficients (26) and µ = 0.01. In
+panels (b) and (d), the initial concentrations of all chemical perceptrons are set to zero.
+(b) Dynamical approximation. Let us apply the second step from Algorithm 1. Using the
+8
+
+
+coefficients from (9), we now form the full ODEs (6):
+dx1
+dt = −0.983x1y1 −0.050x1y2 + 2.398x1y3,
+x1(0) = a1 ∈K1,
+dy1
+dt = 1
+µ + 7.789
+µ
+y1 −1.167
+µ
+x1y1 −1
+µy2
+1,
+y1(0) = b1 ≥0,
+dy2
+dt = 1
+µ −1.918
+µ
+y2 + 0.994
+µ
+x1y2 −1
+µy2
+2,
+y2(0) = b2 ≥0,
+dy3
+dt = 1
+µ + 3.574
+µ
+y3 −0.730
+µ
+x1y3 −1
+µy2
+3,
+y3(0) = b3 ≥0.
+(10)
+We fix the initial conditions arbitrarily to b1 = b2 = b3 = 0, the desired final-time to T = 5 and the
+perceptron speed to µ = 0.01. We then numerically integrate (8) and (10) over t ∈[0, 5] for a fixed
+initial concentration a1 ∈K1 of the executive species, and plot the solutions ¯x(t) and x(t); the same
+computations are then repeated for various values of a1, which we display in Figure 2(b). One can
+notice that the RNCRN underlying (10) with µ = 0.01 accurately approximates the solutions of the
+target system; in particular, we observe bi-stability.
+Tri-stability. One can similarly apply Algorithm 1 to (8) to obtain tri-stable RNCRNs. In
+particular, let us consider a larger set K1 = [1, 18], which includes three stable equilibria, π, 3π,
+and 5π, and two unstable equilibria, 2π and 4π. Applying Algorithm 1, we find an RNCRN with
+M = 4 chemical perceptrons, which with µ = 0.01 displays the desired tri-stability, as displayed in
+Figure 2(c)–(d); see Appendix B.1 for more details. In a similar manner, Algorithm 1 can be used
+to achieve RNCRNs with arbitrary number of stable equilibria; see Appendix B.1.
+DNA-strand-displacement implementation. As outlined in Section 2.1, the RNCRN consists
+of abstract reactions, which must be appropriately enlarged for experimental implementations. As a
+demonstration, let us implement the RNCRN corresponding to the RREs (10) via an experimentally
+feasible DNA-strand-displacement system [62].
+In this framework, e.g.
+the abstract reaction
+X1 +Y2
+1.988
+−−−→X1 +2Y2, induced by the term (0.994/µ)x1y2 with µ = 0.5 from (10), is approximated
+with a system of 4 reactions involving 7 species, given by
+X1 + L1
+1.988
+−−−⇀
+↽−−−
+fast H1 + B1,
+Y2 + H1
+fast
+−−→O1,
+O1 + T1
+fast
+−−→X1 + 2Y2.
+(11)
+Here, we denote the two irreversible reactions X1 + L1
+1.988
+−−−→H1 + B1 and H1 + B1
+fast
+−−→X1 + L1
+as a single reversible one; furthermore, some of the rate coefficients are described qualitatively as
+sufficiently “fast”, see Appendix C for more details. Species X1, Y1, B1 and O1 can be interpreted as
+suitable single-stranded DNA molecules, while L1, H1, T1 as double-stranded DNA complexes; see
+Figure 3(a), where we display the DNA-based approximation (11) schematically.
+In Appendix C, we approximate every reaction from the RNCRN induced by RREs (10) with a
+system of DNA-based reactions, such as (11); furthermore, we fix the perceptron speed to µ = 0.5.
+For the resulting network, which we call the DNA-RNCRN, we assume that time and concentrations
+have units; furthermore, we rescale these quantities so that the concentrations of the DNA-species and
+rate coefficients fit within the physically admissible ranges [62]. By design, the DNA-RNCRN relies
+on suitable DNA species (e.g. L1, B1, T1 from (11)) being present at sufficiently high concentrations.
+Being depleted over time, these fuel species must in general be replenished, e.g. by coupling the
+DNA-RNCRN to a chemostat [62]. In this paper, we do not model the replenishment process
+explicitly; instead, for simplicity, we assume that the fuel species are held constant. The resulting
+approximating constant-fuel RNCRN is given by (40) in Appendix C. In Figure 3(b), we display the
+concentration of the executive species from the constant-fuel DNA-RNCRN, demonstrating that
+9
+
+
+bistability is accurately replicated within experimentally feasible range. See Appendix C for more
+details, including a simulation of the DNA-RNCRN without the constant-fuel assumption.
+𝑋1
++
+1.988
+𝑓𝑎𝑠𝑡
++
+𝐵1
+𝐿1
+𝐻1
+𝑌2
++
+𝐻1
+𝑓𝑎𝑠𝑡
+𝑂1
+𝑋1
+𝑌2
+𝑌2
+𝑓𝑎𝑠𝑡
+𝑇1
+𝑂1
++
+(a)
++
++
+0
+6
+12 18 24 30 36 42 48 54 60
+Time t [hours]
+0
+25
+50
+75
+100
+125
+¯¯x1(t) [nM]
+(b)
+DNA bi-stable trajectories
+RNCRN
+Constant-fuel DNA-RNCRN
+Figure 3: DNA-strand-displacement implementation of the RNCRN with RREs (10) with µ = 0.5.
+(a) Domain-level representation of the DNA system (11), which approximates the bi-molecular
+reaction X1 + Y2
+1.988
+−−−→X1 + 2Y2. (b) Shown in purple is the concentrations ¯¯x1(t) of the executive
+species from a rescaled version of the RREs (10), given by (35) in Appendix C. Also shown in green
+is the corresponding concentration of the executive species from the constant-fuel RNCRN given
+by (40) in Appendix C. The concentrations are measured in nanomoles (nM), while time in hours.
+4.2
+Oscillations
+Let us consider the two-variable target ODE system
+d¯x1
+dt = f1(¯x1, ¯x2) = 6 + 4J0
+3
+2 ¯x1
+
+−¯x2,
+¯x1(0) = a1 ≥0,
+d¯x2
+dt = f2(¯x1, ¯x2) = ¯x1 −4,
+¯x2(0) = a2 ≥0,
+(12)
+were J0(¯x1) is the Bessel function of the first kind. Numerical simulations suggest that (12) has an
+isolated oscillatory solution, which we display as the blue curve in the (¯x1, ¯x2)-space in Figure 4(a);
+also shown as grey arrows is the vector field, and as the unshaded box we display the desired region
+of interest K1 × K2 = [1, 8] × [2, 10]. In Figure 4(c), we show as solid blue curves this oscillatory
+solution in the (t, ¯x1)- and (t, ¯x2)-space.
+Using Algorithm 1, we find an RNCRN with M = 6 chemical perceptrons, whose dynamics with
+µ = 0.01 qualitatively matches that of the target system (12) within K1 × K2; see Appendix B.2 for
+details. We display the solution of this RNCRN as the purple curve in Figure 4(b)–(c).
+10
+
+
+0
+5
+10
+State ¯x1
+0
+5
+10
+State ¯x2
+(a)
+Target system
+0
+5
+10
+State x1
+0
+5
+10
+State x2
+(b)
+RNCRN approximation
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+(c)
+x1(t) trajectories
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x2(t)
+x2(t) trajectories
+Figure 4: RNCRN approximation of the oscillatory target system (12). (a) The vector field of (12)
+is shown as grey arrows, the target region K1 × K2 = [1, 8] × [2, 10] as the unshaded box, and the
+solution of (12) with ¯x1(0) = 2 and ¯x2(0) = 4 in blue. (b) Analogous plot is shown for the RNCRN
+from Appendix B.2, whose reduced and full ODEs are given respectively by (30) and (31), with
+coefficients (29) and µ = 0.01. In particular, displayed as grey arrows is the vector field of the
+reduced ODEs (30), together with an oscillatory solution of the full ODEs (31) shown in purple; for
+comparison, we also display as dashed blue curve the oscillatory solution of (12). (c) Solutions ¯x1(t)
+and x1(t), and ¯x2(t) and x2(t). The initial concentrations of all perceptrons are fixed to zero.
+Robustness. When implementing RNCRNs, the underlying rate coefficients and initial conditions
+cannot be experimentally fine-tuned with perfect accuracy. Therefore, it is of great importance to
+study how the dynamics of RNCRNs behaves under the parameter perturbations. A detailed analysis
+of this problem is beyond the scope of this paper. As a step forward, we numerically investigate
+sensitivity of the oscillatory solution of the RNCRN from Appendix B.2, which approximates the
+target system (12); see Appendix D for details. In particular, we perturb all the rate coefficients in
+the RNCRN by up to 50%, and compute the fraction of such perturbed RNCRNs that qualitatively
+retain the periodic solution as a function of the perturbation noise. The results for the RNCRN
+with µ = 0.1 are presented in Figure 5(a) in purple, with example trajectories in Figure 5(b); we
+observe that e.g. around 35% of systems still oscillate when the coefficients are perturbed by 10%.
+Also shown in Figure 5(a) in green are the results for the underlying quasi-static approximation,
+formally obtained by setting µ = 0. One can notice that this approximation shows a similar degree of
+robustness, suggesting that the perceptron speed is not a major source of sensitivity. This observation
+is confirmed in Figure 5(c)–(d), which shows that the RNCRN is insensitive to a broad range of
+perturbations in µ. Robustness over a broad range of perturbations can also be observed with respect
+to the initial conditions, see Figure 5(e)–(f).
+Noisy training. Figure 5 demonstrates that the RNCRN from Appendix B.2, while not being
+pathologically sensitive to the perturbations in the rate coefficients, is nevertheless much more
+vulnerable to such perturbations than those in perceptron speed and initial conditions. Let us
+now demonstrate that, by slightly modifying Algorithm 1, the rate-coefficient robustness can be
+significantly improved. In particular, step (a) of Algorithm 1 approximates the target vector field
+from (12) with the deterministic reduced vector field from (7). In Appendix D.4, we modify this
+step, by introducing suitable stochastic perturbations into the reduced vector field. We apply this
+noisy version of Algorithm 1 to design a new RNCRN, presented in Appendix D.4, which also
+contains M = 6 chemical perceptrons and approximates (12). This noise-trained RNCRN displays a
+significantly better robustness profile, as demonstrated in yellow in Figure 5(a); in particular, now
+almost all of the systems still oscillate when the rate coefficients are perturbed by 10%, and more
+11
+
+
+than 60% oscillate when the coefficients are perturbed by as much as 50%.
+0
+5 10 15 20 25 30 35 40 45 50
+Noise η [%]
+0
+20
+40
+60
+80
+100
+Proportion oscillating [%]
+(a)
+Rate-coefficient robustness
+Quasi-static
+RNCRN µ = 0.1
+Noise-trained RNCRN µ = 0.1
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Parameter µ
+False
+True
+Oscillating [True/False]
+(c)
+Perceptron-speed robustness
+0 10 20 30 40 50 60 70 80 90 100
+Noise η [%]
+99
+100
+Proportion oscillating [%]
+(e)
+Initial-condition robustness
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+(b)
+Oscillating at η = 10%
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+(d)
+µ = 0.01
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+(f)
+η = 10%
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+Not oscillating at η = 10%
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+µ = 1
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+η = 100%
+Figure 5: Robustness of RNCRNs approximating oscillatory target system (12). (a) Proportion of
+RNCRNs with perturbed rate coefficients that retain oscillations as a function of the perturbation
+noise. This proportion is shown in green for the quasi-static approximation (30), in purple for the
+corresponding RNCRN (31) with µ = 0.1, and in yellow for the noise-trained RNCRN (46) with
+µ = 0.1; see Appendix D.1 and D.4 for more details. Example trajectories of the RNCRN (31) which
+retain and do not retain oscillations are shown in purple in panel (b), together with the corresponding
+solutions of (12) in blue. (c) Preservation of oscillations in the RNCRN (31) as parameter µ is varied,
+with example trajectories shown in panel (d); see Appendix D.2 for more details. (e) Proportion of
+the RNCRNs (31) with perturbed initial conditions that retain oscillations, with example trajectories
+shown in panel (f); see Appendix D.3 for more details. Each point in panels (a), (c) and (e) was
+obtained by considering 104 independently perturbed RNCRNs.
+4.3
+Chaos
+As our final example, we consider the three-variable target ODE system
+d¯x1
+dt = f1(¯x1, ¯x2, ¯x3) = 2.5¯x1(1 −1.5¯x1) −4¯x1¯x2
+1 + 3¯x1
+,
+¯x1(0) = 0.25,
+d¯x2
+dt = f2(¯x1, ¯x2, ¯x3) = −0.4¯x2 + 4¯x1¯x2
+1 + 3¯x1
+−4¯x2¯x3
+1 + 3¯x2
+,
+¯x2(0) = 0.25,
+d¯x3
+dt = f3(¯x1, ¯x2, ¯x3) = −0.6¯x3 + 4¯x2¯x3
+1 + 3¯x2
+,
+¯x3(0) = 0.25.
+(13)
+ODEs (13) are known as the Hasting-Powell system [66], and have been reported to exhibit chaotic
+behaviour. We present a portion of the state-space of (13) in Figure 6(a).
+12
+
+
+Using Algorithm 1, we find an RNCRN with M = 5 chemical perceptrons to approximate the
+dynamics of the Hasting-Powell system (13) over the compact set x1 ∈K1, x2 ∈K2 and x2 ∈K3
+with K1 = K2 = K3 = [0.01, 1]. The parameters and the RREs can be found in Appendix B.3. The
+state-space for the executive species from the RNCRN is presented in Figure 6(b) when µ = 0.1,
+suggesting presence of a chaotic attractor, in qualitative agreement with Figure 6(a). In Figure 6(c),
+we display the underlying time-trajectories. Let us note that alignment of the trajectories is not
+expected for long intervals of time due to the chaotic nature of the target system.
+0
+20
+40
+60
+80
+Time t
+0.0
+0.5
+1.0
+x1(t)
+(c)
+x1(t) trajectories
+0
+20
+40
+60
+80
+Time t
+0.0
+0.5
+1.0
+x2(t)
+x2(t) trajectories
+0
+20
+40
+60
+80
+Time t
+0.0
+0.5
+1.0
+x3(t)
+x3(t) trajectories
+¯x1
+0
+1
+¯x2
+0
+1
+¯x3
+0
+1/2
+(a)
+Target system
+x1
+0
+1
+x2
+0
+1
+x3
+0
+1/2
+(b)
+RNCRN approximation
+Figure 6: RNCRN approximation of the target system (13) with a chaotic attractor. (a) Solution
+of (13) in the state-space. (b) Solution of the RNCRN RREs (34) in the state-space, with coeffi-
+cients (32), µ = 0.1, initial conditions x1(0) = x2(0) = x3(0) = 0.25, and zero initial conditions for
+all perceptrons. (c) Target and executive solutions ¯xi(t) and xi(t) for i = 1, 2, 3.
+5
+Discussion
+In this paper, we have introduced a class of chemical reaction networks (CRNs) that can be trained
+to approximate the dynamics of any well-behaved system of ordinary-differential equations (ODEs).
+These recurrent neural chemical reaction networks (RNCRNs) operate by continually actuating
+the concentrations of the executive species such that they adhere to the target vector field which
+has been encoded by a faster system of chemical perceptrons. In Appendix A, we have proven the
+approximation abilities of RNCRNs. Based on this result, we have put forward Algorithm 1 for
+training RNCRNs, which relies on the backpropagation algorithm from the theory of artificial neural
+networks (ANNs). Due to the nature of backpropagation, Algorithm 1 is not guaranteed to find an
+optimal solution; nevertheless, it proved effective for the target systems presented in this paper. In
+particular, in Section 4, we showcased examples of RNCRNs that replicate sophisticated dynamical
+13
+
+
+behaviors with no more than six chemical perceptrons, governed by reactions which fire at most two
+orders of magnitude faster than those governing the executive species.
+For target systems of ODEs with purely polynomial right-hand sides, there exist a number of
+other methods, which we call chemical maps, to design dynamically-equivalent CRNs [59,67–73].
+CRNs designed using these chemical maps have analytically determined rate coefficients, i.e. they do
+not require numerical methods, such as the backpropagation algorithm, for this purpose; furthermore,
+these CRNs can involve less auxiliary species than RNCRNs. However, an advantage of RNCRNs
+is their ANN-based ability to replicate the dynamics of, not only ODEs with polynomial, but also
+non-polynomial right-hand sides, the latter of which can display a richer set of dynamical behaviors
+compared to the former. In Section 4, we have exploited this fact by considering example ODEs
+that contain a mixture of polynomial and non-polynomial terms. Let us also note that the structure
+of CRNs obtained via chemical maps depends on the given target ODE system. On the other hand,
+RNCRNs have a fixed structure, independent of the complexity of the target system, only relying on
+the reactions from Table 1; this modularity may be beneficial for experimentally building RNCRNs.
+For target systems of ODEs with non-polynomial right-hand sides, there also exists an alternative
+scheme. In particular, under this scheme, one first maps the non-polynomial ODEs to polynomial
+ones [74], which is then followed by an application of a desired chemical map. Similar to RNCRNs,
+this scheme also introduces auxiliary variables to achieve the desired dynamics. However, in stark
+contrast to RNCRNs, owing to the map from [74], this alternative scheme displays a particular
+fragility: the initial conditions for the auxiliary species are constrained to particular values, and
+some deviations may cause some species concentrations to blow-up. In Appendix E, we demonstrate
+such chemically hazardous events when the scheme is applied to the target system (8). This fragility
+not only requires high-precision calibration of the initial conditions, but also effectively requires the
+preparation of an entirely different experiment for different executive species initial conditions. In
+contrast, no such adjustment of the auxiliary species is necessary for RNCRNs.
+While certain properties of RNCRNs are experimentally desirable, such as modularity and
+robustness in initial concentrations of the auxiliary species (which form the bulk of initial conditions),
+there are several challenges present in chemistry that are not present in traditional electronic-based
+ANNs; in what follows, we focus on DNA-strand-displacement technologies [62]. Firstly, adding a
+perceptron or a new connection to an ANN is trivial compared to adding a chemical perceptron
+or a reaction to an RNCRN, which requires engineering a chemical species with specific reactivity.
+Secondly, compared to electronic circuits, chemical systems are much more prone to unintended
+interactions, so that the modularity of each chemical perceptron might break down as the network
+scales in size [18]. Finally, the weight parameters and inputs of an ANN can be fine-tuned to a
+high degree of precision. However, despite techniques to modulate the effective rates of chemical
+reactions, the calibration is significantly less precise than in electronic circuits [75,76], and the same
+is true for the initial conditions [50]. In this context, it is important to study how the dynamics
+of RNCRNs respond to perturbations in both the rate coefficients and all the initial conditions.
+In Section 4.2 and Appendix D, we have performed a preliminary study of this problem, showing
+favorable results; more detailed studies will form a part of future work. Let us also note that, in
+the light of the experimental challenges, we have focused in this paper on the single-layer (shallow)
+RNCRNs. In Appendix A, we have also presented multi-layer (deep) RNCRNs; in future work, we
+will study whether such deep RNCRNs have sufficiently advantageous approximation abilities to
+justify the additional experimental complexity.
+Despite the various experimental challenges, DNA-strand-displacement technologies have been
+used to build intricate chemical systems of great complexity. In particular, under this framework,
+arbitrary bi-molecular CRNs, whose rate coefficients span up to six orders of magnitude [75], can
+14
+
+
+be implemented, and this approach has been used to build chemical systems with more than 100
+species [35,36]. In Section 4.1 and Appendix C, we have implemented an RNCRN via DNA-strand-
+displacement under experimentally feasible conditions. In this context, a natural extension is the
+addition of enzymes, which can enhance the capabilities of the DNA circuits. For example, RNA
+polymerase has been used to continually produce strand displacement components [77,78], while
+strand-displacing polymerase [64] and the trio of polymerase, endonuclease and nickase (PEN) [42,52]
+can also be used to realize a range of chemical reactions. Such enzyme-based approaches have the
+potential to enable more universal, easily supplied fuel (in the form of nucleotide triphosphates) to
+maintain the concentrations of suitable auxiliary components for longer intervals of time, as well as
+to speed-up some of the underlying reactions.
+We have used DNA strand-displacement to demonstrate experimental implementability of
+RNCRNs. More broadly, RNCRNs can be implemented with different physical media, provided
+the existence of a compilation framework from CRNs to such media [62–64].
+Therefore, the
+results presented in this paper have the potential to generalize to other nanotechnological and
+synthetic biological contexts. In particular, given that RNCRNs contain slow and fast species, it is
+natural to consider architectures that operate over multiple time-scales. Important examples are
+transcription-factor networks. These networks have been shown to leverage the innate difference
+in the speed between the slow protein production and degradation, and the fast protein-protein
+interactions [56]; furthermore, the transcription-factor binding sites display dose thresholding
+reminiscent of a perceptron [79]. In this context, one can envisage the total concentration of
+each protein as the (slow) executive species concentration, and the concentrations of particular
+conformational states of the proteins as the (fast) chemical perceptron concentrations. Since the
+ODE models of transcription-factor networks have on the right-hand side rational functions, and not
+polynomials, the underlying activation function would be different from the one considered in this
+paper. Nevertheless, the results we present in Appendix A readily generalize to any non-polynomial
+activation function, allowing for construction of RNCRN-like networks based on transcription factors.
+Beyond chemistry and genetic circuits, RNCRNs may also find applications in immunology [80] and
+population dynamics [81]. In particular, let us note that the ODEs describing microbial cellular
+communities [82] are reminiscent of those governing chemical perceptrons presented in this paper.
+6
+Acknowledgements
+Author Contributions: AD, BQ, TEO, and TP conceptualization the study; AD and TP preformed the
+mathematical analyses; AD preformed the numerical simulations and produced the figures; AD and TP wrote
+the paper; BQ and TEO reviewed the paper.
+Funding: Alexander Dack acknowledges funding from the Department of Bioengineering at Imperial College
+London. Benjamin Qureshi was funded by the European Research Council (ERC) under the European
+Union’s Horizon 2020 research and innovation program (Grant agreement No. 851910). Thomas E. Ouldridge
+would like to thank the Royal Society for a University Research Fellowship. Tomislav Plesa would like to
+thank Peterhouse, University of Cambridge, for a Fellowship.
+Declaration of interests: The authors declare no competing interests.
+Acknowledgments: We thank Chris P. Barnes and Kathleen J. Y. Zhang for useful discussions about
+synthetic microbial communities.
+Data and code availability: Data and code to be made available in a public repository with a DOI
+upon publication. During the review process you may access the following GitHub repository [83]: https:
+//github.com/alexdack/recurrent_neural_chemical_reaction_networks.
+15
+
+
+References
+[1] W. S. McCulloch and W. Pitts, “A logical calculus of ideas immanent in nervous activity,”
+Bulletin of Mathematical Biophysics, vol. 5, pp. 115–133, 1943.
+[2] G. Cybenko, “Approximation by superpositions of a sigmoidal function,” Mathematics of Control,
+Signals, and Systems, vol. 2, pp. 303–314, 1989.
+[3] K. Hornik, M. Stinchcombe, and H. White, “Multilayer feedforward networks are universal
+approximators,” Neural Networks, vol. 2, pp. 359–366, 1989.
+[4] A. Pinkus, “Approximation theory of the MLP model in neural networks,” Acta Numerica,
+vol. 8, pp. 143–195, 1999.
+[5] Y. LeCun, Y. Bengio, and G. Hinton, “Deep learning,” Nature, vol. 521, pp. 436–444, 2015.
+[6] R. T. Q. Chen, Y. Rubanova, J. Bettencourt, and D. Duvenaud, “Neural Ordinary Differential
+Equations,” 2018.
+[7] J. J. Hopfield, “Neurons with graded response have collective computational properties like those
+of two-state neurons.,” Proceedings of the National Academy of Sciences, vol. 81, pp. 3088–3092,
+May 1984.
+[8] D. Krotov and J. Hopfield, “Large Associative Memory Problem in Neurobiology and Machine
+Learning,” Apr. 2021. arXiv:2008.06996.
+[9] L. Perko, “Differential equations and dynamical systems,” 3rd Edition, Springer-Verlag, 2001.
+[10] K.-i. Funahashi and Y. Nakamura, “Approximation of dynamical systems by continuous time
+recurrent neural networks,” Neural Networks, vol. 6, pp. 801–806, Jan. 1993.
+[11] J. Pathak, B. Hunt, M. Girvan, Z. Lu, and E. Ott, “Model-Free Prediction of Large Spatiotempo-
+rally Chaotic Systems from Data: A Reservoir Computing Approach,” Physical Review Letters,
+vol. 120, p. 024102, Jan. 2018.
+[12] M. Kimura and R. Nakano, “Learning dynamical systems by recurrent neural networks from
+orbits,” Neural Networks, vol. 11, pp. 1589–1599, Dec. 1998.
+[13] M.-a. Sato and Y. Murakami, “Learning nonlinear dynamics by recurrent neural networks (some
+problems on the theory of dynamical systems in applied sciences),” 数理解析研究所講究録,
+vol. 760, pp. 71–87, 1991.
+[14] M. A. Bucci, O. Semeraro, A. Allauzen, G. Wisniewski, L. Cordier, and L. Mathelin, “Con-
+trol of chaotic systems by deep reinforcement learning,” Proceedings of the Royal Society A:
+Mathematical, Physical and Engineering Sciences, vol. 475, p. 20190351, 2019.
+[15] L. Cardelli, M. Tribastone, and M. Tschaikowski, “From electric circuits to chemical networks,”
+Natural Computing, vol. 19, pp. 237–248, 2020.
+[16] A. Arkin and J. Ross, “Computational functions in biochemical reaction networks,” Biophysical
+Journal, vol. 67, pp. 560–578, 1994.
+[17] G. Seelig, D. Soloveichik, D. Y. Zhang, and E. Winfree, “Enzyme-Free Nucleic Acid Logic
+Circuits,” Science, vol. 314, pp. 1585–1588, 2006.
+16
+
+
+[18] L. Qian and E. Winfree, “Scaling Up Digital Circuit Computation with DNA Strand Displacement
+Cascades,” Science, vol. 332, pp. 1196–1201, 2011.
+[19] D. Del Vecchio, A. J. Dy, and Y. Qian, “Control theory meets synthetic biology,” Journal of
+The Royal Society Interface, vol. 13, p. 20160380, 2016.
+[20] C. Briat, A. Gupta, and M. Khammash, “Antithetic Integral Feedback Ensures Robust Perfect
+Adaptation in Noisy Biomolecular Networks,” Cell Systems, vol. 2, pp. 15–26, 2016.
+[21] T. Plesa, G.-B. Stan, T. E. Ouldridge, and W. Bae, “Quasi-robust control of biochemical reaction
+networks via stochastic morphing,” Journal of The Royal Society Interface, vol. 18, p. 20200985,
+2021.
+[22] M. Feinberg, “Lecture notes on chemical reaction networks,” Lecture Notes, Mathematics
+Research Center, University of Wisconsin-Madison, 1979.
+[23] A. Hjelmfelt, E. D. Weinberger, and J. Ross, “Chemical implementation of neural networks and
+Turing machines.,” Proceedings of the National Academy of Sciences, vol. 88, pp. 10983–10987,
+1991.
+[24] L. Qian, E. Winfree, and J. Bruck, “Neural network computation with DNA strand displacement
+cascades,” Nature, vol. 475, pp. 368–372, 2011.
+[25] J. Kim, J. Hopfield, and E. Winfree, “Neural Network Computation by In Vitro Transcriptional
+Circuits,” Advances in Neural Information Processing Systems, vol. 17, 2004.
+[26] H.-J. K. Chiang, J.-H. R. Jiang, and F. Fages, “Reconfigurable neuromorphic computation in
+biochemical systems,” in 2015 37th Annual International Conference of the IEEE Engineering
+in Medicine and Biology Society (EMBC), pp. 937–940, 2015.
+[27] M. Vasić, C. Chalk, A. Luchsinger, S. Khurshid, and D. Soloveichik, “Programming and training
+rate-independent chemical reaction networks,” Proceedings of the National Academy of Sciences,
+vol. 119, p. e2111552119, 2022.
+[28] J. Linder, Y.-J. Chen, D. Wong, G. Seelig, L. Ceze, and K. Strauss, “Robust Digital Molecular
+Design of Binarized Neural Networks,” in 27th International Conference on DNA Computing
+and Molecular Programming (DNA 27), vol. 205, pp. 1:1–1:20, 2021.
+[29] D. F. Anderson, B. Joshi, and A. Deshpande, “On reaction network implementations of neural
+networks,” Journal of The Royal Society Interface, vol. 18, p. 20210031, 2021.
+[30] R. T. Nagipogu and J. H. Reif, “NeuralCRNs: A Natural Implementation of Learning in
+Chemical Reaction Networks,” Aug. 2024. arXiv:2409.00034.
+[31] C. Kieffer, A. J. Genot, Y. Rondelez, and G. Gines, “Molecular Computation for Molecular
+Classification,” Advanced Biology, vol. 7, p. 2200203, 2023.
+[32] C. C. Samaniego, E. Wallace, F. Blanchini, E. Franco, and G. Giordano, “Neural networks built
+from enzymatic reactions can operate as linear and nonlinear classifiers,” bioRxiv, 2024.
+[33] A. J. Van Der Linden, P. A. Pieters, M. W. Bartelds, B. L. Nathalia, P. Yin, W. T. S. Huck,
+J. Kim, and T. F. A. De Greef, “DNA Input Classification by a Riboregulator-Based Cell-Free
+Perceptron,” ACS Synthetic Biology, vol. 11, pp. 1510–1520, 2022.
+17
+
+
+[34] W. Poole, A. Ortiz-Muñoz, A. Behera, N. S. Jones, T. E. Ouldridge, E. Winfree, and M. Gopalkr-
+ishnan, “Chemical Boltzmann Machines,” in DNA 2017: DNA Computing and Molecular
+Programming, vol. 10467, pp. 210–231, 2017.
+[35] K. M. Cherry and L. Qian, “Scaling up molecular pattern recognition with DNA-based winner-
+take-all neural networks,” Nature, vol. 559, pp. 370–376, 2018.
+[36] X. Xiong, T. Zhu, Y. Zhu, M. Cao, J. Xiao, L. Li, F. Wang, C. Fan, and H. Pei, “Molecular
+convolutional neural networks with DNA regulatory circuits,” Nature Machine Intelligence,
+vol. 4, pp. 625–635, 2022.
+[37] A. Moorman, C. C. Samaniego, C. Maley, and R. Weiss, “A Dynamical Biomolecular Neural
+Network,” in 2019 IEEE 58th Conference on Decision and Control (CDC), pp. 1797–1802, 2019.
+ISSN: 2576-2370.
+[38] R. Lopez, R. Wang, and G. Seelig, “A molecular multi-gene classifier for disease diagnostics,”
+Nature Chemistry, vol. 10, pp. 746–754, 2018.
+[39] A. J. Genot, T. Fujii, and Y. Rondelez, “Scaling down DNA circuits with competitive neural
+networks,” Journal of The Royal Society Interface, vol. 10, p. 20130212, 2013.
+[40] A. Pandi, M. Koch, P. L. Voyvodic, P. Soudier, J. Bonnet, M. Kushwaha, and J.-L. Faulon,
+“Metabolic perceptrons for neural computing in biological systems,” Nature Communications,
+vol. 10, p. 3880, 2019.
+[41] X. Li, L. Rizik, V. Kravchik, M. Khoury, N. Korin, and R. Daniel, “Synthetic neural-like
+computing in microbial consortia for pattern recognition,” Nature Communications, vol. 12,
+p. 3139, 2021.
+[42] S. Okumura, G. Gines, N. Lobato-Dauzier, A. Baccouche, R. Deteix, T. Fujii, Y. Rondelez, and
+A. J. Genot, “Nonlinear decision-making with enzymatic neural networks,” Nature, vol. 610,
+pp. 496–501, 2022.
+[43] F. Rosenblatt, The perceptron, a perceiving and recognizing automaton Project Para. Cornell
+Aeronautical Laboratory, 1957.
+[44] G. Tkačik and P. R. T. Wolde, “Information Processing in Biochemical Networks,” Annual
+Review of Biophysics, Feb. 2025.
+[45] W. Xiong and J. E. Ferrell, “A positive-feedback-based bistable ‘memory module’ that governs
+a cell fate decision,” Nature, vol. 426, pp. 460–465, Nov. 2003.
+[46] P. E. Hardin, J. C. Hall, and M. Rosbash, “Feedback of the Drosophila period gene product on
+circadian cycling of its messenger RNA levels,” Nature, vol. 343, pp. 536–540, Feb. 1990.
+[47] R. Lev Bar-Or, R. Maya, L. A. Segel, U. Alon, A. J. Levine, and M. Oren, “Generation of
+oscillations by the p53-Mdm2 feedback loop: A theoretical and experimental study,” Proceedings
+of the National Academy of Sciences, vol. 97, pp. 11250–11255, Oct. 2000.
+[48] M. L. Heltberg, S. Krishna, and M. H. Jensen, “On chaotic dynamics in transcription factors
+and the associated effects in differential gene regulation,” Nature Communications, vol. 10, p. 71,
+Jan. 2019.
+18
+
+
+[49] D. Choudhary, K. R. Foster, and S. Uphoff, “Chaos in a bacterial stress response,” Current
+Biology, vol. 33, pp. 5404–5414.e9, Dec. 2023.
+[50] N. Srinivas, J. Parkin, G. Seelig, E. Winfree, and D. Soloveichik, “Enzyme-free nucleic acid
+dynamical systems,” Science, vol. 358, p. eaal2052, Dec. 2017.
+[51] A. P. Lapteva, N. Sarraf, and L. Qian, “DNA Strand-Displacement Temporal Logic Circuits,”
+Journal of the American Chemical Society, vol. 144, pp. 12443–12449, July 2022.
+[52] T. Fujii and Y. Rondelez, “Predator–Prey Molecular Ecosystems,” ACS Nano, vol. 7, pp. 27–34,
+Jan. 2013.
+[53] J. Y. Kishi, T. E. Schaus, N. Gopalkrishnan, F. Xuan, and P. Yin, “Programmable autonomous
+synthesis of single-stranded DNA,” Nature Chemistry, vol. 10, pp. 155–164, Feb. 2018.
+[54] N. Lobato-Dauzier, A. Baccouche, G. Gines, T. Levi, Y. Rondelez, T. Fujii, S. H. Kim, N. Aubert-
+Kato, and A. J. Genot, “Neural coding of temperature with a DNA-based spiking chemical
+neuron,” Nature Chemical Engineering, vol. 1, pp. 510–521, Aug. 2024.
+[55] J. Stricker, S. Cookson, M. R. Bennett, W. H. Mather, L. S. Tsimring, and J. Hasty, “A fast,
+robust and tunable synthetic gene oscillator,” Nature, vol. 456, pp. 516–519, Nov. 2008.
+[56] R. Zhu, J. M. Del Rio-Salgado, J. Garcia-Ojalvo, and M. B. Elowitz, “Synthetic multistability
+in mammalian cells,” Science, vol. 375, p. eabg9765, Jan. 2022.
+[57] A. Goudarzi, M. R. Lakin, and D. Stefanovic, “DNA Reservoir Computing: A Novel Molecular
+Computing Approach,” in DNA Computing and Molecular Programming (D. Soloveichik and
+B. Yurke, eds.), vol. 8141, pp. 76–89, Cham: Springer International Publishing, 2013.
+[58] M. G. Baltussen, T. J. De Jong, Q. Duez, W. E. Robinson, and W. T. S. Huck, “Chemical
+reservoir computation in a self-organizing reaction network,” Nature, vol. 631, pp. 549–555, July
+2024.
+[59] T. Plesa, T. Vejchodský, and R. Erban, “Chemical reaction systems with a homoclinic bifurcation:
+an inverse problem,” Journal of Mathematical Chemistry, vol. 54, pp. 1884–1915, 2016.
+[60] T. Wilhelm, “Chemical systems consisting only of elementary steps – a paradigma for nonlinear
+behavior,” Journal of Mathematical Chemistry, vol. 27, pp. 71–88, 2000.
+[61] T. Plesa, “Stochastic approximations of higher-molecular by bi-molecular reactions,” Journal of
+Mathematical Biology, vol. 86, p. 28, 2023.
+[62] D. Soloveichik, G. Seelig, and E. Winfree, “DNA as a universal substrate for chemical kinetics,”
+Proceedings of the National Academy of Sciences, vol. 107, pp. 5393–5398, 2010.
+[63] Y.-J. Chen, N. Dalchau, N. Srinivas, A. Phillips, L. Cardelli, D. Soloveichik, and G. Seelig,
+“Programmable chemical controllers made from DNA,” Nature Nanotechnology, vol. 8, pp. 755–
+762, Oct. 2013.
+[64] S. Shah, T. Song, X. Song, M. Yang, and J. Reif, “Implementing Arbitrary CRNs Using Strand
+Displacing Polymerase,” in DNA Computing and Molecular Programming (C. Thachuk and
+Y. Liu, eds.), vol. 11648, pp. 21–36, Cham: Springer International Publishing, 2019.
+19
+
+
+[65] D. E. Rumelhart, G. E. Hinton, and R. J. Williams, “Learning representations by back-
+propagating errors,” Nature, vol. 323, pp. 533–536, Oct. 1986.
+[66] L. Stone and D. He, “Chaotic oscillations and cycles in multi-trophic ecological systems,” Journal
+of Theoretical Biology, vol. 248, pp. 382–390, 2007.
+[67] T.
+Plesa,
+“Mapping
+dynamical
+systems
+into
+chemical
+reactions,”
+Available
+as
+https://arxiv.org/pdf/2406.03473, 2025.
+[68] N. Samardzija, L. D. Greller, and E. Wasserman, “Nonlinear chemical kinetic schemes derived
+from mechanical and electrical dynamical systems,” The Journal of Chemical Physics, vol. 90,
+pp. 2296–2304, 1989.
+[69] D. Poland, “Cooperative catalysis and chemical chaos: a chemical model for the Lorenz equations,”
+Physica D: Nonlinear Phenomena, vol. 65, pp. 86–99, 1993.
+[70] T. Plesa, T. Vejchodský, and R. Erban, “Test Models for Statistical Inference: Two-Dimensional
+Reaction Systems Displaying Limit Cycle Bifurcations and Bistability,” in Stochastic Processes,
+Multiscale Modeling, and Numerical Methods for Computational Cellular Biology, pp. 3–27,
+2017.
+[71] T. Plesa, A. Dack, and T. E. Ouldridge, “Integral feedback in synthetic biology: Negative-
+equilibrium catastrophe (Appendix D),” Journal of Mathematical Chemistry, vol. 61, pp. 1980–
+2018, 2023.
+[72] K. M. Hangos and G. Szederkényi, “Mass action realizations of reaction kinetic system models
+on various time scales,” Journal of Physics: Conference Series, vol. 268, p. 012009, 2011.
+[73] K. Kowalski, “Universal formats for nonlinear dynamical systems,” Chemical Physics Letters,
+vol. 209, pp. 167–170, 1993.
+[74] E. H. Kerner, “Universal formats for nonlinear ordinary differential systems,” Journal of
+Mathematical Physics, vol. 22, pp. 1366–1371, 1981.
+[75] D. Y. Zhang and E. Winfree, “Control of dna strand displacement kinetics using toehold
+exchange,” Journal of the American Chemical Society, vol. 131, no. 47, pp. 17303–17314, 2009.
+PMID: 19894722.
+[76] N. E. C. Haley, T. E. Ouldridge, I. Mullor Ruiz, A. Geraldini, A. A. Louis, J. Bath, and A. J.
+Turberfield, “Design of hidden thermodynamic driving for non-equilibrium systems via mismatch
+elimination during DNA strand displacement,” Nature Communications, vol. 11, p. 2562, May
+2020.
+[77] W. Bae, G.-B. V. Stan, and T. E. Ouldridge, “In situ Generation of RNA Complexes for
+Synthetic Molecular Strand-Displacement Circuits in Autonomous Systems,” Nano Letters,
+vol. 21, pp. 265–271, Jan. 2021.
+[78] S. W. Schaffter and E. A. Strychalski, “Cotranscriptionally encoded RNA strand displacement
+circuits,” Science Advances, vol. 8, p. eabl4354, Mar. 2022.
+[79] M. Spivakov, “Spurious transcription factor binding: Non-functional or genetically redundant?,”
+BioEssays, vol. 36, pp. 798–806, Aug. 2014.
+20
+
+
+[80] J. Farmer, N. H. Packard, and A. S. Perelson, “The immune system, adaptation, and machine
+learning,” Physica D: Nonlinear Phenomena, vol. 22, pp. 187–204, Oct. 1986.
+[81] M. Hirafuji, K. Tanaka, and S. Hagan, “Lotka-Volterra machine for a general model of complex
+biological systems,” in Proceedings of the 1999 IEEE International Symposium on Computer
+Aided Control System Design (Cat. No.99TH8404), (Kohala Coast, HI, USA), pp. 516–521,
+IEEE, 1999.
+[82] R. R. Stein, V. Bucci, N. C. Toussaint, C. G. Buffie, G. Rätsch, E. G. Pamer, C. Sander, and
+J. B. Xavier, “Ecological Modeling from Time-Series Inference: Insight into Dynamics and
+Stability of Intestinal Microbiota,” PLOS Computational Biology, vol. 9, p. e1003388, Dec. 2013.
+[83] A.
+Dack,
+B.
+Qureshi,
+T.
+E.
+Ouldridge,
+and
+T.
+Plesa,
+“github.com/alexdack/recurrent_neural_chemical_reaction_networks,” Jul 2024.
+[84] E. A. Coddington and N. Levinson, Theory of Ordinary Differential Equations. New-York:
+McGraw-Hill, 1995.
+[85] W. Klonowski, “Simplifying principles for chemical and enzyme reaction kinetics,” Biophysical
+Chemistry, vol. 18, pp. 73–87, 1983.
+[86] A. N. Tikhonov, “Systems of differential equations containing small parameters in the derivatives,”
+Mat. Sb. (N.S.), vol. 31(73), pp. 575–586, 1952.
+[87] D. Scalise, N. Dutta, and R. Schulman, “DNA Strand Buffers,” Journal of the American
+Chemical Society, vol. 140, pp. 12069–12076, Sept. 2018.
+A
+Appendix: Universal approximation theorem for RNCRNs
+In this section, we present the main theoretical result for single- and multi-layer RNCRNs.
+A.1
+Single-layer RNCRN
+Consider the single-layer RNCRN given by
+∅
+βi
+−→Xi,
+Xi + Yj
+|αi,j|
+−−−→Xi + sign(αi,j)Xi + Yj,
+∅
+γ/µ
+−−→Yj,
+Yj
+|θj|/µ
+−−−→Yj + sign(θj)Yj,
+Xi + Yj
+|ωj,i|/µ
+−−−−→Xi + Yj + sign(ωj,i)Yj,
+2Yj
+1/µ
+−−→Yj,
+(14)
+for i = 1, 2, . . . , N and j = 1, 2, . . . , M, where for any real number x ∈R, we define sign(x) = −1 if
+x < 0, sign(x) = 0 if x = 0 and sign(x) = 1 if x > 0. The RREs induced by (14) are given by (6).
+In what follows, we define x = (x1, x2, . . . , xN) ∈RN, and collect all the rate coefficients
+αi,j, ωj,k, θj into suitable vectors α ∈RNM , ω ∈RMN, θ ∈RM, respectively; similarly, we let
+β = (β1, β2, . . . , βN) ∈RN
+≥. Furthermore, we define the reduced vector field by
+gi(x) = gi(x; α, β, γ, ω, θ) = βi + xi
+M
+X
+j=1
+αi,jσγ
+ N
+X
+k=1
+ωj,kxk + θj
+!
+,
+for i = 1, 2, . . . , N,
+(15)
+which appears on the right-hand side of (7).
+21
+
+
+Theorem A.1. (Universal approximation theorem for single-layer RNCRNs) Consider
+the target ODE system (5) on a compact set K = K1 × K2 × . . . × KN ⊂RN
+> in the state-space, with
+vector field (f1, f2, . . . , fN) Lipschitz-continuous on K. Consider also the single-layer RNCRN (14)
+with RREs (6) with rate coefficients β = β∗∈RN
+≥and γ = γ∗> 0 fixed to any values.
+(i) Quasi-static approximation. Consider the reduced vector field (15). Let ε > 0 be any given
+tolerance. Then, for every sufficiently large M > 0 there exist α∗∈RNM , ω∗∈RMN, and
+θ∗∈RM such that
+max
+x∈K |gi(x; α∗, β∗, γ∗, ω∗, θ∗) −fi(x)| ≤ε for all i = 1, 2, . . . , N.
+(16)
+(ii) Dynamical approximation. Assume that the solution of (5) exists for all t ∈[0, T] for some
+T > 0, and that ¯xi(t) ∈Ki for all t ∈[0, T] for all i = 1, 2, . . . , N. Then, for every sufficiently
+small ε = ε∗> 0 fixed there exists µ0 > 0 such that for all µ ∈(0, µ0) system (6) has a unique
+solution xi(t) ∈Ki for all t ∈[0, T] for all i = 1, 2, . . . , N, and
+max
+t∈[0,T] |xi(t; α∗, β∗, γ∗, ω∗, θ∗, µ) −¯xi(t)| ≤c1ε∗+ c2µ for all i = 1, 2, . . . , N,
+(17)
+where constants c1 and c2 are independent of µ.
+Proof.
+(i) Quasi-static approximation. Consider continuous function hi : K →R defined by hi(x) =
+(fi(x) −β∗
+i )/xi. Since the activation function σγ, defined by (4), is continuous and non-polynomial,
+it follows from [4][Theorem 3.1] that for any ε > 0 there exist M > 0, coefficients α∗
+i,j, ω∗
+j,k, θ∗
+j ∈R
+and a continuous function ρi(x) such that
+hi(x) =
+M
+X
+j=1
+α∗
+i,jσγ∗
+ N
+X
+k=1
+ω∗
+j,kxk + θ∗
+j
+!
++ ρi(x)
+for all i = 1, 2, . . . , N,
+(18)
+and maxx∈K |ρi(x)| ≤ε/Xi, with Xi = maxxi∈Ki xi. Equation (18) implies (16).
+(ii) Dynamical approximation. It follows from (16) and regular perturbation theory [84] that
+there exists ε0 > 0 such that for all ε ∈(0, ε0)
+max
+t∈[0,T] |˜xi(t; α∗, β∗, γ∗, ω∗, θ∗) −¯xi(t)| ≤c1ε for all i = 1, 2, . . . , N,
+(19)
+for some ε-independent constant c1 > 0, where ˜xi(t) = ˜xi(t; α∗, β∗, γ∗, ω∗, θ∗) satisfies the reduced
+system (7). In what follows, we fix ε = ε∗∈(0, ε0).
+Consider the fast (adjoined) system from (6), defined by
+dyj
+dτ = γ∗+ θ∗
+jyj +
+ N
+X
+i=1
+ω∗
+j,ixi
+!
+yj −y2
+j ,
+yj(0) = bj,
+for j = 1, 2, . . . , M,
+(20)
+where x1, x2, . . . , xN are parameters. The ODEs from (20) are decoupled, and each one has a unique
+non-negative continuously differentiable equilibrium yj = σγ∗
+PN
+k=1 ω∗
+j,kxk + θ∗
+j
+
+, which is stable for
+all non-negative initial conditions bj ≥0. It follows from singular perturbation theory (Tikhonov’s
+22
+
+
+theorem) [85, 86] that there exists µ0 > 0 such that for all µ ∈(0, µ0) system (6) has a unique
+solution in K over time-interval [0, T], and
+max
+t∈[0,T] |xi(t; α∗, β∗, γ∗, ω∗, θ∗, µ) −˜xi(t; α∗, β∗, γ∗, ω∗, θ∗)| ≤c2µ for all i = 1, 2, . . . , N,
+(21)
+for some µ-independent constant c2 > 0. Using |xi −¯xi| ≤|xi −˜xi| + |˜xi −¯xi| and (19) and (21),
+one obtains (17).
+Remark. In Theorem A.1, L∞-norm is used to measure the distance between the target and reduced
+vector fields. On the other hand, in Algorithm 1, we instead use the L2-norm, for computational
+simplicity. Rigorous justification of using the L2-norm is beyond the scope of this paper.
+A.2
+Multi-layer RNCRN
+In the ANN context, deep neural networks, i.e. those containing multiple layer of neurons, are
+important [5]. In the CRN context, generalizing the single-layer RREs (6) to multi-layer ones yields
+dxi
+dt = βi + xi
+ML
+X
+k=1
+αi,ky(L)
+k
+,
+xi(0) = ai,
+for i = 1, 2, . . . , N,
+dy(1)
+j1
+dt
+= γ
+µ +
+θ(1)
+j
+µ y(1)
+j1 +
+ N
+X
+i=1
+ω(1)
+j,i
+µ xi
+!
+y(1)
+j1 −1
+µ
+
+y(1)
+j1
+2
+,
+y(1)
+j1 (0) = bj1 ≥0,
+for j1 = 1, 2, . . . , M1,
+dy(2)
+j2
+dt
+= γ
+µ +
+θ(2)
+j
+µ y(2)
+j2 +
+
+
+M1
+X
+k=1
+ω(2)
+j,k
+µ y(1)
+k
+
+y(2)
+j2 −1
+µ
+
+y(2)
+j2
+2
+,
+y(2)
+j2 (0) = bj2 ≥0,
+for j2 = 1, 2, . . . , M2,
+...
+dy(L)
+jL
+dt
+= γ
+µ +
+θ(L)
+j
+µ y(L)
+jL +
+
+
+ML−1
+X
+k=1
+ω(L)
+j,k
+µ y(L−1)
+k
+
+y(L)
+jL −1
+µ
+
+y(L)
+jL
+2
+,
+y(L)
+jL (0) = bjL ≥0,
+for jL = 1, 2, . . . , ML.
+(22)
+In particular, (22) involves N executive species X1, X2, . . . , XN, and L layers of chemical perceptrons,
+with the ith layer containing Mi perceptrons. In this hierarchy, the executive species X1, X2, . . . , XN
+are inputs to the first layer of neurons Y (1)
+1
+, . . . , Y (1)
+M1 , which themselves are inputs to the second
+layer of neurons Y (2)
+1
+, . . . , Y (2)
+M2 , etc.; the final, Lth, layer of neurons Y (L)
+1
+, . . . , Y (L)
+ML feeds back into
+23
+
+
+the executive species. The multi-layer RNCRN induced by (22) is given by
+∅
+βi
+−→Xi,
+Xi + Y (L)
+jL
+|αi,jL|
+−−−−→Xi + sign(αi,jL)Xi + Y (L)
+jL ,
+∅
+γ/µ
+−−→Y (1)
+j1 ,
+Y (1)
+j1
+θ(1)
+j1
+/µ
+−−−−−→Y (1)
+j1
++ sign(θ(1)
+j1 )Y (1)
+j1
+Xi + Y (1)
+j1
+ω(1)
+j1,i
+/µ
+−−−−−→Xi + Y (1)
+j1
++ sign(ω(1)
+j1,i)Y (1)
+j1 ,
+2Y (1)
+j1
+1/µ
+−−→Y (1)
+j1 ,
+∅
+γ/µ
+−−→Y (2)
+j2 ,
+Y (2)
+j2
+θ(2)
+j2
+/µ
+−−−−−→Y (2)
+j2
++ sign(θ(2)
+j2 )Y (2)
+j2 ,
+Y (1)
+j1
++ Y (2)
+j2
+ω(2)
+j2,i
+/µ
+−−−−−→Y (1)
+j1
++ Y (2)
+j2
++ sign(ω(2)
+j2,i)Y (2)
+j2 ,
+2Y (2)
+j2
+1/µ
+−−→Y (2)
+j2 ,
+...
+∅
+γ/µ
+−−→Y (L)
+jL ,
+Y (L)
+jL
+θ(L)
+jL
+/µ
+−−−−−→Y (L)
+jL
++ sign(θ(L)
+jL )Y (L)
+jL ,
+Y (L−1)
+jL−1
++ Y (L)
+jL
+ω(L)
+jL,i
+/µ
+−−−−−→Y (L−1)
+jL−1
++ Y (L)
+jL
++ sign(ω(L)
+jL,i)Y (L)
+jL ,
+2Y (L)
+jL
+1/µ
+−−→Y (L)
+jL ,
+(23)
+for i = 1, . . . , N and jl = 1, . . . , Ml .
+Reduced ODEs. Multiplying the RREs of the chemical perceptrons from (22) by µ, and then
+fixing µ = 0, it follows that their concentrations are given in the quasi-state state by
+(y(1)
+j1 )∗= 1
+2
+
+
+
+ N
+X
+i=1
+ω(1)
+j1,ixi + θ(1)
+j1
+!
++
+v
+u
+u
+t
+ N
+X
+i=1
+ω(1)
+j1,ixi + θ(1)
+j1
+!2
++ 4γ
+
+
+,
+...
+(y(L)
+jL )∗= 1
+2
+
+
+
+
+
+ML−1
+X
+k=1
+ω(L)
+jL,k(y(L−1)
+k
+)∗+ θ(L)
+jL
+
++
+v
+u
+u
+u
+t
+
+
+ML−1
+X
+k=1
+ω(L)
+jL,k(y(L−1)
+k
+)∗+ θ(L)
+jL
+
+
+2
++ 4γ
+
+
+,
+(24)
+for jl = 1, 2, . . . , Ml. In this case, the executive species satisfy the reduced ODEs
+dxi
+dt = gi(x1, . . . , xN) = βi + xi
+ML
+X
+k=1
+αi,k(y(L)
+k
+)∗, xi(0) = ai ≥0,
+for i = 1, 2, . . . , N.
+(25)
+One can formulate analogous theorem to Theorem A.1 for the multi-layer RNCRN, by using [29][Defi-
+nition 4.7 and Proposition 4.9], which ensures that the equilibrium concentration of the fast (adjoined)
+system is globally stable.
+B
+Appendix: Examples
+In this section, we present some details underlying the examples from Section 4.
+24
+
+
+B.1
+Multi-stable target system
+Tri-stability. We use Algorithm 1 to approximate the target system (8) on K1 = [1, 18]. Tolerance
+ε ≈0.5 × 10−3 is met with an RNCRN with M = 4 perceptrons, coefficients β1 = 0, γ = 1, and
+α1 =
+
+
+
+
+−4.247
+0.487
+1.363
+0.185
+
+
+
+, θ =
+
+
+
+
+−4.968
+−3.590
+−11.236
+10.249
+
+
+
+, ω1 =
+
+
+
+
+0.511
+1.043
+1.078
+−2.355
+
+
+
+,
+(26)
+where α1 = (α1,1, α1,2, α1,3, α1,4)⊤, θ = (θ1, θ2, θ3, θ4)⊤, and ω1 = (ω1,1, ω2,1, ω3,1, ω4,1)⊤. The
+reduced ODE is given by
+d˜x1
+dt = g1(˜x1) = ˜x1
+4
+X
+j=1
+α1,jσ1 (ωj,1˜x1 + θj) ,
+(27)
+while the full ODEs read
+dx1
+dt = x1
+
+
+4
+X
+j=1
+α1,jyj
+
+,
+x1(0) = a1 ∈K1,
+dyj
+dt = 1
+µ + θj
+µ yj + ωj,1
+µ x1yj −1
+µy2
+j ,
+yj(0) = bj ≥0,
+j = 1, 2, . . . , 4.
+(28)
+Multi-stability. Analogous to Figure 2, we present some results for uni-, bi-, tri-, quad- and
+penta-stable RNCRNs in Figure 7(a)–(e). Furthermore, we present in Figure 7(f) the number of
+chemical perceptrons in the RNCRNs as a function of the number of the underlying stable equilibria,
+showing a linear trend; in particular, this plot suggests that n + 1 chemical perceptrons may be
+sufficient to achieve n stable equilibria. However, we note that the RNCRNs underlying Figure 7 are
+not necessarily the smallest ones achieved the indicated multi-stability.
+B.2
+Oscillatory target system
+We use Algorithm 1 to approximate the target system (12) on K1 × K2 = [1, 8] × [2, 10]. Tolerance
+ε ≈10−4 is met with an RNCRN with M = 6 perceptrons and coefficients β1 = β2 = 1, γ = 1, and
+α1 =
+
+
+
+
+
+
+
+
+0.664
+3.392
+−1.159
+10.658
+−2.799
+−0.571
+
+
+
+
+
+
+
+
+, α2 =
+
+
+
+
+
+
+
+
+4.260
+0.273
+−0.034
+0.134
+−6.479
+−0.028
+
+
+
+
+
+
+
+
+, θ
+=
+
+
+
+
+
+
+
+
+−1.833
+−2.452
+8.979
+2.420
+0.344
+−6.624
+
+
+
+
+
+
+
+
+, ω1 =
+
+
+
+
+
+
+
+
+0.290
+0.466
+−2.195
+−1.584
+−0.2900
+2.182
+
+
+
+
+
+
+
+
+, ω2 =
+
+
+
+
+
+
+
+
+−0.572
+0.112
+−0.015
+−0.226
+−0.716
+0.788
+
+
+
+
+
+
+
+
+,
+(29)
+where αi = (αi,1, αi,2, . . . , αi,6)⊤for i = 1, 2, θ = (θ1, θ2, θ3, θ4, θ5, θ6)⊤, and ωk = (ω1,k, ω2,k, . . . , ω6,k)⊤
+for k = 1, 2. The reduced ODEs are given by
+d˜x1
+dt = g1(˜x1, ˜x2) = 1 + ˜x1
+6
+X
+j=1
+α1,jσ1 (ωj,1˜x1 + ωj,2˜x2 + θj) ,
+d˜x2
+dt = g2(˜x1, ˜x2) = 1 + ˜x2
+6
+X
+j=1
+α2,jσ1 (ωj,1˜x1 + ωj,2˜x2 + θj) ,
+(30)
+25
+
+
+0
+π 2π 3π 4π 5π 6π 7π 8π 9π 10π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(a)
+Uni-stable dynamics (M = 2)
+f(x1)
+g(x1)
+0
+π 2π 3π 4π 5π 6π 7π 8π 9π 10π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(b)
+Bi-stable dynamics (M = 3)
+f(x1)
+g(x1)
+0
+π 2π 3π 4π 5π 6π 7π 8π 9π 10π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(c)
+Tri-stable dynamics (M = 4)
+f(x1)
+g(x1)
+0
+π 2π 3π 4π 5π 6π 7π 8π 9π 10π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(d)
+Quad-stable dynamics (M = 5)
+f(x1)
+g(x1)
+0
+π 2π 3π 4π 5π 6π 7π 8π 9π 10π
+State x1
+4
+3
+2
+1
+0
+1
+2
+3
+4
+Vector field
+(e)
+Penta-stable dynamics (M = 6)
+f(x1)
+g(x1)
+1
+2
+3
+4
+5
+Stable equilibria
+2
+3
+4
+5
+6
+Chemical perceptrons M
+(f)
+Figure 7: RNCRN approximations of the multi-stable target system (8). (a)-(e) The vector field of the
+target system (8) and reduced systems for some RNCRNs trained over the following state-space sets:
+K1 = [1, 2π] for uni-stability, K1 = [1, 4π] for bi-stability, K1 = [1, 6π] for tri-stability, K1 = [1, 8π]
+for quad-stability, and K1 = [1, 10π] for penta-stability. (f) Number of chemical perceptrons in the
+RNCRNs as a function of the number of the underlying stable equilibria. The RNCRNs are available
+in the code repository [83].
+while the full ODEs read
+dx1
+dt = 1 + x1
+
+
+6
+X
+j=1
+α1,jyj
+
+,
+x1(0) = a1 ∈K1,
+dx2
+dt = 1 + x2
+
+
+6
+X
+j=1
+α2,jyj
+
+,
+x2(0) = a2 ∈K2,
+dyj
+dt = 1
+µ + θj
+µ yj +
+ 2
+X
+i=1
+ωj,i
+µ xi
+!
+yj −1
+µy2
+j ,
+yj(0) = bj ≥0,
+j = 1, 2, . . . , 6.
+(31)
+The coefficients were rounded to 3 decimal places before being used in simulations.
+B.3
+Chaotic target system
+We use Algorithm 1 to approximate the target system (13) on x1 ∈K1, x2 ∈K2 and x2 ∈K3 with
+K1 = K2 = K3 = [0.01, 1]. Tolerance ε ≈102 is met with an RNCRN with M = 5 perceptrons and
+26
+
+
+coefficients β1 = β2 = β3 = 0, γ = 1, and
+α1 =
+
+
+
+
+
+
+−0.272
+2.996
+0.862
+−0.244
+1.276
+
+
+
+
+
+
+, α2 =
+
+
+
+
+
+
+0.109
+24.039
+−5.668
+−0.057
+−9.584
+
+
+
+
+
+
+, α3 =
+
+
+
+
+
+
+0.026
+−0.529
+−1.101
+0.034
+1.065
+
+
+
+
+
+
+,
+θ =
+
+
+
+
+
+
+0.284
+−1.589
+−0.178
+1.212
+−0.707
+
+
+
+
+
+
+, ω1 =
+
+
+
+
+
+
+−5.049
+0.148
+0.506
+15.973
+−1.151
+
+
+
+
+
+
+, ω2 =
+
+
+
+
+
+
+8.895
+−2.951
+−4.504
+−7.781
+−0.606
+
+
+
+
+
+
+, ω3 =
+
+
+
+
+
+
+−0.068
+−0.525
+0.329
+−0.027
+0.199
+
+
+
+
+
+
+,
+(32)
+where αi = (αi,1, αi,2, . . . , αi,5)⊤for i = 1, 2, 3, θ = (θ1, θ2, θ3, θ4, θ5)⊤, and ωk = (ω1,k, ω2,k, . . . , ω5,k)⊤
+for k = 1, 2, 3. The reduced ODEs are given by
+d˜xi
+dt = gi(˜x1, ˜x2, ˜x3) = ˜xi
+5
+X
+j=1
+αi,jσ1 (ωj,1˜x1 + ωj,2˜x2 + ωj,3˜x3 + θj) ,
+i = 1, 2, 3,
+(33)
+while the full ODEs read
+dxi
+dt = xi
+
+
+5
+X
+j=1
+αi,jyj
+
+,
+xi(0) = ai ∈Ki, i = 1, 2, 3,
+dyj
+dt = 1
+µ + θj
+µ yj +
+ 3
+X
+i=1
+ωj,i
+µ xi
+!
+yj −1
+µy2
+j ,
+yj(0) = bj ≥0,
+j = 1, 2, . . . , 5.
+(34)
+The coefficients were rounded to 3 decimal places before being used in simulations.
+C
+Appendix: DNA-strand-displacement implementation
+Let us consider the RREs (10), and assume now that the concentrations x1, y1, y2, y3 are measured
+in units of moles (M), while time t in units of seconds (s). In this section, we compile the induced
+RNCRN into a DNA-strand-displacement system with physically admissible rate coefficients (i.e. rate
+coefficients between 1M−1s−1 to 106M−1s−1) and admissible concentrations (i.e. concentrations less
+than 10−5M) [62]; to ensure these constraints, we fix the percepton speed at a larger value, µ = 0.5
+in (10). Such DNA systems rely on suitable “fuel” species, which are depleted over time, being present
+at sufficiently high concentrations. To simplify analysis and simulations, one approach is to assume
+that the concentrations of the fuel species are held constant. This constant-fuel assumption [62]
+can be maintained in situ by additional experimental techniques that produce components [77,78],
+increased buffering [87], or manually replenishing the fuel species at regular time-intervals. In the
+remainder of this section, we follow three steps: firstly, we introduce a suitable rescaled RNCRN;
+secondly, we map this network into a DNA-based RNCRN, and choose the rescaling such that its
+rate coefficients and species concentrations are admissible; finally, we simplify the latter network by
+making the constant-fuel assumption.
+Rescaled RNCRN. Let us first rescale time and concentrations from RREs (10) by defining
+the new variables τ = κt, ¯¯x(t) = σx(t), ¯¯yi(t) = σyi(t) for i = 1, 2, 3 [62], where κ, σ > 0 are
+27
+
+
+dimensionless, and fix the dimensionless parameter µ = 0.5, leading to the rescaled RREs:
+d¯¯x1
+dτ = −0.983
+κσ
+¯¯x1¯¯y1 −0.050
+κσ
+¯¯x1¯¯y2 + 2.398
+κσ
+¯¯x1¯¯y3,
+¯¯x1(0) = σa1,
+d¯¯y1
+dτ = 2σ
+κ + 15.578
+κ
+¯¯y1 −2.334
+κσ
+¯¯x1¯¯y1 −2
+κσ
+¯¯y2
+1,
+¯¯y1(0) = σb1,
+d¯¯y2
+dτ = 2σ
+κ −3.836
+κ
+¯¯y2 + 1.988
+κσ
+¯¯x1¯¯y2 −2
+κσ
+¯¯y2
+2,
+¯¯y2(0) = σb2,
+d¯¯y3
+dτ = 2σ
+κ + 7.148
+κ
+¯¯y3 −1.460
+κσ
+¯¯x1¯¯y3 −2
+κσ
+¯¯y2
+3,
+¯¯y3(0) = σb3.
+(35)
+Denoting the chemical species with the rescaled concentrations ¯¯x1, ¯¯yi by ¯¯X1 and ¯¯Yi, respectively,
+the rescaled RNCRN induced by (35) is given by
+¯¯X1 + ¯¯Y1
+0.983/(κσ)
+−−−−−−→¯¯Y1,
+¯¯X1 + ¯¯Y2
+0.050/(κσ)
+−−−−−−→¯¯Y2,
+¯¯X1 + ¯¯Y3
+2.398/(κσ)
+−−−−−−→2 ¯¯X1 + ¯¯Y3,
+¯¯X1 + ¯¯Y1
+2.334/(κσ)
+−−−−−−→¯¯X1,
+¯¯X1 + ¯¯Y2
+1.988/(κσ)
+−−−−−−→¯¯X1 + 2 ¯¯Y2,
+¯¯X1 + ¯¯Y3
+1.460/(κσ)
+−−−−−−→¯¯X1,
+¯¯Y1
+15.578/κ
+−−−−−→2 ¯¯Y1,
+¯¯Y2
+3.836/κ
+−−−−→∅,
+¯¯Y3
+7.148/κ
+−−−−→2 ¯¯Y3,
+∅
+2.000σ/κ
+−−−−−→¯¯Y1,
+∅
+2.000σ/κ
+−−−−−→¯¯Y2,
+∅
+2.000σ/κ
+−−−−−→¯¯Y3,
+2 ¯¯Y1
+2.000/(κσ)
+−−−−−−→¯¯Y1,
+2 ¯¯Y2
+2.000/(κσ)
+−−−−−−→¯¯Y2,
+2 ¯¯Y3
+2.000/(κσ)
+−−−−−−→¯¯Y3.
+(36)
+DNA-RNCRN. The rescaled RNCRN (36) can be mapped into a DNA-strand-displacement-
+based CRN [62], which we call the DNA-RNCRN, and present in the text files entitled “do-
+main_level_DNA_full_inits” in the folder “ex_5_dna_implementation/CRNs” available in [83].
+This network consists of 78 chemical species (representing single- and double-stranded DNAs),
+and 53 reactions, all of which involve exactly two reactants. We fix the scaling parameters to
+κ = 3 × 104 and σ = 5 × 10−9; then, the underlying rate coefficients of all the chemical reactions in
+the DNA-RNCRN can be shown to be between 7M −1s−1 and 106M−1s−1, and the concentrations
+of all of the species are then less than 10−5M, i.e. within the physically admissible range. We show
+the concentration of the executive species ¯¯x1(t) from the DNA-RNCRN for various initial conditions
+as the red curves in Figure 8(a); also shown for comparison is the corresponding solution from the
+rescaled target system (35). One can notice that the DNA-RNCRN approximately displays the
+intended bistability for some interval of time. However, as time progresses further, some of the fuel
+species are significantly depleted and, consequently, the DNA-RNCRN starts to deviate significantly
+from its target behavior.
+28
+
+
+0
+6
+12 18 24 30 36 42 48 54 60
+Time t [hours]
+0
+25
+50
+75
+100
+125
+¯¯x1(t) [nM]
+(a)
+DNA-RNCRN bi-stable trajectories
+RNCRN
+DNA-RNCRN
+0
+6
+12 18 24 30 36 42 48 54 60
+Time t [hours]
+0
+25
+50
+75
+100
+125
+¯¯x1(t) [nM]
+(b)
+Constant-fuel bi-stable trajectories
+RNCRN
+Constant-fuel DNA-RNCRN
+Figure 8: DNA-strand-displacement implementation of the RNCRN with RREs (10) with µ = 0.5.
+Panel (a) shows in red the concentration of the executive species from the DNA-RNCRN, presented
+in [83]. Also shown in purple is the concentrations of the executive species from the RREs (35),
+with initial conditions ¯¯x1(0) ∈{7.85 × 10−9 M, 2.36 × 10−8 M, 3.93 × 10−8 M, 5.50 × 10−8 M, 7.07 ×
+10−8 M, 8.64 × 10−8 M}, and zero initial concentration for all chemical perceptrons. Analogous plot
+is shown in panel (b), where the green curve is the concentration of the executive species from the
+constant-fuel RNCRN (40), with initial conditions ¯¯x1(0) ∈{8.37 × 10−9 M, 2.51 × 10−8 M, 4.18 ×
+10−8 M, 5.86 × 10−8 M, 7.53 × 10−8 M, 9.20 × 10−8 M}, C11(0) = C12(0) = C13(0) = 5.33 × 10−9 M,
+and all the other species having zero concentration initially. Note that, due to the buffering modules,
+initial conditions for the executive species from (36) and (40) are slightly different. The simulations
+were preformed using the full precision stated in the associated text files.
+In what follows, we outline how the DNA-RNCRN is designed; we abuse the notation slightly,
+by following the notation from [62].
+Zero-order reactions. The abstract zero-order reaction (i.e. reaction with ∅as the reactants) of
+the form ∅
+γi
+−→¯¯Yi is mapped to the DNA-based network given by
+Ci + Gi
+105γi/δ
+−−−−→Oi,
+Oi + Ti
+106
+−−→Ci + ¯¯Yi,
+(37)
+where Ci, ¯¯Yi, and Oi are single-stranded DNAs, while Gi and Ti are double-stranded DNA complexes
+called gates, acting as fuel species. Let us note that Ci plays an effectively catalytic role in this
+reaction cascade. The initial concentrations for the fuel species Gi and Ti are set to respectively
+Gi(0) = 10−5M and Ti(0) = 10−5M. Furthermore, to ensure the effective reaction rate γi, we fix
+the initial condition of Ci to Ci(0) = δM; in particular, in the DNA-strand-displacement framework,
+effective rates of reactions are calibrated using the initial conditions of suitable DNA species.
+First-order reactions. The abstract first-order reaction (i.e. reaction with only one reactant) of
+the form ¯¯Yi
+θi
+−→2 ¯¯Yi is mapped to the DNA-based network given by
+¯¯Yi + Gi
+105θi
+−−−→Oi,
+Oi + Ti
+106
+−−→2 ¯¯Yi,
+(38)
+where ¯¯Yi and Oi are single-stranded DNAs and, as before, Gi and Ti are fuel species with initial
+concentrations Gi(0) = Ti(0) = 10−5M. A similar DNA-based network is designed for abstract
+reactions of the form Yi
+θi
+−→∅.
+29
+
+
+Second-order reactions. Finally, the abstract second-order reaction (i.e. reaction with two
+reactants) of the form 2 ¯¯Yi
+κi
+−→¯¯Yi is mapped to the DNA-based network given by
+¯¯Yi + Li
+κi
+−−⇀
+↽−−
+106 Hi + Bi,
+¯¯Yi + Hi
+106
+−−→Oi,
+Oi + Ti
+106
+−−→¯¯Yi,
+(39)
+where ¯¯Yi, Bi, and Oi are single-stranded, while Li, Hi, Ti double-stranded DNAs. The initial
+concentrations for the fuel species are set to Li(0) = Ti(0) = Bi(0) = 10−5M. Similar DNA-based
+networks are designed for the other variants of second-order reactions.
+Buffering. We also introduce into the DNA-RNCRN the so-called buffering modules [62]. These
+modules require that certain rate coefficients and initial conditions are multiplied by a factor, which
+we account for in the presented results.
+Constant-fuel DNA-RNCRN. To address the deviation of the DNA-RNCRN from its target
+behavior displayed in Figure 8(a), the fuel species must be replenished. In this paper, we do not
+model such replenishment explicitly; instead, for simplicity, we assume that the concentrations of all
+fuel species in the DNA-RNCRN are constant. Then, this network can be approximated [62] by the
+constant-fuel DNA-RNCRN, given by
+¯¯Y2
+0.512
+−−−⇀
+↽−−−
+10.0 HS2,
+¯¯Y1
+0.512
+−−−⇀
+↽−−−
+10.0 HS1,
+¯¯Y3
+0.512
+−−−⇀
+↽−−−
+10.0 HS3,
+¯¯X1
+0.0699
+−−−−⇀
+↽−−−−
+10.0
+H1,
+¯¯Y1 + H1
+1.00×106
+−−−−−→¯¯Y1,
+¯¯X1
+0.003 56
+−−−−−⇀
+↽−−−−−
+10.0
+H2,
+¯¯Y2 + H2
+1.00×106
+−−−−−→¯¯Y2,
+¯¯X1
+0.170
+−−−⇀
+↽−−−
+10.0 H3,
+¯¯Y3 + H3
+1.00×106
+−−−−−→2 ¯¯X1 + ¯¯Y3,
+¯¯X1
+0.166
+−−−⇀
+↽−−−
+10.0 H4,
+¯¯Y1 + H4
+1.00×106
+−−−−−→¯¯X1,
+¯¯X1
+0.141
+−−−⇀
+↽−−−
+10.0 H5,
+¯¯Y2 + H5
+1.00×106
+−−−−−→¯¯X1 + 2 ¯¯Y2,
+¯¯X1
+0.104
+−−−⇀
+↽−−−
+10.0 H6,
+¯¯Y3 + H6
+1.00×106
+−−−−−→¯¯X1,
+¯¯Y1
+0.000 553
+−−−−−→O7,
+O7
+10.0
+−−→2 ¯¯Y1,
+¯¯Y2
+0.000 136
+−−−−−→O8,
+¯¯Y3
+0.000 254
+−−−−−→O9,
+O9
+10.0
+−−→2 ¯¯Y3,
+C11
+7.10×10−5
+−−−−−−→O11,
+O11
+10.0
+−−→C11 + ¯¯Y1,
+C12
+7.10×10−5
+−−−−−−→O12,
+O12
+10.0
+−−→C12 + ¯¯Y2,
+C13
+7.10×10−5
+−−−−−−→O13,
+O13
+10.0
+−−→C13 + ¯¯Y3,
+¯¯Y1
+0.142
+−−−⇀
+↽−−−
+10.0 H14,
+¯¯Y1 + H14
+1.00×106
+−−−−−→¯¯Y1,
+¯¯Y2
+0.142
+−−−⇀
+↽−−−
+10.0 H15,
+¯¯Y2 + H15
+1.00×106
+−−−−−→¯¯Y2,
+¯¯Y3
+0.142
+−−−⇀
+↽−−−
+10.0 H16,
+¯¯Y3 + H16
+1.00×106
+−−−−−→¯¯Y3,
+(40)
+with C11(0) = C12(0) = C13(0) = 5.33×10−9 M, while the initial conditions for all the other auxiliary
+species (i.e. all species except the executive species X1 and chemical pereptrons Y1, Y2, Y3) are set to
+zero. Let us note that the fuel species concentrations from the DNA-RNCRN, assumed to be fixed
+to constant 10−5M, are absorbed into effective rate coefficients displayed above the reaction arrows
+in (40). The concentration of the executive species ¯¯x1(t) from (40) is shown in Figure 3(b), which
+we repeat for convenience as Figure 8(b). One can observe that the constant-fuel DNA-RNCRN
+30
+
+
+displays the desired behavior which, owing to effective replenishment of the fuel species, is now
+maintained over the desired interval of time.
+D
+Appendix: Robustness
+In this section, we provide a preliminary investigation of robustness of some RNCRNs approximating
+the oscillatory target system (12). In particular, we first consider the RNCRN with RREs (31).
+This RNCRN was not optimized for robustness; nevertheless, we show that it is not pathologically
+sensitive to perturbations. We then apply a noisy version of Algorithm 1 on the target system (12)
+to produce a new oscillatory RNCRN which is more robust to perturbations.
+D.1
+Rate-coefficient robustness
+Let us consider RREs (31) with perturbed rate coefficients and fixed perceptron speed µ, given by
+dˆxi
+dt = ˆβi + ˆxi
+M
+X
+j=1
+ˆαi,j ˆyj,
+ˆxi(0) = ai,
+for i = 1, 2,
+dˆyj
+dt = ˆγ
+µ +
+ˆθj
+µ ˆyj +
+ N
+X
+i=1
+ˆωj,i
+µ ˆxi
+!
+yj −ˆκj
+µ ˆy2
+j ,
+ˆyj(0) = bj,
+for j = 1, 2, . . . , 6,
+(41)
+with coefficients
+ˆβi = 1 + ηrβi,
+ˆαi,j =
+1 + ηrαi,j
+
+αi,j, ˆγ = 1 + ηrγ,
+ˆωj,i =
+1 + ηrωj,i
+
+ωj,i,
+ˆθj =
+1 + ηrθj
+
+θj, ˆκi = 1 + ηrκi,
+(42)
+where r ∈(−1, 1) with appropriate subscripts are independent uniformly distributed random
+variables, scaled with a parameter η ∈[0, 1], i.e. ηr is uniformly distributed in [−η, η].
+To study robustness, we fix the initial conditions to a1 = 2, a2 = 4 and bj = 0, the perceptron
+speed to µ = 0.1, and the noise strength to η ∈[0, 1]. Then, for a fixed sampling of coefficients (42),
+we numerically solve the resulting perturbed RREs (41). We then verify if the solution ˆx1(t) is a
+periodic function of time within the time-interval t ∈[0, 60]; if this is the case, then we say that
+RREs (31) are robust with respect to this particular set of perturbations. For this verification, we
+use a fast Fourier transform and check for the existence of suitable peaks, above a threshold, in the
+frequency domain (see code [83] for implementation). We then repeat this procedure for sufficiently
+many samplings of (42), and compute the ratio of oscillatory to non-oscillatory perturbed systems,
+which we use as an estimate for rate-coefficent robustness for fixed η. We then repeat the same
+computations for various values of noise strength η ∈[0, 1]. See Figure 5(a)–(b).
+D.2
+Perceptron-speed robustness
+To study robustness with respect to the parameter µ, we numerically solve the RREs (31) with rate
+coefficients (29) and various values of µ. The results are shown in Figure 5(c)–(d).
+31
+
+
+D.3
+Initial-condition robustness
+Let us now consider RREs (31) with perturbed initial conditions, given by
+dˆxi
+dt = βi + ˆxi
+M
+X
+j=1
+αi,j ˆyj,
+ˆxi(0) = (1 + ηrai)ai, for i = 1, 2,
+dˆyj
+dt = γ
+µ + θj
+µ ˆyj +
+ N
+X
+i=1
+ωj,i
+µ ˆxi
+!
+yj −κj
+µ ˆy2
+j ,
+ˆyj(0) = (1 + ηrbj)bj, for j = 1, 2, . . . , 6,
+(43)
+where r ∈(−1, 1) with appropriate subscripts are independent uniformly distributed random
+variables, and parameter η ∈[0, 1].
+We fix the rate coefficients from (43) to (29) and µ = 0.1. Furthermore, we fix a1 = 2 and
+a2 = 4, while bj are fixed to the equilibrium values of the chemical perceptrons: b1 = 1.79, b2 = 0.17,
+b3 = 0.20, b4 = 4.19, b5 = 0.42, and b6 = 1.22. The results are presented in Figure 5(e)–(f).
+D.4
+Noisy training
+The RNCRN with RREs (31) has been produced by applying Algorithm 1 with deterministic coeffi-
+cients βi, αi,j, γ, ωj,i, θj in (7). In order to design an RNCRN which is more robust to perturbations
+in the rate coefficients, one may wish to instead apply Algorithm 1 with coefficients βi, αi,j, γ, ωj,i, θj
+being stochastically perturbed at each iteration of the backpropagation algorithm. For the purpose of
+this paper, instead of perturbing each of the coefficients, we introduce only three perturbations, which
+we choose in a way natural to our computer code. In particular, let us now consider Algorithm 1 with
+one modification: in step (a), we ensure that the distance between (fi(x1, x2, . . . , xN)/xi −βi/xi)
+and PM
+j=1 α∗
+i,j
+
+δ(y)
+j
++ σγ
+PN
+k=1 ω∗
+j,k(xk + δ(x)
+k ) + θ∗
+j
+
++ δ(β)
+i
+is within the tolerance, instead of
+PM
+j=1 α∗
+i,jσγ
+PN
+k=1 ω∗
+j,kxk + θ∗
+j
+
+. Here, δ(x)
+k , δ(y)
+j , δ(β)
+i
+are independent normal random variables
+with zero mean and variance η2, which we prescribe. These three random variables are resampled
+at each iteration of the backpropagation algorithm. See the code presented in the folder entitled
+“step_4_noisy_training” within the folder “ex_6_robustness” available in [83].
+32
+
+
+0
+5
+10
+State ¯x1
+0
+5
+10
+State ¯x2
+(a)
+Target system
+0
+5
+10
+State x1
+0
+5
+10
+State x2
+(b)
+RNCRN approximation
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x1(t)
+(c)
+x1(t) trajectories
+0
+10
+20
+30
+40
+50
+60
+Time t
+0
+5
+10
+x2(t)
+x2(t) trajectories
+Figure 9: RNCRN approximation of the oscillatory target system (12) trained with noisy Algorithm 1.
+(a) The vector field of the target system (12) (grey arrows) for K1 × K2 = [1, 8] × [2, 10], and a
+solution of (12) with ¯x1(0) = 2 and ¯x2(0) = 4 (blue). (b) Analogous plot is shown for the RNCRN
+whose reduced and full ODEs are given respectively by (45) and (46), with coefficients (44) and
+µ = 0.01. In particular, displayed as grey arrows is the vector field of the reduced ODEs (45),
+together with an oscillatory solution of the full ODEs (46) shown in purple; for comparison, we also
+display as dashed blue curve the oscillatory solution of (12) from (a). Panel (c) displays the solutions
+¯x1(t) and x1(t), and ¯x2(t) and x2(t). The initial concentrations of the perceptrons are all set to zero.
+Applying this noisy version of Algorithm 1 to the target system (12) on K1 × K2 = [1, 8] × [2, 10],
+with tolerance ε ≈10−1 and variance η2 = 1, we find an RNCRN with M = 6 perceptrons, coefficients
+β1 = β2 = 1, γ = 1, and rounded to 3 decimal places:
+α1 =
+
+
+
+
+
+
+
+
+−0.034
+−0.040
+0.017
+0.036
+0.037
+−0.011
+
+
+
+
+
+
+
+
+, α2 =
+
+
+
+
+
+
+
+
+0
+−0.014
+−0.023
+−0.013
+0.011
+0.020
+
+
+
+
+
+
+
+
+, θ
+=
+
+
+
+
+
+
+
+
+−18.748
+34.068
+39.575
+36.980
+49.304
+−1.085
+
+
+
+
+
+
+
+
+, ω1 =
+
+
+
+
+
+
+
+
+−2.101
+−7.724
+−5.370
+−1.695
+−13.497
+5.802
+
+
+
+
+
+
+
+
+, ω2 =
+
+
+
+
+
+
+
+
+5.662
+0.522
+−4.331
+−3.996
+−3.471
+−3.901
+
+
+
+
+
+
+
+
+,
+(44)
+where αi = (αi,1, αi,2, . . . , αi,6)⊤for i = 1, 2, θ = (θ1, θ2, θ3, θ4, θ5, θ6)⊤, and ωk = (ω1,k, ω2,k, . . . , ω6,k)⊤
+for k = 1, 2. The reduced ODEs are given by
+d˜x1
+dt = g1(˜x1, ˜x2) = 1 + ˜x1
+6
+X
+j=1
+α1,jσ1 (ωj,1˜x1 + ωj,2˜x2 + θj) ,
+d˜x2
+dt = g2(˜x1, ˜x2) = 1 + ˜x2
+6
+X
+j=1
+α2,jσ1 (ωj,1˜x1 + ωj,2˜x2 + θj) ,
+(45)
+33
+
+
+while the full ODEs read
+dx1
+dt = 1 + x1
+
+
+6
+X
+j=1
+α1,jyj
+
+,
+ˆx1(0) = a1 ∈K1,
+dx2
+dt = 1 + x2
+
+
+6
+X
+j=1
+α2,jyj
+
+,
+ˆx2(0) = a2 ∈K2,
+dyj
+dt = 1
+µ + θj
+µ yj +
+ 2
+X
+i=1
+ωj,i
+µ xi
+!
+yj −1
+µy2
+j ,
+yj(0) = bj ≥0,
+j = 1, 2, . . . , 6.
+(46)
+We present the dynamics of (46) in Figure 9, which is analogous to Figure 4. Furthermore, in
+Figure 5(a), we show that this RNCRN displays superior robustness.
+E
+Appendix: Alternative approximation scheme
+In this section, we outline an alternative method for approximating non-polynomial ODEs with
+RREs [73,74], and point out some of its drawbacks.
+Non-polynomial to polynomial ODEs. Consider again the non-polynomial ODE (8). To
+map it to a polynomial one, we apply the method from [74]: we introduce the auxiliary variables
+y1 = sin (x1) and y2 = cos (x1), and use the chain-rule to obtain
+dx1
+dt = y1,
+x1(0) = a1,
+dy1
+dt = y1y2,
+y1(0) = sin(a1),
+dy2
+dt = −y2
+1,
+y2(0) = cos(a1).
+(47)
+Polynomial ODEs to RREs. To ensure that the initial conditions for y1 and y2 are non-
+negative, we translate the variables according to z1(t) = T1 + y1(t) and z2(t) = T2 + y2(t), where
+T1, T2 > 1; for concreteness, we fix T1 = T2 = 2. Then, (47) becomes
+dx1
+dt = −2 + z1,
+x1(0) = a1,
+dz1
+dt = 4 −2z1 −2z2 + z1z2,
+z1(0) = 2 + sin(a1),
+dz2
+dt = −4 + 4z1 −z2
+1,
+z2(0) = 2 + cos(a1).
+(48)
+Terms −2, −2z2 and −4 −z2
+1 in respectively the first, second and third equation of (48) cannot
+be interpreted as chemical reactions [59]. Multiple methods exist to eliminate such non-chemical
+terms [59, 68–72]; in what follows, we use incomplete Carleman embedding [73]. In particular,
+introducing additional variables z3 = 1/x1, z4 = 1/z1, and z5 = 1/z2, and applying the chain-rule,
+34
+
+
+yields
+dx1
+dt = −2x1z3 + z1,
+x1(0) = a1,
+dz1
+dt = 4 −2z1 −2z1z2z4 + z1z2,
+z1(0) = 2 + sin(a1),
+dz2
+dt = −4z2z5 + 4z1 −z2
+1z2z5,
+z2(0) = 2 + cos(a1),
+dz3
+dt = 2z2
+3 −z1z2
+3,
+z3(0) = 1
+a1
+,
+dz4
+dt = 2z4 −4z2
+4 −z2z4 + 2z2z2
+4,
+z4(0) =
+1
+2 + sin(a1),
+dz5
+dt = 4z2
+5 −4z1z2
+5 + z2
+1z2
+5,
+z5(0) =
+1
+2 + cos(a1).
+(49)
+RREs (49) contain terms of degree as high as four; for example, the term −z2
+1z2z5. This term
+induces the reaction 2Z1 + Z2 + Z5
+1−→2Z1 + Z5, which has four reactants, and is therefore
+experimentally infeasible. One could approximate such higher-order reactions with systems of
+second-order ones [60,61]. However, for the purpose of this section, RREs (49) are sufficient.
+Initial-condition robustness. Let us now numerically study robustness of (49) with respect to
+the initial conditions. In Figure 10(a), we display the solution x1(t) of (49), i.e. with ideal initial
+conditions. One can notice that x1(t) from (49) is identical to ¯x1(t) from the target system (8).
+However, note that this perfect accuracy requires one to perfectly adjust the initial conditions for
+the auxiliary species zi(0) for any given initial condition xi(0), i.e. if one changes xi(0), then one
+also has to appropriately change zi(0) for all i = 1, 2, . . . , 5. Critically, as we now show, this perfect
+accuracy can deteriorate catastrophically under some perturbations of the initial conditions.
+In particular, let us consider (49) with perturbed initial conditions:
+dˆx1
+dt = −2ˆx1ˆz3 + ˆz1,
+ˆx1(0) = (1 + ηr1)a1,
+dˆz1
+dt = 4 −2ˆz1 −2ˆz1ˆz2ˆz4 + ˆz1ˆz2,
+ˆz1(0) = (1 + ηr2)(2 + sin(a1)),
+dˆz2
+dt = −4ˆz2ˆz5 + 4ˆz1 −ˆz2
+1ˆz2ˆz5,
+ˆz2(0) = (1 + ηr3)(2 + cos(a1)),
+dˆz3
+dt = 2ˆz2
+3 −ˆz1ˆz2
+3,
+ˆz3(0) = (1 + ηr4) 1
+a1
+,
+dˆz4
+dt = 2ˆz4 −4ˆz2
+4 −ˆz2ˆz4 + 2ˆz2ˆz2
+4,
+ˆz4(0) = (1 + ηr5)
+1
+2 + sin(a1),
+dˆz5
+dt = 4ˆz2
+5 −4ˆz1ˆz2
+5 + ˆz2
+1ˆz2
+5,
+ˆz5(0) = (1 + ηr6)
+1
+2 + cos(a1),
+(50)
+where, as in Appendix D.3, ri ∈(−1, 1) are independent uniformly distributed random variables,
+and parameter η ∈[0, 1]. In the top panel of Figure 10(b), we show as a function of η the proportion
+of perturbed systems (50), over a range of initial conditions, whose solutions x1(t) converge to
+within ±π/4 of the intended equilibrium; one can notice an increasing fragility beyond η = 10%.
+Critically, for some non-ideal initial conditions, concentrations of some of the auxiliary species grow
+unboundedly (blow-up), as shown in the bottom panel of Figure 10(b). Let us note that no such
+chemically hazardous behavior is observed in the RNCRN. In Figure 10(c), we display a particular
+data point from Figure 10(b), showing that x1(t) from (50) can fail to converge close to the intended
+equilibrium π, while, at the same time, the auxiliary species concentration z5(t) blows up.
+35
+
+
+0
+1
+2
+3
+4
+5
+Time t
+0
+π
+2π
+3π
+4π
+5π
+6π
+7π
+8π
+x1(t)
+(a)
+Ideal initial conditions
+Target ¯x1(t)
+Approximation x1(t)
+0 10 20 30 40 50 60 70 80 90 100
+Noise η [%]
+0
+20
+40
+60
+80
+100
+Proportion [%]
+(b)
+Initial-condition robustness
+±π/4 of target equilibrium
+0
+0.2
+0.4
+0.6
+0.8
+Time t
+0
+π
+2π
+3π
+x1(t)
+(c)
+x1(t) failure at η = 46%
+0 10 20 30 40 50 60 70 80 90 100
+Noise η [%]
+0
+20
+40
+60
+Proportion [%]
+Blow-up
+0
+0.2
+0.4
+0.6
+0.8
+Time t
+0
+100π
+200π
+300π
+400π
+z5(t)
+z5(t) blow-up at η = 46%
+Figure 10: Initial-condition sensitivity of system (49) that approximates target system (8). Panel (a)
+shows solution ¯x1(t) of (8), and x1(t) of (49). Top sub-panel (b) shows the proportion of perturbed
+systems (50), over a range of initial conditions, whose solutions x1(t) are within ±π/4 of the desired
+equilibrium at t = 6 as a function of noise strength η. Bottom sub-panel (b) shows the proportion
+of (50) with at least one auxiliary species that blows up before t = 6. Each point in panel (b) was
+obtained by simulating (50) with 104 sampled initial conditions. Panel (c) shows an example of
+failure of x1(t) to converge close to the desired equilibrium, and a blow-up of an auxiliary species.
+The initial conditions are as follows: x1(t) = 4.48121513, z1(0) = 4.13072385, z2(0) = 1.55830895,
+z3(0) = 0.08109365, z4(0) = 0.22538005, z5(0) = 0.56915378.
+F
+Appendix: Algorithm 1 pseudocode
+36
+
+
+Algorithm 1 Two-step algorithm for training the RNCRN
+Require: fi(¯x1, . . . , ¯xN) for i = 1, 2, . . . , N
+▷target system (5)
+Require: K1, K2, . . . , KN ⊂(0, +∞)
+▷target compact sets
+Require: γ > 0 and β1, β2, . . . , βN ≥0
+▷positive and nonnegative rate coefficients
+Require: εQ > 0 and εD > 0
+▷quasi-static and dynamical tolerance
+Require: LQ and LD
+▷loss functions for the quasi-static and the dynamic approximation
+Require: T > 0
+▷time length of dynamics
+Require: a1, a2, . . . , aM, b1, b2, . . . , bM ≥0
+▷initial conditions of target system
+Require: 0 < µ ≪1
+▷speed of chemical perceptrons lower bound
+Require: Integrate(f, t ∈[0, T], z(0))
+▷procedure for numerical integration
+Require: Minimize(L, Ω)
+▷procedure to minimize loss (i.e. backpropagation [65] )
+Require: Reduce(µ)
+▷procedure to reduce µ∗and εQ
+procedure Quasi-static approximation(εQ)
+M ←0
+ε∗
+Q ←∞
+while ε∗
+Q > εQ do
+M ←M + 1
+L ←LQ
+n
+fi(x1, x2, . . . , xN)/xi −βi/xi), PM
+j=1 αi,jσγ
+PN
+k=1 ωj,kxk + θj
+o
+ε∗
+Q, α∗
+i,j, ω∗
+j,k, θ∗
+j ←Minimize(L, (αi,j, ωj,k, θj))
+end while
+return ε∗
+Q, α∗
+i,j, ω∗
+j,k, θ∗
+j
+end procedure
+procedure Dynamical approximation(εQ)
+ε∗
+D ←∞
+µ∗←1
+¯z(0) ←(a1, a2, . . . , aM)
+z(0) ←(a1, a2, . . . , aM, b1, b2, . . . , bM)
+TARGET ←Equation (5)
+¯x1(t), . . . , ¯xN(t) ←Integrate(TARGET, t ∈[0, T],¯z(0))
+ε∗
+Q, α∗
+i,j, ω∗
+j,k, θ∗
+j ←Quasi-static approximation(εQ)
+while ε∗
+D > εD and µ∗> µ do
+µ∗←Reduce(µ∗)
+RNCRN ←Equation (6) with αi,j = α∗
+i,j, θj = θ∗
+j, ωj,i = ω∗
+j,i, γ, µ∗, and β1, β2, . . . , βN
+x1(t), . . . , xN(t), y1(t), . . . , yM(t) ←Integrate(RNCRN, t ∈[0, T], z(0))
+ε∗
+D ←LD{xi(t), ¯xi(t)} over all t ∈[0, T] and all i = 1, 2, . . . , N
+end while
+if ε∗
+D < εD then
+return α∗
+i,j, ω∗
+j,k, θ∗
+j, µ∗
+else
+εQ ←Reduce(εQ)
+return Dynamical approximation(εQ)
+▷recursive procedure
+end if
+end procedure
+37

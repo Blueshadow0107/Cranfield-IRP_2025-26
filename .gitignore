@@ -24,6 +24,14 @@ GEMINI.md
 
 # Generated PDFs (keep source, ignore output)
 Presentations/*.pdf
+Report/*.pdf
+
+# ============================================================
+# Python (virtualenv, bytecode caches)
+# ============================================================
+.venv/
+__pycache__/
+*.pyc
 
 # ============================================================
 # OS files
@@ -54,6 +62,22 @@ postProcessing/
 # Downloaded academic papers (large binaries, copyright)
 # ============================================================
 Notes/papers/*.pdf
+deep-research-output/**/papers/
+
+# ============================================================
+# Third-party reference code (kept locally, not ours)
+# ============================================================
+Analysis/reference_code/
+
+# ============================================================
+# Archived simulation runs (large outputs, kept locally)
+# ============================================================
+Analysis/archive/
+
+# ============================================================
+# OpenFOAM dynamicCode build artifacts
+# ============================================================
+dynamicCode/
 
 # ============================================================
 # Backups and archives

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Solver Evolution: From ψ–ω to Primitive Variables</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 2em auto; padding: 0 1em; line-height: 1.6; color: #333; }
+  h1 { color: #1a5276; border-bottom: 2px solid #1a5276; padding-bottom: 0.3em; }
+  h2 { color: #2874a6; margin-top: 1.5em; }
+  h3 { color: #2e86c1; }
+  .ok { color: #27ae60; font-weight: bold; }
+  .fail { color: #c0392b; font-weight: bold; }
+  .warn { color: #d35400; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+  th, td { border: 1px solid #bbb; padding: 8px 12px; text-align: left; }
+  th { background: #eaf2f8; }
+  code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; }
+  pre { background: #f8f9fa; padding: 1em; border-radius: 6px; overflow-x: auto; }
+  .box { background: #eaf2f8; padding: 1em; border-radius: 6px; margin: 1em 0; }
+  .key-insight { background: #fdebd0; padding: 1em; border-left: 4px solid #f39c12; margin: 1em 0; }
+</style>
+</head>
+<body>
+
+<h1>Solver Evolution Log</h1>
+<p><strong>Date:</strong> 2026-06-07 | <strong>Project:</strong> Cranfield IRP 2025-26 — Continuous Analog Wave Computation in Porous Media</p>
+
+<div class="box">
+<strong>Goal:</strong> Replace the discrete-obstacle streamfunction-vorticity (ψ–ω) solver with a primitive-variable (u, v, p) solver that can handle continuous Brinkman drag <code>−α(x,y)·u</code>.
+</div>
+
+<h2>1. The Starting Point: ψ–ω Solver (Working)</h2>
+
+<table>
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>File</td><td><code>cylinder_array_solver.py</code></td></tr>
+<tr><td>Variables</td><td>Streamfunction ψ, vorticity ω</td></tr>
+<tr><td>Grid</td><td>Cell corners (NX+1 × NY+1)</td></tr>
+<tr><td>Time stepping</td><td>Explicit Euler</td></tr>
+<tr><td>Obstacles</td><td>Dirichlet BCs (ψ = 0 inside), Thom's formula on surface</td></tr>
+<tr><td>Status</td><td class="ok">STABLE — validated with 6 configurations</td></tr>
+</table>
+
+<p><strong>Validation result:</strong> "none" vs "side_far" gave <strong>1,700× amplitude separation</strong> and <strong>1,600× std-dev separation</strong> — proving geometry can create binary-separable wake outputs.</p>
+
+<h2>2. Primitive-Variable Attempts (All Failed)</h2>
+
+<h3>v1 — Explicit Projection Method, Zero IC</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>MAC staggered grid, Chorin-Temam projection, zero initial velocity</td><td class="fail">NaN by step 500 (t = 0.025 s)</td></tr>
+</table>
+<p><strong>Failure mode:</strong> Inlet velocity suddenly imposed while interior is zero → divergence <code>div(u*) ≈ −800</code> at inlet → pressure Poisson solve produces global pressure gradient <code>O(10⁵)</code> → corrector creates large velocities near outlet → next step diverges worse.</p>
+
+<h3>v2 — Parabolic Initial Condition</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Initialize with exact Poiseuille profile everywhere</td><td class="fail">NaN by step 500</td></tr>
+</table>
+<p><strong>Failure mode:</strong> Same boundary incompatibility. The discrete Laplacian <code>L</code> used in the pressure Poisson equation does <em>not</em> equal the divergence-of-gradient operator <code>D·G</code> at boundaries. The corrector fails to drive <code>div(u) → 0</code> at inlet-adjacent cells.</p>
+
+<h3>v3 — Interior-Only Corrector</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Only correct interior faces with pressure gradient; boundary faces keep their BC values</td><td class="fail">NaN by step 100</td></tr>
+</table>
+
+<h3>v4 — Dirichlet Outlet Pressure</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Pure Neumann → mixed: Neumann on inlet/walls, Dirichlet <code>p = 0</code> on outlet</td><td class="fail">NaN by step 100</td></tr>
+</table>
+
+<h3>v5 — D·G-Compatible Pressure Matrix</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Build pressure matrix using the exact <code>D·G</code> operator instead of standard Laplacian</td><td class="fail">NaN by step 100</td></tr>
+</table>
+<p><strong>Note:</strong> Even with the exact operator, startup transients with <code>div(u*) = O(1)</code> still cause global pressure oscillations.</p>
+
+<h3>v6 — Implicit Diffusion (Crank-Nicolson)</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Treat diffusion implicitly via Helmholtz solve; advection + projection remain explicit</td><td class="fail">NaN by step 100</td></tr>
+</table>
+
+<h3>v7 — Smaller Time Step (dt = 1×10⁻⁵)</h3>
+<table>
+<tr><th>Change</th><th>Result</th></tr>
+<tr><td>Reduce dt by 5× to improve stability</td><td class="fail">NaN by step 500 (same physical time)</td></tr>
+</table>
+<p><strong>Key finding:</strong> The instability is <strong>structural, not a CFL violation</strong>. Error per physical time <code>t</code> is independent of <code>dt</code> because explicit Euler on an unstable mode grows as <code>e^(λt)</code>.</p>
+
+<div class="key-insight">
+<strong>Root cause identified:</strong> The projection method on a staggered MAC grid with inlet/outlet boundaries requires <code>div(∇p) = ∇²p</code> exactly. This holds for interior cells but <strong>fails at boundaries</strong> because the pressure gradient is not defined at boundary faces (they are not corrected). The residual divergence accumulates exponentially.
+</div>
+
+<h2>3. Brinkman in ψ–ω Attempts (Also Failed)</h2>
+
+<table>
+<tr><th>Attempt</th><th>Change</th><th>Result</th></tr>
+<tr><td>v1</td><td>Add <code>S_ω = −α·ω − v·∂α/∂x + u·∂α/∂y</code> explicitly</td><td class="fail">NaN by step 2,000</td></tr>
+<tr><td>v2</td><td>Treat <code>−α·ω</code> term implicitly: <code>ω_new = (ω_old + dt·RHS) / (1 + dt·α)</code></td><td class="fail">NaN by step 2,000</td></tr>
+<tr><td>v3</td><td>Reduce <code>α_max</code> from 10⁶ → 10⁴</td><td class="fail">NaN by step 2,000</td></tr>
+</table>
+
+<p><strong>Root cause:</strong> The explicit advection term <code>u·∂ω/∂x + v·∂ω/∂y</code> sees the sharp vorticity gradient at obstacle boundaries and explodes. The original solver avoids this by using <strong>Thom's formula</strong> to explicitly set boundary vorticity — without that discrete boundary treatment, the gradient is unresolvable by explicit time-marching.</p>
+
+<h2>4. The Old Assignment Method (Working)</h2>
+
+<p>Found in backup drive: <code>assignments-ARCHIVED/INCOMP/</code></p>
+
+<table>
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>Method</td><td>Artificial Compressibility (Chorin, 1967)</td></tr>
+<tr><td>Grid</td><td>Collocated (u, v, p at same points)</td></tr>
+<tr><td>Advection</td><td><strong>Upwind</strong> <code>(u[i] − u[i−1])/dx</code></td></tr>
+<tr><td>Viscous</td><td>Central differences</td></tr>
+<tr><td>Pressure</td><td><code>p_new = p_old − β·dt·div(u)</code> — no Poisson solve</td></tr>
+<tr><td>Stability</td><td>Artificial viscosity <code>0.01·ν</code> + adaptive under-relaxation</td></tr>
+</table>
+
+<p><strong>Why it works:</strong> No global Poisson solve means pressure errors are local. Upwind advection handles sharp gradients. The method converges to steady state via pseudo-time stepping.</p>
+
+<div class="key-insight">
+<strong>Trade-off:</strong> Artificial compressibility is a <strong>pseudo-time method</strong> — it converges to steady state, but the transient is not physically time-accurate. For watching the flow "develop from rest," this is a limitation.
+</div>
+
+<h2>5. Current File Inventory</h2>
+
+<table>
+<tr><th>File</th><th>Status</th><th>Notes</th></tr>
+<tr><td><code>cylinder_array_solver.py</code></td><td class="ok">WORKING</td><td>Original ψ–ω solver with discrete obstacles</td></tr>
+<tr><td><code>primitive_ns_solver.py</code></td><td class="fail">BROKEN</td><td>7 iterations of MAC projection method — all NaN</td></tr>
+<tr><td><code>cylinder_array_brinkman.py</code></td><td class="fail">BROKEN</td><td>3 iterations of Brinkman in ψ–ω — all NaN</td></tr>
+<tr><td><code>thermoviscous_channel.py</code></td><td class="ok">WORKING</td><td>Null results documented</td></tr>
+</table>
+
+<h2>6. Open Decisions</h2>
+
+<ol>
+<li><strong>Steady-state vs time-accurate?</strong> If steady-state is enough, artificial compressibility (from assignment) is a proven path.</li>
+<li><strong>Discrete vs continuous obstacles?</strong> The discrete ψ–ω solver works and can be framed theoretically as the resolved microscale per Allaire 1991 homogenization.</li>
+<li><strong>Brinkman drag?</strong> To make Brinkman work, we would need either implicit advection (nonlinear solve per step) or a much smoother <code>α(x,y)</code> field with no sharp gradients.</li>
+</ol>
+
+<div class="box">
+<strong>Recommendation:</strong> Given MSc time constraints, the pragmatic path is to use the <strong>working discrete-obstacle ψ–ω solver</strong> and frame it in the thesis as the resolved limit of a porous medium. The Brinkman transition can be discussed theoretically (homogenization) without requiring a working continuous solver.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+% Chapter: Introduction
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Background and Motivation}
+\label{sec:background}
+
+Artificial neural networks have become the dominant paradigm for machine learning, yet their inference is overwhelmingly executed on silicon-based digital electronics. In this architecture, computation is discretised into clocked arithmetic operations, memory is physically separated from processing units, and high-throughput inference requires ever-larger allocations of power and chip area. The resulting latency, energy consumption, and hardware cost motivate the search for alternative computational substrates that can perform inference directly in the physical domain.
+
+One promising alternative is \emph{physical neural networks} (PNNs), in which a physical process itself implements the mathematical transformations of a neural network. Recent demonstrations include optical diffractive networks \cite{lin2018alloptical}, mechanical learning networks \cite{stern2020supervised}, and acoustic metamaterial computers \cite{zuo2018acoustic}. In these systems, information is encoded in wave fields --- amplitudes, phases, or intensities --- and propagation through a structured medium performs the computation in parallel across space and continuous in time.
+
+This project investigates a specific class of PNN: a \emph{continuous analog wave computer implemented in porous media}. The substrate is a fluid-saturated porous solid through which acoustic waves propagate. The pore architecture modulates the effective acoustic properties of the medium, and the spatial distribution of porosity therefore acts as the trainable "weight" field of the network. Compared with free-space or layered wave computers, a porous medium offers a compact, three-dimensional, manufacturable volume in which wave interference and scattering can be exploited for computation.
+
+The central motivation is to determine whether such a continuous porous acoustic domain can be designed or optimised to perform simple computational tasks, such as frequency-selective routing or binary classification, using first-principles acoustic simulation.
+
+\section{Research Aim and Objectives}
+\label{sec:aim}
+
+The aim of this project is to investigate the feasibility of continuous analog wave computation in fluid-saturated porous media, using numerical simulation to design and evaluate a trainable acoustic computing substrate.
+
+The specific objectives are:
+\begin{enumerate}
+    \item To develop a modular first-order acoustic finite-difference time-domain (FDTD) solver capable of simulating wave propagation in inhomogeneous media with absorbing, hard-wall, and pressure-release boundary conditions.
+    \item To incorporate thermal effects on the speed of sound and to extend the solver toward equivalent-fluid porous models, in particular the Zwikker--Kosten (ZK) and Johnson--Champoux--Allard (JCA) formulations.
+    \item To validate the FDTD implementation against analytical expectations and, where practicable, against an OpenFOAM computational-fluid-dynamics baseline.
+    \item To demonstrate a trainable design region within the acoustic domain and to optimise its geometry or material distribution for a simple wave-computing task.
+\end{enumerate}
+
+\section{Thesis Structure}
+\label{sec:structure}
+
+The remainder of this thesis is organised as follows. \refChap{chap:literature_review} reviews wave-based physical neural networks, acoustic analog computing, porous-media acoustics, and related chemical or memristive porous substrates. \refChap{chap:methodology} presents the governing equations, the FDTD discretisation, the equivalent-fluid porous models, and the optimisation framework. \refChap{chap:results} reports validation tests, wave-propagation experiments, Bragg-grating behaviour, and design-region optimisation results. \refChap{chap:conclusions} summarises the contributions, limitations, and directions for future experimental work.

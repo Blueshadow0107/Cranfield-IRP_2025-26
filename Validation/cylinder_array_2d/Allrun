@@ -1,0 +1,22 @@
+#!/bin/bash
+# Run script for 2D cylinder flow case
+
+# Source OpenFOAM environment
+source /opt/openfoam13/etc/bashrc
+
+# Clean previous results
+./Allclean
+
+# Build mesh (half-domain)
+blockMesh
+
+# Mirror to full domain
+mirrorMesh -overwrite
+
+# Run laminar incompressible solver
+pimpleFoam
+
+# Post-process force coefficients
+# forceCoeffs.dat is written to postProcessing/forceCoeffsIncompressible/0/
+
+echo "Done. Check postProcessing/ for probe and force data."

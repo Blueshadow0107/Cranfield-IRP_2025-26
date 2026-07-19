@@ -1,0 +1,9 @@
+#!/bin/bash
+# Clean script for 2D cylinder flow case
+
+source /opt/openfoam13/etc/bashrc
+
+rm -rf constant/polyMesh
+rm -rf [0-9]*
+rm -rf postProcessing
+rm -f log.*

@@ -1,0 +1,121 @@
+% Chapter: Literature Review
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Introduction}
+\label{sec:lr_intro}
+
+This chapter reviews the literature relevant to continuous analog wave computation in porous media. The review is organised into four strands: (1) wave-based physical neural networks, in which electromagnetic or acoustic waves perform inference through structured media; (2) acoustic analog computing, including metamaterial logic and mathematical operations; (3) porous-media acoustics, which provides the effective-medium models needed to describe sound propagation in fluid-saturated pores; and (4) porous and chemical computing substrates, which establish precedents for using porous architectures as computational materials. \refsec{sec:lr_synthesis} synthesises these strands and identifies the research gap addressed by the present study.
+
+\section{Wave-Based Physical Neural Networks}
+\label{sec:wave_pnn}
+
+A physical neural network is a physical system whose dynamics implement the transformations of a neural network. In wave-based PNNs, the hidden state is a wave field and the trainable parameters are material properties or boundary conditions that shape propagation.
+
+\subsection{Wave Physics as a Recurrent Neural Network}
+\label{subsec:hughes_rnn}
+
+Hughes \etal\ \cite{hughes2019wave} showed that the scalar wave equation can be interpreted as a recurrent neural network. In their formulation, the field at two successive time steps constitutes the hidden state, and the Laplacian operator and material-dependent wave speed act as recurrent weights. They trained the spatial distribution of the refractive index to perform vowel recognition using backpropagation through the wave simulation. This work established the theoretical foundation for treating wave propagation as a trainable dynamical system.
+
+[Expand here with your own reading of Hughes \etal\ 2019: their discretisation, loss function, PML treatment, and how their second-order scalar model differs from your first-order acoustic formulation.]
+
+\subsection{Deep Physical Neural Networks}
+\label{subsec:wright_deep}
+
+Wright \etal\ \cite{wright2022deep} extended the PNN concept to \emph{deep} physical networks with multiple layers, demonstrating image classification and vowel recognition in an optical table-top setup. Their work showed that backpropagation can be implemented physically and that layered wave systems can rival small digital networks on classification tasks.
+
+[Add your own summary of the Wright \etal\ architecture, training procedure, and limitations.]
+
+\subsection{Backpropagation-Free Training}
+\label{subsec:momeni_bp_free}
+
+Momeni \etal\ \cite{momeni2023backpropagation} proposed a backpropagation-free training algorithm for deep physical neural networks. Rather than propagating gradients from the output loss through every layer, their method updates each physical layer using local forward measurements. This approach eliminates the need for a digital twin and is reported to be robust to experimental noise and drift. The method has been demonstrated on acoustic, microwave, and optical platforms.
+
+[Add your own critique: why this is relevant to the field, and why the layered architecture it assumes does not directly map onto the continuous porous domain considered here.]
+
+\subsection{Diffractive Deep Neural Networks}
+\label{subsec:lin_diffractive}
+
+Lin \etal\ \cite{lin2018alloptical} introduced all-optical diffractive deep neural networks, in which successive phase masks act as trainable layers and free-space propagation provides the inter-layer linear transform. This architecture is the optical prototype for layered physical NNs and has inspired acoustic analogues.
+
+[Add your own notes on how diffractive networks relate to your continuous-domain approach.]
+
+\section{Acoustic Analog Computing}
+\label{sec:acoustic_computing}
+
+\subsection{Metamaterial Mathematical Operations}
+\label{subsec:silva_math}
+
+Silva \etal\ \cite{silva2014mathematical} showed that metamaterials can be designed to perform mathematical operations such as differentiation and integration on incident wave fields. Their work established that spatially varying material properties can encode transfer functions directly in the physical medium.
+
+\subsection{Acoustic Logic and Classification}
+\label{subsec:zuo_acoustic}
+
+Zuo \etal\ \cite{zuo2018acoustic} demonstrated an acoustic analog computing system based on labyrinthine metasurfaces, realising operations including edge detection and equation solving. Such systems show that acoustic waves can be routed and transformed by structured surfaces, providing a bridge to the volumetric porous approach pursued here.
+
+[Add further acoustic-computing references as you find them, e.g. acoustic logic gates, topological routing, or programmable metasurfaces.]
+
+\section{Porous-Media Acoustics}
+\label{sec:porous_acoustics}
+
+To describe wave propagation in a fluid-saturated porous solid, it is common to use equivalent-fluid models that replace the heterogeneous pore-scale geometry with effective bulk properties.
+
+\subsection{Biot Theory}
+\label{subsec:biot}
+
+Biot \cite{biot1956theory} developed the coupled theory of elastic waves in a fluid-saturated porous solid, predicting two compressional waves and one shear wave. While Biot theory is required when the solid frame is elastic, many acoustic problems can be simplified by treating the frame as rigid and using an equivalent-fluid description.
+
+\subsection{Equivalent-Fluid Models}
+\label{subsec:equivalent_fluid}
+
+The Zwikker--Kosten (ZK) and Johnson--Champoux--Allard (JCA) models provide frequency-dependent effective density and bulk modulus for sound in rigid-framed porous materials. The ZK model captures viscous losses through a complex effective density, while the JCA model adds thermal relaxation effects. These models are essential for mapping pore geometry to acoustic behaviour and therefore for treating porosity as a trainable design parameter.
+
+[Expand this section with the governing equations of the ZK and JCA models and cite the original Zwikker--Kosten and Johnson--Champoux--Allard papers.]
+
+\section{Porous and Chemical Computing Substrates}
+\label{sec:porous_substrates}
+
+Although the present project focuses on acoustic wave computation, porous materials have previously been investigated as substrates for unconventional computation in other physical regimes. Mesoporous silica memristors \cite{jaafar2022mesoporous}, porous crystalline frameworks \cite{ding2023porous}, and geopolymer ionic memristors exploit ion transport in fluid-filled pores to implement memory and reservoir-computing functions. These works establish that pore architecture can be engineered to produce computational behaviour, supporting the broader premise that porous media are viable neural-computing substrates.
+
+[Keep or shorten this section depending on how strongly you wish to connect to the earlier chemical-computing direction.]
+
+\section{Synthesis and Research Gaps}
+\label{sec:lr_synthesis}
+
+\subsection{Unifying Themes}
+\label{subsec:themes}
+
+The reviewed literature converges on the idea that structured physical media can implement neural computation by modulating wave propagation. Table~\ref{tab:substrates} compares representative approaches.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of physical neural-network substrates}
+    \label{tab:substrates}
+    \begin{tabular}{@{}p{3.2cm}p{3.5cm}p{3.5cm}p{4.0cm}@{}}
+        \toprule
+        \textbf{Approach} & \textbf{Substrate} & \textbf{Training} & \textbf{Key Reference} \\
+        \midrule
+        Wave-RNN & Inhomogeneous scalar wave medium & Backprop through PDE & Hughes \etal\ \cite{hughes2019wave} \\
+        Deep PNN & Layered optical/metamaterial system & Backprop or local learning & Wright \etal\ \cite{wright2022deep}; Momeni \etal\ \cite{momeni2023backpropagation} \\
+        Diffractive NN & Phase-mask layers & Layer-wise phase pattern & Lin \etal\ \cite{lin2018alloptical} \\
+        Acoustic analog & Labyrinthine metasurfaces & Fixed geometry & Zuo \etal\ \cite{zuo2018acoustic} \\
+        Porous memristor & Fluid-filled nanopores & Ionic switching & Jaafar \etal\ \cite{jaafar2022mesoporous} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Identified Gaps}
+\label{subsec:gaps}
+
+Despite this progress, several gaps remain:
+
+\begin{enumerate}
+    \item \textbf{Continuous porous acoustic computer.} Existing wave-based PNNs are typically implemented in free-space optics or layered metamaterials. The use of a continuous, fluid-saturated porous volume as a single trainable acoustic substrate has not been explored.
+    \item \textbf{First-order equivalent-fluid FDTD.} Most wave-RNN implementations use the second-order scalar wave equation. A first-order acoustic FDTD solver coupled to equivalent-fluid porous models would provide a more direct connection to the physics of sound in pores.
+    \item \textbf{Thermal effects and validation.} The influence of temperature on sound speed, and validation against CFD tools such as OpenFOAM, are rarely addressed in the PNN literature.
+    \item \textbf{Manufacturability story.} Porous media offer a natural path to physical realisation through sintered materials, foams, or 3D-printed lattices, but the mapping from optimised effective properties to real geometry remains non-unique.
+\end{enumerate}
+
+\subsection{Position of This Study}
+\label{subsec:position}
+
+This project is positioned at the intersection of wave-based physical neural networks and porous-media acoustics. It treats a continuous porous domain as a recurrent dynamical system whose spatially varying porosity encodes the weights of an analog wave computer. The methodology combines first-principles FDTD simulation with equivalent-fluid porous modelling and gradient-free optimisation, with OpenFOAM validation of the baseline acoustics.

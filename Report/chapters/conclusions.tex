@@ -1,16 +1,46 @@
 % Chapter: Conclusions and Future Work
+% Continuous Analog Wave Computation in Porous Media
 
 \section{Summary of Contributions}
 \label{sec:contributions}
 
-[Summarise the key contributions and findings of the project.]
+% NOTE: Mirror the objectives from the introduction. State what was actually achieved.
+% Be honest: if something is preliminary, say so. Use the same language as the objectives.
+
+[Bullet summary of what was achieved.]
 
 \section{Limitations}
 \label{sec:limitations}
 
-[Acknowledge limitations of the study — e.g., computational constraints, scope, assumptions.]
+% NOTE: Be direct about weaknesses. This strengthens the thesis because it shows critical
+% awareness. Do not be apologetic, just factual.
+
+\begin{itemize}
+    \item Frequency-domain formulation assumes linear time-invariant steady-state response; transient and nonlinear effects are not captured.
+    \item Gradient-free optimisation limits design-space size and convergence speed.
+    \item 2D approximation; real porous devices are three-dimensional.
+    \item Fixed Lambda and Lambda' reduce the physical realism of the design space.
+    \item Mapping from optimised effective properties to a manufacturable geometry is not addressed.
+\end{itemize}
 
 \section{Future Work}
 \label{sec:future}
 
-[Suggest directions for future research building on this work.]
+% NOTE: Future work should be concrete and extend naturally from the limitations.
+% Avoid vague "more research is needed." Specify what kind and why.
+
+\begin{enumerate}
+    \item Extend to time-domain FDTD or auxiliary differential equations for broadband transient signals.
+    \item Implement adjoint-based gradient optimisation for larger design regions.
+    \item Relax fixed Lambda/Lambda' or link them to a pore-scale geometric model.
+    \item Validate select designs in OpenFOAM or experimentally.
+    \item Demonstrate a concrete classification or routing task with quantified accuracy and generalisation.
+\end{enumerate}
+
+\section{Concluding Remarks}
+\label{sec:concluding}
+
+% NOTE: One paragraph closing the thesis. Restate the aim, the main finding, and the
+% broader implication. End with a forward-looking sentence.
+
+[Final paragraph.]

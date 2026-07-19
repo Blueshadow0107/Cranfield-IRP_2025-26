@@ -1,0 +1,386 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% THEME & COLOURS (matched to GDP PowerPoint)
+% ============================================================
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{gdpPurple}{HTML}{633E88}
+\definecolor{gdpDarkBlue}{HTML}{0C406D}
+\definecolor{gdpNavy}{HTML}{091932}
+\definecolor{gdpOrange}{HTML}{DD7A0F}
+\definecolor{gdpSlate}{HTML}{3B4950}
+\definecolor{gdpLightGray}{HTML}{E7E6E6}
+\definecolor{gdpBurgundy}{HTML}{820E21}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=gdpSlate}
+\setbeamercolor{frametitle}{fg=gdpPurple,bg=white}
+\setbeamercolor{framesubtitle}{fg=gdpDarkBlue,bg=white}
+\setbeamercolor{title}{fg=gdpPurple}
+\setbeamercolor{subtitle}{fg=gdpDarkBlue}
+\setbeamercolor{author}{fg=gdpSlate}
+\setbeamercolor{institute}{fg=gdpSlate}
+\setbeamercolor{date}{fg=gdpSlate}
+\setbeamercolor{item}{fg=gdpDarkBlue}
+\setbeamercolor{subitem}{fg=gdpPurple}
+\setbeamercolor{block title}{fg=white,bg=gdpDarkBlue}
+\setbeamercolor{block body}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{block title alerted}{fg=white,bg=gdpBurgundy}
+\setbeamercolor{block body alerted}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{footline}{fg=gdpSlate}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb,graphicx,booktabs,array}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\setlength{\tabcolsep}{3pt}
+\setbeamertemplate{itemize/enumerate body begin}{\small}
+\setbeamertemplate{itemize/enumerate subbody begin}{\footnotesize}
+\addtolength{\leftmargini}{-0.3cm}
+\addtolength{\leftmarginii}{-0.2cm}
+
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2cm}
+  \textbf{\large\insertframetitle}
+  \vspace{0.05cm}
+  \par\textcolor{gdpDarkBlue}{\rule{\textwidth}{1.2pt}}
+  \vspace{-0.3cm}
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,leftskip=0.3cm]{footline}%
+      \insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,rightskip=0.3cm]{footline}%
+      \insertframenumber{}
+    \end{beamercolorbox}%
+  }%
+}
+
+\setbeamertemplate{title page}{
+  \vspace{1.5cm}
+  \begin{center}
+    {\Huge\bfseries\textcolor{gdpPurple}{\inserttitle}}\\[0.4cm]
+    {\Large\textcolor{gdpDarkBlue}{\insertsubtitle}}\\[1.2cm]
+    {\large\textcolor{gdpSlate}{\insertauthor}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertinstitute}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertdate}}
+  \end{center}
+}
+
+\title{Thermal Reconfiguration \& Nonlinearity}
+\subtitle{Architecture Review for Porous Wave Computation}
+\author{MSc Individual Research Project}
+\institute{Cranfield University\hspace{0.3cm}|\hspace{0.3cm}Supervisors: Prof. Weisi Guo, Prof. Takis Tsoutsanis}
+\date{31 May 2026}
+
+\begin{document}
+
+% ============================================================
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ============================================================
+\begin{frame}{Where We Are}
+  \textbf{Project direction:} Trainable acoustic wave computation in fluid-saturated porous media.
+
+  \vspace{0.3cm}
+  \textbf{Two questions explored today:}
+  \begin{enumerate}
+    \item \textbf{Architecture:} What physical system should we simulate?
+    \item \textbf{Nonlinearity:} Can porous media exhibit nonlinear behaviour? (Neural networks need nonlinear activation.)
+  \end{enumerate}
+
+  \vspace{0.3cm}
+  \textbf{Key insight:} Porous media are \textbf{not} inherently linear. At finite amplitudes---or with heating, bubbles, or prestress---they exhibit rich, trainable nonlinear behaviour.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Three Candidate Architectures}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{2.6cm}>{\raggedright}p{3.4cm}>{\raggedright}p{3.4cm}>{\raggedright\arraybackslash}p{3.8cm}@{}}
+      \toprule
+      & \textbf{A: Fixed + Thermal} & \textbf{B: Bubble Cloud} & \textbf{C: Hybrid} \\
+      \midrule
+      Scaffold & 3D porous solid & None & 3D porous solid \\
+      Reconfiguration & Laser heats fluid: $c(T)$, $\rho(T)$, $\mu(T)$ & Laser nucleates bubbles & Both \\
+      Wave modes & Fast P + Slow P + Shear & Compression only & All + bubble resonance \\
+      Nonlinearity & Moderate & \textbf{Extreme} & \textbf{All sources} \\
+      Simulation risk & Low & Medium & High \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.15cm}
+  \textcolor{gdpDarkBlue}{\small All three use external lasers for reconfiguration. All three are optically controlled.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Architecture Direction}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \textbf{Starting point: Architecture A}
+      \begin{itemize}
+        \item Fixed porous scaffold + saturated fluid
+        \item Laser heating rewrites $c(T)$, $\rho(T)$ spatially
+        \item Full Biot poroelasticity (3 wave modes)
+        \item Low simulation risk, high repeatability
+      \end{itemize}
+
+      \vspace{0.2cm}
+      \textbf{Possible extension: Architecture C elements}
+      \begin{itemize}
+        \item Bubble nucleation for strong nonlinearity
+        \item Only if time permits after core deliverables
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{block}{\footnotesize Rationale}
+        \footnotesize
+        A gives a defensible core thesis. C is high-risk; if it fails, we still have results.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Optothermal Reconfiguration: Concept}
+  \textbf{Idea:} Project a laser heating pattern $T(\mathbf{x})$ onto a porous scaffold. Local temperature changes alter the acoustic properties of the saturating fluid.
+
+  \vspace{0.3cm}
+  \textbf{The temperature field becomes the ``weight matrix'':}
+  \[
+    c(\mathbf{x}) = c_0\bigl[1 - \alpha_c\,\Delta T(\mathbf{x})\bigr], \qquad
+    \rho(\mathbf{x}) = \rho_0\bigl[1 - \beta_\rho\,\Delta T(\mathbf{x})\bigr]
+  \]
+
+  \vspace{0.2cm}
+  \textbf{Static programming:} Heat, let equilibrate, run acoustic computation.\\
+  \textbf{Dynamic programming:} Vary $T(\mathbf{x},t)$ during propagation (stretch goal).
+\end{frame}
+
+% ============================================================
+\begin{frame}{Thermal Effects: Physical Mechanisms}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{2.8cm}>{\raggedright}p{3.2cm}cc@{}}
+      \toprule
+      \textbf{Effect} & \textbf{Mechanism} & \textbf{Strength} & \textbf{Speed} \\
+      \midrule
+      Sound-speed change & $c(T)$ decreases $\sim$3 m/s/\textdegree C & Moderate & ms \\
+      Density change & Thermal expansion $\rho(T)$ & Weak & ms \\
+      Viscosity change & $\nu(T)$ drops with $T$ & Moderate & ms \\
+      \textbf{Bubble nucleation} & Superheat $>$ $T_{sat}(P)$ & \textbf{Extreme} & $\mu$s \\
+      Thermal stress & Expansion mismatch & Moderate & ms \\
+      Convection & $\nabla T$ $\to$ buoyancy flow & Weak & 100\,ms--s \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.15cm}
+  \textbf{Timescale hierarchy:} Acoustic period ($\mu$s) $\ll$ Thermal diffusion (ms) $\ll$ Bubble dissolution (100\,ms--s).
+
+  \textcolor{gdpDarkBlue}{\small At 1\,MHz the acoustic wave sees a ``frozen'' temperature landscape---clean static programming.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Nonlinearity Question}
+  \textbf{Q: Are porous media linear?}
+
+  \vspace{0.3cm}
+  \textbf{A: Only at very small amplitudes.} Under the standard assumptions:
+  \begin{itemize}
+    \item Slow flow $\to$ Darcy's law (linear)
+    \item Small deformation $\to$ Hooke's law (linear)
+    \item Uniform temperature $\to$ constant properties
+    \item No free gas $\to$ single-phase fluid
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textbf{Break any assumption---nonlinearity appears.} Six distinct mechanisms have been documented in the acoustics literature.
+
+  \vspace{0.2cm}
+  \textcolor{gdpDarkBlue}{\small This is not a bug. Neural networks \textit{need} nonlinear activation functions. Porous media provide them naturally.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Nonlinearity I: Grain Contact \& Forchheimer}
+  \textbf{1. Grain Contact (Hertzian)}
+
+  In granular media, contact stiffness increases with compression following a power-law relationship. Wave speed becomes strain-dependent. The nonlinear parameter is $10^2$--$10^4\times$ larger than in homogeneous solids.
+
+  \vspace{0.3cm}
+  \textbf{2. Forchheimer Inertial}
+
+  At high velocity, inertial pressure drop dominates viscous drag. A quadratic velocity term appears in the momentum equation, causing amplitude-dependent attenuation and harmonic generation. Experimentally observed at $>$140\,dB in rigid porous absorbers.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Nonlinearity II: Biot Coupling \& Bubble Resonance}
+  \textbf{3. Biot Solid--Fluid Coupling}
+
+  Tong et al.\ (2017) showed that a linear solid coupled to a linear fluid produces a \textbf{nonlinear coupled system}. The cross-coupling term is \textit{unique to porous media}. Fast and slow wave interaction generates double-frequency waves ($2\omega$ from $\omega$).
+
+  \vspace{0.3cm}
+  \textbf{4. Bubble Resonance (Strongest)}
+
+  Gas bubbles in fluid exhibit strong nonlinear oscillations described by the Rayleigh--Plesset equation. Near the Minnaert resonance, the nonlinear parameter $B/A$ explodes by orders of magnitude. Effective sound speed can drop to $\sim$10\,m/s.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Nonlinearity III: Thermal Gradient \& Acoustoelasticity}
+  \textbf{5. Thermal Gradient}
+
+  Spatially varying $T(\mathbf{x})$ creates a gradient-index acoustic medium. Add viscous heating (temperature rise proportional to pressure squared) and you obtain the Westervelt equation---intrinsic amplitude-dependent nonlinearity. Thermal lensing focuses or defocuses sound.
+
+  \vspace{0.3cm}
+  \textbf{6. Acoustoelastic Prestress}
+
+  Wave speeds in a prestressed medium depend on stress through third-order elastic constants. Laser-induced thermal expansion creates internal stress fields---a second-order thermal nonlinearity.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Why Nonlinearity Matters for Neural Computation}
+  A linear system can only perform linear operations. A neural network needs \textbf{nonlinear activation}.
+
+  \vspace{0.2cm}
+  \begin{table}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3.2cm}>{\raggedright}p{5.2cm}>{\raggedright\arraybackslash}p{4.2cm}@{}}
+      \toprule
+      \textbf{NN Element} & \textbf{Physical Realisation} & \textbf{Control Knob} \\
+      \midrule
+      Weights & Local $c(T)$, impedance $Z(T)$ & Laser heating pattern \\
+      Linear transform & Wave propagation + interference & Scaffold geometry \\
+      \textbf{Activation} & \textbf{Forchheimer sat. + bubble clipping + harmonic gen.} & \textbf{Laser intensity + amplitude} \\
+      Bias & Static pressure, background $T$ & Chamber conditions \\
+      Output & Microphone / hydrophone array & Sensor placement \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.15cm}
+  \textcolor{gdpDarkBlue}{\small The nonlinearity is not fixed---it is spatially programmable via $T(\mathbf{x})$. This makes the activation function itself trainable.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Another Paradigm: Vortex-Based Computation}
+  \textbf{Beyond acoustics: using Navier--Stokes dynamics directly.}
+
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{Strouhal--Reynolds:} shedding frequency $f_S \propto \text{St}(\text{Re})$ acts as a built-in nonlinear activation
+        \item \textbf{Cylinder arrays:} geometry encodes discrete weights; wake interference implements computation
+        \item \textbf{Memory:} vortex advection and recirculation create state that persists after input ceases
+        \item \textbf{Critical regime:} Re $\approx$ 40 (twin-vortex, before Hopf bifurcation) shows peak reservoir-computing performance
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{\footnotesize Key Literature}
+        \footnotesize
+        Goto \textit{et al.}\ (2021): peak RC at Re$\approx$40; ESP breaks after bifurcation.\\[0.1cm]
+        Sharifi Ghazijahani (2025): ESN predicts flow behind 7-cylinder arrays.\\[0.1cm]
+        Roshko (1954): universal Strouhal--Reynolds curve.
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \textcolor{gdpBurgundy}{\small Navier--Stokes is \textbf{inherently} nonlinear. No need to engineer nonlinearity into the material.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Common Geometry}
+  \begin{center}
+    \textcolor{gdpPurple}{\large Both approaches are the same structural object.}
+  \end{center}
+
+  \vspace{0.2cm}
+  \footnotesize
+  \begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3.0cm}>{\raggedright}p{4.8cm}>{\raggedright\arraybackslash}p{5.2cm}@{}}
+      \toprule
+      & \textbf{Acoustic (this deck)} & \textbf{Vortex (emerging)} \\
+      \midrule
+      Scaffold & 3D porous solid / obstacle array & Cylinder array in channel \\
+      Weights & Local $c(T)$, $Z(T)$ via heating & Cylinder diameter / spacing \\
+      Physics & Helmholtz / Biot (linear bulk) & Navier--Stokes (nonlinear bulk) \\
+      Nonlinearity & Boundary/interface only & Inherent (convective) \\
+      Memory & Transit time only & Vortex advection \\
+      Timescale & $\mu$s & ms \\
+      Readout & Pressure / velocity probes & Photoelasticity / PIV \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.2cm}
+  \textcolor{gdpDarkBlue}{\small The choice is not ``both''---they are \textbf{alternative substrates} for the same geometric paradigm. Timescale mismatch ($\sim$1000$\times$) precludes hybridisation.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Next Steps \& Open Questions}
+  \textbf{Immediate (this week)}
+  \begin{itemize}
+    \item Commit to architecture (A as core, C as stretch)
+    \item Choose operating fluid and temperature range
+    \item Compile $c(T)$, $\rho(T)$, $\mu(T)$ data
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \textbf{Short-term (next 2--4 weeks)}
+  \begin{itemize}
+    \item Implement linear Biot FDTD baseline
+    \item Add static thermal modulation $c(T(\mathbf{x}))$
+    \item Validate against analytical Biot solutions
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \textbf{Critical open questions}
+  \begin{itemize}
+    \item What $\Delta T$ is achievable? Is $c(T)$ variation large enough?
+    \item How localised can $T(\mathbf{x})$ be before thermal blur destroys ``weights''?
+    \item What source amplitude activates Forchheimer nonlinearity?
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Summary}
+  \begin{itemize}
+    \item \textbf{Architecture:} A (fixed scaffold + thermal fluid) as core; C (hybrid) as stretch goal
+    \item \textbf{Thermal control:} Laser heating rewrites $c(T)$, $\rho(T)$ spatially; static programming is clean
+    \item \textbf{Nonlinearity:} Six documented mechanisms; porous media are \textbf{not} inherently linear
+    \item \textbf{Trainability:} Temperature field controls both linear weights \textit{and} nonlinear activation strength
+    \item \textbf{Novelty:} No existing system combines 3D porous substrate + acoustic waves + optothermal reconfiguration + trainable nonlinearity
+  \end{itemize}
+
+  \vspace{0.4cm}
+  \begin{center}
+    \Large\textbf{\textcolor{gdpPurple}{Questions / Discussion}}
+  \end{center}
+\end{frame}
+
+\end{document}

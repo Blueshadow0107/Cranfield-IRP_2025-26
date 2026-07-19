@@ -1,0 +1,1845 @@
+Detailed Balanced Chemical Reaction Networks
+as Generalized Boltzmann Machines
+William Poolea, 1, Tom Ouldridgeb, Manoj Gopalkrishnanc, 2, and Erik Winfreea, 1, 2
+aComputation and Neural Systems, California Institute of Technology, Pasadena, California, USA; bBioengineering, Imperial College London, London, England; cElectrical
+Engineering, India Institute of Technology Bombay, Mumbai, India
+This manuscript was compiled on May 16, 2022
+Can a micron sized sack of interacting molecules understand, and adapt to a constantly-ﬂuctuating environment? Cellular life provides an
+existence proof in the afﬁrmative, but the principles that allow for life’s existence are far from being proven. One challenge in engineering
+and understanding biochemical computation is the intrinsic noise due to chemical ﬂuctuations. In this paper, we draw insights from machine
+learning theory, chemical reaction network theory, and statistical physics to show that the broad and biologically relevant class of detailed
+balanced chemical reaction networks is capable of representing and conditioning complex distributions. These results illustrate how a
+biochemical computer can use intrinsic chemical noise to perform complex computations. Furthermore, we use our explicit physical model
+to derive thermodynamic costs of inference.
+Chemical Reaction Network | Probabilistic Inference | Boltzmann Machine | Molecular Programming
+C
+omputing with small numbers of molecules at around room temperature presents a unique set of challenges. However,
+cell and molecular biology demonstrate that every living cell can perform complex information processing using circuitry
+built out of just a few basic building blocks (1). More recently, systems biologists have identiﬁed a variety of biochemical
+design principles observed across many organisms which suggests that uniﬁed understanding of biochemical systems may
+be possible (2, 3). At the same time, synthetic biologists and engineers, inspired by the sophistication seen in biology, are
+beginning to build cellular and synthetic cell-like systems capable of functions ranging from locomotion to division to digital
+and analog information processing (4–7). Programmed biochemical systems are rapidly expanding into medical diagnostics (8),
+cancer therapeutics (9), sustainable bioreactors (10), and advanced materials (11). However, designing and understanding
+increasingly complex biochemical computation will require new principles and design methodologies. This work adds a new
+perspective by showing that a wide class of biochemical models can be formally interpreted, designed, and analyzed using
+machine-learning inspired methods.
+Almost all modern computers are built on the digital abstraction of variables having binary values. This abstraction allows
+computers to excel at tasks like Boolean logic and integer arithmetic. However, there is no reason why biochemical computers
+need be digital or would have evolved that way. Despite early success building synthetic biochemical logic circuits (12, 13), so
+far these systems have failed to achieve anything close to the complexity of a smartphone, much less a living organism. An
+alternative is to take an analog approach where biochemical signals are allowed a continuous range of values. In the past
+decades, analog computing has been reborn under the guise of deep learning and is revolutionizing domains from computer
+vision (14) to natural language processing (15) to biochemistry (16). A third approach, and the one we emphasize in this paper,
+is probabilistic programming (17), a hybrid of the conventional digital abstraction and analog computing where discrete values
+are assigned probabilities. Indeed, many state of the art machine learning methods involve probabilistic elements (18) and
+more conventional machine learning methods may be seen as approximations of probabilistic models (19). It has also been
+suggested that analog or hybrid digital-analog approaches to information processing may be more eﬃcient, particularly in
+the nervous system and biochemical contexts (20, 21). There is also an increased interest in specialized hardware capable of
+Signiﬁcance Statement
+This work presents a highly interdisciplinary approach towards understanding how biochemical systems can perform inference. By
+combining theories from the ﬁelds of machine learning, chemical reaction networks, and statistical physics, we have been able to
+provide a unique lens to understand biochemical networks as physical implementations of machine learning algorithms. In this work,
+we focus on inference: namely how can a chemical system make decisions based upon noisy data. Our results indicate that thermal
+ﬂuctuations can be used as a resource at the micron scale. Finally, due to the concrete nature of our theory, we can directly apply
+known results from thermodynamics to chemical systems performing inferential computations.
+WP did the primary research, simulation, and wrote the manuscript. TO, MG, and EW jointly provided critical feedback, guidance, and technical expertise to the project.
+We declare no competing interests.
+2 E.W. and M.G. jointly supervised this work.
+1To whom correspondence should be addressed. E-mail: wpoole@caltech.edu; winfree@caltech.edu
+1
+arXiv:2205.06313v1  [q-bio.MN]  12 May 2022
+
+
+directly implementing probabilistic computations and machine learning (22). In this vein, machine learning architectures, such
+as neural networks, have been theorized (23–27) and built in a variety of biochemical systems (28) yet they remain considerably
+less complex than their digital relatives.
+Inside individual cells, noise also plays an important role in biochemical computation which diﬀers from the deterministic
+precision of silicon computers. At the micron to sub-micron scale, the counts of individual (non-solvent) molecules frequently
+become very small which in turn results in high variance (29). Mathematically, such systems are commonly modeled with
+stochastic chemical reaction networks (CRNs) (30). Biochemical noise has been rigorously quantiﬁed in systems such as
+gene expression (31), stochastic partitioning at cell division (32), and neuronal ﬁring (33). This extensive documentation
+of noise suggests that chemical computers must function in a a noisy environment, respond to noisy signals, and rely on
+noisy components. One way to deal with this noise is to mitigate it: methods such as kinetic proofreading (34, 35), low
+pass ﬁlters (36, 37), and fold change detectors (38, 39) have all been observed naturally and engineered in order to mitigate
+ﬂuctuations. However, an alternate approach is to ask how biochemical systems can use intrinsic noise to their advantage.
+A number of theoretical biochemical algorithms have been proposed that use intrinsic chemical ﬂuctuations to generate
+distributions (40), infer parameters of probabilistic models (41), and solve combinatorial constraint satisfaction problems (42).
+Probabilistic inference can be seen as the archetypal problem for understanding how to deal with noise and make the best
+decision (43). In computer science and machine learning, generative probabilistic models have emerged as a powerful framework
+for inference (44). Boltzmann machines are one of the most well studied of these models and excel at learning high dimensional
+probability distribution using hidden (latent) variables and computing conditional distributions (45). In this paper, we build
+on previous work which presented a number of CRN implementations of Boltzmann machines (46). Here, we show how a broad
+class of stochastic biochemical models called detailed balanced (db) CRNs may be viewed as generalizations of Boltzmann
+machines: capable of representing complex distributions using hidden variables and computing conditional distributions. Due
+to the explicit and physical nature of these models, we then go on to provide some thermodynamic costs related to inference.
+In the a separate paper we apply these models to the task of learning.
+1. Background
+A. Probabilistic Inference. In this work, we are interested in generative models, a broad class of mathematical models that
+represent probability distributions (47). Speciﬁcally we focus on Boltzmann machines and stochastic chemical reaction networks;
+when interpreted as generative models, each of these systems probabilistically samples (or explores) a high dimensional state
+space. In general, we are less concerned with the sampling dynamics than the steady state distribution which occurs in the
+limit of running a generative model for inﬁnite time. In fact, a low number of dynamic variables can represent a steady-state
+distribution that is exponential in the degrees of freedom (46). Seen in this light, probability distributions present a powerful
+framework for a system to understand its environment. Within the context of generative models, we equate inference with the
+computation of conditional steady state distributions. For instance, a cell inferring the state of the environment h given a noisy
+signal v is equivalent to computing the conditional distribution P(h | v). Implicit in our framework is the idea that the variable
+being conditioned on is held constant while the conditional distribution is being computed - the constant variables are referred
+to as clamped. Additionally, the un-clamped or free variables must be coupled to the clamped variables for inference to be
+meaningful. In the limit of no coupling between x and y, a distribution can be written in product form, P(x, y) = P(x)P(y),
+which means x and y are independent and conditioning provides no new information: P(x | y) = P(x) and P(y | x) = P(y).
+Most readers will be familiar with conditional distributions of the form P(h | v) which is conditioning on v having an exact
+value. However, it is also possible to generalize conditioning to holding moments of a distribution ﬁxed via the conditional
+limit theorem (48). For example, P(h, v | ⟨v⟩= v) means that the distribution P(h, v) has been conditioned on v having an
+average value of ⟨v⟩= v. This kind of conditioning allows v to ﬂuctuate, subject to constraints. Under a number of reasonable
+conditions we detail in Supplemental Section A, the conditional limit theorem states:
+P(h, v | ⟨v⟩= v) = argmin
+P ∈µ
+D(P(h, v) || P(h, v)).
+[1]
+Here D(P || Q) = P
+x P(x) log P (x)
+Q(x) is the relative entropy and µ is the space of all distributions with mean ⟨v⟩= v. As we
+will discuss, this generalization turns out to be more mathematically tractable than holding v ﬁxed and allows for complex
+inferential computations. Finally, in this work, we will use the term clamped to also denote variables whose means have been
+conditioned and it will be clear by context which kind of conditioning is being performed.
+B. Boltzmann Machines. Boltzmann Machines∗(BM) are a class of probabilistic graphical model which have been extensively
+studied theoretically (49, 50) and used for many machine learning applications (51–53). For the purposes of this work, BMs
+serve as a guide for understanding what it means for a system to be capable of inference. Brieﬂy, a BM is a stochastic neural
+network of binary nodes xi ∈{0, 1} which have an equilibrium distribution:
+P(x) = 1
+Z e−E(x)
+Z =
+X
+x∈{0,1}N
+e−E(x)
+E(x) =
+X
+i>j
+wijxixj −
+X
+i
+θixi.
+[2]
+∗Many readers may be familiar with restricted Boltzmann Machines which are a subclass of Boltzmann Machines with speciﬁc topological structure.
+
+
+Here, θ ∈R are bias terms and the weight terms wij ∈R couple nodes xi and xj and induce correlations ensuring xi and xj
+are not independent. Additionally Boltzmann machines can use hidden units and marginalization to represent even more
+complex distributions. Let X = {xi} be partitioned into two disjoint sets V and U of visible and hidden units, respectively.
+The probability of the visible units is given by the marginalization over the hidden units:
+P(v) =
+X
+u
+P(v, u).
+[3]
+Similar to the many layers of latent variables in a deep neural network, the hidden units U have been shown to increase the
+complexity of the distributions that the BM can model (49, 50, 54).
+BMs are also able to seamlessly compute conditional distributions. Again, partition the nodes X into two disjoint sets U and
+V . Here U will be the free variables and V will be clamped. The conditional distribution π(u | v) can be exactly sampled by
+clamping v to a constant value while simulating the BM (49). In many cases, a combination of clamping and marginalization
+is used together where both visible and hidden units can be clamped or free. General purpose inference allows Boltzmann
+Machines to classify data (55) (U are class labels and hidden units, V are data points); generate distributions (56) (U are data
+and hidden units, V are labels and hidden units); and infer missing data (52) (U are unknown data and hidden units, V are
+known data).
+Finally, the parameters (energies) of a BM can learned via gradient descent on the relative entropy between a BM run freely
+and the distribution of the BM clamped to samples from data distribution ψ(v).
+dwij
+dt
+= ∂D(P || P)
+∂wij
+= ϵ(⟨xixj⟩P −⟨xixj⟩P)
+dθi
+dt = ∂D(P || P)
+∂θi
+= ϵ(⟨xi⟩P −⟨xi⟩P)
+[4]
+Here, P(v, u) = P(u | v)ψ(v) is the clamped distribution and ϵ is the learning rate. Importantly, this optimization procedure is
+equivalent to minimizing the relative entropy DD(ψ(v) || P(v)). However, by using the clamped distribution P this learning
+rule is able to train hidden units representing latent variables not part of the data distribution ψ.
+C. Chemical Reaction Networks. In this work, we model biochemical ﬂuctuations using stochastic chemical reaction networks
+(CRNs) with mass action kinetics. This model is consistent with the statistical mechanics of a well-mixed ideal solution (30)
+and has a long history being applied to biological problems including modeling genetic circuits (57) and understanding noise in
+biochemical processes (58). Similarly, stochastic CRNs have been studied as a programming language, shown to be Turing
+universal (59–61) and used to guide implementations and analyses of molecular programs in laboratory settings (62–64) .
+Formally, a CRN (S, R, k) is a set of species S, reactions R and reaction rates k. Reactions convert one multiset of species
+into another: Ir
+kr
+−→Or. Here Ir and Or are the vectors of input and output species for reaction r, respectively. These
+vectors can be combined into a single matrix called the stoichiometric matrix M = O −I. CRNs may have both stochastic
+and deterministic dynamics. However, in this paper we focus on the stochastic dynamics of the probability that species in
+the CRN will have particular counts. Reactions occur with probability proportional to their mass-action propensity function
+ρr(s) =
+kr
+V|Ir|
+Q
+i
+si!
+(si−Ir
+i )!. Here, V denotes the volume of the CRN and will be assumed to be 1 unless explicitly deﬁned
+otherwise and kr have units of per second. We use si to mean the counts of species Si and s without a subscript denotes a
+vector of species’ counts. The dynamics of the probability distribution are given by the chemical master equation:
+dP(s, t)
+dt
+=
+X
+r
+P(s −M r, t)ρr(s −M r) −P(s, t)ρr(s).
+[5]
+Often, we are interested in the stationary distribution P∗(s; s0) found by setting (5) to 0 or by simulating the CRN dynamics
+until convergence with exact methods such as the Gillespie algorithm (65). For arbitrary CRNs, P∗(s; s0) may or may not exist,
+may not be unique, and may depend on the initial condition s0. However, for the class of detailed balanced CRNs deﬁned
+below existence and uniqueness are guaranteed.
+The reachability class of a CRN, Γs0 ⊆ZS, is the subset of the integer lattice reachable by a sequence of reactions starting at
+an initial state s0. In some cases, Γs0 may be inﬁnite. We emphasize that this set is distinct from the stoichiometric subspace
+Ωs0 which is given by the kernel of the stoichiometric matrix M. The latter is an aﬃne space of the form A(s −s0) = 0, with
+A a |S| by k dimensional matrix representing k ≥0 conserved quantities in the system. Speciﬁcally, Γs0 ⊆Ωs0 (66). For
+example, the CRN ∅−⇀
+↽−2S has an inﬁnite reachability class of either the even or odd positive integers depending on s0 and a
+stoichiometric compatibility class that covers all the positive integers. Indeed, as we will prove later, it is by restricting the
+reachability class relative to the stoichiometric subspace that we are able to program detailed balanced CRNs to represent
+broad classes of distributions. Note that the reachability class may be arbitrarily complex compared to the stoichiometric
+compatibility class (67).
+D. Detailed Balanced Chemical Reaction Networks. Detailed balanced CRNs (dbCRN) are a subclass of CRNs that represent
+non-driven chemical systems such as molecular binding and unbinding. Mathematically, the detailed balanced property requires
+that:
+• Each species Si ∈S has an energy Gi
+
+
+100
+125
+150
+175
+200
+225
+250
+275
+300
+time
+10
+20
+30
+example
+trajectories
+A: Product Poisson Distribution
+s1
+s2
+s3
+(s1, s2)
+Reachability
+0.000
+0.005
+0.010
+0.015
+0.020
+0.025
+Probability
+0
+5
+10
+15
+20
+25
+30
+0.00
+0.05
+0.10
+0.15
+(s1)
+0.0
+0.1
+(s2)
+0
+5
+10
+15
+20
+25
+30
+100
+125
+150
+175
+200
+225
+250
+275
+300
+time
+0
+10
+20
+B: Restricting the Reachability Class
+s1
+s2
+s3
+(s1, s2)
+Reachability
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+Probability
+0
+5
+10
+15
+20
+25
+30
+0.00
+0.05
+0.10
+0.15
+(s1)
+0.0
+0.1
+(s2)
+0
+5
+10
+15
+20
+25
+30
+100
+125
+150
+175
+200
+225
+250
+275
+300
+time
+0.0
+2.5
+5.0
+7.5
+C: Marginalizing Over Restricted Hidden Species
+s1
+s2
+ch
+cs
+(s1, s2)
+Reachability
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+Probability
+0
+2
+4
+6
+8
+10
+0.0
+0.1
+0.2
+(s1)
+0.0
+0.2
+(s2)
+0
+2
+4
+6
+8
+10
+Fig. 1. Restricting the reachability class of a dbCRN can give rise to complex distributions. A. Product Poisson Distribution of two independent species marginalized over a third
+independent species generated from a dbCRN whose reachability class is the entire positive integer lattice: ∅−
+⇀
+↽
+−Si. B. The marginal equilibrium distribution of a dbCRN
+restricted whose reachability class is restricted to an afﬁne subspace: S1 −
+⇀
+↽
+−S2 −
+⇀
+↽
+−S3. This reachability class induces correlations between the species. C. The marginal
+equilibrium distribution of a dbCRN with a highly restricted reachability class marginalized over many binary hidden species. See equation (8) for the full dbCRN. This dbCRN
+produces a distribution with a very complex structure. Note: all trajectories shown at the top are just tiny fractions of the total simulated time.
+• All reactions are reversible meaning if I
+k+
+−−→O ∈R then O
+k−
+−−→I ∈R.
+• Reaction rates obey k+
+k−= e−∆G, where ∆G = P
+i Gi(Oi −Ii).
+A detailed balanced reaction network’s stationary distribution is an equilibrium distribution meaning there is no net energy
+ﬂow or entropy production at steady state. These distributions can correspond to both the canonical or grand canonical
+ensembles of statistical physics, depending on whether only energy is allowed to be exchanged with the surrounding heat bath
+or if certain species within a reservoir can also be exchanged (such as via the reaction ∅−⇀
+↽−2S where ∅indicates a molecule
+moving to or from the reservoir). This equilibrium distribution necessarily has product a Poisson form written in terms of the
+free energy function G(s) (68):
+π(s; s0) = 1
+Z
+Y
+i
+e−Gisi
+si!
+= 1
+Z e−G(s)
+Z =
+X
+s∈Γs0
+e−G(s)
+G(s) =
+X
+i
+Gi(s) =
+X
+i
+Gisi + log si!
+[6]
+Notice that in general the equilibrium distribution π(s; s0) depends on the initial condition s0. However, for notational
+simplicity we will typically just write π(s) with the initial condition dependence implied. Similarly, the sum in the partition
+function runs over the reachability class Γs0 and the dependence of Z on s0 is always implied. Additionally, in some proofs to
+avoid cluttered notation, the reachability class may be omitted from sums over species s but is always implied. We comment
+that π(s; s0) is ergodic within the reachability class Γs0 due to the detailed balanced conditions. Finally, in this paper, we are
+primarily concerned with how species’ energies aﬀect the equilibrium distribution. If D = (S, R, k) is a detailed balanced CRN,
+DG is the same set of species and reactions with the rate constants k changed to reﬂect the new energies G. This CRN will not
+necessarily be unique because any pair of forward and backward rates can be rescaled arbitrarily, however it will have a unique
+equilibrium distribution given by equation (6).
+E. Detailed Balanced CRNs Can Model Complex Environments. Equation (6) seems to suggest that dbCRNs can only produce
+simple distributions in product-Poisson form that seem to only allow control of the mean of the species’ counts, because Poisson
+distributions are deﬁned by their mean. For example, a product Poisson distribution on the entire integer lattice can be seen in
+ﬁgure 1A. Yet, in previous work, we constructed dbCRNs able to produce non-Poisson distributions such as those produced by
+Boltzmann Machines (46). Indeed, carefully constructed dbCRNs can in fact produce any distribution with ﬁnite support (40).
+Each of these constructions implicitly restricts the reachability class with speciﬁc reactions and initial conditions. In this
+section, we illustrate two example of dbCRNs producing non-poisson distributions. First, we consider the simple dbCRN used
+to produce the distributions in Figure 1B:
+S1 −⇀
+↽−S2 −⇀
+↽−S3
+s1 + s2 + s3 = c.
+[7]
+
+
+Here the a single constraint restricts the reachability class of each species where c is the total number of all the species at the
+start of the simulation. Even such a simple constraint is enough to break the independence of a product Poisson distribution
+which can be seen by the obvious anti-correlatiom between S1 and S2 in Figure 1B.
+Detailed balanced CRNs with many more conservation laws can produce arbitrary distributions with ﬁnite support. For
+example, the dbCRN used to produce the face in ﬁgure 1C and the smiley-frowny face in 2C is given by the reactions:
+Cα + P α
+x,y −⇀
+↽−Cα + P α
+x+1,y + S1,
+Cα + P α
+x,y −⇀
+↽−CαP α
+x,y+1 + S2,
+Cα + P α
+x,y −⇀
+↽−Cβ + P β
+x,y.
+[8]
+Here, Cα are control species tuning whether the distribution is happy (α = h) or sad (α = s). There are two sets of pixel
+species P α
+x,y, one for the happy face (α = h) and one for the sad face (α = s) with x and y denoting the pixel locations. The
+visible species are S1 and S2. The energies of the pixel species have been set to produce the happy and sad images. This
+construction requires a very tightly coupled reachability class with initial conditions that satisfy the following constraints:
+cs + ch = 1
+X
+x,y,α
+pα
+x,y = 1,
+X
+x,y
+pα
+x,y = cα,
+s1 =
+X
+x,y,α
+xpα
+x,y
+s2 =
+X
+x,y,α
+ypα
+x,y.
+[9]
+In words: there is only one Cα species present and one P α
+x,y species present at any time and they must both have the same
+value for α. The counts of S1 and S2 must also correspond to the values x and y, respectively, of the single P α
+x,y species present.
+Importantly, if this dbCRN begins in a state which obeys these conservation laws, all subsequent states will also obey these
+laws due to the carefully chosen set of reactions.
+F. Chemical Boltzmann Machines. In our previous work on chemical Boltzmann machines (46), we showed that a special class
+of detailed balanced CRNs called the Edge-Species Chemical Boltzmann Machine (ECBM) construction exactly simulates a
+traditional Boltmzann Machine and is capable of a limited form of inference. This construction uses reactions to constrain the
+reachability class of certain species with conservation laws. This fact can be seen by the example of a two-node ECBM (which
+can be generalized to arbitrary graphs):
+S0
+1 + S0
+2 −⇀
+↽−S1
+1 + S0
+2
+S1
+1 + S0
+2 + S0
+W −⇀
+↽−S1
+1 + S1
+2 + S1
+W
+[10]
+S0
+1 + S0
+2 −⇀
+↽−S0
+1 + S1
+2
+S0
+1 + S1
+2 + S0
+W −⇀
+↽−S1
+1 + S1
+2 + S1
+W .
+[11]
+Here, each node i ∈{1, 2} of a BM is represented by two species S0
+i and S1
+i corresponding to the oﬀand on states. The edge
+species S0
+W and S1
+W relates to the energy term w12 in a BM and similarly has oﬀand on states. This dbCRN has stoichiometric
+conservation laws s0
+i + s1
+i = Ni
+i ∈{1, 2, W} as well as the possibility of an emergent conservation law s1
+0s1
+1 = s1
+W which
+occurs when N1 = N2 = NW = 1 and the CRN starts in a state which respects this law. The key observation is that, due to
+the this ﬁnal conservation law, the BM energy wij directly corresponds to the species energy GW 1
+ij of an ECBM. Additionally,
+in our past work, we developed a rudimentary clamping process by which a subset of species in the dbCRN is held constant for
+conditioning (possibly "turning oﬀ" a subset of reactions when some species are clamped to zero). However we observe that
+our previous clamping construction is fragile because it requires that the reachability class of the unclamped species remains
+unchanged, which will only be true for very carefully designed dbCRNs.
+In this work, we generalize the ideas of clamping to all dbCRNs and show how they can be implemented in a purely chemical
+setting. First, we will provide a general framework for understanding how restricting the reachability class of a dbCRN enables
+the production of complex distributions. Then, we will provide a new deﬁnition of clamping which is broadly applicable to any
+dbCRN demonstrating that any dbCRN is capable of inference. Finally, we will use this notion of clamping to derive some
+thermodynamic costs for inference.
+2. Effective Use of Hidden Species Requires Reachability Entanglement
+In this section, we provide the ﬁrst core result of this paper: a unifying framework for understanding how some dbCRNs are
+able to produce equilibrium distributions which are far from products of independent Poisson distributions. First, we will show
+that restricting the reachability class of dbCRNs is essential to producing far-from-Poisson distributions. Furthermore, when
+using hidden units to increase the representational power of a dbCRN, the reachability class of these units must be “entangled”
+with the reachability class of the visible units for the hidden units to have any eﬀect on the visible distribution.
+As a reference case, consider a dbCRN with reactions such that the entire positive integer lattice is reachable: Γρ
+s0 = Z|S|
+≥0
+with equilibrium distribution ρ(s). Then all the species are independent of each other because ρ is a product of independent
+Poisson distributions. Proof: Rewrite equation (6) into product form to show independence.
+ρ(s) =
+Q
+i e−Gi(si)
+P
+s∈Zn
+≥0
+Q
+i e−Gi(si) =
+Q
+i e−Gi(si)
+Q
+i
+P
+si∈Z≥0 e−Gi(si) =
+Y
+i
+e−Gi(si)
+P
+si∈Z≥0 e−Gi(si) =
+Y
+i
+ρi(si).
+[12]
+Notice that switching the order of the sum and product in the denominator is only possible because the entire positive integer
+lattice is reachable. An example of such a CRN, ∅−⇀
+↽−Si i ∈{1, 2, 3}, is illustrated in ﬁgure 1A. In general, the partition
+function Z cannot necessarily be factored this way.
+
+
+Now, consider a second dbCRN with the same species and the same species’ energies but diﬀerent reactions and a diﬀerent
+reachability class Γπ
+s0 ⊂Γρ
+s0 and equilibrium distribution π(s; s0). How well a product poisson ρ is approximated by the
+distribution π can be measured using the relative entropy:
+D(π || ρ) =
+X
+s∈Γρ
+s0
+π(s) log π(s)
+ρ(s) =
+X
+s∈Γρ
+s0
+e−G(s)
+Zπ
+log Zρ
+Zπ = log( Zρ
+Zπ ) = log(1 + Z−
+Zπ ).
+[13]
+Here, Zρ and Zπ are the partition functions of ρ and π, respectively, and Z−= Zρ −Zπ > 0. Note that we are using the
+convention π(s) = 0 ∀s ̸∈Γπ
+s0 and 0 log 0 = 0. Due to the logarithm, for π to be far from product Poisson, a heavily weighted
+subset of states must be unreachable so that Z−≫Zπ. The ﬁgure 1B illustrates how restricting the reachability class with
+linear conservation laws induces correlations using the dbCRN is S1 −⇀
+↽−S2 −⇀
+↽−S3 as an example.
+More generally, the combination of marginalization and restricting the reachability class can be employed to increase the
+relative entropy between the equilibrium distribution of any dbCRN, σ(v), and the equilibrium distribution of another dbCRN
+with the same species V as well as additional hidden species U such that the equilibrium is π(v, u). We will show this by
+providing a suﬃcient condition for hidden units to not increase the relative entropy and then describe how to construct systems
+which do not satisfy that condition. Assume that all the species V have the same energies G in both dbCRNs and that
+the reachable states in the ﬁrst dbCRN are also reachable in the second dbCRN, for some value of the hidden species u:
+Γσ
+v(0) ∩Γπ
+v(0),u(0) = Γσ
+v(0) where the initial condition is s0 = v0, u0 (here ∩is used loosely to denote the overlap between two
+spaces of diﬀerent dimensions as opposed to a typical set intersection). The marginal distribution of the second dbCRN is:
+π(v) =
+X
+u∈γ(v)
+π(v, u)
+γ(v) = {u s.t. v′ = v | (u, v′) ∈Γπ
+s0}
+[14]
+Here the function γ produces a set of the reachable hidden states u given a visible state v with the dependence on the
+reachability class and initial condition implied in the function arguments for brevity. The relative entropy can then be written:
+D(π(v) || σ(v)) =
+X
+v∈Γσ
+π(v) log π(v)
+σ(v) =
+X
+v∈Γσ
+
+X
+u∈γ(v)
+π(v, u)
+
+log
+P
+u∈γ(v) π(v, u)
+σ(v)
+[15]
+=
+X
+(v,u)∈Γπ
+π(v, u) log
+
+Zσ
+Zπ
+X
+u∈γ(v)
+e−G(u)
+
+
+[16]
+If γ(v) is constant for all v, the restrictions on the reachability class are independent of the visible species, allowing the partition
+function to be factored Zπ = Zσ(P
+u e−G(u)). This simpliﬁes the previous equation to 0 showing that marginalization requires
+restricted reachability classes to modify distributions:
+γ(v) = const =⇒D(π(v) || ρ(v)) = log Zσ(P
+u e−G(u))
+Zπ
+= 0.
+[17]
+A conceptual way to interpret this result is that marginalizing over the species U does not aﬀect the species V if the reachable
+states of V and U are independent. This illustrates that complex reachability restrictions on the hidden species are not enough:
+for them to provide extra power for representing complex distributions, the reachability of the visible and hidden species must
+be entangled. Figure 1C depicts the equilibrium distribution of a dbCRN which marginalizes over many hidden species and
+extensively restricts reachability. This construction relied on very speciﬁc initial conditions described in section E which cause
+the hidden pixel species are highly entangled with each other—only one pixel can be present at a time—and also with the
+visible species—each visible count (s1, s2) corresponds to a unique pixel species Ps1,s2.
+In summary, dbCRNs can represent a diverse set of distributions. When a dbCRN is unconstrained with species’ counts
+allowed to take any value, all dbCRNs will have Poisson equilibrium distributions with species’ means determined by their
+energies (illustrated in Figure 1A). Species may then be coupled together via conservation laws which can induce correlations
+(illustrated in Figure 1B). Furthermore, increasingly complex conservation laws have the potential to dramatically constrain the
+reachability class and enable the production of distributions with very rich structure. In some cases, the reachability class can
+be constrained via auxiliary hidden species which have their reachable states entangled with the reachable states of the visible
+species. In such cases, marginalization over the hidden species may produce even more complex distributions on the visible
+species (illustrated in Figure 1C). Finally, we comment that marginalization occurs implicitly when two chemical systems
+interact. Consider subsystem A with species SA = (V, U A) which observes a diﬀerent subsystem B with species SB = (V, U B).
+If A observes the species V long enough, it implicitly observes the marginal distribution over the unobserved species UB.
+3. Inference with Detailed Balanced CRNs
+As referenced in the background section B on Boltzmann Machines, general purpose inference is incredibly powerful and can
+be used for a wide range of computational tasks. In the following sections, we show that dbCRNs are similarly capable of
+inference. To do this, we deﬁne a new notion of clamping which overcomes the limitations of our previous work (46) and is
+applicable to all dbCRNs. We then show how this clamping can be implemented by an auxilary set of chemical species. In this
+section, each CRN will be assumed to have its species partitioned into disjoint sets of free and clamped species, S = (SF , SC).
+
+
+0
+10
+20
+30
+(S1, S2)
+G[S3] = 3
+A. Clamping A Product Poisson
+0
+10
+20
+30
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Marginals
+G[S3] = 3
+G[S3] = 0
+0
+10
+20
+30
+G[S3] = 0
+G[S3] =
+3
+0.000
+0.005
+0.010
+0.015
+0.020
+0.025
+0
+10
+20
+30
+G[S3] =
+3
+s1
+s2
+s3
+0
+10
+20
+30
+(S1, S2)
+G[S3] = 3
+B. Clamping in a Low Dimensional Subspace
+0
+10
+20
+30
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Marginals
+G[S3] = 3
+G[S3] = 0
+0
+10
+20
+30
+G[S3] = 0
+G[S3] =
+3
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0
+10
+20
+30
+G[S3] =
+3
+s1
+s2
+s3
+0
+4
+8
+(S1, S2)
+G[Ch] = 3
+C. Clamping in a High Dimensional Subspace
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Marginals
+G[Ch] = 3
+G[Ch] = 0
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+G[Ch] = 0
+G[Ch] =
+3
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+G[Ch] =
+3
+s1
+s2
+ch
+cs
+Fig. 2. Energy clamping hidden species is a powerful inferential computation capable of dramatically changing the marginal distribution of visible species. A. Energy clamping a
+dbCRN with a reachability class covering the entire positive integer lattice: ∅−
+⇀
+↽
+−Si. Clamping the energy of S3 does not change the marginal distribution of π(s1, s2). B.
+Energy clamping species in a dbCRN with a restricted reachability class can increase or decrease correlations in unclamped species. Here, the energy of S3 in the dbCRN
+S1 −
+⇀
+↽
+−S2 −
+⇀
+↽
+−S3 is clamped causing S1 and S2 become increasingly anti-correlated at high energies and more independent at low energies. C. Energy clamping species in a
+dbCRN with many hidden species and highly entangled reachability classes between hidden and visible species can give rise to dramatic changes in the marginal distribution of
+the visible species. Here, the clamping a single hidden species Ch is capable of generating diverse distributions illustrated by the frowning, open mouthed, and smiling emojis.
+The construction for this dbCRN is described in by equation (8).
+
+
+A. Energy Clamping. We deﬁne a new kind of clamping which is applicable to all dbCRNs. We call this process energy clamping
+because it works by modulating the energies of chemical species illustrated in ﬁgure 3A. The energy clamped dbCRN DGC has
+the same species and reactions as DG but diﬀerent energies and hence diﬀerent reaction rates:
+GC
+i =
+
+Gi
+Si ∈SF
+Gi + ∆i
+Si ∈SC
+[18]
+where ∆i are the changes in energy for each clamped species. The clamped dbCRN has a new equilibrium distribution πC(s):
+πC(s) = e−GC(s)
+ZC
+ZC =
+X
+s∈Γs0
+e−GC(s)
+GC(s) =
+X
+i
+GC
+i si + log si!
+[19]
+Here we are treating the energy changes ∆as tunable parameters which control the means of our species. Unlike traditional
+clamping of a Boltzmann Machine or the construction from the CBM paper, energy clamping does not hold the value of a
+species ﬁxed. Instead, energy clamping can be interpreted as holding the mean of the clamped species ﬁxed while allowing for
+ﬂuctuations. These ﬂuctuations are important because they ensure that the reachability class is preserved. This is formalized
+via the second core result of this paper which equates energy clamping to inference by conditioning on the mean via the
+conditional limit theorem (48):
+Theorem: Energy clamping is equivalent to conditioning upon the mean ⟨sC⟩being equal to c.
+πC(sF , sC) = π(sF , sC | ⟨sC⟩= c)
+[20]
+Here, we have implicitly chosen ∆such that ⟨sC⟩πC = c. Proof: See SI A. We note that there is generally no analytic formula
+for choosing the values of ∆which result in a particular mean; however, optimization procedures such as the gradient descent
+learning rule for dbCRN energies described in (46) can be used to ﬁnd these parameters numerically.
+The idea of conditioning on the mean versus holding the value of a species constant is analogous to the diﬀerence
+between microcanonical ensembles, where energy is constant, and the canonical ensemble where the mean energy is ﬁxed, but
+allowed to ﬂuctuate. Energy clamping modulates the energy of a species which holds the steady-state mean value constant but
+the actual count of that species is still allowed to ﬂuctuate. The correctness of energy clamping can also be seen more simply
+through the following theorem on the conditional distributions:
+Theorem:
+Energy clamping produces the same conditional distributions between π and πC when conditioned on
+the species SC taking a speciﬁc value c:
+π(sF | sC = c) = πC(sF | sC = c).
+[21]
+Proof:
+π(sF | sC = c) = π(sF , c)
+π(c)
+=
+e−G(sF )−G(c)
+P
+sF e−G(sF )−G(c) =
+e−G(sF )
+P
+sF e−G(sF )
+[22]
+πC(sF | sC = c) = πC(sF , c)
+πC(c)
+=
+e−GC(sF )−GC(c)
+P
+sF e−GC(sF )−GC(c) =
+e−G(sF )
+P
+sF e−G(sF )
+[23]
+here the ﬁnal steps notes that GC(sF ) = G(sF ) by deﬁnition. This result shows that the clamped dbCRN has the correct
+conditional distribution when conditioned on any sC = c.
+Energy clamping provides a framework to hold the species of an arbitrary detailed balanced CRN around a value by
+modulating the energy vector G ⇒GC. In the case where Si can take any value on the integer lattice, energy clamping can be
+thought of as tuning the mean of Si directly as seen in the lower plot of ﬁgure 2A. In the case where Si is constrained via a
+conservation class to some minimum and maximum value, energy clamping may be better thought of as pushing Si towards
+one of its extreme values. Furthermore, when reachable states of the clamped species are entangled with the reachable states
+of free species, energy clamping induces changes in the distribution of free species illustrated clearly in ﬁgure 2B. In these
+cases, energy clamping may perform computationally challenging inferential tasks. For example, in Figure 2C, clamping a
+single species Ch is able to induce dramatic changes in the distribution of the visible species causing the transition between a
+frowning face to a smiling face. Importantly, the energy clamping construction does not change the reachability class of the
+underlying dbCRN which allows it to apply to any species in any dbCRN, regardless of reactions in the CRN. In the next
+section, we will describe how energy clamping can be implemented via external chemical potentials.
+
+
+A
+B
+Fig. 3. A. An illustration of energy clamping the reaction Sopen −
+⇀
+↽
+−
+Sloop. The reaction can be pushed in either direction by by changing
+the sequence depicted in blue which can tune the relative energies
+∆Sopen and ∆Sloop. B. An illustration of potential clamping where
+Sopen is connected to a potential species P resulting in the reaction:
+P + Sopen −
+⇀
+↽
+−Sloop. Changing [P ] is the equivalent to changing
+∆. The gray lines indicate that S is in a small volume relative to P .
+B. Clamping with A Potential Bath. Energy clamping provides a formal
+framework by which dbCRN can perform inference. However, imple-
+menting energy clamping directly would involve carefully modifying the
+internal energies of diﬀerent species in a dbCRN. Although theoretically
+possible, this is not an easy parameter to tune experimentally. In this
+section, we construct a dbCRN in a small volume ν can be coupled to a
+large external bath at volume V ≫ν to produce a chemical system which
+implements energy clamping. We call these CRNs potentiated dbCRNs.
+A physical illustration of a potentiated CRN can be found in ﬁgure 3.
+We will show that the species in the bath, denoted potential species P,
+produce a chemical potential equivalent to energy clamping.
+Any dbCRN, DG, can be converted to a potentiated dbCRN, DP
+G, by
+adding an additional potential species Pi that are coupled to a correspond-
+ing the clamped species Si ∈SC and held at a constant concentration
+[Pi] = pi
+V where pi is a count. Formally, this can be viewed as replacing all
+instances of Si in each reaction (both inputs and outputs) with Si + Pi.†
+For example, the dbCRN with reaction 2Si −⇀
+↽−Sj + Sk become a poten-
+tiated dbCRN with reaction 2Si + 2Pi −⇀
+↽−Sj + Sk + Pj + Pk in the case
+that all species are clamped. Formally, given a dbCRN DG = (S, R, k)
+we will denote the the potentiated dbCRN DP
+G = (S ∪P, RP, k) where
+P are the potential species, RP are the reactions from R modiﬁed to
+include potentials, and the rates kr of each reaction are unchanged. This
+model is a hybrid model in the sense that Si are measured in counts
+and vary stochastically but Pi varies continuously and is measured in
+concentration. This formalism will be derived as the limiting case of a
+completely stochastic CRN when the count of Pi becomes large in the
+SI. In other work, we couple the potentiated dbCRN back to the bath
+through a set of (non detailed balanced) chemical reactions producing a CRN which is able to autonomously learn from its
+environment.
+Theorem: Any potentiated dbCRN DP
+G is detailed balanced. Proof: See SI. Remark: it is not strictly necessary for each Si
+to have a unique potential species Pi; many Si could share the same Pj (a universal potential species) if they are all clamped
+together simultaneously. Remark: if individual reactions are connected to a potential, instead of each species, the CRN is no
+longer detailed balanced and most of the results in this paper are not expected to hold. The physics of such systems have been
+studied elsewhere (69, 70).
+Theorem: Let DP
+G be a potentiated dbCRN with equilibrium distribution πP (s) and DGC be an energy clamped dbCRN
+with equilibrium distribution πC(s). πP (s) = πC(s) provided that:
+∆i = µi = GP
+i + log pi
+V = GP
+i + log[Pi]
+[24]
+Here the energy diﬀerence ∆i is equated to the chemical potential of Pi, commonly denoted µi, and GP
+i is the energy of Pi.
+Proof: See SI B.
+4. Thermodynamics of Inference via Clamping
+This section provides energetic and thermodynamic costs for inference with potentiated dbCRNs. We start with a dbCRN DG
+with equilibrium distribution πG and, via the clamping process, end up with a new distribution πG′. The ﬁnal distribution
+πG′ can be physically realized in a variety of ways: by changing the energies G′ = G + ∆; or by equipping DG with potential
+species so that G′ = G + µ. Importantly, in the both these scenarios, πG′ remains a dbCRN. In the following section, we will
+investigate reversibly and non-reversibly modulating the potentials of a potentiated dbCRN.
+To analyze the costs of inference, we consider clamping a potentiated dbCRN by changing the concentrations of the potential
+species directly by changing the external baths. In the following analysis, the system will be a tuple (π, P) where π is an
+initial distribution of the CRN and P are the potential bath concentrations. The system is always in thermal equilibrium with
+its environment (the solvent) at a temperature T. By changing the concentration of the external bath of the species P, the
+chemical potentials µ can be controlled. Similarly to the analysis by Ouldridge and collaborators(71, 72), we will imagine a
+set of diﬀerent baths b each with a concentration of potential species [P b] which can be freely disconnected and reconnected
+reaction volume. The purpose of this analysis is to highlight diﬀerent costs of inference in certain extreme conditions which can
+act as benchmarks for future investigations. We begin with some basic thermodynamic deﬁnitions for a dbCRN at a (not
+necessarily equilibrium) distribution ω connected to a potential bath with concentrations [P]. Denote the energy function GP
+which includes chemical potential terms. The internal energy,‡ GP
+ω , entropy, SP
+ω , and free energy, FP
+ω , of a dbCRN are given
+†Technically, the potential species Pi could go on either side of the reaction - we consider just one side for simplicity.
+‡For simplicity, we are assuming that the species energies Gi are in fact enthalpies. In reality, they may contain both enthalpic and entropic components however for simplicity of presentation we ignore
+that complication.
+
+
+by:(73)
+GP
+ω = ⟨GP (s)⟩ω =
+X
+s
+ω(s)GP (s),
+SP
+ω = −kB⟨log ω⟩ω = −kB
+X
+s
+ω(s) log ω(s),
+and
+FP
+ω = GP
+ω −TSP
+ω .
+[25]
+If ω = πP , the equilibrium distribution for potential concentrations [P], then entropy and free energy can also be written:
+SP
+πP = kB(GπP
+T
++ log ZπP )
+FP
+πP = −kBT log ZπP
+[26]
+The free energy diﬀerence between a potentiated dbCRN with potential concentrations [P] in a non-equilibrium distribution ω
+and its equilibrium πP is given by (74):
+∆FP
+ω→πP = FP
+ω −FP
+πP = GP
+ω −TSP
+ω −FπP = kBT
+X
+s
+ω(s)(log ω(s) −log πP (s)) = kBTD(ω || πP ).
+[27]
+b-1
+[P
+]
+b+1
+[P
+]
+b
+[P ]
+Fig. 4. An illustration of inference via potential baths. The baths different concentrations
+of potential species (shown in blue) can be connected and disconnected from a to a
+dbCRN in a small volume (dashed circle) for free. Not to scale.
+The Reversible Case: Following the analysis by Ouldridge
+and collaborators (71), we consider a process in which the
+potentiated dbCRN begins in an equilibrium distribution
+πP 0 connected to a bath of potential species at concentration
+[P 0]. We now disconnect the potentiated dbCRN from this
+potential bath and instantaneously reconnect it to a new
+bath [P 1] then allow the potentiated dbCRN to equilibrate
+to a new equilibrium distribution πP 1. In our analysis we
+approximate the potential baths being constant; in reality,
+a small number of Pi species may be transferred between
+potential baths which could result in additional entropy pro-
+duction terms due to mixing. This procedure is repeated
+a total of N times resulting in a sequence of potential con-
+centrations: [P 0] →... →[P j] →... →[P N]. Similarly,
+there is a corresponding sequence of equilibrium distribu-
+tions: πP 0 →... →πP j →... →πP N . In each step, the
+non-equilibrium free energy diﬀerence given by equation (27)
+will be dissipated into the bath (73):
+∆FP j+1
+πP j →πP j+1 = kBTD(πP j || πP j+1).
+[28]
+Schematically a single step of the process can be described by:
+(P j, πP j)
+W
+=⇒(P j+1, πP j)
+∆F
+==⇒(P j+1, πP j+1)
+[29]
+Notice that some work W must be done to modulate the potentials but we assume that is recoverable by reversing the process.
+Summing over all N transitions results in the total entropy produced by the process. In the limit of N →∞, no entropy will
+be produced by this process:
+∆Sreversible = lim
+N→∞
+1
+T
+N−1
+X
+j=0
+∆FP j+1
+πP j →πP j+1 = 0.
+[30]
+Proof: See SI ??. This shows that a quasi-static reversible process is capable of inference and generates no entropy. This result
+indicates that inference, if computed slowly, can be free—something we suspect might be advantageous to cellular life in certain
+conditions.
+The Maximally Irreversible Case: Next, we consider a non-reversible process. In this protocol, the potential baths
+are changed instantaneously from P 0 to P N. This can be imagined as moving through the same series of baths as above
+but inﬁnitely quickly instead of inﬁnitely slowly (or equivalently moving directly to the ﬁnal buﬀer).The CRN is initially at
+equilibrium with distribution πP 0. Following the change, the CRN will initially be out of equilibrium at the distribution πP 0
+but at potential concentration P N. Then, the CRN relaxes to the equilibrium distribution πP N based upon the new potential
+species’ concentrations.
+(P 0, πP 0)
+W
+=⇒(P N, πP 0)
+∆F
+==⇒(P N, πP N )
+[31]
+Again, approximate the potential baths as constant and assume any work W to modulate the potentials is recoverable by the
+reverse process. Then, the entropy generated as the potentiated dbCRN equilibrates with the bath can be written by applying
+equation (28) to a single step:
+∆FP N
+πP 0 →πP N = kBTD(πP 0 || πP N ) ≥0.
+[32]
+In other words, the thermodynamic cost of performing inference quickly is the relative entropy between the initial distribution
+of the system and the ﬁnal distribution of the system. Importantly, performing inference in this way always has an energetic
+cost because the relative entropy is always positive. Entropy is produced by the dbCRN being pushed out of equilibrium and
+then settling into a new equilibrium state.
+
+
+5. Discussion
+We begin our discussion with the title of this paper—a metaphor between detailed balanced chemical reaction networks and
+Boltzmann machines. As a paradigm of generative machine learning models, BMs have three important features. First, they
+are capable of representing a broad class of distributions and make use marginalization over hidden hidden units to enhance
+their computational power. Second, BMs can condition these distributions to perform probabilistic inference via the clamping
+process. Finally, there is a simple algorithm which allows for their parameters to be trained from data. We argue that dbCRNs
+share these fundamental features. First, we analyzed necessary conditions for dbCRNs to represent complex distributions far
+from the canonical product Poisson form they are best known for and show that this can be accomplished by careful control of
+their species counts and initial conditions in order to restrict their reachability class. We then provided necessary conditions for
+dbCRNs to make use of hidden species to further increase the complexity of the distributions they generate. Addressing the
+second point, we showed how energy clamping is a form of conditioning and can enable complex inferential computations which
+make use of hidden units. However, in this work we have not yet addressed the third point—that a simple learning algorithm
+exists for dbCRNs—because previous work has already uncovered such an algorithm allowing for the species energies Gi to be
+tuned in silico (46):
+dGi
+dt
+= dD(π || π)
+dGi
+= ϵ(⟨si⟩π −⟨si⟩π).
+[33]
+Here the time derivative is meant to denote a gradient descent algorithm over training epochs, ϵ is the learning rate, π is the
+distribution of a dbCRN, and π is a distribution of a dbCRN which has been clamped to a sample of the training data. In other
+work, we examine this learning algorithm in more detail and show how it can be implemented by non-detailed balanced CRNs.
+We next turn to the question of the representational power of dbCRNs. We have provided a necessary condition for
+marginalization over hidden species to increase the complexity of distributions a dbCRN can represent: that the reachable
+states of the visible species must be dependent on the states of the hidden species. This leads to the question of which
+dbCRN architectures can produce far-from-Poisson distributions and how the representational power of dbCRNs relates to
+their underlying structure. So far, we know of two powerful constructions which require many species and/or reactions as well
+as carefully controlled binary species counts. The pixel CRN construction used to produce the face distribution in ﬁgure (1)
+uses O(N) hidden species where N is the size of the supported visible distribution. Similarly, the chemical Boltzmann machine
+construction described in Section F uses O(2DK) reactions where D is the degree of the underlying BM and K = log2 N is the
+number of binary species needed to represent a distribution of size N. This leads us to speculate that restricting the reachability
+class of a dbCRN is a kind of computational resource much as entanglement is a resource in quantum computing (75).
+Next, we examined how modulating the energies of the species in a dbCRN can be interpreted as computing a conditional
+distribution and hence a form of inference. Energy clamping, as we named this process, can also be implemented by coupling
+clamped species in the dbCRN to potential baths. Modulating the energies of chemical species can happen easily by changing
+the sequences of DNA or other polymers and therefore likely is a form of inference that can occur evolutionary. Using a
+chemical potential to modulate the mean of a chemical signal could also easily occur in a real or synthetic biochemical network
+and may be used for an organism to adapt to its environment. We suspect that these kinds of inferential systems could be
+realised in vivo due to the binding and unbinding events between the genome and diﬀerent proteins or RNAs such as occurs in
+epigenetic chromatin structures in eukaryotes and in folded or looping conformations caused by many transcription factors
+in bacteria and eukaryotes (76, 77). In order to build such a system in the lab, the greatest challenge will be to produce a
+chemical network with low species counts and dynamically measure the stochastic ﬂuctuations. Advances in droplet based
+technologies coupled with microﬂuidics (78) and positioning of single DNA molecules (79) provide potential avenues for the
+construction of such a circuit in vitro. In a separate paper we further examine how potential clamping can be implemented in a
+chemical environment.
+To conclude, we wish to emphasize that the mathematical structures described in this paper are in fact quite general,
+even though they may appear overly speciﬁc. At the highest level, detailed balanced CRNs are ubiquitous in biology and
+engineered bio-molecular systems; interactions such as molecular binding, diﬀusion, and conformation changes are frequently
+detailed balanced. Indeed, for our results on energy clamping and inference to hold, a detailed balanced sub-system need
+only be at a dynamic quasi-equilibrium relative to other subsystems. Similarly, our results on potentiated dbCRNs are also
+somewhat more general than they may appear: potentials may be shared between multiple species and, as exempliﬁed in
+the DNA looping model, can occur on either side of a detailed balanced reaction. This ﬂexibility means that dynamic and
+driven biochemical systems may, in fact, be generalized Boltzmann machines in disguise. Finally, the observation that dynamic
+changes in generalized potential species coupled to detailed balanced sub-systems could be acting as molecular machine learning
+models - representing complex distributions and computing inference while simultaneously adapting to and learning from the
+environment is addressed separately.
+Materials and Methods
+Methods: all numerical simulations were carried out using the Gillespie algorithm implemented in the Bioscrape python package (80).
+Steady state distributions were found by simulating a CRN for a long time until the distribution converged.
+ACKNOWLEDGMENTS.
+Acknowledgement: we would like to thank R.M. Murray of Caltech for helpful feedback on this project. W.P.
+was supported by the U.S. National Science Foundation. Additionally, the NSF in conjunction with the Indo-US Science and Technology
+
+
+Forum provided support for W.P. to spend a semester in Mumbai India working with M.G. which was instrumental to the success of this
+project.
+1.
+B Alberts, et al., Essential Cell Biology. (Garland Science), (2015).
+2.
+U Alon, An introduction to systems biology: design principles of biological circuits. (CRC press), (2019).
+3.
+D Del Vecchio, et al., What have the principles of engineering taught us about biological systems. Cell Syst 2, 5–7 (2016).
+4.
+P Siuti, J Yazbek, TK Lu, Synthetic circuits integrating logic and memory in living cells. Nat. biotechnology 31, 448–452 (2013).
+5.
+I Santiago, FC Simmel, Self-propulsion strategies for artiﬁcial cell-like compartments. Nanomaterials 9, 1680 (2019).
+6.
+SK Aoki, et al., A universal biomolecular integral feedback controller for robust perfect adaptation. Nature 570, 533–537 (2019).
+7.
+BY Xu, J Xu, T Yomo, A protocell with fusion and division. Biochem. Soc. Transactions 47, 1909–1919 (2019).
+8.
+S Slomovic, K Pardee, JJ Collins, Synthetic biology devices for in vitro and in vivo diagnostics. Proc. Natl. Acad. Sci. 112, 14429–14435 (2015).
+9.
+MR Wu, B Jusiak, TK Lu, Engineering advanced cancer therapies with synthetic biology. Nat. Rev. Cancer 19, 187–195 (2019).
+10.
+K French, Harnessing synthetic biology for sustainable development. Nat. Sustain. 2, 250–252 (2019).
+11.
+RA Le Feuvre, NS Scrutton, A living foundry for synthetic biological materials: a synthetic biology roadmap to new advanced materials. Synth. Syst. Biotechnol. 3, 105–112 (2018).
+12.
+L Qian, E Winfree, Scaling up digital circuit computation with DNA strand displacement cascades. Science 332, 1196–1201 (2011).
+13.
+AA Nielsen, et al., Genetic circuit design automation. Science 352 (2016).
+14.
+A Krizhevsky, I Sutskever, GE Hinton, Imagenet classiﬁcation with deep convolutional neural networks. Commun. ACM 60, 84–90 (2017).
+15.
+TB Brown, et al., Language models are few-shot learners. arXiv preprint arXiv:2005.14165 (2020).
+16.
+J Jumper, et al., Highly accurate protein structure prediction with alphafold. Nature pp. 1–11 (2021).
+17.
+AD Gordon, TA Henzinger, AV Nori, SK Rajamani, Probabilistic programming in Future of Software Engineering Proceedings. pp. 167–181 (2014).
+18.
+Z Ghahramani, Probabilistic machine learning and artiﬁcial intelligence. Nature 521, 452–459 (2015).
+19.
+R Ranganath, L Tang, L Charlin, D Blei, Deep exponential families in Artiﬁcial Intelligence and Statistics. (PMLR), pp. 762–771 (2015).
+20.
+R Sarpeshkar, Analog versus digital: extrapolating from electronics to neurobiology. Neural computation 10, 1601–1638 (1998).
+21.
+R Sarpeshkar, Analog synthetic biology. Philos. Transactions Royal Soc. A: Math. Phys. Eng. Sci. 372, 20130110 (2014).
+22.
+CD James, et al., A historical survey of algorithms and hardware architectures for neural-inspired and neuromorphic computing applications. Biol. Inspired Cogn. Archit. 19, 49–64 (2017).
+23.
+O Rössler, A synthetic approach to exotic kinetics (with examples) in Physics and mathematics of the nervous system. (Springer), pp. 546–582 (1974).
+24.
+A Hjelmfelt, ED Weinberger, J Ross, Chemical implementation of neural networks and turing machines. Proc. Natl. Acad. Sci. 88, 10983–10987 (1991).
+25.
+E Mjolsness, DH Sharp, J Reinitz, A connectionist model of development. J. theoretical Biol. 152, 429–453 (1991).
+26.
+NE Buchler, U Gerland, T Hwa, On schemes of combinatorial transcription logic. Proc. Natl. Acad. Sci. 100, 5136–5141 (2003).
+27.
+J Kim, JJ Hopﬁeld, E Winfree, Neural network computation by in vitro transcriptional circuits. Neural Inf. Process. Syst. 17, 681–688 (2004).
+28.
+KM Cherry, L Qian, Scaling up molecular pattern recognition with DNA-based winner-take-all neural networks. Nature 559, 370–376 (2018).
+29.
+I Lestas, G Vinnicombe, J Paulsson, Fundamental limits on the suppression of molecular ﬂuctuations. Nature 467, 174–178 (2010).
+30.
+DT Gillespie, A rigorous derivation of the chemical master equation. Phys. A: Stat. Mech. its Appl. 188, 404–425 (1992).
+31.
+MB Elowitz, AJ Levine, ED Siggia, PS Swain, Stochastic gene expression in a single cell. Science 297, 1183–1186 (2002).
+32.
+D Huh, J Paulsson, Non-genetic heterogeneity from stochastic partitioning at cell division. Nat. genetics 43, 95–100 (2011).
+33.
+AA Faisal, LP Selen, DM Wolpert, Noise in the nervous system. Nat. reviews neuroscience 9, 292–303 (2008).
+34.
+JJ Hopﬁeld, Kinetic proofreading: a new mechanism for reducing errors in biosynthetic processes requiring high speciﬁcity. Proc. Natl. Acad. Sci. 71, 4135–4139 (1974).
+35.
+CG Evans, E Winfree, Physical principles for DNA tile self-assembly. Chem. Soc. Rev. 46, 3808–3829 (2017).
+36.
+S Hooshangi, S Thiberge, R Weiss, Ultrasensitivity and noise propagation in a synthetic transcriptional cascade. Proc. Natl. Acad. Sci. 102, 3581–3586 (2005).
+37.
+KA Fujita, et al., Decoupling of receptor and downstream signals in the Akt pathway by its low-pass ﬁlter characteristics. Sci. Signal. 3, ra56–ra56 (2010).
+38.
+L Goentoro, O Shoval, MW Kirschner, U Alon, The incoherent feedforward loop can provide fold-change detection in gene regulation. Mol. cell 36, 894–899 (2009).
+39.
+J Kim, I Khetarpal, S Sen, RM Murray, Synthetic circuit for exact adaptation and fold-change detection. Nucleic acids research 42, 6078–6089 (2014).
+40.
+D Cappelletti, A Ortiz-Muñoz, DF Anderson, E Winfree, Stochastic chemical reaction networks for robustly approximating arbitrary probability distributions. Theor. Comput. Sci. 801, 64–95 (2020).
+41.
+MV Virinchi, A Behera, M Gopalkrishnan, A reaction network scheme which implements the EM algorithm in DNA Computing and Molecular Programming. (Springer), Vol. LNCS 11145, pp. 189–207
+(2018).
+42.
+E Winfree, Chemical reaction networks and stochastic local search in DNA Computing and Molecular Programming. (Springer), Vol. LNCS 11648, pp. 1–20 (2019).
+43.
+R D.Shachter, M A.Peot, Decision making using probabilistic inference methods. Eighth Conf. on Uncertain. Artif. Intell. pp. 276–283 (19920).
+44.
+MI Jordan, C Bishop, An introduction to graphical models (2004).
+45.
+GE Hinton, TJ Sejnowski, DH Ackley, Boltzmann machines: Constraint satisfaction networks that learn. (Carnegie-Mellon University, Department of Computer Science Pittsburgh, PA), (1984).
+46.
+W Poole, et al., Chemical boltzmann machines in DNA Computing and Molecular Programming. (Springer), Vol. LNCS 10467, pp. 210–231 (2017).
+47.
+R Salakhutdinov, Learning deep generative models. Annu. Rev. Stat. Its Appl. 2, 361–385 (2015).
+48.
+TM Cover, J Thomas, Elements of information theory. (John Wiley & Sons), (1999).
+49.
+DH Ackley, GE Hinton, TJ Sejnowski, A learning algorithm for boltzmann machines. Cogn. science 9, 147–169 (1985).
+50.
+TJ Sejnowski, Higher-order boltzmann machines in AIP Conference Proceedings. (American Institute of Physics), Vol. 151, pp. 398–403 (1986).
+51.
+R Salakhutdinov, G Hinton, Deep boltzmann machines in Artiﬁcial intelligence and statistics. (PMLR), pp. 448–455 (2009).
+52.
+Y Tang, R Salakhutdinov, G Hinton, Robust boltzmann machines for recognition and denoising in 2012 IEEE conference on computer vision and pattern recognition. (IEEE), pp. 2264–2271 (2012).
+53.
+Y Wang, J Zeng, Predicting drug-target interactions using restricted boltzmann machines. Bioinformatics 29, i126–i134 (2013).
+54.
+N Le Roux, Y Bengio, Representational power of restricted boltzmann machines and deep belief networks. Neural computation 20, 1631–1649 (2008).
+55.
+H Larochelle, M Mandel, R Pascanu, Y Bengio, Learning algorithms for the classiﬁcation restricted boltzmann machine. The J. Mach. Learn. Res. 13, 643–669 (2012).
+56.
+GW Taylor, GE Hinton, Factored conditional restricted boltzmann machines for modeling motion style in Proceedings of the 26th annual international conference on machine learning. pp. 1025–1032
+(2009).
+57.
+DDVRM Murray, M Caltech, Biomolecular feedback systems. Bernoulli (2010).
+58.
+I Lestas, J Paulsson, NE Ross, G Vinnicombe, Noise in gene regulatory networks. IEEE Transactions on Autom. Control. 53, 189–200 (2008).
+59.
+D Soloveichik, M Cook, E Winfree, J Bruck, Computation with ﬁnite stochastic chemical reaction networks. natural computing 7, 615–633 (2008).
+60.
+M Cook, D Soloveichik, E Winfree, J Bruck, Programmability of chemical reaction networks in Algorithmic bioprocesses. (Springer), pp. 543–584 (2009).
+61.
+R Cummings, D Doty, D Soloveichik, Probability 1 computation with chemical reaction networks. Nat. Comput. 15, 245–261 (2016).
+62.
+YJ Chen, et al., Programmable chemical controllers made from DNA. Nat. Nanotechnol. 8, 755–762 (2013).
+63.
+N Srinivas, J Parkin, G Seelig, E Winfree, D Soloveichik, Enzyme-free nucleic acid dynamical systems. Science 358 (2017).
+64.
+S Badelt, et al., A general-purpose CRN-to-DSD compiler with formal veriﬁcation, optimization, and simulation capabilities in DNA Computing and Molecular Programming. (Springer), Vol. LNCS
+10467, pp. 232–248 (2017).
+65.
+DT Gillespie, Stochastic simulation of chemical kinetics. Annu. Rev. Phys. Chem. 58, 35–55 (2007).
+66.
+J Gunawardena, Chemical reaction network theory for in-silico biologists. Notes available for download at http://vcp. med. harvard. edu/papers/crnt. pdf p. 5 (2003).
+67.
+J Leroux, S Schmitz, Reachability in vector addition systems is primitive-recursive in ﬁxed dimension in ACM/IEEE Symposium on Logic in Computer Science (LICS). (IEEE), pp. 1–13 (2019).
+68.
+DF Anderson, G Craciun, TG Kurtz, Product-form stationary distributions for deﬁciency zero chemical reaction networks. Bull. mathematical biology 72, 1947–1970 (2010).
+69.
+T Schmiedl, U Seifert, Stochastic thermodynamics of chemical reaction networks. The J. chemical physics 126, 044101 (2007).
+70.
+M Polettini, M Esposito, Irreversible thermodynamics of open chemical networks. i. emergent cycles and broken conservation laws. The J. chemical physics 141, 07B610_1 (2014).
+71.
+TE Ouldridge, RA Brittain, PRt Wolde, The power of being explicit: demystifying work, heat, and free energy in the physics of computation. arXiv preprint arXiv:1812.09572 (2018).
+72.
+RA Brittain, NS Jones, TE Ouldridge, What would it take to build a thermodynamically reversible universal turing machine? computational and thermodynamic constraints in a molecular design.
+arXiv preprint arXiv:2102.03388 (2021).
+73.
+TE Ouldridge, The importance of thermodynamics for molecular systems, and the importance of molecular systems for thermodynamics. Nat. Comput. 17, 3–29 (2018).
+74.
+H Qian, Relative entropy: Free energy associated with equilibrium ﬂuctuations and nonequilibrium deviations. Phys. Rev. E 63, 042103 (2001).
+75.
+E Chitambar, G Gour, Quantum resource theories. Rev. Mod. Phys. 91, 025001 (2019).
+76.
+NA Becker, AM Greiner, JP Peters, LJ Maher III, Bacterial promoter repression by DNA looping without protein–protein binding competition. Nucleic acids research 42, 5495–5504 (2014).
+77.
+AM Chiariello, C Annunziatella, S Bianco, A Esposito, M Nicodemi, Polymer physics of chromosome large-scale 3d organisation. Sci. reports 6, 1–8 (2016).
+
+
+78.
+L Shang, Y Cheng, Y Zhao, Emerging droplet microﬂuidics. Chem. reviews 117, 7964–8040 (2017).
+79.
+A Gopinath, E Miyazono, A Faraon, PW Rothemund, Engineering and mapping nanocavity emission via precision placement of DNA origami. Nature 535, 401–405 (2016).
+80.
+A Swaminathan, W Poole, V Hsiao, RM Murray, Fast and ﬂexible simulation and parameter estimation for synthetic biology using bioscrape. bioRxiv (2019).
+81.
+MV Virinchi, A Behera, M Gopalkrishnan, A stochastic molecular scheme for an artiﬁcial cell to infer its environment from partial observations in DNA Computing and Molecular Programming.
+(Springer), Vol. LNCS 10467, pp. 82–97 (2017).
+82.
+E Schechter, Handbook of Analysis and its Foundations. (Academic Press), (1996).
+6. Supplemental Information
+A. Proof that Energy Clamping is Conditioning. The following is a proof of the theorem (20).
+Claim 1: First, we will show that the distribution P = πC(sF , sC) minimizes the relative entropy D(P || π) subject to the constraint
+that ⟨sC⟩P = c using the method of Lagrange multipliers. We ﬁrst deﬁne the functional we wish to minimize:
+J(P) = D(P || π) + ∆·
+ 
+c −
+X
+s
+P(s)s
+!
++ α
+ 
+1 −
+X
+s
+P(s)
+!
+.
+[34]
+where ∆∈RN will constrain the means and α ∈R will normalize the distribution. Note that by setting ∆i = 0 the mean of Si will not be
+constrained, so this functional can constrain any subset of the species S. Optimize this function with respect to each component of the
+function space Ps = P(s):
+∂J
+∂Ps
+=
+∂
+∂Ps
+" X
+s′
+Ps′ log Ps′
+πs′ + ∆· (c −s′)Ps′
+!
++ α
+ 
+1 −
+X
+s′
+Ps′
+!#
+= 0
+[35]
+=
+∂
+∂Ps
+[Ps log Ps
+π(s) + ∆· (c −s)Ps + αPs]
+= 0
+[36]
+= log Ps
+π(s) + 1 + ∆· (c −s) + α
+= 0
+[37]
+=⇒P ∗
+s = Cπ(s)e∆·s =
+1
+ZC
+e
+−P
+i GC
+i si+log si! = πC(s)
+[38]
+Where the C is a normalizing constant which becomes part of the partition function ZC and ∆is chosen so that ⟨sC⟩πC = c. In practice,
+optimization techniques can be used to ﬁnd ∆provided that c ∈Γs0 where Γs0 is the convex hull around Γs0 because the mean does not
+have to be an integer value. The conceptual meaning of this result is that πC is optimal choice of distribution, with expected value
+⟨sC⟩= c for the clamped species SC, to encode π.
+We are now ready to invoke the conditional limit theorem (See Cover and Thomas Elements of Information Theory theorem
+11.6.2 p. 371(48)). This theorem states that if one were to observe a very rare sample of π with mean c the distribution of that sample
+would be given by πC. Importantly, this provides a rigorous deﬁnition of what it means to condition upon the a distribution having a
+mean value which allows us to interpret energy clamping as a form of conditioning and hence inference. We note this theorem has been
+applied to understand similar chemical systems previously by Virinchi et al (81).
+Deﬁne: P to be the probability simplex (set of distributions) over the reachability class of the CRN Γs0.
+P =
+
+
+
+µ : (sF , sC) →R
+s.t.
+X
+sF ,sC∈Γs0
+µ(sF , sC) = 1
+
+
+
+.
+[39]
+Note that this is a convex subspace of a Banach function space (48).
+Deﬁne: The space of distributions in the probability simplex, E ⊆P, where the expected value of the species sC = c.
+E = {µ(sF , sC) ∈P s.t. ⟨sC⟩µ = c}
+[40]
+here ⟨·⟩µ denote the expected value relative to the distribution µ.
+Claim 2: E is convex.
+Proof: the expected value ⟨·⟩µ is a linear operator so the constraint Eµ[sC] = c deﬁnes an aﬃne sub-
+space of P. The intersection of an aﬃne subspace and a convex space is also convex, so E is convex (48).
+We now deﬁne a set of N samples from the distribution π and the empirical distribution of types derived from the sample se-
+quence.
+Deﬁne: Sn = s1, ..., sn are a vector of n i.i.d. samples from the distribution πD
+Deﬁne: PSn is the empirical distribution of types derived from the sequence of samples Sn.
+PSn(s) =
+P
+i I(si, s)
+n
+[41]
+where I(s′, s) denotes the identity operator.
+We can now apply the condition limit theorem which states that for any convex set E and empirical distribution of types PSn
+derived from a distribution π, in the in the limit n →∞the probability of a sample si having the value s is given by:
+lim
+n→∞P(si = s | PXn ∈E) = P ∗
+P ∗= argminP ∈ED(P || π) = πC
+[42]
+
+
+In words, consider drawing a set of samples n samples Sn from a detailed balanced CRN with equilibrium distribution π
+where the means of a subset of the species sc of these samples are given by ⟨sC⟩PSn = c. In the limit n →∞, the samples will be
+distributed according a distribution, P ∗(sF , sC), which can be produced by another detailed balanced CRN with equilibrium distribution
+P ∗= πC where the species’ energies GC
+i = ∆i + Gi are chosen such that ⟨sF ⟩πC = c. This process can be thought of as a kind of sample
+clamping because the sampling process must be somehow biased to produce a diﬀerent mean. This technical description allows us to
+equate sample clamping with the energy clamping; they are equivalent descriptions of conditioning on the mean value of π:
+πC(sF , sC) = π(sF , sC | ⟨sC⟩= c).
+[43]
+And hence energy clamping produces a conditional distribution and therefore can be interpreted as a kind of inference.
+B. Proof of Energy Clamping and Potential Clamping Equivalence. The following is a proof of the theorem (24):
+Claim 1 Any potentiated dbCRN is still detailed balanced with equilibrium distribution given by:
+πP (s, p) = 1
+Z exp −(
+X
+i
+Gisi + GP
+i pi + log si! + log pi!)
+[44]
+Proof: Consider the reaction P
+i IiSi
+k+
+−−⇀
+↽−−
+k−
+P
+i OiSi. After being connected to the potential baths, this reaction becomes:
+X
+i
+Ii(Si + Pi)
+k+
+−−⇀
+↽−−
+k−
+X
+i
+Oi(Si + Pi)
+[45]
+k+
+k−= e
+−P
+i(Gi+GP
+i )(Oi−Ii)
+[46]
+ρ+(x) = k+ Y
+i
+si!pi!
+(si −Ii)!(pi −Ii)!
+ρ−(x) = k−Y
+i
+si!pi!
+(si −Oi)!(pi −Oi)!
+[47]
+I and O are the reactions inputs and outputs which are the same stoichiometry for each species Si and its potential Pi by construction.
+Gi and GP
+i are the energies of the species Si and Pi, respectively. ρ±(x) are the propensities of the forward and backward reactions. Note
+that the rate constants (in units of per second) are unchanged by the addition of the potential species by construction. Next, we show
+that πP (s + O −I)ρ−(s + O −I) = πP (s)ρ+(s) proving that πP is an stationary distribution which satisﬁes detailed balance:
+ρ+(s)
+ρ−(s + O −I) = k+
+k−
+Q
+i
+si!pi!
+(si−Ii)!(pi−Ii)!
+Q
+i
+(si+Oi−Ii)!(pi+Oi−Ii)!
+(si−Ii)!(pi−Ii)!
+=
+Y
+i
+e(Gi+GP
+i )(Ii−Oi)si!pi!
+(si + Oi −Ii)!(pi + Oi −Ii)!
+[48]
+πP (s + O −I, p + O −I)
+πP (s)
+=
+Y
+i
+si!pi!e−Gi(si+Oi−Ii)−GP
+i (pi+Oi−Ii)
+(si + Oi −Ii)!(pi + Oi −Ii)!e−Gisi−GP
+i pi =
+Y
+i
+e(Gi+GP
+i )(Ii−Oi)si!pi!
+(si + Oi −Ii)!(pi + Oi −Ii)! .
+[49]
+Because the dbCRN with potential species is detailed balanced, we can simply apply the product Poisson formula (6) to get the
+equilibrium distribution (44).
+Claim 2: πP (s, p) is just a function of s.
+πP (s) = 1
+Z e
+−P
+i Gisi−GP
+i (si−s0
+i +p0
+i )−log si!−log(si−s0
+i +p0
+i )!
+[50]
+Proof: Given an initial condition (s0, p0), it is clear that the change in si and pi are coupled by the construction of the CRN: pi = si−s0
+i +p0
+i .
+Equation (50) results from inserting this conservation law into (44). Furthermore, note that the terms Gi(si −s0
+i + p0
+i ) −log(si −s0
+i + p0
+i )!
+are a kind of stochastic chemical potential.
+Claim 3: In the limit pi ≫0 and pi ≫si −s0
+i , πP has the simpliﬁed form:
+πP (s) ≈1
+Z e
+−P
+i Gisi−GP
+i si−log si!−si log p0
+i
+[51]
+Proof: Using Stirling’s approximation, log(si −s0
+i + p0
+i )! ≈(si −s0
+i + p0
+i ) log(si −s0
+i + p0
+i ). If p0
+i ≫si −s0
+i then log(si −s0
+i + p0
+i ) ≈log p0
+i .
+Finally, the constant terms GP
+i (p0
+i −s0
+i ) and (p0
+i −s0
+i ) log p0
+i will factor out between the Gibbs factor and the partition function.
+Claim 4:
+Equating the exponential terms of (51) to the exponential terms of an energy clamped CRN (19) term by term
+results in the relation:
+GC
+i = Gi + GP
+i + log p0
+i = Gi + µi.
+[52]
+where µi is the chemical potential of Pi and is retrieved by changing from units of counts to units of concentration. Proof: this follows
+easily from some simple algebraic manipulation.
+C. Proof of the Thermodynamically Reversible Limit. In this section, we will prove that the thermodynamically reversible limit of an inﬁnitely
+slow clamping process exists and generates no entropy. We will consider a dbCRN DG and slowly change the energies of the CRN to
+G + ∆. We note that modulating the energies ∆is equivalent to modulating the potentials P and results in simpler notation. We will
+assume ∆changes over N steps resulting in a sequence of equilibrium distributions for entire process: π0, ..., πj, ..., πN. Each distribution
+is given by:
+πj(s) =
+1
+Zj e−(G+ j∆
+N )·s−log s!
+and
+Zj =
+X
+s
+e−(G+ j∆
+N )·s−log s!.
+[53]
+
+
+Here, · denotes the dot product between two vectors and the factorial of a vector is the product of the factorialization of its components:
+s! = Q
+i si!. First we will apply equation 27 iteratively to each step of the N steps in the process:
+∆SN
+kB
+=
+N−1
+X
+j=0
+D(πj || πj+1) =
+N−1
+X
+j=0
+X
+s
+1
+Zj e−(G+ j∆i
+N )·s−log s! log Zj+1
+Zj
+e−(G+ j∆
+N )·s−log s!
+e−(G+ (j+1)∆
+N
+)·s−log si!
+[54]
+=
+N−1
+X
+j=0
+X
+s
+πj(s)(log Zj+1
+Zj
++ log e
+∆
+N ·s) =
+N−1
+X
+j=0
+X
+s
+πj(s)(log Zj+1
+Zj
++ ( ∆
+N · s))
+[55]
+=
+N−1
+X
+j=0
+log Zj+1
+Zj
++ ⟨∆
+N · s⟩πj
+[56]
+Next we simplify the ratio of partition functions, Zj+1
+Zj :
+Zj+1
+Zj
+=
+P
+s e−(G+ (j+1)∆
+N
+)·s−log s!
+P
+s e−(G+ j∆
+N )·s−log s!
+=
+X
+s
+e−(G+ j∆
+N )·s−log s!e−∆
+N ·s
+Zj
+=
+X
+s
+πj(s)e−∆
+N ·s = ⟨e−∆
+N ·s⟩πj
+[57]
+[58]
+Combining these results we obtain the total entropy produced for an N-step process:
+∆SN
+kB
+=
+N−1
+X
+j=0
+h
+log⟨e−∆
+N ·s⟩πj + ⟨∆
+N · s⟩πj
+i
+.
+[59]
+Next, we take the limit N →∞. For the quasi-static reversible process:
+∆Sreversible =
+lim
+N→∞∆SN
+[60]
+We begin by ﬁnding upper bounds for the both term in the sum:
+A = max
+s
+e−∆·s
+and
+B = max
+s
+∆· s
+[61]
+This allows the terms inside the sum to be bounded:
+log⟨e−∆
+N ·s⟩πj ≤log⟨A
+1
+N ⟩πj = 1
+N log A
+and
+⟨∆
+N · s⟩πj ≤⟨B
+N ⟩πj = B
+N .
+[62]
+Furthermore, the inﬁnite sums of the bounds converge:
+lim
+N→∞
+N−1
+X
+j=0
+1
+N log A = log A
+and
+lim
+N→∞
+N−1
+X
+j=0
+B
+N = B
+[63]
+These results allow us to apply the dominated convergence theorem (82) which shows that the limit N →∞and the summation commute.
+We will then apply the monotone convergence theorem (82) to pull the limit inside of the expected value for the ﬁrst term; because e−∆
+N ·s
+is monotone for positive N, the limit can be pulled inside the expected value. Similarly, for the second term
+1
+N is monotone in N so the
+limit can be pulled inside the expected value:
+lim
+N→∞
+N−1
+X
+j=0
+log⟨e−∆
+N ·s⟩πj =
+N−1
+X
+j=0
+lim
+N→∞log⟨e−∆
+N ·s⟩πj =
+N−1
+X
+j=0
+log⟨lim
+N→∞e−∆
+N ·s⟩πj = 0.
+[64]
+lim
+N→∞
+N−1
+X
+j
+⟨∆
+N · s⟩πj =
+N−1
+X
+j
+lim
+N→∞⟨∆
+N · s⟩πj =
+N−1
+X
+j
+⟨lim
+N→∞
+∆
+N · s⟩πj = 0.
+[65]
+This completes the proof that limN→∞SN = 0, showing that the quasi-reversible limit exists for energy-clamping arbitrary detailed
+balanced CRNs.

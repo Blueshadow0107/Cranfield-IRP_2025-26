@@ -1,143 +1,88 @@
 % Chapter: Literature Review
-% Fluid Neural Networks over Continuous Computations
-% Focus: physical/chemical computing substrates
+% Continuous Analog Wave Computation in Porous Media
 
 \section{Introduction}
-\label{sec:lr_intro}
+\label{sec:lit_intro}
 
-This chapter reviews the literature on computing with physical fluids and chemical reactions. The central premise of the present project is that neural computation need not be confined to silicon hardware executing discrete, sequential operations; instead, computation can be performed by continuous chemical and hydrodynamic processes that evolve in parallel across a physical space. The review spans four interconnected strands: (1) reaction-diffusion computing, in which excitable chemical media perform Boolean and higher-level logic; (2) neural and associative-memory architectures implemented in chemistry; (3) microfluidic logic and programmable fluidic circuits; and (4) trainable chemical reaction networks and reservoir computers. \refsec{sec:lr_synthesis} synthesises these strands, identifies the research gaps that the present project addresses, and positions the study within the broader landscape of unconventional computation.
+The remarkable success of artificial neural networks in tasks such as image classification, natural language processing, and scientific prediction has been built on digital hardware that discretises computation into clocked arithmetic operations. As models grow in size and inference is pushed toward edge devices, the energy cost, latency, and chip area of this approach have motivated a search for alternative computational substrates in which the physics of the device itself performs useful transformations. This chapter reviews the literature on such physical neural networks, with particular attention to wave-based systems and to the porous acoustic medium proposed in this thesis. The review begins with the broad idea of physical computation, narrows to acoustic wave computers, then to equivalent-fluid porous acoustics, and concludes with inverse-design methods and the specific research gap addressed by this project.
 
-\section{Reaction-Diffusion Computing}
-\label{sec:reaction_diffusion}
+\section{Physical Neural Networks}
+\label{sec:lit_pnn}
 
-\subsection{Foundations: Chemical Logic Gates}
-\label{subsec:chemical_logic}
+A physical neural network is a material or device whose internal physical dynamics implement the mathematical operations of a neural network. Rather than simulating those dynamics in software, the network is the physical system itself: inputs are encoded as fields or excitations, the material transforms them through its natural evolution, and outputs are read from probes or detectors. The appeal of this approach is that computation can occur in parallel across space and continuously in time, without the repeated memory transfers that dominate digital inference.
 
-The field of chemical computation has its roots in the observation that excitable reaction-diffusion (RD) systems can support propagating wave fronts whose interactions implement Boolean logic. Tóth and Showalter \cite{toth1995logic} demonstrated the first empirical realisation of chemical logic gates using the Belousov-Zhabotinsky (BZ) reaction: AND and OR gates were constructed by guiding excitation waves through geometrically constrained channels and exploiting their collision dynamics. Steinbock, Kettunen and Showalter \cite{steinbock1996chemical} extended this to ``printed'' catalyst patterns on gel substrates, creating reconfigurable chemical wave logic gates in which the gate function was determined by the spatial arrangement of the catalyst rather than by fixed hardware.
+Optical systems have been among the most prominent demonstrations. Lin et al showed that a stack of diffractive surfaces can be trained to perform image classification and other tasks entirely through light propagation \cite{lin2018alloptical}. The layers modulate the phase of the optical field, and interference in free space produces the desired mapping. This work established that a physical wave system can be designed as a deep neural network, with the geometry of the diffractive elements serving as the trainable weights.
 
-Adamatzky and De Lacy Costello \cite{adamatzky2002xor} experimentally realised a chemical XOR gate using the palladium chloride--potassium iodide reaction in a geometrically structured gel medium. The XOR operation emerged from the collision and annihilation of diffusive wave fronts at channel junctions. This body of work established that a functionally complete set of logical operations could be implemented in chemical media, satisfying the theoretical requirement for universal computation \cite{magnasco1997chemical}. Adamatzky subsequently systematised these findings in comprehensive monographs on reaction-diffusion computers \cite{adamatzky2005reaction} and collision-based computing \cite{adamatzky2002collision}.
+Mechanical systems provide a complementary view. Stern et al demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader theoretical framework for learning in physical networks \cite{stern2021physical}. In these systems the equilibrium or linear response of the network encodes the learned function, and training adjusts physical parameters such as spring constants rather than digital weights.
 
-\subsection{From Boolean Logic to Continuous Modulation}
-\label{subsec:continuous_modulation}
+More recently, Wright et al extended the physical neural network idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}. Momeni et al addressed a key practical difficulty of that approach, namely that real physical systems are noisy and difficult to differentiate through, by proposing a backpropagation-free training method for deep physical neural networks \cite{momeni2023backpropagation}. Together these works show that physical networks can be both deep and trainable, but they also highlight the challenge of transferring designs from simulation to physical hardware.
 
-A significant conceptual advance came with the recognition that chemical computation need not rely on discrete Boolean states. Egbert, Gagnon and Pérez-Mercader \cite{egbert2018dynamic, egbert2019soup} showed that a ``chemical soup'' --- a contiguous, homogeneous reaction-diffusion medium without pre-wired channels --- could be transformed into a network of logic gates by dynamically modulating external conditions (feed rates, temperature, illumination) in space and time. In their implementation, parameter regimes were switched sequentially to drive the Gray-Scott reaction through bistable, perturbatory, and monostable phases, thereby implementing NAND, OR, and AND operations. The computation was reprogrammable in real time, and the authors demonstrated a full binary adder constructed from cascaded chemical NAND gates.
+A unifying theoretical perspective was provided by Hughes et al, who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}. In this view, the state of the wave field at each time step is the hidden state of the RNN, and the evolution operator is a sparse linear recurrence whose coefficients depend on the local material properties. This framework is relevant to the present work because it treats the acoustic field as the computational state and the material distribution as the trainable parameters. The present work does not implement the time-domain recurrent formulation directly; instead, it adopts a frequency-domain Helmholtz formulation as a tractable first step toward trainable acoustic processors of this kind.
 
-This approach is particularly relevant to the present project because it replaces fixed geometric constraints with \emph{controllable} external modulation --- a direct analogue to the ``control units'' (valves, flow controllers, inlet conditions) that will govern the proposed fluid neural network. The chemical medium itself is passive; the intelligence of the computation resides in the control policy.
+\section{Acoustic Wave Computing}
+\label{sec:lit_acoustic}
 
-\subsection{Geometrically Constrained vs. Free-Space Computation}
-\label{subsec:constrained_vs_free}
+Acoustic waves are an attractive substrate for physical computation because they propagate in ordinary fluids and solids, interact strongly with structured boundaries, and can be generated and detected with simple transducers. Early work in acoustic metamaterials showed that subwavelength scatterers can be arranged to perform mathematical operations on incident wave fields. Silva et al demonstrated that metamaterial slabs could implement spatial differentiation, integration, and other analog mathematical operations \cite{silva2014mathematical}, and Zangeneh-Nejad et al provided a broader review of analog computing with metamaterials \cite{zangenehnejad2021analogue}.
 
-The literature distinguishes two paradigms for reaction-diffusion computing \cite{adamatzky2005reaction}. In \emph{geometrically constrained} systems, excitation waves travel along predefined channels and interact at junctions, mimicking conventional circuit topologies. In \emph{free-space} (architectureless) systems, localised excitations travel through a uniform medium and compute via collision, following the billiard-ball model of computation. The present project occupies an intermediate position: the physical space is geometrically defined (a microfluidic or reactor geometry), but the ``wiring'' is fluid and dynamically reconfigurable through flow control, allowing both constrained and free-space behaviours to emerge depending on the control policy.
+Another line of research has pursued acoustic logic gates and routing. Zuo et al developed an acoustic analog computing system based on labyrinthine metasurfaces, in which phase manipulation in structured channels implements Boolean operations \cite{zuo2018acoustic}. Zhang et al used self-collimating acoustic beams in phononic crystals to construct AND, OR, NOT, and XOR gates \cite{zhang2015acoustic}, and later extended the idea to compact transformable logic gates based on density-near-zero metamaterials \cite{zhang2016compact}. Wang et al proposed binary-phase acoustic passive logic gates \cite{wang2019binary}, and Xia et al demonstrated an ultra-broadband acoustic logic gate using passive phase manipulation \cite{xia2026ultrabroadband}. Parsa et al used evolutionary search to embed AND and XOR gates in two-dimensional granular metamaterials by arranging mass- or stiffness-contrasting particles \cite{parsa2022evolution}. These papers establish that acoustic interference and scattering can produce useful computational primitives, but they rely on carefully engineered free-space, channel, or granular geometries rather than on continuously varying material properties.
 
-\section{Neural Architectures in Chemical Media}
-\label{sec:chemical_neural}
+The present work differs from these acoustic logic-gate studies in two respects. First, the medium is a porous solid rather than a free-space or channel geometry, which changes the governing physics from ordinary acoustics to equivalent-fluid porous acoustics. Second, the design space is parameterised by continuous fields of porosity, flow resistivity, and tortuosity, allowing gradient-free optimisation to discover structures that would be difficult to design by hand.
 
-\subsection{Chemical Neurons and Droplet Networks}
-\label{subsec:chemical_neurons}
+A final consideration is whether to formulate the problem in the time domain or the frequency domain. Hughes et al's RNN framework is naturally time-domain: the acoustic state evolves through discrete time steps, and the system can be trained like a recurrent neural network \cite{hughes2019wave}. Time-domain finite-difference methods are well developed for room acoustics and musical acoustics \cite{botteldooren1995finite, bilbao2009numerical, taflove2005computational, yee1966numerical}. However, the Johnson-Champoux-Allard model of porous acoustics is most naturally expressed in the frequency domain, because the effective density and bulk modulus are frequency-dependent complex quantities. For this reason the present work adopts a frequency-domain Helmholtz formulation, solving for each frequency independently and reconstructing time-domain signals through superposition.
 
-Moving beyond Boolean logic, researchers have sought to implement neural-network primitives directly in chemical hardware. Gentili \etal\ \cite{gentili2012chemical} demonstrated that a single BZ reaction site could function as a ``chemical neuron'' --- a binary and fuzzy logic processor whose output depended on the integrated history of excitatory and inhibitory inputs. The chemical neuron exhibited thresholding, saturation, and refractory behaviour analogous to biological neurons.
+\section{Porous Media Acoustics}
+\label{sec:lit_porous}
 
-Górecki and co-workers \cite{gorecki2009information} developed structured excitable media for information processing, constructing chemical diodes, counters, and cross-junction logic elements. Sielewiesiuk and Górecki \cite{sielewiesiuk2001logical} analysed the logical functions available at a cross junction of excitable chemical media, deriving the complete truth table for wave interactions at a four-way junction. These elements form the building blocks of chemical neural networks: diodes provide directed connections, junctions provide summation, and excitable sites provide thresholding.
+\subsection{Equivalent-Fluid Models}
 
-At a larger scale, Gruenert \etal\ \cite{gruenert2015droplet} constructed \emph{networks of computing chemical droplet neurons}. Each droplet contained BZ reagent and communicated with neighbours through lipid membranes; the information flow between droplets was characterised using information-theoretic measures. This work demonstrated that interconnected chemical elements could form functional networks with collective computational properties, bridging the gap between single chemical logic gates and system-level neural computation.
+The acoustics of fluid-saturated porous media can be approached at two levels. The more general theory, due to Biot, treats both the fluid and the solid frame as elastic continuums coupled at the pore boundaries \cite{biot1956theory}. Biot's theory predicts two compressional waves and one shear wave in the porous medium, and it remains the foundation for poroelastic analysis. For many air-saturated materials with a heavy, stiff frame, however, the frame can be treated as rigid and motionless, and the air in the pores behaves as an equivalent fluid with frequency-dependent effective properties. This equivalent-fluid approximation greatly simplifies the governing equations and is accurate when the acoustic wavelength is much larger than the pore size.
 
-\subsection{Associative Memory in Reaction-Diffusion Chemistry}
-\label{subsec:associative_memory}
+The earliest equivalent-fluid model for sound absorbing materials was developed by Zwikker and Kosten \cite{zwikker1949sound}. Their model accounts for viscous losses in the pores through a complex effective density and forms the basis for later, more detailed descriptions. The Johnson-Champoux-Allard (JCA) model extends this approach by including both dynamic tortuosity and dynamic bulk modulus, with separate viscous and thermal characteristic lengths \cite{johnson1987dynamic, champoux1991dynamic}. The full theory and its applications are described in the reference text by Allard and Atalla \cite{allard2009propagation}. The JCA model is used in the present work because it captures the frequency-dependent damping and dispersion of sound in rigid-frame porous materials with a small number of measurable parameters.
 
-Stovold and O'Keefe \cite{stovold2012simulating, stovold2016associative, stovold2017associative} made the most direct antecedent contribution to chemical neural networks. They showed that the BZ reaction could implement an \emph{associative memory} --- a recurrent neural network that stores and retrieves patterns via dynamical attractors. Their approach encoded binary patterns as initial concentration distributions in a discretised reaction-diffusion medium; the system evolved under BZ kinetics toward the stored pattern most similar to the input, thereby performing pattern completion.
+Nonlinear extensions of porous acoustics exist, including Biot's own nonlinear theory of porous solids \cite{biot1973nonlinear} and more recent work on nonlinear wave propagation in porous materials. These are not considered here because the speech-band amplitudes of interest are small enough that linear acoustics is an excellent approximation.
 
-The Stovold-O'Keefe associative memory is significant for two reasons. First, it demonstrated that a chemical medium could implement the fundamental operation of recurrent neural networks --- convergence to an attractor state --- without any digital electronics. Second, it established a methodology for mapping neural network weights onto chemical reaction rates and diffusion coefficients, providing a template for the ``training'' phase of the present project, in which control parameters must be optimised to encode desired network functions.
+\subsection{Porous Materials in Computing Contexts}
 
-Rambidi, Maximychev and Usatov \cite{rambidi1994molecular} had earlier proposed ``molecular neural network devices'' based on nonlinear dynamic media, framing the physical realisation of neural networks in molecular systems as a principled design problem. Their work anticipated the convergence of nonlinear chemical dynamics with neural network theory that Stovold and O'Keefe later demonstrated experimentally.
+Porous materials have been used in several computing-related contexts, though rarely as continuous acoustic inference substrates. Jaafar et al demonstrated mesoporous silica memristors for neuromorphic switching and reservoir computing \cite{jaafar2022mesoporous}, and Ding et al reviewed porous crystalline materials for memories and neuromorphic computing systems \cite{ding2023porous}. These works exploit the pore structure for electronic or ionic switching rather than for acoustic wave interference. They nevertheless support the broader motivation that porous media are a promising, manufacturable platform for unconventional computing.
 
-\section{Microfluidic Logic and Programmable Fluidics}
-\label{sec:microfluidic}
+\subsection{Metaporous Materials}
 
-\subsection{Bubble and Droplet Logic}
-\label{subsec:bubble_logic}
+The term \emph{metaporous} refers to engineered porous structures that combine a porous substrate with resonant or structured elements to obtain acoustic behaviour beyond that of ordinary porous materials. Typical examples include perforated or micro-perforated face plates backed by porous layers, porous matrices with embedded Helmholtz resonators, and periodic three-dimensional lattice cells. These structures are designed at the unit-cell or microstructure level and are usually analysed with finite-element or acoustic-structural models rather than with an equivalent-fluid approximation. Metaporous absorbers can achieve broadband or deep-subwavelength absorption by tuning the geometry of the resonant features, and inverse-design studies such as Pan et al have optimised metaporous topologies for target absorption spectra. The present work differs from metaporous design because it treats the porous medium as a continuous equivalent fluid described by the JCA model. The design variables are macroscopic effective properties rather than unit-cell geometry, and the objective is wave-based computation rather than absorption.
 
-While reaction-diffusion computing exploits the intrinsic chemical dynamics of a medium, an alternative approach constructs logic elements from the hydrodynamics of multiphase flow in microchannels. Prakash and Gershenfeld \cite{prakash2007bubble} introduced \emph{bubble logic}, in which gas bubbles in a liquid carrier serve as bits of information and channel geometries implement Boolean operations. A bubble traversing a channel modifies the fluidic resistance of surrounding channels, enabling hydrodynamic interactions that realise AND, OR, NOT, and universal logic gates. The bubbles simultaneously carry a chemical payload, merging chemistry and computation in a single fluid stream.
+Other physical computing substrates provide useful context. Adamatzky reviewed the history of liquid computers, in which fluids or chemical reactions perform computation \cite{adamatzky2019liquid}. Baltussen et al demonstrated chemical reservoir computation in a self-organizing reaction network \cite{baltussen2024chemical}, and Prakash and Gershenfeld developed microfluidic bubble logic, in which gas bubbles in channels carry and process information \cite{prakash2007bubble}. These systems are not acoustic, but they illustrate a long tradition of using physical and chemical media for computation. The gap addressed by this thesis is the use of porous acoustic media specifically as a trainable wave-computing substrate.
 
-The bubble logic paradigm is directly relevant to Point B of the project description --- parallelism through non-reactive fluids. Because bubbles in separate channels do not interact unless deliberately merged, multiple independent computations can proceed in parallel within the same device. This inherent spatial parallelism addresses the ``queue issue'' of sequential silicon inference.
+\section{Inverse Design and Optimisation}
+\label{sec:lit_inverse}
 
-\subsection{Integrated Fluidic Circuits and Pneumatic Control}
-\label{subsec:fluidic_circuits}
+Designing a wave-computing device by hand becomes difficult as the number of design parameters grows, so inverse design methods are essential. Topology optimisation is a well-established approach in which a design field is allowed to vary continuously across the domain and is driven toward an optimal configuration by gradients of an objective function \cite{zangenehnejad2021analogue}. Density-based methods use a filtered and projected material distribution to obtain manufacturable binary or multi-material designs. These methods are powerful but typically require adjoint gradients and careful regularisation to avoid small-scale features.
 
-Weaver \etal\ \cite{weaver2010fluidic} developed fluidic control-logic devices using pneumatic microvalves, creating analogues of electronic resistor-transistor circuits. Two valves in parallel implement an AND gate; two in series implement an OR gate. These primitives enable the construction of finite-state machines, multiplexers, and feedback controllers entirely within the fluidic domain.
+Inverse design has also been applied to conventional porous and metaporous materials, although with objectives quite different from wave computing. Boulvert et al optimised one-dimensional through-thickness gradients of Johnson-Champoux-Allard-Lafarge parameters to achieve broadband perfect absorption \cite{boulvert2019optimally}. Pan et al used a convolutional-neural-network surrogate coupled to a genetic algorithm to inversely design two-dimensional metaporous geometries for target sound-absorption spectra \cite{pan2023accelerated}. These studies demonstrate that spatially varying porous parameters can be optimised, but they do so for absorption or transmission rather than for analog computation.
 
-More recently, researchers have demonstrated \emph{pneumatic computers} for embedded control of microfluidics, achieving clock rates up to 5~Hz with reprogrammable logic arrays implemented as layered microfluidic membranes. While these switching speeds are far below electronic counterparts, the energy efficiency and chemical compatibility of fluidic control make them attractive for applications where the computation is intrinsically coupled to chemical or biological processes.
+When gradients are unavailable or unreliable, gradient-free optimisation becomes attractive. This is the case in the present work, where the design variables are coarse blocks of porous parameters and the objective function is evaluated by solving the Helmholtz equation. Gradient-free methods such as differential evolution, covariance matrix adaptation, or Bayesian optimisation can explore small design spaces without requiring derivatives. They scale poorly to very large numbers of variables, but for a block-wise parameterisation with tens or hundreds of variables they are practical and robust.
 
-\subsection{MIMIC: Microfluidic Signal Processing}
-\label{subsec:mimic}
+Adjoint-based and differentiable solvers represent the state of the art for larger design spaces. In the frequency-domain Helmholtz setting, the adjoint method allows the gradient of an objective function with respect to many design parameters to be computed at the cost of one additional solve. Physics-informed neural networks and automatic differentiation provide alternative routes to gradient-based design. These approaches are not used in the present work, but they define the direction in which future work could scale the design space.
 
-Kim \etal\ \cite{kim2023realtime} designed the MIMIC (Microfluidic Molecular Communication) platform, which performs signal-processing primitives --- amplification, thresholding, shaping, and detection --- entirely through designed chemical reactions in flowing fluid. The platform successfully transmitted ASCII-encoded messages via chemical bit sequences over metres of tubing, demonstrating that digital signal processing can be implemented as continuous-flow chemical circuits. The MIMIC platform provides an engineering blueprint for the input-output interface of a fluid neural network: chemical signals are injected, processed through reactions, and read out optically or electrochemically.
+\section{Synthesis and Research Gap}
+\label{sec:lit_synthesis}
 
-\section{Trainable Chemical Networks and Reservoir Computing}
-\label{sec:trainable}
+The literature reviewed above establishes three important points. First, physical neural networks are a viable alternative to digital inference, with demonstrations in optics, mechanics, and acoustics. Second, acoustic waves can be used to implement computational primitives such as logic gates and mathematical operations through interference and scattering. Third, porous media have well-developed equivalent-fluid models and are increasingly used in neuromorphic and unconventional computing contexts.
 
-\subsection{Chemical Reservoir Computing}
-\label{subsec:chemical_reservoir}
-
-Baltussen \etal\ \cite{baltussen2024chemical} reported a landmark demonstration of chemical reservoir computing using the Formose reaction in a continuous stirred-tank reactor (CSTR). The autocatalytic polymerisation of formaldehyde generates a self-organising network of approximately $10^6$ intermediate compounds, which serves as the reservoir. Input signals perturb the reactant inflow; a trainable linear readout maps the resulting high-dimensional concentration field to desired outputs. The system demonstrated nonlinear classification, metabolic prediction, and chaotic time-series forecasting.
-
-The CSTR configuration is inherently fluid and continuous, matching Point A of the project description. However, the reservoir's internal dynamics are fixed; only the readout layer is trained. The present project extends this paradigm by proposing to train the \emph{control parameters} of the physical space itself (flow rates, mixing ratios, temperature) to shape the internal dynamics for specific tasks.
-
-\subsection{Neural CRNs: Trainable Chemical Reaction Networks}
-\label{subsec:neural_crns}
-
-Nagipogu and Reif \cite{nagipogu2025neural} proposed Neural CRNs --- a framework for implementing trainable Neural ODEs using deterministic mass-action chemical reaction networks. Their key advance was showing that both linear and nonlinear modelling circuits could be implemented using exclusively unimolecular and bimolecular reactions, avoiding the impractical trimolecular chemistries required by prior art. The entire supervised learning pipeline executes in only two sequential phases, and first-order gradient approximations enable nonlinear models to scale linearly with input dimensionality.
-
-While Neural CRNs are currently validated only in silico, they provide the most credible design methodology for building trainable fluid neural networks. The framework maps directly onto the present project's Phase 2: training control parameters to encode network functions in a chemical medium.
-
-\subsection{Mathematical Framework: Neural ODEs as Control Policies}
-\label{subsec:neural_odes_control}
-
-Chen \etal\ \cite{chen2018neural} introduced Neural Ordinary Differential Equations (Neural ODEs), in which the hidden state evolves continuously according to a learned vector field. Although originally formulated for digital implementation, the Neural ODE framework provides the mathematical language for describing continuous computation in physical media: the state $\mathbf{h}(t)$ corresponds to the concentration field, the vector field $f$ corresponds to the reaction kinetics and advection, and the control parameters $\boldsymbol{\theta}$ correspond to the controllable physical variables (flow rates, inlet concentrations, temperature) that the present project seeks to optimise.
-
-\section{Synthesis and Research Gaps}
-\label{sec:lr_synthesis}
-
-\subsection{Unifying Themes}
-\label{subsec:themes}
-
-The reviewed literature converges on a single idea: \emph{computation can be performed by continuous physical processes rather than discrete electronic switches}. Table~\ref{tab:substrates} summarises the principal approaches.
+What is missing is an inverse-designed two-dimensional rigid-frame porous acoustic processor in which the medium is parameterised by continuous effective-fluid properties and optimised for a wave-computing task such as frequency classification or routing. Existing acoustic computers rely on free-space, channel, or granular geometries, while existing porous-media inverse design focuses on graded absorption layers or metaporous unit-cell topologies for absorption. This project addresses that gap by formulating the JCA Helmholtz equation in a design region, parameterising the medium by blocks of porosity, flow resistivity, and tortuosity, and optimising those blocks for a simple wave-computing task.
 
 \begin{table}[htbp]
-    \centering
-    \caption{Comparison of fluid and chemical computation substrates}
-    \label{tab:substrates}
-    \begin{tabular}{@{}p{3.5cm}p{3.5cm}p{3.5cm}p{3.8cm}@{}}
-        \toprule
-        \textbf{Approach} & \textbf{Substrate} & \textbf{Training} & \textbf{Key Reference} \\
-        \midrule
-        Reaction-diffusion logic & BZ/palladium gel & Fixed geometry & Tóth \& Showalter \cite{toth1995logic}; Adamatzky \cite{adamatzky2002xor} \\
-        Modulated chemical soup & Gray-Scott CSTR & External modulation schedule & Egbert \etal\ \cite{egbert2019soup} \\
-        Chemical associative memory & BZ reaction-diffusion & Pattern-encoded initial conditions & Stovold \& O'Keefe \cite{stovold2016associative} \\
-        Bubble logic & Gas--liquid microchannels & Channel geometry & Prakash \& Gershenfeld \cite{prakash2007bubble} \\
-        Chemical reservoir & Formose CSTR & Linear readout only & Baltussen \etal\ \cite{baltussen2024chemical} \\
-        Neural CRN & Mass-action kinetics & Reaction rate constants & Nagipogu \& Reif \cite{nagipogu2025neural} \\
-        \bottomrule
-    \end{tabular}
+\centering
+\caption{Comparison of the present work with the closest related approaches.}
+\label{tab:closest_work}
+\begin{tabular}{@{}>{\raggedright}p{2.4cm}>{\raggedright}p{2.8cm}>{\raggedright}p{2.8cm}>{\raggedright}p{2.8cm}>{\raggedright\arraybackslash}p{2.4cm}@{}}
+\toprule
+& \textbf{Boulvert et al 2019} & \textbf{Pan et al 2023} & \textbf{Parsa et al 2022} & \textbf{This work} \\
+\midrule
+Substrate & Graded porous layer & 2D metaporous structure & Granular metamaterial & Rigid-frame porous equivalent fluid \\
+Dimension & 1D through-thickness & 2D unit-cell geometry & 2D discrete particles & 2D continuous effective medium \\
+Design variables & JCAL parameters vs. depth & Unit-cell topology & Particle positions & $\phi$, $\sigma$, $\alpha_\infty$ blocks \\
+Objective & Broadband absorption & Target absorption spectra & AND / XOR logic gates & Wave-computing task \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-\subsection{Identified Gaps}
-\label{subsec:gaps}
-
-Despite substantial progress, several gaps remain that the present project is positioned to address:
-
-\begin{enumerate}
-    \item \textbf{Trainable fluid architecture.} Existing chemical computers either fix the reaction network and train only a readout layer (reservoir computing), or fix the geometry and modulate external conditions (Egbert \etal). No existing system trains the \emph{hydrodynamic control parameters} (flow rates, mixing topology, inlet scheduling) to optimise computational performance. The present project proposes exactly this: using gradient-based or evolutionary optimisation to learn control policies that shape fluid mixing for parallel neural inference.
-    
-    \item \textbf{Parallel non-reactive inference.} Bubble logic and droplet microfluidics demonstrate spatial parallelism, but they implement Boolean operations rather than neural network inference. Chemical associative memories implement neural dynamics, but they are not inherently parallel across independent inputs. The present project seeks to combine the parallelism of microfluidic logic with the representational power of neural networks, using non-reactive fluid streams to isolate independent inference processes.
-    
-    \item \textbf{Controllable physical space with CFD-informed design.} Most experimental chemical computers rely on simplified geometries (Petri dishes, single CSTRs, straight microchannels). The present project will use computational fluid dynamics to design a spatially extended, controllable reactor whose internal flow fields are optimised for mixing, reaction, and readout. This CFD-first design approach is novel in the chemical computing literature.
-    
-    \item \textbf{Benchmarking against silicon.} Few studies systematically compare the inference latency, throughput, or energy efficiency of chemical/fluidic computers against silicon baselines. The present project's Phase 3 addresses this gap directly.
-\end{enumerate}
-
-\subsection{Position of This Study}
-\label{subsec:position}
-
-This project is positioned at the intersection of chemical reaction-diffusion computing, microfluidic logic, and optimal control. It extends the reaction-diffusion paradigm by introducing \emph{trainable hydrodynamic control} --- a middle ground between fixed-geometry chemical logic and fully programmable digital electronics. It extends the microfluidic logic paradigm by moving beyond Boolean operations to continuous-valued neural inference. And it extends the reservoir computing paradigm by proposing to train not only the readout but the internal fluid dynamics themselves.
-
-[\textbf{TODO: refine this paragraph once the specific reactor geometry and control mechanism are finalised.}]
+ 

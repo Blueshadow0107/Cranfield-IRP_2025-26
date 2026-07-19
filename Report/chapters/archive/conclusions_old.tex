@@ -1,0 +1,36 @@
+% Chapter: Conclusions and Future Work
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Summary of Contributions}
+\label{sec:contributions}
+
+This project investigated the feasibility of continuous analog wave computation in fluid-saturated porous media. The main contributions are:
+\begin{enumerate}
+    \item A modular first-order acoustic FDTD solver with thermal effects, absorbing/hard-wall/pressure-release boundary conditions, and reusable analysis helpers.
+    \item Validation of the solver against canonical acoustic behaviours including free-field propagation, wall reflections, and cavity resonances.
+    \item Demonstration of frequency-dependent scattering from a periodic obstacle array, establishing a primitive wave-routing operation.
+    \item Initial integration of equivalent-fluid porous models and a gradient-free design-region optimisation framework.
+\end{enumerate}
+
+\section{Limitations}
+\label{sec:limitations}
+
+The study has several limitations:
+\begin{itemize}
+    \item The porous model uses a single-frequency approximation for the effective density, which limits broadband signal accuracy.
+    \item Optimisation is gradient-free and restricted to small design spaces.
+    \item OpenFOAM validation is incomplete; only the FDTD implementation has been thoroughly tested.
+    \item The mapping from optimised effective properties to a physical porous geometry remains unresolved.
+\end{itemize}
+
+\section{Future Work}
+\label{sec:future}
+
+Future work should address the following directions:
+\begin{enumerate}
+    \item Implement a full frequency-dependent equivalent-fluid model using auxiliary differential equations or convolution to support broadband porous signals.
+    \item Develop an adjoint-based or differentiable FDTD solver to enable efficient gradient-based optimisation of large design regions.
+    \item Complete OpenFOAM validation of baseline acoustics and extend it to inhomogeneous media.
+    \item Explore manufacturable porous geometries, such as sintered media or 3D-printed lattices, that approximate the optimised effective properties.
+    \item Demonstrate a concrete task, such as two-frequency routing or binary vowel classification, with quantified accuracy.
+\end{enumerate}

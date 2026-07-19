@@ -1,0 +1,62 @@
+% Chapter: Results and Discussion
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Overview}
+\label{sec:res_overview}
+
+This chapter presents the validation and demonstration results obtained with the first-order acoustic FDTD solver. \refsec{sec:validation} reports six validation tests that verify boundary-condition behaviour and source injection. \refsec{sec:wave_propagation} illustrates free-field pulse propagation and energy conservation. \refsec{sec:bragg_grating} examines frequency-selective reflection from a periodic obstacle array. \refsec{sec:porous_slab} presents initial transmission results for an equivalent-fluid porous slab. \refsec{sec:design_optimisation} describes a gradient-free optimisation of a design region for a simple routing task. \refsec{sec:discussion} discusses the implications, limitations, and relation to the literature reviewed in \refchap{chap:literature_review}.
+
+\section{FDTD Validation}
+\label{sec:validation}
+
+Six validation cases were run to verify the solver:
+\begin{enumerate}
+    \item Free-field pulse propagation with absorbing boundaries.
+    \item Hard-wall reflection on one side, absorbing elsewhere.
+    \item Pressure-release boundary on one side, absorbing elsewhere.
+    \item Sine-wave source in a hard-wall cavity.
+    \item Sine-wave source in a pressure-release cavity.
+    \item Broadband pulse with mixed boundary conditions.
+\end{enumerate}
+
+For each case, probe time traces and frequency spectra were recorded. [Insert figures and explain which physical behaviours confirm correctness, e.g. pulse speed matching $c_0$, phase reversal at pressure-release walls, standing-wave frequencies in cavities.]
+
+\section{Wave Propagation and Energy}
+\label{sec:wave_propagation}
+
+A Gaussian pressure pulse was injected into a domain with absorbing boundaries. Snapshots at several times show circular wavefronts propagating at the expected sound speed. The potential and kinetic energies were computed and their sum remained approximately constant before the wave reached the boundaries.
+
+[Insert snapshot figure and energy plot.]
+
+\section{Bragg Grating Frequency Response}
+\label{sec:bragg_grating}
+
+A periodic array of cylindrical obstacles was placed in the wave path. Simulations at 5~kHz and 8~kHz show partial reflection and standing-wave patterns upstream of the array, confirming frequency-dependent scattering. The frequency separation provides a first step toward a frequency-router: a structure whose reflection/transmission balance varies with input frequency.
+
+[Insert field-snapshot comparison and, if available, transmission-versus-frequency curve.]
+
+\section{Porous Slab Transmission}
+\label{sec:porous_slab}
+
+An initial equivalent-fluid porous slab was modelled by assigning spatially varying effective density and bulk modulus in the design region. [Report whether this used the ZK or JCA model, what parameters were chosen, and how the transmitted pulse amplitude and phase compared with the homogeneous case.]
+
+\section{Design-Region Optimisation}
+\label{sec:design_optimisation}
+
+A binary or continuous porosity pattern within a rectangular design region was optimised to maximise the pressure amplitude at a target probe for one frequency while minimising it for another. [Describe the parameterisation, objective function, search method, and the final pattern.]
+
+[Insert optimisation convergence plot and field snapshot of the best design.]
+
+\section{Discussion}
+\label{sec:discussion}
+
+The validation tests confirm that the FDTD solver captures the essential physics of first-order acoustic propagation with the implemented boundary conditions. The Bragg-grating result demonstrates that a simple periodic structure can produce frequency-dependent wave routing, which is the primitive operation underlying more complex wave computers.
+
+The porous-slab and optimisation results are preliminary. Key limitations include:
+\begin{itemize}
+    \item The equivalent-fluid implementation currently uses a single-frequency approximation for $\rho_\mathrm{eff}(\omega)$, limiting broadband accuracy.
+    \item The optimisation is gradient-free and therefore slow compared with adjoint-based methods.
+    \item The mapping from optimised effective properties to a manufacturable pore geometry is non-unique and not yet addressed.
+\end{itemize}
+
+These limitations are discussed further in \refchap{chap:conclusions}.

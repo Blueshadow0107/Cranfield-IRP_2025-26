@@ -1,0 +1,1586 @@
+## Preamble
+
+Brain-inspired reservoir computing with fluidic iontronic nanochannels
+T. M. Kamsma,1, 2, ∗,† J. Kim,3, ∗K. Kim,3 W. Q. Boon,1 C. Spitoni,2 J. Park,3, † and R. van Roij1, †
+1Institute for Theoretical Physics, Utrecht University, Princetonplein 5, 3584 CC Utrecht, The Netherlands
+2Mathematical Institute, Utrecht University, Budapestlaan 6, 3584 CD Utrecht, The Netherlands
+3Department of Mechanical Engineering, Sogang University,
+35 Baekbeom-ro (Sinsu-dong), Mapo-gu, Seoul 04107, Republic of Korea
+(Dated: April 26, 2024)
+The brain’s remarkable and efficient information processing capability is driving research into brain-inspired
+(neuromorphic) computing paradigms. Artificial aqueous ion channels are emerging as an exciting platform for
+neuromorphic computing, representing a departure from conventional solid-state devices by directly mimicking
+the brain’s fluidic ion transport. Supported by a quantitative theoretical model, we present easy to fabricate
+tapered microchannels that embed a conducting network of fluidic nanochannels between a colloidal structure.
+Due to transient salt concentration polarisation our devices are volatile memristors (memory resistors) that are
+remarkably stable. The voltage-driven net salt flux and accumulation, that underpin the concentration polar-
+isation, surprisingly combine into a diffusionlike quadratic dependence of the memory retention time on the
+channel length, allowing channel design for a specific timescale. We implement our device as a synaptic ele-
+ment for neuromorphic reservoir computing. Individual channels distinguish various time series, that together
+represent (handwritten) numbers, for subsequent in-silico classification with a simple readout function. Our
+results represent a significant step towards realising the promise of fluidic ion channels as a platform to emulate
+the rich aqueous dynamics of the brain.
+Neuromorphic computing aims to replicate the information
+processing of the human brain, which is orders of magnitude
+more energy efficient than conventional computing devices
+[1, 2]. This is paramount as the unsustainable trend of en-
+ergy consumption by computers is growing at an exponen-
+tial rate, driving investigations into brain-inspired computing
+paradigms [3]. To pursue brain-like information processing, a
+device structure that goes beyond the conventional von Neu-
+mann architecture is necessary [4]. To this end, memristors
+(memory resistors) have emerged as promising artificial ana-
+logues to biological synapses that enable brain-inspired circuit
+architectures [2, 3, 5–7].
+Despite the successful implementation of memristors in
+various conventional platforms, the vast majority of these de-
+vices consist (at least partially) of solid-state components,
+rely on only a single information carrier (usually electrons
+or holes), and only respond to electric driving forces [3, 7].
+These limitations contrast with the brain’s nimble synapses,
+which can utilize both electrical and chemical signals by rely-
+ing on transport in an aqueous environment of various ionic
+and molecular species in parallel [8].
+In light of this dis-
+parity, an emerging and exciting approach seeks inspiration
+not only from the architecture of the brain, but also from its
+aqueous medium and ionic signal carriers [9]. These so-called
+iontronic devices employ ions moving in an aqueous environ-
+ment to carry information, offering the promise of multiple in-
+formation carriers, chemical regulation, and bio-integrability
+[10]. Consequently, various iontronic memristors have been
+presented [11–14] that can exhibit synaptic plasticity features
+[15, 16], and utilize chemical regulation [17, 18]. Addition-
+ally, recent advancements have been made in employing ion-
+tronic devices for signaling and computing, with theoretical
+∗These two authors contributed equally to this work
+† Corresponding author
+proposals [19–21], and demonstrations of traditional truth ta-
+bles [22–24], respectively. Despite these prospects, the devel-
+opment of aqueous neuromorphic devices is still in its infancy
+and neuromorphic computing implementations remain a chal-
+lenge [10, 25, 26].
+Here we theoretically propose and experimentally realise
+the implementation of an aqueous volatile memristor as a
+synaptic element for iontronic neuromorphic computing. This
+device is stable over long periods of time, providing reliable
+and distinct responses to temporal inputs, enabling its use as
+computing element. Additionally, device fabrication is fast,
+cost-effective and easy via a soft-lithography process that is
+almost free-shaping. By constructing a channel of a certain
+chosen length, made easy by the flexible fabrication process,
+we can design our channel to feature a specific timescale cho-
+sen from a wide range, a desirable property of memristive
+devices [27]. The volatile nature, i.e. decaying conductance
+memory when driving forces are removed, with adjustable
+memory retention times makes our memristor a promising
+candidate for reservoir computing, a brain-inspired machine
+learning framework which has drawn attention due to its ca-
+pability of handling complex time series and sequential tasks
+[28–33]. We implement benchmark protocols of classifying
+(handwritten) numbers that are encoded as temporal signals.
+Our aqueous channels process the time series, distinguishing
+them for subsequent in silico classification with a simple read-
+out function, performing (at least) comparable with more con-
+ventional solid-state platforms employing similar protocols
+[32–35].
+Our iontronic device is understood through a quantitative
+theoretical model that directly derives from continuum trans-
+port equations and identifies an inhomogeneous ionic space
+charge density, observed between the colloids [36], as (a gen-
+eral) main ingredient to induce salt concentration polarisation
+and consequent ion current rectification. Moreover, our the-
+ory elucidates how the voltage-driven net salt flux and accu-
+arXiv:2309.11438v2  [cond-mat.soft]  25 Apr 2024
+
+
+2
+Facilitation
+Depression
+Short Term Plasticity
+Input
+Response
+(f)
+(a)
+(d)
+
+Ion transport in 
+aqueous enviroment
+Synaptic strength ~ Conductance
+(c)
+0V
+0V
+0V
+5V
+-2.5V
+5V
+Vapp(t)
+Ground
+Deep channel 1
+High
+charge
+Deep channel 2
+Low
+charge
+Asymmetric NCNM
+Charged
+silica nanoparticles
+Cation
+Anion
+Height H=5 μm
+L=150μm
+2Rb=200μm
+V<0
+V>0
+10 mM KCl
+2Rt=10μm
+(b)
+(e)
+10 mM KCl
+FIG. 1. Features and properties of our iontronic memristor through theory and experiment. (a) Schematic (left) and pictures (right) of the
+device. The channel connects two reservoirs of aqueous KCl electrolyte and incorporates a rigid colloidal structure, forming a network of
+nanochannels between the colloids. (b) Steady-state I −V curve observed in experiments (blue) and predicted by our theory (red), showing
+a similar current rectification property. (c) Dynamic I −V curve in response to a sinusoidal voltage over the channel (top, green). The
+theory (bottom, red) and the experiments (bottom, blue) both exhibit a similar pinched hysteresis loop. (d) Simplified schematic of synaptic
+signal transmission. An action potential triggers neurotransmitter release (not depicted) from the presynaptic neuron (orange), binding to
+receptors on the postsynaptic neuron (yellow), potentially inducing ion transport and altering its membrane potential [8]. The dynamic channel
+conductance is analogous to the synaptic strength. (e) Current measurements (blue) when four consecutive 5 V pulses and five read pulses
+(green) are applied. (f) Short-term plasticity features observed in the channel (blue) and predicted by the theory, where we show the full
+(numerical) solution for g(t)/g0 (red, dashed) and the measurements this would correspond to in the experiment (red, dots). Four consecutive
+voltage pulses with ∆t smaller than the channel’s memory retention time τ leads to facilitation (top) and depression (middle) for pulses of 5 V
+and −2.5 V, respectively. The short term characteristic is clearly visible when ∆t ≫τ, in this instance no cumulative change in conductance
+is found (bottom).
+mulation, that underpin the (transient) concentration polari-
+sation, surprisingly combine into a diffusionlike conductance
+memory timescale that quadratically depends on the chan-
+nel length. Consequently, the theory correctly predicts the
+voltage-dependent (dynamic) conductance, thereby facilitat-
+ing a great acceleration of the experiments by pointing out the
+relevant signal voltages, signal timescales, and suitable reser-
+voir computing protocol.
+The combination of i) a stable fluidic memristor that can be
+designed to feature a specific memory timescale, made with
+ii) an almost free-shaping and cost-effective soft-lithography
+fabrication process, iii) a theoretical model that quantitatively
+describes and predicts the device dynamics, and iv) the imple-
+mentation of an aqueous iontronic device as an element for
+neuromorphic computing, forms a significant advancement
+towards developing iontronic devices that can facilitate the
+wealth of communication pathways harnessed by the brain.
+1
+Fluidic NCNM Memristor: Theory and Experiment
+Our experimental system, as shown in Fig. 1(a), consists of
+a tapered microfluidic channel of uniform height H = 5 µm
+and a width that linearly decreases over its length L = 150 µm
+from 2Rb = 200 µm at the broad base to 2Rt = 10 µm at the
+narrow tip. The channel, which connects two deep reservoirs
+containing an aqueous 10 mM KCl electrolyte, is filled with a
+rigid face-centered cubic (fcc) crystal structure at a near-close-
+packed volume fraction η ≃0.74 of charged silica spheres
+with radius a = 100 nm and approximate surface charge den-
+
+
+3
+sity σc = −0.01 Cm−2. To form the colloidal structure, the
+colloids, dispersed in a 70% ethanol solution, are injected into
+deep channel 1 (as in Fig. 1(a)) of 100 µm height, filling the
+tapered shallow channel up to the base through capillary ac-
+tion. The fluid halts at the interface between the shallow chan-
+nel and deep channel 2 due to the Laplace-pressure and con-
+sequently evaporates, promoting nanoparticle self-assembly
+into a close-packed fcc. The device is then dried and prepared
+for the experiments by filling it with the aqueous electrolyte.
+The electrolyte in the space between the colloids forms a con-
+ducting nanochannel network membrane (NCNM) with pore
+spaces up to tens of nm in the tetrahedral and octahedral holes
+of the fcc lattice. This connected porous structure can sup-
+port an ionic current I driven by a voltage drop V over the
+length of the channel, defined as tip minus base voltage (i.e.
+V = −Vapp). More system parameters and characteristics are
+laid out in the SI.
+Some of us previously showed that these type of colloid-
+filled microchannels are ionic diodes with excellent ion cur-
+rent rectification (ICR) ratios of up to 55 for the channels on
+which the devices in this work are based [36], and even up
+to ∼1600, the highest reported value at the time, for a more
+recent version containing two colloidal structures of opposite
+surface charge [37]. The physical phenomenon that underpins
+the ICR is the strong voltage-dependent salt concentration po-
+larisation, hypothesised to be induced by an experimentally
+observed inhomogeneous ionic space charge density between
+the colloidal particles [36]. Calculations on a standard col-
+loidal Wigner-Seitz cell model, presented in detail in the Sup-
+plemental Information (SI), show that a small (essentially in-
+visible) variation of order ∼1% in the colloidal packing frac-
+tion between base and tip of the channel can alter the colloidal
+surface charge density by several 10% for a fixed zeta poten-
+tial. By assuming macroscopic electroneutrality [38, 39], the
+ionic space charge in the (thin) electric double layers of the
+charged colloids varies similarly, thereby providing a natural
+explanation for the hitherto unexplained ionic charge density
+profile. In order to theoretically investigate the hypothesis that
+the inhomogeneous space charge density is responsible for the
+ICR, we employ standard Poisson-Nernst-Planck (PNP) equa-
+tions for ionic transport to explain that the inhomogeneous
+ionic space charge density indeed leads to current rectifica-
+tion. Our theoretical framework, based on an efficient slab-
+averaging approach in tapered channel geometries [40, 41], is
+described below, while the detailed calculations can be found
+in the SI.
+The PNP equations form an effective theoretical frame-
+work to analyse ion transport in charged porous materials [42].
+However, the complex three-dimensional geometric structure
+of the NCNM, with features on length scales varying from the
+colloidal surface-surface distance all the way up to the chan-
+nel length, introduces intricate numerical challenges for fully
+spatially resolved solutions of the PNP equations. To simplify,
+we consider slab-averages, i.e. the average along a cross sec-
+tion [38, 40, 41, 43, 44], of the electric potential and the ionic
+concentrations in the porous structure between the colloids.
+Although this sacrifices on nanoscale details, it does account
+for the pinched electric field lines towards the channel tip and
+for the spatial variation of the ionic charge density. Through
+this method we reduce the three-dimensional Nernst-Planck
+equation to a one-dimensional form, providing an expression
+for the total salt and charge flux through the channel. The
+divergence of the total salt flux qualitatively shows that the
+
+---
+
+## Experiments
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Truevalue
+Predicted
+0
+0.2
+0.4
+0.6
+0.8
+1.0
+(d)
+(e)
+(f)
+Time series
+NCNM memr.
+5x10 NN
+Classification
+g/g0
+Trimming
+Rounding
+Segmenting
+FIG. 4. Our iontronic memristor as a reservoir computing element. (a) Theoretical prediction (top) and experimental observation (bottom)
+of the relative change in conductance as a response to the 24 = 16 different possible bit-strings, where a “0” and “1” correspond to pulses
+of −2.5 V and 5 V, respectively. Three separate devices were used to find the average conductance and typical variation in response to each
+unique voltage train. (b) Depiction of how a “2” can be transformed into 5 distinct bit-strings (other digits are depicted in the SI). (c) Schematic
+of how the number “2” from (b) is translated to 5 voltage trains, yielding 5 conductance values after the fourth (last) pulse. The conductances
+and variabilities from (a) were then used to train a single-layer fully connected 5×10 neural network in silico, that converts the conductances
+to a classification of the number “2". (d) Nine examples of handwritten numbers from the MNIST database [52], where the (originally 28×28
+pixel) images are trimmed to 20×22 pixel images, the grayscales are rounded to either white or black pixels and then the image is segmented
+into 110 bit-strings. (e) The loss function (mean squared loss) during training per training round when the experimentally found noise, which is
+experimentally quantified using the (device-to-device) variabilities found in our result in (a), of the devices is not taken into account (orange)
+and when it is taken into account (blue). (f) The confusion matrix on a test set of 2,000 samples, showing an overall accuracy of 81%,
+comparable with recent reported results using more conventional platforms [32, 33].
+protocol of classifying handwritten numbers using reservoir
+computing [32, 33]. To build up to this, we first employ a
+standard method of separating 4-bit strings and show that our
+memristor already performs remarkably well at this initial task
+compared to previous results using more conventional plat-
+forms [34, 35]. All 24 = 16 combinations are translated into a
+series of voltage pulses with a duration of 0.75 s, separated by
+intervals of 0.75 s, where a 0 and a 1 correspond to a voltage
+of -2.5 V and 5 V, respectively. In theory, applying the voltage
+pulse trains should yield 16 distinct conductance time traces
+g(t) shown in Fig. 4(a, top), effectively mapping the 16 pos-
+sible input patterns onto the 16 different conductance values
+after the fourth pulse, purely by virtue of the device proper-
+ties. Excitingly, when we apply this protocol in experiments
+we find the predicted 16 distinct conductance signatures as
+shown in Fig. 4(a, bottom), featuring the exact same ordering
+of conductance values and quantitatively similar changes in
+conductances, once more highlighting the predictive power of
+the theory. To obtain Fig. 4(a, bottom), all 16 different volt-
+age pulse trains were repeated twice on three different devices,
+producing six measurements in total and yielding the average
+conductances shown in Fig. 4(a, bottom). All 6 runs displayed
+essentially the same behaviour, producing a spread of conduc-
+tances after the fourth write-pulse for each pulse train, with
+standard deviations of around g/g0 ∼0.06 −0.26 (complete
+list in SI). Individual device variability is lower, with typically
+standard deviations of several g/g0 ∼0.01 and no more than
+0.16. As we perform an analog computing method, rather than
+discrete logic, the possible overlap between measured conduc-
+tances is not an issue and the various time series can reliably
+encode (handwritten) numbers, as we show next.
+To illustrate how the results shown in Fig. 4(a) can be lever-
+aged to classify more complex data inputs with an explanatory
+example, let us consider the simple single-digit numbers 0-9,
+represented by black and white 4 × 5 pixel images. By con-
+verting a row of 4 pixels to a string of bits by letting a white
+
+
+7
+pixel correspond to a “0” and a black pixel to a “1”, we can
+encode the entire image with 5 strings of 4 bits, as shown in
+Fig. 4(b) for the number “2” (other digits are shown in the SI).
+These bit-strings then generate 5 distinct signature outputs, as
+we saw in Fig. 4(a). A single-layer fully connected 5×10 neu-
+ral network is then trained in silico to classify the 5 measured
+conductances as numbers. This protocol is schematically il-
+lustrated in Fig. 4(c). Other types of simple readout functions
+could possibly also suffice. We trained our read-out network
+in silico using the results shown in Fig. 4(a, bottom). To incor-
+porate the (device-to-device) variability, each individual pulse
+was subject to some noise newly drawn from a normal distri-
+bution with mean 0 and standard deviation given by the ex-
+perimentally determined standard deviation for that specific
+voltage train. During training, we repeated this process 100
+times for each of the numbers 0-9, achieving perfect classifi-
+cation of all 10 digits with noise-free inference measurements.
+If we also take the noise into account during inference, we still
+achieve an overall accuracy of 95%, highlighting the system’s
+robustness against noise. Note that actual training is only per-
+formed on a simple and small neural network, that would oth-
+erwise not be capable of handling temporal inputs, while the
+“hard” work of separating the time-dependent signals is han-
+dled by the internal physics of our fluidic memristor. Ulti-
+mately, this successful classification of simple digit images
+serves as an explanatory proof-of-concept for the broader ap-
+plication of performing complex time-dependent data analysis
+tasks.
+Building on our previous experiments with classifying sim-
+ple digit images, we go a step further by classifying hand-
+written numbers from the well-known MNIST database. This
+database contains a large dataset of 28 × 28 pixel images of
+handwritten numbers and has become a standard dataset to
+test and demonstrate the classification capabilities of machine
+learning methods [52]. We first converted each image into
+a 20×22 pixel black and white image by trimming the edges
+off and rounding the grayscales to either black or white pixels,
+as depicted in Fig. 4(d). Each image was then sectioned into
+pixel rows of four pixels, which can be encoded with a voltage
+pulse train as outlined before, leading to a total of 110 con-
+ductance states per image. The readout function consists of a
+single-layer fully connected 110×10 neural network, trained
+on a dataset of 20,000 samples. The training incorporated the
+conductance response and device-to-device noise using the re-
+sults shown in Fig. 4(a), with the noise taken into account
+like we did for the classification 4×5 pixel digits. The noise
+hardly had any effect on overall accuracy, as can be seen by
+the nearly identical decrease of the loss function during train-
+ing in Fig. 4(e). Via this rudimentary straightforward proto-
+col, we achieved an accuracy of 81% on a test set of 2,000
+samples, comparable with earlier reported accuracies of 83%
+and 85.6% resulting from the same protocol using solid-state
+memristors [32, 33]. In Fig. 4(f) the classification is schemat-
+ically depicted in a confusion matrix, where we see how often
+each combination of true and predicted numbers occurred in
+the test set.
+Our successful implementation of an aqueous iontronic de-
+vice as a synaptic element for reservoir computing with a per-
+formance that is (at least) on par with more traditional plat-
+forms [32–35] is a promising demonstration of the potential
+that our fluidic platform offers for brain-inspired computing.
+The functionality extracted from our simple devices is remark-
+able, obviating the need for complicated circuits to distinguish
+the various time series of interest here, instead relying on the
+stable conductance modulation of individual devices. Con-
+sequently, as we advance towards circuits integrating multi-
+ple coupled NCNM devices, we anticipate that the robust in-
+dividual device properties demonstrated here will enable the
+realization of expanded functionalities with relatively simple
+circuits.
+3
+
+---
+
+## Methods
+
+[7] A. Mani, T. A. Zangle, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part i: analytical model and characteristic analysis, Langmuir 25, 3898 (2009).
+[8] T. A. Zangle, A. Mani, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part ii: numerical and experimental study, Langmuir 25, 3909 (2009).
+[9] A. Mani and M. Z. Bazant, Deionization shocks in microstructures, Physical Review E 84, 061504 (2011).
+[10] M. Aarts, W. Q. Boon, B. Cuénod, M. Dijkstra, R. van Roij, and E. Alarcon-Llado, Ion current rectification and long-range interference
+in conical silicon micropores, ACS Applied Materials & Interfaces (2022).
+[11] J. Kim, J. Jeon, C. Wang, G. T. Chang, and J. Park, Asymmetric nanochannel network-based bipolar ionic diode for enhanced heavy
+metal ion detection, ACS nano 16, 8253 (2022).
+[12] B. Sabbagh, N. E. Fraiman, A. Fish, and G. Yossifon, Designing with iontronic logic gates-from a single polyelectrolyte diode to an in-
+tegrated ionic circuit, ACS Applied Materials & Interfaces 15, 23361 (2023), pMID: 37068481, https://doi.org/10.1021/acsami.3c00062.
+[13] P. Robin, N. Kavokine, and L. Bocquet, Modeling of emergent memory and voltage spiking in ionic transport through angstrom-scale
+slits, Science 373, 687 (2021).
+[14] P. Robin, T. Emmerich, A. Ismail, A. Niguès, Y. You, G.-H. Nam, A. Keerthi, A. Siria, A. Geim, B. Radha, et al., Long-term memory
+and synapse-like dynamics in two-dimensional nanofluidic channels, Science 379, 161 (2023).
+[15] H. Von Grünberg, R. van Roij, and G. Klein, Gas-liquid phase coexistence in colloidal suspensions?, Europhysics Letters 55, 580 (2001).
+[16] E. Trizac, L. Bocquet, M. Aubouy, and H.-H. von Grünberg, Alexander’s prescription for colloidal charge renormalization, Langmuir 19,
+4027 (2003).
+[17] F. Smallenburg, N. Boon, M. Kater, M. Dijkstra, and R. van Roij, Phase diagrams of colloidal spheres with a constant zeta-potential, The
+Journal of chemical physics 134 (2011).
+
+---
+
+## Experiments
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Truevalue
+Predicted
+0
+0.2
+0.4
+0.6
+0.8
+1.0
+(d)
+(e)
+(f)
+Time series
+NCNM memr.
+5x10 NN
+Classification
+g/g0
+Trimming
+Rounding
+Segmenting
+FIG. 4. Our iontronic memristor as a reservoir computing element. (a) Theoretical prediction (top) and experimental observation (bottom)
+of the relative change in conductance as a response to the 24 = 16 different possible bit-strings, where a “0” and “1” correspond to pulses
+of −2.5 V and 5 V, respectively. Three separate devices were used to find the average conductance and typical variation in response to each
+unique voltage train. (b) Depiction of how a “2” can be transformed into 5 distinct bit-strings (other digits are depicted in the SI). (c) Schematic
+of how the number “2” from (b) is translated to 5 voltage trains, yielding 5 conductance values after the fourth (last) pulse. The conductances
+and variabilities from (a) were then used to train a single-layer fully connected 5×10 neural network in silico, that converts the conductances
+to a classification of the number “2". (d) Nine examples of handwritten numbers from the MNIST database [52], where the (originally 28×28
+pixel) images are trimmed to 20×22 pixel images, the grayscales are rounded to either white or black pixels and then the image is segmented
+into 110 bit-strings. (e) The loss function (mean squared loss) during training per training round when the experimentally found noise, which is
+experimentally quantified using the (device-to-device) variabilities found in our result in (a), of the devices is not taken into account (orange)
+and when it is taken into account (blue). (f) The confusion matrix on a test set of 2,000 samples, showing an overall accuracy of 81%,
+comparable with recent reported results using more conventional platforms [32, 33].
+protocol of classifying handwritten numbers using reservoir
+computing [32, 33]. To build up to this, we first employ a
+standard method of separating 4-bit strings and show that our
+memristor already performs remarkably well at this initial task
+compared to previous results using more conventional plat-
+forms [34, 35]. All 24 = 16 combinations are translated into a
+series of voltage pulses with a duration of 0.75 s, separated by
+intervals of 0.75 s, where a 0 and a 1 correspond to a voltage
+of -2.5 V and 5 V, respectively. In theory, applying the voltage
+pulse trains should yield 16 distinct conductance time traces
+g(t) shown in Fig. 4(a, top), effectively mapping the 16 pos-
+sible input patterns onto the 16 different conductance values
+after the fourth pulse, purely by virtue of the device proper-
+ties. Excitingly, when we apply this protocol in experiments
+we find the predicted 16 distinct conductance signatures as
+shown in Fig. 4(a, bottom), featuring the exact same ordering
+of conductance values and quantitatively similar changes in
+conductances, once more highlighting the predictive power of
+the theory. To obtain Fig. 4(a, bottom), all 16 different volt-
+age pulse trains were repeated twice on three different devices,
+producing six measurements in total and yielding the average
+conductances shown in Fig. 4(a, bottom). All 6 runs displayed
+essentially the same behaviour, producing a spread of conduc-
+tances after the fourth write-pulse for each pulse train, with
+standard deviations of around g/g0 ∼0.06 −0.26 (complete
+list in SI). Individual device variability is lower, with typically
+standard deviations of several g/g0 ∼0.01 and no more than
+0.16. As we perform an analog computing method, rather than
+discrete logic, the possible overlap between measured conduc-
+tances is not an issue and the various time series can reliably
+encode (handwritten) numbers, as we show next.
+To illustrate how the results shown in Fig. 4(a) can be lever-
+aged to classify more complex data inputs with an explanatory
+example, let us consider the simple single-digit numbers 0-9,
+represented by black and white 4 × 5 pixel images. By con-
+verting a row of 4 pixels to a string of bits by letting a white
+
+
+7
+pixel correspond to a “0” and a black pixel to a “1”, we can
+encode the entire image with 5 strings of 4 bits, as shown in
+Fig. 4(b) for the number “2” (other digits are shown in the SI).
+These bit-strings then generate 5 distinct signature outputs, as
+we saw in Fig. 4(a). A single-layer fully connected 5×10 neu-
+ral network is then trained in silico to classify the 5 measured
+conductances as numbers. This protocol is schematically il-
+lustrated in Fig. 4(c). Other types of simple readout functions
+could possibly also suffice. We trained our read-out network
+in silico using the results shown in Fig. 4(a, bottom). To incor-
+porate the (device-to-device) variability, each individual pulse
+was subject to some noise newly drawn from a normal distri-
+bution with mean 0 and standard deviation given by the ex-
+perimentally determined standard deviation for that specific
+voltage train. During training, we repeated this process 100
+times for each of the numbers 0-9, achieving perfect classifi-
+cation of all 10 digits with noise-free inference measurements.
+If we also take the noise into account during inference, we still
+achieve an overall accuracy of 95%, highlighting the system’s
+robustness against noise. Note that actual training is only per-
+formed on a simple and small neural network, that would oth-
+erwise not be capable of handling temporal inputs, while the
+“hard” work of separating the time-dependent signals is han-
+dled by the internal physics of our fluidic memristor. Ulti-
+mately, this successful classification of simple digit images
+serves as an explanatory proof-of-concept for the broader ap-
+plication of performing complex time-dependent data analysis
+tasks.
+Building on our previous experiments with classifying sim-
+ple digit images, we go a step further by classifying hand-
+written numbers from the well-known MNIST database. This
+database contains a large dataset of 28 × 28 pixel images of
+handwritten numbers and has become a standard dataset to
+test and demonstrate the classification capabilities of machine
+learning methods [52]. We first converted each image into
+a 20×22 pixel black and white image by trimming the edges
+off and rounding the grayscales to either black or white pixels,
+as depicted in Fig. 4(d). Each image was then sectioned into
+pixel rows of four pixels, which can be encoded with a voltage
+pulse train as outlined before, leading to a total of 110 con-
+ductance states per image. The readout function consists of a
+single-layer fully connected 110×10 neural network, trained
+on a dataset of 20,000 samples. The training incorporated the
+conductance response and device-to-device noise using the re-
+sults shown in Fig. 4(a), with the noise taken into account
+like we did for the classification 4×5 pixel digits. The noise
+hardly had any effect on overall accuracy, as can be seen by
+the nearly identical decrease of the loss function during train-
+ing in Fig. 4(e). Via this rudimentary straightforward proto-
+col, we achieved an accuracy of 81% on a test set of 2,000
+samples, comparable with earlier reported accuracies of 83%
+and 85.6% resulting from the same protocol using solid-state
+memristors [32, 33]. In Fig. 4(f) the classification is schemat-
+ically depicted in a confusion matrix, where we see how often
+each combination of true and predicted numbers occurred in
+the test set.
+Our successful implementation of an aqueous iontronic de-
+vice as a synaptic element for reservoir computing with a per-
+formance that is (at least) on par with more traditional plat-
+forms [32–35] is a promising demonstration of the potential
+that our fluidic platform offers for brain-inspired computing.
+The functionality extracted from our simple devices is remark-
+able, obviating the need for complicated circuits to distinguish
+the various time series of interest here, instead relying on the
+stable conductance modulation of individual devices. Con-
+sequently, as we advance towards circuits integrating multi-
+ple coupled NCNM devices, we anticipate that the robust in-
+dividual device properties demonstrated here will enable the
+realization of expanded functionalities with relatively simple
+circuits.
+3
+
+---
+
+## Discussion
+
+We implemented a fluidic iontronic volatile memristor
+as a synaptic element for neuromorphic reservoir comput-
+ing, while the device relies on the same aqueous electrolyte
+medium and ionic signal carriers as biological neurons. Our
+memristor consists of a tapered microchannel that features a
+conducting network of nanochannels embedded in a rigid col-
+loidal structure, forming a nanochannel network membrane
+(NCNM). Device fabrication is fast, cost-effective, and easy
+via an almost free-shaping soft-lithography process. The trait
+that underpins the conductance memory effect of the channel
+is its steady-state diode behaviour, for which NCNM devices
+have shown excellent performance [36, 37], translating into
+a wide range of achievable conductances. Additionally, our
+device exhibited stable and reliable (dynamic) conductance
+modulation, enabling its use as a computing element. More-
+over, the quadratic dependence of the memory timescale on
+the channel length offers a straightforward method to design a
+channel to feature a specific timescale, a sought after feature
+for advancing neuromorphic computing capabilities [27].
+Our memristor is inspired and supported by a compre-
+hensive theory directly derived from the underlying physical
+equations of diffusive and electric continuum ion transport.
+We experimentally quantitatively verified the predictions of
+our theory on multiple occasions, amongst which the specific
+and surprising prediction that the memory retention time of
+the channel depends on the channel diffusion time, despite the
+channel being constantly voltage-driven. The theory exclu-
+sively relies on physical parameters, such as channel dimen-
+sions and ion concentrations, and enabled streamlined experi-
+mentation by pinpointing the relevant signal timescales, signal
+voltages, and suitable reservoir computing protocol. Addi-
+tionally, we identify an inhomogeneous charge density as the
+key ingredient for iontronic channels to exhibit current rec-
+tification (provided they are well-described by slab-averaged
+PNP equations). Consequently, our theory paves the way for
+targeted advancements in iontronic circuits and facilitates ef-
+ficient exploration of their diverse applications.
+For future prospects, a next step is the integration of multi-
+ple devices, where the flexible fabrication methods do offer a
+clear path towards circuits that couple multiple channels. Ad-
+ditionally, optimising the device to exhibit strong conductance
+modulation for lower voltages would be of interest to bring
+
+
+8
+electric potentials found in nature into the scope of possible
+inputs and reduce the energy consumption for conductance
+modulation. From a theoretical perspective, the understand-
+ing of the (origin of the) inhomogeneous space charge and
+the surface conductance is still somewhat limited. These con-
+tain (physical) parameters that are now partially chosen from
+a reasonable physical regime to yield good agreement, but do
+not directly follow from underlying physical equations. We
+also assume that the inhomogeneous ionic space charge distri-
+bution is constant, while it might well be voltage-dependent.
+Lastly, our theoretical model treats the complex porous struc-
+ture in terms of slab-averages, thereby possibly missing out on
+detailed features. These constraints of the theoretical model
+could account for some of the discrepancies between theory
+and experiment, which is notable in the steady-state current
+in Fig. 1(b) and the decrease in conductance in Fig. 1(f). For
+the purposes of this work our current approach is sufficient,
+however, a more in-depth study could offer a more profound
+understanding into the interesting features of the channel.
+In conclusion, in order to narrow the gap between the
+promise of aqueous iontronic neuromorphic computation and
+its implementation, our work demonstrates the capabilities of
+a fluidic memristor by employing it as an artificial synapse for
+carrying out neuromorphic reservoir computing.
+Temporal
+signals, in the form of voltage pulse trains, that together
+represent (handwritten) numbers were distinguished by
+individual channels for subsequent in silico classification
+with a simple readout function, demonstrating (at least)
+comparable performance to more conventional solid-state
+platforms [32–35]. Additionally, the device is fabricated with
+a cost-effective easy soft-lithography process. The achieved
+computing properties are inspired and supported by a quan-
+titative predictive theoretical model of the device dynamics.
+Consequently, our work establishes a solid foundation, both
+theoretically and experimentally, for future investigations into
+fluidic memristive systems and their application in aqueous
+neuromorphic computing architectures, paving the way for
+computing systems that more closely resemble the brains
+fascinating aqueous processes.
+
+---
+
+## Acknowledgements
+
+This work is part of the D-ITP consortium, a program of the
+Netherlands Organisation for Scientific Research (NWO) that
+is funded by the Dutch Ministry of Education, Culture and
+Science (OCW). This work is also supported by a National
+Research Foundation of Korea (NRF) grant funded by the Ko-
+rean government (MSIP) (2020R1A2C2009093) and by the
+Korea Environment Industry & Technology Institute (KEITI)
+through its Ecological Imitation-based Environmental Pollu-
+tion Management Technology Development Project funded by
+the Korea Ministry of Environment (MOE) (2019002790007).
+Author contributions
+T.M.K. conceptualized the work and developed the theory;
+J.K. carried out the experiments; K.K. contributed to carry-
+ing out the experiments; W.Q.B. contributed to developing the
+theory; C.S., J.P. and R.v.R. supervised the research. All au-
+thors discussed the results and contributed to the manuscript.
+
+---
+
+## Methods
+
+[7] A. Mani, T. A. Zangle, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part i: analytical model and characteristic analysis, Langmuir 25, 3898 (2009).
+[8] T. A. Zangle, A. Mani, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part ii: numerical and experimental study, Langmuir 25, 3909 (2009).
+[9] A. Mani and M. Z. Bazant, Deionization shocks in microstructures, Physical Review E 84, 061504 (2011).
+[10] M. Aarts, W. Q. Boon, B. Cuénod, M. Dijkstra, R. van Roij, and E. Alarcon-Llado, Ion current rectification and long-range interference
+in conical silicon micropores, ACS Applied Materials & Interfaces (2022).
+[11] J. Kim, J. Jeon, C. Wang, G. T. Chang, and J. Park, Asymmetric nanochannel network-based bipolar ionic diode for enhanced heavy
+metal ion detection, ACS nano 16, 8253 (2022).
+[12] B. Sabbagh, N. E. Fraiman, A. Fish, and G. Yossifon, Designing with iontronic logic gates-from a single polyelectrolyte diode to an in-
+tegrated ionic circuit, ACS Applied Materials & Interfaces 15, 23361 (2023), pMID: 37068481, https://doi.org/10.1021/acsami.3c00062.
+[13] P. Robin, N. Kavokine, and L. Bocquet, Modeling of emergent memory and voltage spiking in ionic transport through angstrom-scale
+slits, Science 373, 687 (2021).
+[14] P. Robin, T. Emmerich, A. Ismail, A. Niguès, Y. You, G.-H. Nam, A. Keerthi, A. Siria, A. Geim, B. Radha, et al., Long-term memory
+and synapse-like dynamics in two-dimensional nanofluidic channels, Science 379, 161 (2023).
+[15] H. Von Grünberg, R. van Roij, and G. Klein, Gas-liquid phase coexistence in colloidal suspensions?, Europhysics Letters 55, 580 (2001).
+[16] E. Trizac, L. Bocquet, M. Aubouy, and H.-H. von Grünberg, Alexander’s prescription for colloidal charge renormalization, Langmuir 19,
+4027 (2003).
+[17] F. Smallenburg, N. Boon, M. Kater, M. Dijkstra, and R. van Roij, Phase diagrams of colloidal spheres with a constant zeta-potential, The
+Journal of chemical physics 134 (2011).
+
+---
+
+## Results
+
+of the American Chemical Society 134, 3651 (2012).
+[13] G. Paulo, K. Sun, G. Di Muccio, A. Gubbiotti, B. Morozzo della
+Rocca, J. Geng, G. Maglia, M. Chinappi, and A. Giacomello,
+Hydrophobically gated memristive nanopores for neuromor-
+phic applications, Nature Communications 14, 8390 (2023).
+[14] P. Ramirez, S. Portillo, J. Cervera, S. Nasir, M. Ali, W. En-
+singer, and S. Mafe, Neuromorphic responses of nanofluidic
+memristors in symmetric and asymmetric ionic solutions, The
+Journal of Chemical Physics 160 (2024).
+[15] S. H. Han, S. I. Kim, M.-A. Oh, and T. D. Chung, Iontronic
+analog of synaptic plasticity: Hydrogel-based ionic diode with
+chemical precipitation and dissolution, Proceedings of the Na-
+tional Academy of Sciences 120, e2211442120 (2023).
+[16] P. Ramirez, V. Gómez, J. Cervera, S. Mafe, and J. Bisquert,
+Synaptical tunability of multipore nanofluidic memristors, The
+Journal of Physical Chemistry Letters 14, 10930 (2023).
+[17] T. Xiong, C. Li, X. He, B. Xie, J. Zong, Y. Jiang, W. Ma,
+F. Wu, J. Fei, P. Yu, et al., Neuromorphic functions with a
+polyelectrolyte-confined fluidic memristor, Science 379, 156
+(2023).
+[18] P. Robin, T. Emmerich, A. Ismail, A. Niguès, Y. You, G.-H.
+Nam, A. Keerthi, A. Siria, A. Geim, B. Radha, et al., Long-
+term memory and synapse-like dynamics in two-dimensional
+nanofluidic channels, Science 379, 161 (2023).
+[19] P. Robin, N. Kavokine, and L. Bocquet, Modeling of emer-
+gent memory and voltage spiking in ionic transport through
+angstrom-scale slits, Science 373, 687 (2021).
+[20] T. M. Kamsma, W. Q. Boon, T. ter Rele, C. Spitoni, and R. van
+Roij, Iontronic neuromorphic signaling with conical microflu-
+idic memristors, Phys. Rev. Lett. 130, 268401 (2023).
+[21] T. M. Kamsma, E. A. Rossing, C. Spitoni, and R. van Roij,
+Advanced iontronic spiking modes with multiscale diffusive
+dynamics in a fluidic circuit, arXiv preprint arXiv:2401.14921
+(2024).
+[22] T. Emmerich, Y. Teng, N. Ronceray, E. Lopriore, R. Chiesa,
+A. Chernev, V. Artemov, M. Di Ventra, A. Kis, and A. Rade-
+novic, Nanofluidic logic with mechano–ionic memristive
+switches, Nature Electronics , 1 (2024).
+[23] B. Sabbagh, N. E. Fraiman, A. Fish, and G. Yossifon, De-
+signing with iontronic logic gates-from a single polyelec-
+trolyte diode to an integrated ionic circuit, ACS Applied
+Materials & Interfaces 15, 23361 (2023), pMID: 37068481,
+https://doi.org/10.1021/acsami.3c00062.
+[24] J. Li, M. Li, K. Zhang, L. Hu, and D. Li, High-performance in-
+tegrated iontronic circuits based on single nano/microchannels,
+Small , 2208079 (2023).
+[25] B. Xie, T. Xiong, W. Li, T. Gao, J. Zong, Y. Liu, and P. Yu, Per-
+spective on nanofluidic memristors: From mechanism to appli-
+cation, Chemistry–An Asian Journal 17, e202200682 (2022).
+[26] A. Noy, Z. Li, and S. B. Darling, Fluid learning: Mimicking
+brain computing with neuromorphic nanofluidic devices, Nano
+Today 53, 102043 (2023).
+[27] E. Chicca and G. Indiveri, A recipe for creating ideal hybrid
+memristive-cmos neuromorphic processing systems, Applied
+Physics Letters 116, 120501 (2020).
+[28] G. Tanaka, T. Yamane, J. B. Héroux, R. Nakane, N. Kanazawa,
+S. Takeda, H. Numata, D. Nakano, and A. Hirose, Recent ad-
+vances in physical reservoir computing: A review, Neural Net-
+works 115, 100 (2019).
+[29] M. Cucchi, C. Gruener, L. Petrauskas, P. Steiner, H. Tseng,
+A. Fischer, B. Penkovsky, C. Matthus, P. Birkholz, H. Klee-
+mann, et al., Reservoir computing with biocompatible organic
+electrochemical networks for brain-inspired biosignal classifi-
+cation, Science Advances 7, eabh0693 (2021).
+[30] J. Cao, X. Zhang, H. Cheng, J. Qiu, X. Liu, M. Wang, and
+Q. Liu, Emerging dynamic memristors for neuromorphic reser-
+voir computing, Nanoscale 14, 289 (2022).
+[31] M. Cucchi, S. Abreu, G. Ciccone, D. Brunner, and H. Klee-
+mann, Hands-on reservoir computing: a tutorial for practical
+implementation, Neuromorphic Computing and Engineering 2,
+032002 (2022).
+[32] R. Midya, Z. Wang, S. Asapu, X. Zhang, M. Rao, W. Song,
+Y. Zhuo, N. Upadhyay, Q. Xia, and J. J. Yang, Reservoir com-
+puting using diffusive memristors, Advanced Intelligent Sys-
+tems 1, 1900084 (2019).
+[33] C. Du, F. Cai, M. A. Zidan, W. Ma, S. H. Lee, and W. D. Lu,
+Reservoir computing using dynamic memristors for temporal
+information processing, Nature communications 8, 1 (2017).
+[34] J. Pyo and S. Kim, Non-volatile and volatile switching behav-
+iors determined by first reset in ag/taox/tin device for neuromor-
+phic system, Journal of Alloys and Compounds 896, 163075
+(2022).
+[35] D. Kim, J. Shin, and S. Kim, Implementation of reservoir com-
+puting using volatile wox-based memristor, Applied Surface
+Science , 153876 (2022).
+[36] E. Choi, C. Wang, G. T. Chang, and J. Park, High current ionic
+diode using homogeneously charged asymmetric nanochannel
+network membrane, Nano Letters 16, 2189 (2016).
+[37] J. Kim, J. Jeon, C. Wang, G. T. Chang, and J. Park, Asymmetric
+nanochannel network-based bipolar ionic diode for enhanced
+heavy metal ion detection, ACS nano 16, 8253 (2022).
+[38] A. Mani, T. A. Zangle, and J. G. Santiago, On the propagation
+of concentration polarization from microchannel- nanochannel
+interfaces part i: analytical model and characteristic analysis,
+Langmuir 25, 3898 (2009).
+[39] A. Mani and M. Z. Bazant, Deionization shocks in microstruc-
+tures, Physical Review E 84, 061504 (2011).
+[40] W. Q. Boon, T. E. Veenstra, M. Dijkstra, and R. van Roij,
+Pressure-sensitive ion conduction in a conical channel: optimal
+pressure and geometry, Physics of Fluids 34, 101701 (2022).
+[41] T. M. Kamsma, W. Q. Boon, C. Spitoni, and R. van Roij, Un-
+veiling the capabilities of bipolar conical channels in neuromor-
+phic iontronics, Faraday Discussions (2023).
+[42] M. Schmuck and M. Z. Bazant, Homogenization of the
+poisson–nernst–planck equations for ion transport in charged
+porous media, SIAM Journal on Applied Mathematics 75, 1369
+(2015).
+[43] T. A. Zangle, A. Mani, and J. G. Santiago, On the propagation
+of concentration polarization from microchannel- nanochannel
+interfaces part ii: numerical and experimental study, Langmuir
+25, 3909 (2009).
+[44] L. Jubin, A. Poggioli, A. Siria, and L. Bocquet, Dramatic
+pressure-sensitive ion conduction in conical nanopores, Pro-
+ceedings of the National Academy of Sciences 115, 4063
+(2018).
+[45] V. S. Markin, A. G. Volkov, and L. Chua, An analytical model
+of memristors in plants, Plant signaling & behavior 9, e972887
+(2014).
+[46] L. Chua, If it’s pinched it’s a memristor, Semicond. Sci. Tech-
+nol. 29, 104001 (2014).
+
+
+10
+[47] W. Brown, M. Kvetny, R. Yang, and G. Wang, Selective ion
+enrichment and charge storage through transport hysteresis in
+conical nanopipettes, The Journal of Physical Chemistry C 126,
+10872 (2022).
+[48] Z. Rotman, P.-Y. Deng, and V. A. Klyachko, Short-term plas-
+ticity optimizes synaptic information transmission, Journal of
+Neuroscience 31, 14800 (2011).
+[49] L. Abbott and W. G. Regehr, Synaptic computation, Nature 431,
+796 (2004).
+[50] P.-Y. Deng and V. A. Klyachko, The diverse functions of short-
+term plasticity components in synaptic computations, Commu-
+nicative & Integrative Biology 4, 543 (2011).
+[51] T. M. Kamsma, R. van Roij, and C. Spitoni, A simple mathe-
+matical theory for simple volatile memristors and their spiking
+circuits, arXiv preprint arXiv:2404.08647 (2024).
+[52] L. Deng, The mnist database of handwritten digit images for
+machine learning research [best of the web], IEEE Signal Pro-
+cessing Magazine 29, 141 (2012).
+
+
+Supplemental Information for: Brain-inspired computing with fluidic iontronic nanochannels
+T. M. Kamsma,1, 2, ∗,† J. Kim,3, ∗K. Kim,3 W. Q. Boon,1 C. Spitoni,2 J. Park,3, † and R. van Roij1, †
+1Institute for Theoretical Physics, Utrecht University, Princetonplein 5, 3584 CC Utrecht, The Netherlands
+2Mathematical Institute, Utrecht University, Budapestlaan 6, 3584 CD Utrecht, The Netherlands
+3Department of Mechanical Engineering, Sogang University,
+35 Baekbeom-ro (Sinsu-dong), Mapo-gu, Seoul 04107, Republic of Korea
+(Dated: April 26, 2024)
+1
+Theory
+1.1
+Poisson-Nernst-Planck equations
+We consider ionic transport through a triangular tapered channel of uniform height H, length L, and widths 2Rt and 2Rb at
+the (smaller) tip and the (larger) base, i.e. Rt < Rb, as illustrated in Fig. 1(a) of the main text. In our experiments we have
+L = 150 µm (unless stated otherwise), Rt = 5 µm and Rb = 100 µm. We introduce the axial coordinate x, with x = 0 at the
+base and x = L at the tip, and the cartesian width-coordinate y ∈[0,R(x)], with y = 0 the symmetry axis and y = R(x) the half
+width of the channel given by R(x) = Rb −(Rb −Rt)x/L for x ∈[0,L]. In the channel the height coordinate z lies in the interval
+z ∈[−H/2,H/2]. The channel is filled with a rigid close-packed fcc crystal of charged colloidal spheres (in the experiments
+with packing fraction η ≃0.74, radius a = 100 nm, and zeta potential ψ0 ≈−39 mV). The channel connects two large and
+deep aqueous reservoirs containing a 1:1 electrolyte at room temperature with salt bulk concentration ρb (in the experiments
+ρb = 10 mM KCl with a Debye length λD = 3.1 nm). The ionic transport takes place through the electrolyte that fills the space
+between the colloids in the colloidal crystal and is driven by a time-dependent voltage V(t). We define the applied voltage
+V = V(L) −V(0) to be the voltage at the tip minus the voltage at the base, such that conductance enhancement always occurs
+when V > 0, regardless of which side is grounded. In the main text we have a grounded tip so we apply Vapp(t) = −V(t) at the
+base. The transport is described in terms of the Poisson-Nernst-Planck (PNP) equations, that relate the electrostatic potential
+Ψ(x,y,z,t) and the cationic and anionic concentrations ρ+(x,y,z,t) and ρ−(x,y,z,t), respectively, to the ionic fluxes j±(x,y,z,t).
+In the space between the colloidal spheres we write
+∇2Ψ = −e
+ε (ρ+ −ρ−),
+(S1)
+∂ρ±
+∂t +∇·j± = 0,
+(S2)
+j± = −D
+
+∇ρ± ±ρ±
+e∇Ψ
+kBT
+
+,
+(S3)
+where e denotes the elementary charge, ε = 80.23ε0 the dielectric constant of water at room temperature T, kB the Boltzmann
+constant, and D the ionic diffusion coefficient that we take equal for the cations and the anions. The electrostatics is accounted
+for by the Poisson equation (S1), the conservation of ions by the continuity equation (S2), and the combination of Fickian
+diffusion and Ohmic conduction by the Nernst-Planck equation (S3). We neglect electro-osmotic fluid flow, which we expect to
+be relatively small due to the narrow constrictions of the geometry. The system of equations (S1)-(S3) is closed upon imposing
+blocking boundary conditions on all solid walls, n · j± = 0, with n the (inward) normal on the walls of the channel and the
+colloids, together with Gauss’ law n·∇Ψ = −eσ/ε with σ the surface charge density (on the wall and on the colloidal surfaces).
+We also impose that ρ±(x,y,z,t) equals the bulk concentration ρb at the far end of either reservoir, that Ψ(0,y,z,t) = 0 and
+Ψ(L,y,z,t) = V(t) to account for the applied potentials.
+The resulting closed set of PNP equations and boundary conditions can in principle be solved numerically by finite-element
+methods. The geometry of a colloidal crystal in a tapered channel, however, is computationally challenging as it requires a spatial
+resolution on the nm length scale of the electric double layer, on the 1-100 nm length scale of the pore structure in between the
+∗These two authors contributed equally to this work
+† Corresponding author
+arXiv:2309.11438v2  [cond-mat.soft]  25 Apr 2024
+
+
+2
+colloidal particles, and on the 10-100 µm length scale of the channel dimensions. By treating the complex porous structure
+homogeneous medium, these equations were modified and successfully solved numerically to describe the simplified physics
+inside the type of channel of interest here [1], however at a considerable computational cost and no analytic insights. Instead of
+a computationally costly numerical approach, we will derive analytical results straight from the Nernst-Planck equation (S3) to
+obtain an analytic approximation for the channel dynamics. This will yield a computationally significantly cheaper theoretical
+model which can be treated analytically to investigate the origin of the ion current rectifying properties of the channel, and to
+predict features such as its conductance memory properties.
+1.2
+Slab-averaged electric field, space charge, and salt concentration
+Our theoretical approach is based upon a methodology that we successfully developed and applied recently to quantitatively
+explain the steady-state and dynamic conductance properties of simpler channels filled with a homogeneous aqueous electrolyte
+[2–4]. Here we show that this methodology can be extended to the nanoporous channel network that characterizes the channel
+we study in this work. The colloidal structure within the channel forms a (nearly) close-packed face centered cubic (fcc) crystal
+at a volume fraction η ≃0.74 as we saw before. With a colloid radius a = 100 nm, this means that the pores through which
+ions can be transported have diameters as large as several tens of nm in the octahedral and tetrahedral holes of the fcc-lattice
+[5, 6], which is much larger than the Debye length of λD ≈3.1 nm that characterises the thickness of the electric double layers.
+In other words, the channels are mostly in the regime of non-overlapping and hence fully developed thin electric double layers,
+bringing us into the scope of area-averaging techniques [2, 4, 7, 8]. Specifically, this justifies the same underlying assumption
+as in Refs. [2–4] that the local and voltage-dependent total salt concentration ρs ≡ρ+ +ρ−, the total ionic space charge density
+ρe = ρ+−ρ−, and the local electric potential Ψ can faithfully be represented by the y−z-slab-averaged functions ρs(x,V), ρe(x),
+and Ψ(x), respectively, where we recall that the lateral coordinate x ∈[0,L] runs from base to tip. Here we explicitly denote
+the dependence of ρs on V, while refraining from denoting the explicit (linear) dependence of Ψ on V below for notational
+convenience. While we expect also a V-dependence of ρe in a full calculation, we will restrict ourselves to a V-independent
+form below.
+If the slab-averaged electric field lines cannot escape the tapered channel, a realistic assumption in our experiments as the di-
+electric constant of water is much higher than that of the wall-material, then the slab-averaged electric field component −∂xΨ(x)
+must be proportional to 1/R(x) on the basis of charge neutrality on the length scale beyond the Debye length. Since we define
+V = V(L)−V(0), i.e. the tip minus the base voltage, the applied voltage also satisfies
+R L
+0 ∂xΨ(x)dx = V. Combining the scaling
+with this property, we find with ∆R = Rb −Rt that
+∂xΨ(x) =
+∆RV
+Lln
+
+Rb
+Rt
+
+R(x)
+.
+(S4)
+This slab-averaged electric field in the channel is therefore proportional to the applied field V/L and gets progressively stronger
+closer to the tip. The total steady-state salt flux js(x,y,z) = j+(x,y,z,t)+j−(x,y,z) can now be integrated over slabs in the y and
+z direction to obtain for the x-component of the total salt flux Jx(x) =
+R R(x)
+−R(x)
+R H/2
+−H/2 js(x,y,z)· ˆxdydz through the channel
+Jx(x) = −Dεfcc
+
+2R(x)H∂xρs(x,V)+2R(x)Hρe(x)e∂xΨ(x)
+kBT
+
+.
+(S5)
+Here we introduced the porosity εfcc = 1−η to take the volume into account that is excluded to the electrolyte by the colloidal
+fcc crystal, where we assume the colloidal particles to be impenetrable to the electrolyte. As we take slab averages one would
+expect an area term, instead of the porosity. However, microscopically, the available electrolyte area through which the ions can
+diffuse in the slab has a periodicity in x that is dictated by the lattice spacing, which is much smaller than the channel length L
+and can hence be ignored in our slab-averaged description. Therefore we consider each slab to have the same available surface
+area for ions, which in this simplified one-dimensional view is the porosity εfcc [9].
+Eq. (S5) depends on the slab-averaged ionic space charge density ρe(x), that picks up contributions from the electric double
+layers (EDLs) around the charged colloidal spheres. Given that EDLs have spatial extensions as small as the Debye length (here
+λD = 3.1 nm) around the colloidal spheres (here of radius a = 100 nm), one might expect the slab-averaged space charge density
+to be a constant on the much larger length scale of the channel, with a magnitude ∝ηZ with Z the charge of a colloid. Interest-
+ingly, however, earlier measurements presented in Ref. [1] on channels nearly identical to the ones we study here convincingly
+showed a heterogeneous rather than a homogeneous space charge density that could well be fitted by the monotonic functional
+form
+
+
+3
+ρe(x) =
+ρe,t
+1−(1−ρe,t/ρe,b)(L−x)/L,
+(S6)
+where ρe,t and ρe,b are the space charge density at the tip and the base, respectively, which may differ from each other even at
+zero applied voltage [1]. In this work we have ρe,t = 8.85 mM and ρe,b = 8.00 mM for the steady-state results of Fig. 1(b) and
+ρe,b = 6.3 mM for the other (dynamic) results, the choice for these values is further discussed in Sec. 2. Whereas we take the
+functional form of Eq.(S6) as experimental input from now on, the reason for this ionic charge heterogeneity on length scales
+of the channel length remains an interesting open question. Our hypothesis, that we underpin with standard Poisson-Boltzmann
+calculations of a single colloid in a spherical Wigner-Seitz cell in Sec. 1 .5, shows that a reduction of the colloidal packing
+fraction from 0.74 to 0.73 can already increase the colloidal charge density (and hence the average ionic charge in the EDLs) by
+as much as ∼20% at a fixed zeta potential. Thus, a small heterogeneity of the colloidal packing fraction from tip to base could
+provide a microscopic explanation for the spatial dependence of ρe(x) by assuming macroscopic electroneutrality [7, 9]. Given
+the device fabrication (see Sec. 3) such a small asymmetry of η between tip and base is quite well possible although such a small
+deviation in packing fraction is difficult to observe experimentally.
+With Eqs. (S4) and (S6) every component of Eq. (S5) is known except for ρs(x,V). We can use Eq. (S5) for Jx(x) to find the
+steady-state salt concentration ρs(x,V) explicitly by imposing the steady-state condition ∂xJx(x) = 0. This yields a differential
+equation for ρs(x,V), that can be solved analytically after inserting Eqs.(S4) and (S7), yielding
+ρs(x,V) = 2ρb −ρe,b
+eV
+kBT
+∆R
+Rb
+ln
+
+Rb
+Rt
+
+ln
+ ρe,t
+ρe,b
+L−x
+L +x/L
+
++ln
+
+R(x)
+Rt
+
+ln
+ ρe,b
+ρe,t
+
+ln2 
+Rb
+Rt
+
+(ρe,b/ρe,t −Rt/Rb)
+.
+(S7)
+We note that H, D, and εfcc do not appear in Eq. (S7) since these drop out of the underlying differential equation ∂xJx(x) = 0.
+More importantly, ρs(x,V) is voltage-dependent, resulting in the voltage-dependent channel conductance we derive next.
+1.3
+Static channel conductance
+The tapered microchannels of our interest are well known to exhibit ionic rectification properties characterised by a static
+conductance g∞≡I(V)/V that is a nontrivial function of the applied static voltage V. By viewing the slabs of thickness dx at
+x ∈[0,L] as a series of resistors with resistivities ∝dx/ρs(x), one can write the static conductance of the channels of present
+interest as
+g∞(V) = g0
+Z L
+0 ρs(x,V)dx/(2ρbL),
+(S8)
+where we made an approximation compared to the more accurate dependence on L/
+R L
+0 (ρs(x,V))−1dx, which reduces compu-
+tational complexity and yields mostly the same results [2–4]. The V-dependence stems from the salt concentration dependence
+on V as given by Eq.(S7). As in Ref. [4], we replace ρs(x,V) by max[0.2ρb,ρs(x,V)] in the actual (numerical) evaluations of
+Eq. (S8) in order to account for the possibility of unphysical negative concentrations that could follow from Eq.(S7) at strongly
+negative voltages in part of the density profiles. (In this regime the underlying assumption that the Debye length is much larger
+than than the channel dimensions breaks down).
+The reference (zero-voltage) conductance g0 of the channel can, in direct analogy with recent results from Refs. [2–4], be
+written as
+g0 =2ρbεfcceD 2∆RH
+Lln( Rb
+Rt )
+e
+kBT +gs = 2ρb
+e2D
+kBT εfcc
+2∆RH
+Lln( Rb
+Rt )
+
+1+ 4λD
+Rpore
+
+cosh
+ eψ0
+2kBT
+
+−1
+
+,
+(S9)
+which includes the volumetric contribution ∝εfcc that depends on the channel-geometry parameters calculated with the total
+charge flux
+R R(x)
+−R(x)
+R H/2
+−H/2 [j+(x,y,z)−j−(x,y,z)] · ˆxdydz. Additionally we also consider a surface contribution ∝λD/Rpore, with
+Rpore the effective radius of the pores embedded in the fcc crystal, which accounts for the excess conductivity due to the excess
+salt concentration in the colloidal EDLs [10] and which we determine below. This surface term is of direct relevance here due to
+the large internal surface in the channel as a result of the colloidal structure. However, the internal structure of the fcc crystal is
+complex with pores of varying sizes and shapes, and regions with fully developed EDLs in the pores with the size of several tens
+
+
+4
+Jx(x)
+Treat electric field,
+charge density, and 
+salt concentration as slab averaged
+Reduce Nernst-Planck Eq. to
+a one-dimensional form
+via integration
+Ψ(x,y,z)
+ρs(x,y,z,V)
+ρe(x,y,z)
+Ψ(x)
+ρs(x,V)
+ρe(x)
+j(x,y,z)
+Unknown
+∂xJx(x) = 0
+ρs(x,V)
+Solve differential equation
+1)
+2)
+3)
+4)
+Net flux
+Total salt change
+Concentration polarisation 
+timescale 𝜏
+Fig. S1. Schematic depiction of the steps taken in our theoretical analysis, involving 1) the slab-averaging assumption, 2) the integration of the
+salt flux over each slab to reduce the full three-dimensional Nernst-Planck equation to its one-dimensional slab-averaged form as in Eq. (S5),
+and 3) the solution of the steady-state condition of a divergence-free flux to obtain Eq. (S7). Lastly, 4) the combination of the salt concentration
+and the salt flux to extract a timescale for the salt concentration polarisation as detailed in Sec. 1 .4.
+of λD neighboured by regions where the EDLs are not fully developed since the shortest distance between colloids is smaller than
+a few λD. Therefore, the surface conductance of the channel is a highly non-trivial property and investigating this in full detail
+falls outside the scope of this work. Instead we will employ an effective method where we treat the internal pores as a channel
+of radius Rpore, with a total slab surface area 2εfccR(x)H. This approach then yields Eq. (S9) [10]. We find good agreement with
+the experiments if we take Rpore = 2λD = 0.06a. Although this seems somewhat small compared to the radii of up to ∼10λD
+for the larger pores, it is still in a reasonable regime given the fact that many regions in a close-packed fcc crystal feature much
+smaller distances between colloids. For the parameters used in the experiment (see Sec. 2) we have that gs/g0 ≈0.38, so the
+conductance is still mostly dictated by bulk conductance, as expected with the relatively large pores compared to the Debye
+length.
+The combination of Eq. (S8) and Eq. (S9) provides us with the steady-state conductance function g∞(V) used in the main text.
+1.3.1
+Space charge density inhomogeneity is a salt source or sink term
+The methodology we employ in Sec. 1 .2 to derive salt concentration polarisation can provide insights into designing new
+devices that also exhibit salt accumulation and depletion. As shown in Sec. 1 .3, the presence of salt concentration polarisation
+affects the channel conductance and will hence lead to current rectification. Our theoretical model explains current rectification
+in the colloid-filled channels we present here, but other types of channels also exhibit current rectification as a result of an
+inhomogeneous space charge [11, 12]. Our theoretical description might provide insights into such other systems as well,
+provided some assumptions are satisfied. (i) The underlying PNPS equations only describe continuum transport, so sub-nm or
+atomic scale systems [13, 14] will fall outside the scope of this theoretical framework. (ii) The radial dependence of the potential
+and the concentrations must be relatively weak and/or short ranged, such that the slab-averaged salt-concentration ρs(x,V) and
+electric field −∂xΨ(x) are fair approximations. For instance, a single channel with strongly overlapping electric double layers
+
+
+5
+throughout the entire channel will exhibit a significant salt concentration profile in the radial direction of the channel, possibly
+resulting in physical phenomena that a slab average ρs(x,V) does not take into account.
+Eq. [S5] can be generalised to
+Jx(x) = −Da
+
+A(x)∂xρs(x,V)+Qe(x)e∂xΨ(x)
+kBT
+
+= −Da
+
+A(x)∂xρs(x,V)+A(x)ρe(x)e∂xΨ(x)
+kBT
+
+,
+(S10)
+with Qe(x)dx the total ionic charge in a slab of infinitesimal thickness dx with volume A(x)dx at location x, and where we
+define ρe(x) ≡Qe(x)/A(x) the slab-averaged ionic charge density. Eq. (S10) describes a channel with cross-sectional area A(x)
+and the average area per slab available for ions a (which would be 1 for materials without any solid obstructions for the ions),
+where we remark that in the simplified one-dimensional view of treating each slab to feature the same available area one can
+use the porosity as we did in Eq. (S5) [9]. In the present channel geometry we have A(x) = 2HR(x), but Eq. (S10) could also
+apply to hourglass shaped channels [12], T-shaped channels [11], or conical channels [2, 4]. If macroscopic charge neutrality
+is ensured within the channel, e.g. in the case of thin electric double layers, and if the electric field lines cannot leave the
+channel because of a weakly polarising outside medium, then the relation −∂xΨ(x) ∝1/A(x) must hold. A fully analytical
+solution as in Eq. (S4) might not always be possible, however the inverse proportionality with the channel area A(x) suffices
+for the qualitative mechanistic understanding discussed here. Consider, namely, a channel without any applied voltage such
+that the salt concentration ρs(x,V) is constant within the channel. Upon applying a voltage, the electric field −∂xΨ(x) will
+form quasi-instantaneously, so a short time after the voltage is applied we have a fully formed electric field, but still a constant
+salt concentration ρs(x,V). In this case the diffusion term in Eq. (S10) vanishes and due to the aforementioned proportionality
+−∂xΨ(x) ∝1/A(x), the only x-dependence that remains in Eq. (S10) is ρe(x). Therefore, if we take the divergence ∂xJx(x) of
+the total salt flux in Eq. (S10) and apply the continuity Eq. [S2] we find
+dρs(x,V)
+dt
+= −dJx(x)
+dx
+∝ρe(x).
+(S11)
+This shows how any inhomogeneous ionic space charge density forms a source or sink for salt term upon applying a voltage,
+thereby inducing salt concentration polarisation and consequently current rectification. An important understanding is that the
+ionic charge density must be inhomogeneous, and not just the total ionic charge in the slab. The reason is that even though the
+total charge Qe(x) ≡ρe(x)A(x) in the slab for a constant space charge density ρe(x) = ρe could still be x-dependent due to its
+scaling with A(x), this dependence would cancel out with the 1/A(x) dependence of the electric field.
+The insight that an inhomogeneous charge density forms a source-sink term previously explained how a constant surface
+charge density σ in a conical geometry could induce current rectification [2] as the total (surface) charge is in this case given
+by Qe(x) = 2πR(x)σdx. Since in this geometry A(x) = πR(x)2 we see that Qe(x) ∝
+p
+A(x) and therefore ρe(x) ≡Qe(x)/A(x) ∝
+1/
+p
+A(x), exhibiting the required x-dependence. Additionally Eq. (S11) shows why merely a geometric inhomogeneity, such
+as a tapered geometry, is not enough to induce current rectification; it must go coupled with a spatially varying slab-averaged
+ionic charge density. The insight of Eq. (S11) could not only explain current rectification in channels with a space charge density
+step-function as in recent polyelectrolyte channels [12] and NCNM channels with colloids of opposing charge [11], it may also
+provide specific guidance to design current rectification properties in future iontronics.
+1.4
+Typical conductance memory retention time
+As detailed in Refs. [3, 4], the process of ion accumulation and depletion is not instantaneous. To investigate this timescale
+for the channel of interest here we can apply the same approach as in Refs. [3, 4]. We consider two quantities, the total number
+of ions N =
+R L
+0 2R(x)Hεfccρs(x,V)dx in the channel and the net salt flux Jx(0)−Jx(L) into the channel. The change of N given
+by Eq. (S7) upon a small voltage perturbation V ′ around V = 0 yields
+∂N
+∂V
+
+V=0
+V ′ =
+εfcceHLρe,tρe,b∆RV ′
+2kBT ln2 
+Rb
+Rt
+
+(ρe,tRt −ρe,bRb)
+
+(Rb +Rt)ln
+ ρe,t
+ρe,b
+
++
+ln
+
+Rb
+Rt
+
+−(ρe,t −ρe,b)∆R(ρe,t(Rb +3Rt)−ρe,b(3Rb +Rt))−2ln
+ ρe,t
+ρe,b
+
+(ρe,tRt −ρe,bRb)2
+(ρe,t −ρe,b)2∆R
+
+
+≡αV ′,
+(S12)
+where α > 0 for our parameters, in agreement with the enhanced (reduced) conductance of a positive (negative) potential V ′
+found in the experiments and as can be seen in Fig. 1(b).
+
+
+6
+At V = 0 the concentration profile is at equilibrium, so for a small voltage perturbation V ′ we can assume ¯ρs(x) = 2ρb. With
+this assumption the first term in Eq. (S5) vanishes. The net salt flux into the channel, Jx(0) −Jx(L), is then determined by the
+remaining conductive terms
+Jx(0)−Jx(L) = 2Dεfcc
+∆RH
+Lln
+
+Rb
+Rt
+(ρe,t −ρe,b) e
+kBT V ′ ≡γV ′,
+(S13)
+where γ > 0 for our parameter choices, again in agreement with the enhanced (reduced) conductance of a positive (negative)
+potential V ′ found in the experiments and as can be seen in Fig. 1(b). We see that the net flux is determined by the difference in
+space charge density between the tip and the base (ρe,t −ρe,b). This is consistent with Eq. (S5), where we saw that the total salt
+flux is proportional to the charge density in the absence of a diffusion term. Therefore, this reconfirms the underlying mechanistic
+insight that a inhomogeneous charge density is what drives a net salt flux and consequent salt concentration polarisation, as also
+argued in Sec. 1 .3 .1.
+The typical time it takes for ion depletion or accumulation, and thus the typical memory retention timescale, is then approxi-
+mated by τ = α/γ. This yields
+τ =
+L2ρe,tρe,b
+
+(Rb −Rt)(Rb +Rt)ln
+ ρe,t
+ρe,b
+
++
+ln
+ Rb
+Rt
+
+−(ρe,t−ρe,b)(Rb−Rt)(ρe,t(Rb+3Rt)−ρe,b(3Rb+Rt))−2ln
+
+ρe,t
+ρe,b
+
+(ρe,tRt−ρe,bRb)2
+
+(ρe,t−ρe,b)2
+
+
+4D(ρe,t −ρe,b)(Rb −Rt)ln
+
+Rb
+Rt
+
+(ρe,tRt −ρe,bRb)
+= L2
+4Dρe,tρe,b
+
+
+(Rb +Rt)ln
+ ρe,t
+ρe,b
+
+(ρe,t −ρe,b)ln
+
+Rb
+Rt
+
+(ρe,tRt −ρe,bRb)
+−
+ρe,tRb −ρe,bRt
+(ρe,t −ρe,b)2(ρe,tRt −ρe,bRb)
+−
+3
+(ρe,t −ρe,b)2 −
+2ln
+ ρe,t
+ρe,b
+
+(ρe,tRt −ρe,bRb)
+(ρe,t −ρe,b)3∆R
+
+
+= L2
+4D
+
+
+(1+Rt/Rb)ln
+ ρe,t
+ρe,b
+
+(1−ρe,b/ρe,t)ln
+
+Rb
+Rt
+
+(ρe,tRt/(ρe,bRb)−1)
+−
+1−ρe,bRt/(Rbρe,t)
+(ρe,t/ρe,b +ρe,b/ρe,t −2)(Rt/Rb −ρe,b/ρe,t)
+−
+3
+ρe,t/ρe,b +ρe,b/ρe,t −2 −
+2ln
+ ρe,t
+ρe,b
+
+(Rt/Rb −ρe,b/ρe,t)
+(1−ρe,b/ρe,t)(ρe,t/ρe,b +ρe,b/ρe,t −2)∆R/Rb
+
+.
+From the above calculation it has now become clear that τ ∝L2/(4D), which corresponds to the time it takes to diffuse over
+distances of the order of the channel length L. The remaining involved terms form a dimensionless number
+ξ =
+(1+Rt/Rb)ln
+ ρe,t
+ρe,b
+
+(1−ρe,b/ρe,t)ln
+
+Rb
+Rt
+
+(ρe,tRt/(ρe,bRb)−1)
+−
+1−ρe,bRt/(Rbρe,t)
+(ρe,t/ρe,b +ρe,b/ρe,t −2)(Rt/Rb −ρe,b/ρe,t)
+−
+3
+ρe,t/ρe,b +ρe,b/ρe,t −2 −
+2ln
+ ρe,t
+ρe,b
+
+(Rt/Rb −ρe,b/ρe,t)
+(1−ρe,b/ρe,t)(ρe,t/ρe,b +ρe,b/ρe,t −2)(1−Rt/Rb)
+of order O(10−1) depending on the channel geometry Rt/Rb and internal space charge distribution ρe,b/ρe,t. Fig. S2 shows
+the dependence of ξ for typical tip-to-base ratios of the space charge concentrations in Fig. S2(a) and the channel widths in
+Fig. S2(b). For our standard parameters we find ξ ≈0.42. This simplifies our notation considerably such that we arrive at the
+final concise expression Eq. (S14) for τ which can be found in the main text as Eq. [1],
+τ = L2
+4Dξ.
+(S14)
+For our standard parameter set as laid out in Sec. 2, we have τ ≈1.62 s.
+
+
+7
+To then arrive at Eq. [2] of the main text, we make the natural assumption that the time-derivative of the dynamic conductance
+∂tg(t) depends on the difference with the corresponding steady-state conductance, i.e. ∂tg(t) = f
+g∞(V(t)) −g(t)
+
+for some
+function f, where f(0) must vanish based on stability arguments. By expanding f up to first order we find ∂tg(t) ∝g∞(V(t))−
+g(t) with the proportionality constant naturally given by the typical timescale τ of the underlying salt concentration polarisation
+that drives the conductance change, given by Eq. (S14) (Eq. [1] in the main text).
+(a)
+(b)
+Fig. S2. The memory time proportionality function ξ as a function the internal space charge ratio ρe,b/ρe,t in (a) and the tip and base radii
+ratio Rt/Rb in (b), for three different values of Rt/Rb and ρe,b/ρe,t, respectively. In both (a) and (b) the blue graph represents Rt/Rb = 0.05
+and ρe,b/ρe,t = 0.71, respectively, the system parameters used in the main text, except for Fig. 1(b) which uses ρe,b/ρe,t = 0.90.
+1.5
+Cell model
+In Sec. 1 .2 we showed how the inhomogeneous charge distribution leads to salt concentration polarisation and thereby to ion
+current rectification. However, Eq. (S6) presented in Ref. [1], which describes the inhomogeneous space charge, follows from
+empirical measurements without a microscopic explanation of the actual origin of this important feature of the channel. Here we
+will leverage the well-established Poisson-Boltzmann cell-model [15, 16] to propose a tentative explanation of the emergence of
+the observed inhomogeneous space charge.
+We consider a dispersion of charged colloidal spheres of radius a at packing fraction η in a 1:1 electrolyte of Debye length
+λD, such that the volume per particle equals (4π/3)b3 with b ≡aη−1/3 > a. The environment of each particle fluctuates due
+to colloidal Brownian motion, and hence the calculation of the profile of the electric potential ψ(r;{R}) is a complicated
+many-body problem that depends on the instantaneous configuration {R} of the colloidal particles. This problem can be reduced
+tremendously, however, if we assume each sphere to be at the center of an electrically neutral and spherically symmetric Wigner-
+Seitz cell of radius b. The dimensionless electrostatic potential φ(r) ≡eψ(r)/kBT is then the same in each cell, and can for
+r ∈[a,b] be described by the Poisson-Boltzmann equation with boundary conditions
+φ ′′(r)+ 2
+r φ ′(r) =λ −2
+D sinhφ(r),
+(S15)
+φ ′(b) =0,
+(S16)
+φ(a) =φ0,
+(S17)
+where a prime denotes a radial derivative and where φ0 is the fixed dimensionless zeta potential in units of kBT/e ≃25 mV. This
+is a closed system of equations that can easily be solved numerically for fixed a, b, λD, and ψ0 or rather for fixed dimensionless
+η, a/λD and φ0. The resulting surface charge density eσ of the spheres is then from Gauss’s law given by σ = −φ ′(a)/4πλB
+with λB = e2/4πεkBT = 0.72 nm the Bjerrum length of water.
+For dispersions that are dilute enough that b−a ≫λD, the EDLs described by Eqs.(S15) are fully developed. In this regime it
+is well known that the colloidal particles obtain their maximum (absolute) surface charge [17]. At high packing fraction where
+b−a ≃λD, the colloidal surfaces discharge and loose their charge completely in the (unphysical) limit b = a. The situation for the
+colloidal dispersion of our system is intricate, since for a = 100 nm and η = 0.74 we have b/a ≃1.105 and hence b−a ≃3λD.
+In this regime the assumption of spherical symmetry of the EDLs is highly questionable, because the surface-surface distances
+between a central particle in a close-packed fcc crystal at η = 0.74 vary between smaller than λD in the 12 directions of its
+nearest neighbours to about 10λD in the directions of the 8 tetrahedral and the 6 octahedral holes of the fcc crystal. We can
+
+
+8
+therefore expect that the particles only significantly discharge in the vicinity of nearest-neigbour contact. Within the spherical-
+cell approximation, we mimic this anisotropy of the colloidal surface charge by averaging over these 12+8+6 = 26 directions,
+with equal weight for simplicity, to define the effective surface charge density σ∗= (12σ2 +14σ∞)/26, with the surface charges
+σ2 and σ∞of the spherical cell with b half the nearest-neighbour distance and b ≫a the dilute limit, respectively. In Fig. S3
+we show the dependence of σ∗/σ∞on the packing fraction η for the present system parameter with φ0 = −1.53, which is such
+that σC = σ∞= 0.01 C/m2. It shows that decreasing the packing fraction from η = 0.74 to 0.73, which corresponds to reducing
+b by as little as 0.5 nm (i.e. by ≃λD/6), the colloidal charge can increase by as much as ∼20%. A reduction to η ≃0.67
+and η ≃0.63 (which corresponds to b −a = λD and 2λD) increases the surface charge by about 80% and 100%, respectively,
+compared to that at η = 0.74. On the basis of these simple estimates, we argue that the slab-averaged space charge in the channel
+(that compensates the colloidal surface charge) can therefore also exhibit the same relative change between tip and base. The
+variation we use of ρe,b/ρe,t = 0.90 for the steady-state results of Fig. 1(b) and ρe,b/ρe,t = 0.71 for the other (dynamic) results
+falls well within this reasonable range of change predicted by the explanation we offer here. We leave an additional estimate on
+an alleged spatial variation of φ0 in the channel to explain the heterogeneous space charge as future work.
+0.62
+0.66
+0.7
+0.74
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+η
+σ*/σ∞
+b-a=λD
+b-a=2λD
+Fig. S3. Dependence on the colloidal packing fraction η of the effective surface charge density σ∗of a colloid in an fcc crystal as a fraction
+of the surface charge density σ∞= σC = 0.01 C/m2 of a free isolated colloid. An increase of up to ∼100% in σ∗is already visible when the
+cell radius b in the direction of the nearest neighbour just extends one or two Debye lengths λD beyond the colloid of radius a, i.e. when the
+nearest neighbour distance b−a ∈[0,2λD].
+2
+
+---
+
+## Methods
+
+[7] A. Mani, T. A. Zangle, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part i: analytical model and characteristic analysis, Langmuir 25, 3898 (2009).
+[8] T. A. Zangle, A. Mani, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part ii: numerical and experimental study, Langmuir 25, 3909 (2009).
+[9] A. Mani and M. Z. Bazant, Deionization shocks in microstructures, Physical Review E 84, 061504 (2011).
+[10] M. Aarts, W. Q. Boon, B. Cuénod, M. Dijkstra, R. van Roij, and E. Alarcon-Llado, Ion current rectification and long-range interference
+in conical silicon micropores, ACS Applied Materials & Interfaces (2022).
+[11] J. Kim, J. Jeon, C. Wang, G. T. Chang, and J. Park, Asymmetric nanochannel network-based bipolar ionic diode for enhanced heavy
+metal ion detection, ACS nano 16, 8253 (2022).
+[12] B. Sabbagh, N. E. Fraiman, A. Fish, and G. Yossifon, Designing with iontronic logic gates-from a single polyelectrolyte diode to an in-
+tegrated ionic circuit, ACS Applied Materials & Interfaces 15, 23361 (2023), pMID: 37068481, https://doi.org/10.1021/acsami.3c00062.
+[13] P. Robin, N. Kavokine, and L. Bocquet, Modeling of emergent memory and voltage spiking in ionic transport through angstrom-scale
+slits, Science 373, 687 (2021).
+[14] P. Robin, T. Emmerich, A. Ismail, A. Niguès, Y. You, G.-H. Nam, A. Keerthi, A. Siria, A. Geim, B. Radha, et al., Long-term memory
+and synapse-like dynamics in two-dimensional nanofluidic channels, Science 379, 161 (2023).
+[15] H. Von Grünberg, R. van Roij, and G. Klein, Gas-liquid phase coexistence in colloidal suspensions?, Europhysics Letters 55, 580 (2001).
+[16] E. Trizac, L. Bocquet, M. Aubouy, and H.-H. von Grünberg, Alexander’s prescription for colloidal charge renormalization, Langmuir 19,
+4027 (2003).
+[17] F. Smallenburg, N. Boon, M. Kater, M. Dijkstra, and R. van Roij, Phase diagrams of colloidal spheres with a constant zeta-potential, The
+Journal of chemical physics 134 (2011).
+
+---
+
+## Methods
+
+[7] A. Mani, T. A. Zangle, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part i: analytical model and characteristic analysis, Langmuir 25, 3898 (2009).
+[8] T. A. Zangle, A. Mani, and J. G. Santiago, On the propagation of concentration polarization from microchannel- nanochannel interfaces
+part ii: numerical and experimental study, Langmuir 25, 3909 (2009).
+[9] A. Mani and M. Z. Bazant, Deionization shocks in microstructures, Physical Review E 84, 061504 (2011).
+[10] M. Aarts, W. Q. Boon, B. Cuénod, M. Dijkstra, R. van Roij, and E. Alarcon-Llado, Ion current rectification and long-range interference
+in conical silicon micropores, ACS Applied Materials & Interfaces (2022).
+[11] J. Kim, J. Jeon, C. Wang, G. T. Chang, and J. Park, Asymmetric nanochannel network-based bipolar ionic diode for enhanced heavy
+metal ion detection, ACS nano 16, 8253 (2022).
+[12] B. Sabbagh, N. E. Fraiman, A. Fish, and G. Yossifon, Designing with iontronic logic gates-from a single polyelectrolyte diode to an in-
+tegrated ionic circuit, ACS Applied Materials & Interfaces 15, 23361 (2023), pMID: 37068481, https://doi.org/10.1021/acsami.3c00062.
+[13] P. Robin, N. Kavokine, and L. Bocquet, Modeling of emergent memory and voltage spiking in ionic transport through angstrom-scale
+slits, Science 373, 687 (2021).
+[14] P. Robin, T. Emmerich, A. Ismail, A. Niguès, Y. You, G.-H. Nam, A. Keerthi, A. Siria, A. Geim, B. Radha, et al., Long-term memory
+and synapse-like dynamics in two-dimensional nanofluidic channels, Science 379, 161 (2023).
+[15] H. Von Grünberg, R. van Roij, and G. Klein, Gas-liquid phase coexistence in colloidal suspensions?, Europhysics Letters 55, 580 (2001).
+[16] E. Trizac, L. Bocquet, M. Aubouy, and H.-H. von Grünberg, Alexander’s prescription for colloidal charge renormalization, Langmuir 19,
+4027 (2003).
+[17] F. Smallenburg, N. Boon, M. Kater, M. Dijkstra, and R. van Roij, Phase diagrams of colloidal spheres with a constant zeta-potential, The
+Journal of chemical physics 134 (2011).

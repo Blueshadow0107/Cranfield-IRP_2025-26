@@ -1,4 +1,4 @@
-# Wave Computing Pivot: Research Summary and Recommendation
+ # Wave Computing Pivot: Research Summary and Recommendation
 
 *Date: 2026-05-08*  
 *Context: Cranfield IRP 2025-26 — "Neural Network based on Porous Media"*

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Code Structure — Cranfield IRP Analysis</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; max-width: 1000px; margin: 2em auto; padding: 0 1em; line-height: 1.6; color: #333; }
+  h1 { color: #1a5276; border-bottom: 2px solid #1a5276; padding-bottom: 0.3em; }
+  h2 { color: #2874a6; margin-top: 1.5em; border-bottom: 1px solid #ddd; padding-bottom: 0.2em; }
+  h3 { color: #2e86c1; }
+  .ok { color: #27ae60; font-weight: bold; }
+  .fail { color: #c0392b; font-weight: bold; }
+  .warn { color: #d35400; font-weight: bold; }
+  .info { color: #2980b9; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+  th, td { border: 1px solid #bbb; padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #eaf2f8; }
+  code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; }
+  pre { background: #f8f9fa; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 0.9em; }
+  .box { background: #eaf2f8; padding: 1em; border-radius: 6px; margin: 1em 0; }
+  .legend { display: flex; gap: 2em; margin: 1em 0; font-size: 0.9em; }
+  .legend span { display: flex; align-items: center; gap: 0.5em; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot-ok { background: #27ae60; }
+  .dot-fail { background: #c0392b; }
+  .dot-warn { background: #d35400; }
+  .dot-info { background: #2980b9; }
+  .arch-diagram { background: #f8f9fa; padding: 1.5em; border-radius: 8px; margin: 1em 0; }
+  .arch-diagram pre { background: transparent; padding: 0; }
+  .module { border: 2px solid #2874a6; border-radius: 8px; padding: 1em; margin: 0.5em 0; }
+  .module h4 { margin-top: 0; color: #2874a6; }
+</style>
+</head>
+<body>
+
+<h1>Analysis/ Directory — Complete Code Structure</h1>
+<p><strong>Project:</strong> Cranfield IRP 2025-26 | <strong>Location:</strong> <code>Analysis/</code></p>
+
+<div class="legend">
+  <span><span class="dot dot-ok"></span> Working / Validated</span>
+  <span><span class="dot dot-warn"></span> Works but null results</span>
+  <span><span class="dot dot-fail"></span> Broken / Unstable</span>
+  <span><span class="dot dot-info"></span> Utility / Reference</span>
+</div>
+
+<h2>1. Core Solvers</h2>
+
+<table>
+<tr>
+  <th>File</th>
+  <th>Status</th>
+  <th>Physics</th>
+  <th>Variables</th>
+  <th>Obstacle Model</th>
+  <th>Key Result</th>
+</tr>
+
+<tr>
+  <td><code>cylinder_array_solver.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>2D incompressible NS</td>
+  <td>ψ–ω</td>
+  <td>Discrete Dirichlet BCs + Thom's formula</td>
+  <td>1,700× wake separation across 6 configs</td>
+</tr>
+
+<tr>
+  <td><code>cylinder_array_brinkman.py</code></td>
+  <td class="fail">BROKEN</td>
+  <td>2D incompressible NS + Brinkman drag</td>
+  <td>ψ–ω</td>
+  <td>Continuous <code>α(x,y)</code> field</td>
+  <td>NaN — explicit advection unstable at sharp α boundaries</td>
+</tr>
+
+<tr>
+  <td><code>primitive_ns_solver.py</code></td>
+  <td class="fail">BROKEN</td>
+  <td>2D incompressible NS + Brinkman</td>
+  <td>u, v, p (primitive)</td>
+  <td>Continuous <code>α(x,y)</code> field</td>
+  <td>NaN — projection method boundary incompatibility</td>
+</tr>
+
+<tr>
+  <td><code>thermoviscous_channel.py</code></td>
+  <td class="warn">NULL RESULT</td>
+  <td>2D incompressible NS + temperature + Arrhenius viscosity</td>
+  <td>ψ–ω + T</td>
+  <td>None (straight channel)</td>
+  <td>0.000% ratio variation across 12 heat patterns</td>
+</tr>
+
+<tr>
+  <td><code>thermoviscous_cylinder.py</code></td>
+  <td class="warn">NULL RESULT</td>
+  <td>Same + single cylinder</td>
+  <td>ψ–ω + T</td>
+  <td>Discrete cylinder</td>
+  <td>Heat + cylinder numerically unstable at Re≥20</td>
+</tr>
+</table>
+
+<h2>2. Test & Sweep Scripts</h2>
+
+<table>
+<tr><th>File</th><th>Status</th><th>Purpose</th><th>Calls</th></tr>
+
+<tr>
+  <td><code>test_cylinder_array_fast.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Sweep 6 obstacle configurations (none, single, tandem, side)</td>
+  <td><code>cylinder_array_solver.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_cylinder_array.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Full cylinder array test with plotting</td>
+  <td><code>cylinder_array_solver.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_cylinder_re_sweep.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Reynolds number sweep (Re = 10–100)</td>
+  <td><code>cylinder_array_solver.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_cylinder_vortex_sweep.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Vortex shedding study</td>
+  <td><code>cylinder_array_solver.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_cylinder_heat.py</code></td>
+  <td class="warn">NULL RESULT</td>
+  <td>Single cylinder + heat patterns</td>
+  <td><code>thermoviscous_cylinder.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_cylinder_heat_re20.py</code></td>
+  <td class="warn">NULL RESULT</td>
+  <td>Heat patterns at Re=20</td>
+  <td><code>thermoviscous_cylinder.py</code></td>
+</tr>
+
+<tr>
+  <td><code>sweep_heat_patterns.py</code></td>
+  <td class="warn">NULL RESULT</td>
+  <td>Systematic heat pattern sweep</td>
+  <td><code>thermoviscous_channel.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_high_re.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>High Reynolds number tests</td>
+  <td><code>cylinder_array_solver.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_womersley.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Womersley number verification</td>
+  <td><code>womersley_demo.py</code></td>
+</tr>
+
+<tr>
+  <td><code>test_womersley_sweep.py</code></td>
+  <td class="ok">WORKING</td>
+  <td>Womersley parameter sweep</td>
+  <td><code>womersley_demo.py</code></td>
+</tr>
+</table>
+
+<h2>3. Reference & Utility Scripts</h2>
+
+<table>
+<tr><th>File</th><th>Status</th><th>Purpose</th></tr>
+<tr><td><code>womersley_demo.py</code></td><td class="ok">WORKING</td><td>Analytical Womersley solution for oscillatory pipe flow</td></tr>
+<tr><td><code>womersley_cylinder.py</code></td><td class="ok">WORKING</td><td>Womersley flow past single cylinder</td></tr>
+<tr><td><code>womersley_cylinder_dual.py</code></td><td class="ok">WORKING</td><td>Dual-frequency Womersley cylinder</td></tr>
+<tr><td><code>dashboard_server.py</code></td><td class="info">UTILITY</td><td>Real-time simulation dashboard (Flask/WebSocket)</td></tr>
+</table>
+
+<h2>4. Architecture Diagram</h2>
+
+<div class="arch-diagram">
+<pre>
+┌─────────────────────────────────────────────────────────────────┐
+│                     THESIS CONTRIBUTION                          │
+│         "Continuous Analog Wave Computation in Porous Media"     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────┐    ┌─────────────────────┐             │
+│  │  PILLAR 1: Acoustic │    │  PILLAR 2: CFD      │             │
+│  │  Y-junction FDTD     │    │  (Main Contribution)│             │
+│  │  (Proof-of-concept)  │    │                     │             │
+│  └─────────────────────┘    │  ┌───────────────┐  │             │
+│                             │  │ Discrete      │  │             │
+│  ┌─────────────────────┐    │  │ Obstacles     │  │ ← WORKING   │
+│  │  PILLAR 3: Diffractive│   │  │ (ψ–ω solver)  │  │             │
+│  │  Slice FDTD          │    │  └───────────────┘  │             │
+│  │  (Proof-of-concept)  │    │         ↓           │             │
+│  └─────────────────────┘    │  ┌───────────────┐  │             │
+│                             │  │ Continuous    │  │ ← BROKEN    │
+│                             │  │ Brinkman      │  │             │
+│                             │  │ (primitive)   │  │             │
+│                             │  └───────────────┘  │             │
+│                             └─────────────────────┘             │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  FAILED ATTEMPTS (Primitive Variable Solver)            │    │
+│  │  ─────────────────────────────────────────              │    │
+│  │  v1: Explicit projection, zero IC          → NaN        │    │
+│  │  v2: Parabolic IC                          → NaN        │    │
+│  │  v3: Interior-only corrector               → NaN        │    │
+│  │  v4: Dirichlet outlet pressure             → NaN        │    │
+│  │  v5: D·G-compatible matrix                 → NaN        │    │
+│  │  v6: Implicit diffusion (Crank-Nicolson)   → NaN        │    │
+│  │  v7: dt = 1×10⁻⁵                           → NaN        │    │
+│  │                                                         │    │
+│  │  Root cause: Boundary incompatibility of discrete       │    │
+│  │  div(∇p) vs ∇²p operators on staggered MAC grid         │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  FAILED ATTEMPTS (Brinkman in ψ–ω)                      │    │
+│  │  ─────────────────────────────────                      │    │
+│  │  v1: Explicit Brinkman source              → NaN        │    │
+│  │  v2: Semi-implicit −α·ω                    → NaN        │    │
+│  │  v3: α_max = 10⁴                           → NaN        │    │
+│  │                                                         │    │
+│  │  Root cause: Explicit advection unstable at sharp       │    │
+│  │  vorticity gradients without Thom's boundary formula    │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  PROVEN PATH (from old assignment)                      │    │
+│  │  ─────────────────────────────────                      │    │
+│  │  Artificial Compressibility (Chorin 1967)               │    │
+│  │  • Collocated grid                                      │    │
+│  │  • Upwind advection                                     │    │
+│  │  • Local pressure update: p = p − β·dt·div(u)           │    │
+│  │  • No global Poisson solve                              │    │
+│  │  • Converges to steady state (not time-accurate)        │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<h2>5. Data Flow — Working Solver</h2>
+
+<div class="module">
+<h4>cylinder_array_solver.py</h4>
+<pre>
+Initialize:
+  psi = parabolic inlet profile
+  omega = from psi via finite differences
+  obs_mask = boolean array from CYLINDERS config
+
+For each time step:
+  1. solve_streamfunction(omega, psi_bcs)
+     └── PoissonLU.solve(−omega_interior)  [sparse direct solve]
+  
+  2. interior_velocities(psi)
+     └── u = dpsi/dy, v = −dpsi/dx  [central differences]
+  
+  3. update_obstacle_vorticity(omega, psi)
+     └── Thom's formula at obs_boundary cells
+  
+  4. vorticity_rhs(omega, u, v, nu)
+     └── advection + conservative diffusion
+  
+  5. omega += DT * rhs_omega  [explicit Euler]
+
+Post-process:
+  FFT probe history → dominant freq, amplitude, std
+</pre>
+</div>
+
+<h2>6. Data Flow — Broken Primitive Solver</h2>
+
+<div class="module">
+<h4>primitive_ns_solver.py (latest v7)</h4>
+<pre>
+Initialize:
+  u = 0, v = 0, p = 0  (fluid at rest)
+  alpha_u, alpha_v = interpolate alpha_cell to faces
+
+Pre-build matrices:
+  helm_u = splu(I − 0.5·dt·ν·L_u)   [Helmholtz for implicit diffusion]
+  helm_v = splu(I − 0.5·dt·ν·L_v)
+  poisson_lu = splu(D·G matrix)      [pressure Poisson]
+
+For each time step:
+  1. Predictor (Crank-Nicolson diffusion)
+     ├── Interpolate v→u_faces, u→v_faces
+     ├── Compute advection_u, advection_v  [upwind]
+     ├── Compute laplacian_u, laplacian_v
+     ├── rhs_u = u + dt·(−adv − α·u) + 0.5·dt·ν·L(u)
+     ├── u* = helm_u.solve(rhs_u)
+     └── Apply velocity BCs to u*, v*
+  
+  2. Pressure Poisson
+     ├── div_u_star = divergence(u*, v*)
+     ├── rhs_p = (ρ/dt) · div_u_star
+     └── p = poisson_lu.solve(rhs_p)
+  
+  3. Corrector (interior faces only)
+     ├── u = u* − (dt/ρ)·dp/dx
+     ├── v = v* − (dt/ρ)·dp/dy
+     └── Boundary faces keep u*, v* values
+
+Problem: div(u*) after step 2 is O(1) at boundaries
+         → pressure gradient is O(10⁵)
+         → corrector creates O(10⁻²) velocities
+         → next predictor sees larger gradients
+         → exponential blowup
+</pre>
+</div>
+
+<h2>7. Config System</h2>
+
+<p>All solvers read <code>config.json</code> from the <code>Analysis/</code> directory. Common overrides:</p>
+
+<pre>
+{
+  "CYLINDERS": [[100, 25, 10]],
+  "RE": 40,
+  "DT": 2.5e-5,
+  "T_TOTAL": 2.0,
+  "ALPHA_MAX": 1.0e6,
+  "USE_SMOOTH": false
+}
+</pre>
+
+<h2>8. Figures Output</h2>
+
+<p>All solvers write to <code>Analysis/figures/</code>:</p>
+
+<table>
+<tr><th>File</th><th>Source</th></tr>
+<tr><td><code>array_velocity.png</code></td><td><code>cylinder_array_solver.py</code></td></tr>
+<tr><td><code>array_probe.png</code></td><td><code>cylinder_array_solver.py</code></td></tr>
+<tr><td><code>array_fft.png</code></td><td><code>cylinder_array_solver.py</code></td></tr>
+<tr><td><code>brinkman_velocity.png</code></td><td><code>cylinder_array_brinkman.py</code></td></tr>
+<tr><td><code>brinkman_probe.png</code></td><td><code>cylinder_array_brinkman.py</code></td></tr>
+<tr><td><code>brinkman_fft.png</code></td><td><code>cylinder_array_brinkman.py</code></td></tr>
+</table>
+
+<h2>9. Key Lines of Code</h2>
+
+<table>
+<tr><th>File</th><th>LOC</th><th>Core Algorithm LOC</th></tr>
+<tr><td><code>cylinder_array_solver.py</code></td><td>325</td><td>~120</td></tr>
+<tr><td><code>cylinder_array_brinkman.py</code></td><td>290</td><td>~120</td></tr>
+<tr><td><code>primitive_ns_solver.py</code></td><td>450</td><td>~200</td></tr>
+<tr><td><code>thermoviscous_channel.py</code></td><td>~300</td><td>~100</td></tr>
+</table>
+
+<div class="box">
+<strong>Summary:</strong> The working codebase is <code>cylinder_array_solver.py</code> plus its test scripts (~10 files). The primitive-variable and Brinkman attempts add ~700 lines of non-working code. The thesis can proceed with the discrete-obstacle solver as the resolved microscale limit.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRP Code Study — Thermoviscous Channel Flow</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --text: #c9d1d9;
+    --text2: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --warn: #d29922;
+    --danger: #f85149;
+    --keyword: #ff7b72;
+    --func: #d2a8ff;
+    --string: #a5d6ff;
+    --num: #79c0ff;
+    --comment: #8b949e;
+    --border: #30363d;
+    --sidebar: 280px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: var(--sidebar); background: var(--bg2); border-right: 1px solid var(--border);
+    position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; padding: 1.5rem;
+  }
+  .sidebar h2 { margin-top: 0; font-size: 1.1rem; color: var(--accent); }
+  .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+  .sidebar nav li { margin: 0.25rem 0; }
+  .sidebar nav a {
+    display: block; padding: 0.35rem 0.6rem; border-radius: 6px;
+    color: var(--text2); text-decoration: none; font-size: 0.9rem;
+  }
+  .sidebar nav a:hover, .sidebar nav a.active { background: var(--bg3); color: var(--text); }
+  .sidebar .tag {
+    display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px;
+    margin-left: 0.4rem; vertical-align: middle;
+  }
+  .tag.physics { background: #1b4d3e; color: #3fb950; }
+  .tag.math { background: #1d2d44; color: #58a6ff; }
+  .tag.code { background: #4a1b1b; color: #ff7b72; }
+  .main { margin-left: var(--sidebar); flex: 1; padding: 2rem 2.5rem; max-width: 900px; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .subtitle { color: var(--text2); margin-bottom: 1.5rem; }
+  h2 { margin-top: 2.5rem; font-size: 1.4rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { margin-top: 1.5rem; font-size: 1.1rem; color: var(--accent2); }
+  .note {
+    background: var(--bg3); border-left: 4px solid var(--accent); padding: 0.8rem 1rem;
+    border-radius: 0 6px 6px 0; margin: 1rem 0;
+  }
+  .warning {
+    background: rgba(210,153,34,0.1); border-left: 4px solid var(--warn);
+    padding: 0.8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0;
+  }
+  .equation {
+    background: var(--bg2); border: 1px solid var(--border); padding: 0.6rem 1rem;
+    border-radius: 6px; font-family: "Courier New", monospace; margin: 0.6rem 0;
+    overflow-x: auto;
+  }
+  .code-block {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    margin: 1rem 0; overflow: hidden;
+  }
+  .code-header {
+    background: var(--bg3); padding: 0.4rem 0.8rem; font-size: 0.8rem; color: var(--text2);
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    user-select: none;
+  }
+  .code-header:hover { background: #30363d; }
+  .code-header .toggle-icon { transition: transform 0.2s; }
+  .code-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+  pre {
+    margin: 0; padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
+  }
+  code { font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace; }
+  .code-block.collapsed pre { display: none; }
+  .k { color: var(--keyword); } /* keyword */
+  .f { color: var(--func); }    /* function */
+  .s { color: var(--string); }  /* string/comment/docstring */
+  .n { color: var(--num); }     /* number */
+  .c { color: var(--comment); font-style: italic; } /* comment */
+  .d { color: var(--text2); }   /* decorator */
+  .fig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .fig-grid img { width: 100%; border-radius: 6px; border: 1px solid var(--border); }
+  .fig-single img { width: 100%; max-width: 600px; border-radius: 6px; border: 1px solid var(--border); }
+  .fig-caption { text-align: center; color: var(--text2); font-size: 0.85rem; margin-top: 0.3rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; }
+  th { background: var(--bg3); }
+  td { background: var(--bg2); }
+  .param-name { color: var(--accent); font-family: monospace; }
+  .param-val { color: var(--num); font-family: monospace; }
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .fig-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>📑 Sections</h2>
+    <nav>
+      <ul>
+        <li><a href="#overview" class="active">Overview</a></li>
+        <li><a href="#params">1. Parameters <span class="tag physics">physics</span></a></li>
+        <li><a href="#deps">2. Dependencies <span class="tag code">code</span></a></li>
+        <li><a href="#grid">3. Grid Init <span class="tag code">code</span></a></li>
+        <li><a href="#poisson">4. Poisson Solver <span class="tag math">math</span></a></li>
+        <li><a href="#helpers">5. Helper Functions <span class="tag code">code</span></a></li>
+        <li><a href="#init">6. Initialization <span class="tag code">code</span></a></li>
+        <li><a href="#timeloop">7. Time Loop <span class="tag physics">physics</span></a></li>
+        <li><a href="#post">8. Post-Processing <span class="tag code">code</span></a></li>
+        <li><a href="#figures">Figures</a></li>
+        <li><a href="#bugs">Bugs & Fixes <span class="tag code">log</span></a></li>
+      </ul>
+    </nav>
+    <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1rem;">
+      <h2>🔑 Key Concepts</h2>
+      <nav>
+        <ul>
+          <li><a href="#concept-stream">Streamfunction ψ</a></li>
+          <li><a href="#concept-vort">Vorticity ω</a></li>
+          <li><a href="#concept-re">Reynolds Number</a></li>
+          <li><a href="#concept-cfl">CFL Condition</a></li>
+          <li><a href="#concept-thom">Thom's Formula</a></li>
+          <li><a href="#concept-lu">LU Factorisation</a></li>
+          <li><a href="#concept-csr">CSR Format</a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>🌊 Thermoviscous Channel Flow</h1>
+    <p class="subtitle">2D Incompressible Navier-Stokes in Streamfunction-Vorticity Form</p>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>This code simulates <strong>thermoviscous fluid flow</strong> in a 2D microchannel. It solves the incompressible Navier-Stokes equations using a <strong>streamfunction-vorticity formulation</strong> on a structured finite-difference grid.</p>
+      <div class="note">
+        <strong>What it does:</strong> A parabolic inlet velocity profile (Poiseuille flow) is modulated by two sinusoidal signals (2 Hz and 3 Hz). The fluid passes through "thermal strips" with different viscosities, and the code tracks how the frequency content evolves at the outlet.
+      </div>
+      <table>
+        <tr><th>Feature</th><th>Implementation</th></tr>
+        <tr><td>Spatial discretization</td><td>Finite differences, node-based</td></tr>
+        <tr><td>Time integration</td><td>Explicit Euler (forward in time)</td></tr>
+        <tr><td>Poisson solver</td><td>Sparse LU factorization (pre-factored)</td></tr>
+        <tr><td>Boundary conditions</td><td>Dirichlet on all walls, zero-gradient at inlet/outlet for ω</td></tr>
+        <tr><td>Thermal effect</td><td>Spatially varying viscosity field ν(x,y)</td></tr>
+      </table>
+    </section>
+
+    <section id="params">
+      <h2>1. Parameters</h2>
+      <p>All simulation constants are defined at the top. The domain is a <strong>10 mm × 2.5 mm</strong> channel.</p>
+
+      <h3>Grid & Physics</h3>
+      <table>
+        <tr><th>Symbol (code)</th><th>Value</th><th>Meaning</th></tr>
+        <tr><td class="param-name">NX, NY</td><td class="param-val">200, 50</td><td>Grid nodes in x and y</td></tr>
+        <tr><td class="param-name">DX, DY</td><td class="param-val">50 μm</td><td>Grid spacing (uniform)</td></tr>
+        <tr><td class="param-name">RHO</td><td class="param-val">998 kg/m³</td><td>Fluid density (water)</td></tr>
+        <tr><td class="param-name">NU_COLD</td><td class="param-val">1.0e-6 m²/s</td><td>Baseline kinematic viscosity</td></tr>
+        <tr><td class="param-name">RE</td><td class="param-val">10</td><td>Reynolds number</td></tr>
+        <tr><td class="param-name">DT</td><td class="param-val">1.0e-4 s</td><td>Timestep</td></tr>
+        <tr><td class="param-name">T_TOTAL</td><td class="param-val">3.0 s</td><td>Total simulation time</td></tr>
+      </table>
+
+      <h3>Derived Quantities</h3>
+      <div class="equation">U_MAX = Re · ν / H  →  peak inlet velocity</div>
+      <div class="equation">U_AVG = (2/3) · U_MAX  →  average velocity (parabolic profile property)</div>
+      <div class="equation">A_AMP = 0.2 · U_MAX  →  signal modulation amplitude</div>
+
+      <h3>Strip Geometry</h3>
+      <p>Four rectangular strips are placed inside the channel. Each strip can have a different viscosity multiplier (<code>STRIP_NU_FRAC</code>). When <code>frac = 1.0</code>, the strip has the same viscosity as the surrounding fluid.</p>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Parameters code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> sparse
+<span class="k">from</span> scipy.sparse.linalg <span class="k">import</span> spsolve, splu
+<span class="k">from</span> pathlib <span class="k">import</span> Path
+
+NX = <span class="n">200</span>
+NY = <span class="n">50</span>
+DX = <span class="n">50e-6</span>
+DY = DX
+
+RHO = <span class="n">998.0</span>
+NU_COLD = <span class="n">1.0e-6</span>
+RE = <span class="n">10</span>
+U_MAX = RE * NU_COLD / (NY * DY)
+U_AVG = (<span class="n">2.0</span> / <span class="n">3.0</span>) * U_MAX
+A_AMP = <span class="n">0.2</span> * U_MAX
+
+F1 = <span class="n">2.0</span>
+F2 = <span class="n">3.0</span>
+PHASE_DEG = <span class="n">0.0</span>
+
+DT = <span class="n">1.0e-4</span>
+T_TOTAL = <span class="n">3.0</span>
+NT = <span class="f">int</span>(T_TOTAL / DT)
+RAMP_TIME = <span class="n">0.5</span>
+
+STRIP_WIDTH = <span class="n">10</span>
+STRIP_HEIGHT = <span class="n">20</span>
+STRIP_X_STARTS = [<span class="n">20</span>, <span class="n">60</span>, <span class="n">100</span>, <span class="n">140</span>]
+STRIP_Y_START = (NY - STRIP_HEIGHT) // <span class="n">2</span>
+STRIP_NU_FRAC = [<span class="n">1.0</span>, <span class="n">1.0</span>, <span class="n">1.0</span>, <span class="n">1.0</span>]</code></pre>
+      </div>
+    </section>
+
+    <section id="deps">
+      <h2>2. Dependencies</h2>
+      <p>The script uses five Python imports. Here is what each one does and why it is needed:</p>
+      <table>
+        <tr><th>Package</th><th>Imported as</th><th>What it provides</th><th>If removed</th></tr>
+        <tr>
+          <td class="param-name">numpy</td>
+          <td class="param-val">np</td>
+          <td>Array creation, slicing, broadcasting, math functions (sin, cos, max, abs), FFT (<code>np.fft.rfft</code>)</td>
+          <td>The solver does not exist — every field is an <code>np.ndarray</code></td>
+        </tr>
+        <tr>
+          <td class="param-name">matplotlib.pyplot</td>
+          <td class="param-val">plt</td>
+          <td>Plotting: <code>imshow</code> for 2D fields, <code>plot</code> for traces, <code>bar</code> for frequency response, <code>savefig</code> to disk</td>
+          <td>No figures, no PPT slides, no thesis visuals</td>
+        </tr>
+        <tr>
+          <td class="param-name">scipy.sparse</td>
+          <td class="param-val">sparse</td>
+          <td>Sparse matrix data structures. <code>csr_matrix</code> stores the 5-point Laplacian in ~400 KB instead of ~800 MB dense</td>
+          <td>Out of memory — the Poisson matrix has 10k×10k entries</td>
+        </tr>
+        <tr>
+          <td class="param-name">scipy.sparse.linalg</td>
+          <td class="param-val">splu</td>
+          <td>Sparse LU factorization (<code>splu</code>) and solve. Factorize once, then fast back-substitution each step</td>
+          <td>30k steps takes ~1 hour instead of ~30 seconds</td>
+        </tr>
+        <tr>
+          <td class="param-name">pathlib</td>
+          <td class="param-val">Path</td>
+          <td>Cross-platform filesystem paths: <code>Path(__file__).parent / "figures"</code></td>
+          <td>Minor — could use <code>os.path</code> instead</td>
+        </tr>
+      </table>
+      <div class="note">
+        <strong>Installation:</strong> All except <code>pathlib</code> (standard library) are installed via <code>pip install numpy scipy matplotlib</code> or any scientific Python distribution (Anaconda, etc.).
+      </div>
+    </section>
+
+    <section id="grid">
+      <h2>3. Grid Initialization</h2>
+      <p>Two primary fields are allocated:</p>
+      <ul>
+        <li><strong>ψ (psi)</strong> — streamfunction, scalar potential whose derivatives give velocity</li>
+        <li><strong>ω (omega)</strong> — vorticity, the curl of velocity (∂v/∂x − ∂u/∂y)</li>
+      </ul>
+      <p>The viscosity field <code>nu</code> is initialized as a uniform field, then overwritten inside each strip region.</p>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Grid init code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code>psi = np.zeros((NX + <span class="n">1</span>, NY + <span class="n">1</span>))
+nu = np.ones((NX + <span class="n">1</span>, NY + <span class="n">1</span>)) * NU_COLD
+<span class="k">for</span> i, frac <span class="k">in</span> <span class="f">enumerate</span>(STRIP_NU_FRAC):
+    x0 = STRIP_X_STARTS[i]
+    nu[x0:x0+STRIP_WIDTH+<span class="n">1</span>, STRIP_Y_START:STRIP_Y_START+STRIP_HEIGHT+<span class="n">1</span>] = NU_COLD * frac</code></pre>
+      </div>
+    </section>
+
+    <section id="poisson">
+      <h2>3. Poisson Solver</h2>
+      <p>At every timestep, we solve:</p>
+      <div class="equation">∇²ψ = −ω</div>
+      <p>This is the <strong>Poisson equation</strong> that links streamfunction to vorticity. Because the grid is fixed, we <strong>pre-build and LU-factorize</strong> the Laplacian matrix once — a huge speedup.</p>
+
+      <h3>Building the Laplacian Matrix</h3>
+      <p>The 5-point Laplacian stencil for an interior node (i, j) is assembled into a sparse CSR matrix. Dirichlet boundary conditions are handled by moving boundary terms to the RHS.</p>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Poisson solver code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="k">def</span> <span class="f">build_poisson_matrix</span>(nx, ny, dx, dy):
+    n_int = (nx - <span class="n">2</span>) * (ny - <span class="n">2</span>)
+    data, row_idx, col_idx = [], [], []
+    <span class="k">def</span> <span class="f">add_entry</span>(r, c, val):
+        row_idx.append(r); col_idx.append(c); data.append(val)
+    nxi = nx - <span class="n">2</span>
+    <span class="k">for</span> j <span class="k">in</span> <span class="f">range</span>(<span class="n">1</span>, ny - <span class="n">1</span>):
+        <span class="k">for</span> i <span class="k">in</span> <span class="f">range</span>(<span class="n">1</span>, nx - <span class="n">1</span>):
+            r = (j - <span class="n">1</span>) * nxi + (i - <span class="n">1</span>)
+            diag = <span class="n">-2.0</span>/(dx*dx) - <span class="n">2.0</span>/(dy*dy)
+            add_entry(r, r, diag)
+            <span class="k">if</span> i > <span class="n">1</span>: add_entry(r, r-<span class="n">1</span>, <span class="n">1.0</span>/(dx*dx))
+            <span class="k">if</span> i < nx-<span class="n">2</span>: add_entry(r, r+<span class="n">1</span>, <span class="n">1.0</span>/(dx*dx))
+            <span class="k">if</span> j > <span class="n">1</span>: add_entry(r, r-nxi, <span class="n">1.0</span>/(dy*dy))
+            <span class="k">if</span> j < ny-<span class="n">2</span>: add_entry(r, r+nxi, <span class="n">1.0</span>/(dy*dy))
+    <span class="k">return</span> sparse.csr_matrix((data,(row_idx,col_idx)), shape=(n_int,n_int))
+
+PoissonMat = build_poisson_matrix(NX+<span class="n">1</span>, NY+<span class="n">1</span>, DX, DY)
+PoissonLU = splu(PoissonMat)  <span class="c"># ← pre-factorize once</span></code></pre>
+      </div>
+
+      <h3>solve_streamfunction()</h3>
+      <p>This subtracts boundary contributions from the RHS, solves for interior ψ, then reconstructs the full field with Dirichlet BCs applied on all edges.</p>
+      <div class="warning">
+        <strong>Watch out:</strong> The RHS array uses Fortran ordering (<code>order='F'</code>) because the sparse matrix was built with <code>i</code> varying fastest. C-order (<code>flatten()</code>) would misalign the vector and matrix, causing the solver to return garbage. After solving, reshape back with the same ordering.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 solve_streamfunction code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="k">def</span> <span class="f">solve_streamfunction</span>(omega, psi_bcs):
+    rhs = -omega[<span class="n">1</span>:-<span class="n">1</span>, <span class="n">1</span>:-<span class="n">1</span>].copy()
+    rhs[:, <span class="n">0</span>]  -= psi_bcs[<span class="s">'bottom'</span>][<span class="n">1</span>:-<span class="n">1</span>] / (DY*DY)
+    rhs[:, -<span class="n">1</span>] -= psi_bcs[<span class="s">'top'</span>][<span class="n">1</span>:-<span class="n">1</span>]    / (DY*DY)
+    rhs[<span class="n">0</span>, :]  -= psi_bcs[<span class="s">'left'</span>][<span class="n">1</span>:-<span class="n">1</span>]   / (DX*DX)
+    rhs[-<span class="n">1</span>, :] -= psi_bcs[<span class="s">'right'</span>][<span class="n">1</span>:-<span class="n">1</span>]  / (DX*DX)
+
+    psi_int = PoissonLU.solve(rhs.flatten(order=<span class="s">'F'</span>))
+    psi_int = psi_int.reshape((NX-<span class="n">1</span>, NY-<span class="n">1</span>), order=<span class="s">'F'</span>)
+
+    psi_full = np.zeros((NX+<span class="n">1</span>, NY+<span class="n">1</span>))
+    psi_full[<span class="n">1</span>:-<span class="n">1</span>, <span class="n">1</span>:-<span class="n">1</span>] = psi_int
+    psi_full[<span class="n">0</span>, :] = psi_bcs[<span class="s">'left'</span>]
+    psi_full[-<span class="n">1</span>, :] = psi_bcs[<span class="s">'right'</span>]
+    psi_full[:, <span class="n">0</span>] = psi_bcs[<span class="s">'bottom'</span>]
+    psi_full[:, -<span class="n">1</span>] = psi_bcs[<span class="s">'top'</span>]
+    <span class="k">return</span> psi_full</code></pre>
+      </div>
+    </section>
+
+    <section id="helpers">
+      <h2>4. Helper Functions</h2>
+
+      <h3>ramp(t)</h3>
+      <p>Smoothly ramps the inlet from 0 to full amplitude over <code>RAMP_TIME</code> using a cosine half-period. Avoids sharp transients at startup.</p>
+      <div class="equation">ramp(t) = 0.5 · (1 − cos(π·t / t_ramp))  for t &lt; t_ramp, else 1.0</div>
+
+      <h3>inlet_psi_profile(t)</h3>
+      <p>Constructs the inlet streamfunction profile ψ(y). It has two parts:</p>
+      <ol>
+        <li><strong>Parabolic (Poiseuille) part:</strong> from integrating the parabolic velocity profile</li>
+        <li><strong>Signal part:</strong> two superposed sine waves modulating the flow</li>
+      </ol>
+      <div class="equation">ψ_parab(y) = U_max · (2y²/H − 4y³/(3H²))</div>
+      <div class="equation">ψ_full(y,t) = ψ_parab(y) + ramp(t) · A_amp · [sin(2π·2·t) + sin(2π·3·t)] · y</div>
+
+      <h3>velocity_from_psi(psi)</h3>
+      <p>Recovers velocity components from ψ using central differences:</p>
+      <div class="equation">u = ∂ψ/∂y,   v = −∂ψ/∂x</div>
+      <p>One-sided differences are used on the boundaries where central differences would reach outside the domain.</p>
+
+      <h3>vorticity_rhs(omega, psi, nu)</h3>
+      <p>This is the <strong>vorticity transport equation</strong> right-hand side:</p>
+      <div class="equation">∂ω/∂t = −u·∂ω/∂x − v·∂ω/∂y + ν·∇²ω</div>
+      <p>Which is: <strong>−advection + diffusion</strong>. The function computes this on interior nodes only (1:-1, 1:-1).</p>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Helper functions code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="k">def</span> <span class="f">ramp</span>(t):
+    <span class="k">if</span> t >= RAMP_TIME: <span class="k">return</span> <span class="n">1.0</span>
+    <span class="k">return</span> <span class="n">0.5</span> * (<span class="n">1.0</span> - np.cos(np.pi * t / RAMP_TIME))
+
+<span class="k">def</span> <span class="f">inlet_psi_profile</span>(t):
+    y = np.arange(NY + <span class="n">1</span>) * DY
+    psi_parab = U_MAX * (<span class="n">2.0</span>*y**<span class="n">2</span>/H - <span class="n">4.0</span>*y**<span class="n">3</span>/(<span class="n">3.0</span>*H**<span class="n">2</span>))
+    r = ramp(t)
+    signal = A_AMP * (np.sin(<span class="n">2</span>*np.pi*F1*t) + np.sin(<span class="n">2</span>*np.pi*F2*t+np.deg2rad(PHASE_DEG)))
+    <span class="k">return</span> psi_parab + r * signal * y
+
+<span class="k">def</span> <span class="f">velocity_from_psi</span>(psi):
+    u = np.zeros_like(psi); v = np.zeros_like(psi)
+    u[:,<span class="n">1</span>:-<span class="n">1</span>] = (psi[:,<span class="n">2</span>:] - psi[:,:-<span class="n">2</span>]) / (<span class="n">2.0</span>*DY)
+    v[<span class="n">1</span>:-<span class="n">1</span>,:] = -(psi[<span class="n">2</span>:,:] - psi[:-<span class="n">2</span>,:]) / (<span class="n">2.0</span>*DX)
+    <span class="c"># one-sided on boundaries...</span>
+    <span class="k">return</span> u, v
+
+<span class="k">def</span> <span class="f">vorticity_rhs</span>(omega, psi, nu):
+    <span class="c"># velocities at interior nodes</span>
+    u =  (psi[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">2</span>:] - psi[<span class="n">1</span>:-<span class="n">1</span>,:-<span class="n">2</span>]) / (<span class="n">2.0</span>*DY)
+    v = -(psi[<span class="n">2</span>:,<span class="n">1</span>:-<span class="n">1</span>] - psi[:-<span class="n">2</span>,<span class="n">1</span>:-<span class="n">1</span>]) / (<span class="n">2.0</span>*DX)
+    <span class="c"># gradients</span>
+    dwdx = (omega[<span class="n">2</span>:,<span class="n">1</span>:-<span class="n">1</span>] - omega[:-<span class="n">2</span>,<span class="n">1</span>:-<span class="n">1</span>]) / (<span class="n">2.0</span>*DX)
+    dwdy = (omega[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">2</span>:] - omega[<span class="n">1</span>:-<span class="n">1</span>,:-<span class="n">2</span>]) / (<span class="n">2.0</span>*DY)
+    <span class="c"># advection + diffusion</span>
+    adv = u*dwdx + v*dwdy
+    diff = nu * ((omega[<span class="n">2</span>:,<span class="n">1</span>:-<span class="n">1</span>]-<span class="n">2</span>*omega[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>]+omega[:-<span class="n">2</span>,<span class="n">1</span>:-<span class="n">1</span>])/(DX*DX)
+                 + (omega[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">2</span>:]-<span class="n">2</span>*omega[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>]+omega[<span class="n">1</span>:-<span class="n">1</span>,:-<span class="n">2</span>])/(DY*DY))
+    w = np.zeros_like(omega)
+    w[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>] = -adv + diff
+    <span class="k">return</span> w</code></pre>
+      </div>
+    </section>
+
+    <section id="init">
+      <h2>5. Initialization</h2>
+      <p>The initial condition is a steady parabolic flow. ψ is tiled across the domain, and ω is derived from the discrete Laplacian of ψ.</p>
+
+      <h3 id="concept-thom">Thom's Formula (Wall Vorticity)</h3>
+      <p>For a no-slip wall, the vorticity is not zero — it must be <strong>computed from the wall-adjacent ψ</strong>. Thom's formula gives:</p>
+      <div class="equation">ω_wall = −2 · ψ₁ / Δy²   (bottom wall)</div>
+      <div class="equation">ω_wall = −2 · (ψ_{N−1} − ψ_N) / Δy²   (top wall)</div>
+      <p>This is a 2nd-order accurate boundary condition derived from a Taylor expansion of ψ at the wall.</p>
+
+      <div class="warning">
+        <strong>Initialization matters:</strong> ψ must be initialized as a fully developed parabolic profile
+        across the <em>entire</em> domain (not just boundaries). If ψ_interior = 0 while ψ_wall ≠ 0,
+        Thom's formula generates a huge vorticity mismatch at the corners and the solver blows up instantly.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Initialization code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code>psi_init = inlet_psi_profile(<span class="n">0.0</span>)
+psi = np.tile(psi_init, (NX + <span class="n">1</span>, <span class="n">1</span>))
+
+omega = np.zeros((NX + <span class="n">1</span>, NY + <span class="n">1</span>))
+omega[:,<span class="n">1</span>:-<span class="n">1</span>] = -(psi[:,<span class="n">2</span>:] - <span class="n">2.0</span>*psi[:,<span class="n">1</span>:-<span class="n">1</span>] + psi[:,:-<span class="n">2</span>]) / (DY*DY)
+<span class="c"># Thom's formula for wall vorticity</span>
+omega[:,<span class="n">0</span>]   = <span class="n">-2.0</span> * psi[:,<span class="n">1</span>] / (DY*DY)
+omega[:,-<span class="n">1</span>]  = <span class="n">-2.0</span> * (psi[:,-<span class="n">2</span>] - psi[:,-<span class="n">1</span>]) / (DY*DY)</code></pre>
+      </div>
+    </section>
+
+    <section id="timeloop">
+      <h2>6. Main Time Loop</h2>
+      <p>The timestepping follows this <strong>explicit fractional-step</strong> order:</p>
+      <ol>
+        <li><strong>Apply BCs</strong> to ψ (inlet, outlet, top, bottom)</li>
+        <li><strong>Solve Poisson</strong> ∇²ψ = −ω for the new ψ</li>
+        <li><strong>Update wall vorticity</strong> using Thom's formula from the new ψ</li>
+        <li><strong>Set inlet/outlet ω</strong> to zero-gradient (open boundary)</li>
+        <li><strong>Compute vorticity RHS</strong> (advection + diffusion)</li>
+        <li><strong>Update interior ω</strong> explicitly: ω_new = ω_old + DT · RHS</li>
+      </ol>
+
+      <div class="warning">
+        <strong>Order matters!</strong> The code first solves Poisson for ψ, then uses the <em>new</em> ψ to compute wall ω. This avoids a 1-step lag that existed in an earlier version.
+      </div>
+
+      <h3>Open Boundary Vorticity</h3>
+      <p>At the inlet and outlet (open boundaries, not physical walls), we do <strong>not</strong> use Thom's formula. Instead, we impose a zero-gradient condition:</p>
+      <div class="equation">ω_inlet = ω₁   (zero-gradient in x)</div>
+      <div class="equation">ω_outlet = ω_{N−1}   (zero-gradient in x)</div>
+      <p>This lets vorticity advect smoothly through the open boundaries rather than forcing it to zero.</p>
+
+      <h3 id="concept-cfl">Stability Check</h3>
+      <p>Two key numbers are printed at startup:</p>
+      <ul>
+        <li><strong>CFL</strong> = U_max · DT / DX  — must be &lt; ~1 for explicit advection stability</li>
+        <li><strong>Diffusion limit</strong> = DX² / (4·ν) / DT  — must be &gt; ~1 for explicit diffusion stability</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Time loop code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="k">for</span> n <span class="k">in</span> <span class="f">range</span>(NT):
+    t = n * DT
+    psi_in = inlet_psi_profile(t)
+    psi_top = psi_in[-<span class="n">1</span>]
+    psi_bcs = {
+        <span class="s">'left'</span>: psi_in,
+        <span class="s">'right'</span>: psi_in,
+        <span class="s">'bottom'</span>: np.zeros(NX + <span class="n">1</span>),
+        <span class="s">'top'</span>: np.ones(NX + <span class="n">1</span>) * psi_top,
+    }
+    <span class="c"># 1. Solve Poisson for psi from current omega</span>
+    psi = solve_streamfunction(omega, psi_bcs)
+    <span class="c"># 2. Wall vorticity from NEW psi</span>
+    omega[:,<span class="n">0</span>]  = <span class="n">-2.0</span> * psi[:,<span class="n">1</span>] / (DY*DY)
+    omega[:,-<span class="n">1</span>] = <span class="n">-2.0</span> * (psi[:,-<span class="n">2</span>] - psi[:,-<span class="n">1</span>]) / (DY*DY)
+    <span class="c"># 3. Open boundaries: zero-gradient</span>
+    omega[<span class="n">0</span>,:]  = omega[<span class="n">1</span>,:]
+    omega[-<span class="n">1</span>,:] = omega[-<span class="n">2</span>,:]
+    <span class="c"># 4. Compute RHS and update</span>
+    rhs = vorticity_rhs(omega, psi, nu[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>])
+    omega[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>] += DT * rhs[<span class="n">1</span>:-<span class="n">1</span>,<span class="n">1</span>:-<span class="n">1</span>]
+    <span class="c"># 5. Record outlet centerline velocity every N steps</span>
+    <span class="k">if</span> n % RECORD_EVERY == <span class="n">0</span>:
+        jc = NY // <span class="n">2</span>
+        u_out = (psi[-<span class="n">1</span>, jc+<span class="n">1</span>] - psi[-<span class="n">1</span>, jc-<span class="n">1</span>]) / (<span class="n">2.0</span>*DY)
+        u_outlet_center[rec_idx] = u_out
+        t_record[rec_idx] = t
+        rec_idx += <span class="n">1</span>
+    <span class="c"># 6. Diagnostics every 1000 steps</span>
+    <span class="k">if</span> n % <span class="n">1000</span> == <span class="n">0</span>:
+        <span class="c"># ... print max|u|, max|v|, max|omega| ...</span></code></pre>
+      </div>
+    </section>
+
+    <section id="post">
+      <h2>7. Post-Processing</h2>
+      <p>After the simulation, six figures are generated:</p>
+      <table>
+        <tr><th>Figure</th><th>What it shows</th></tr>
+        <tr><td>viscosity_field.png</td><td>Spatial map of ν/ν_cold — where the strips are</td></tr>
+        <tr><td>outlet_time_trace.png</td><td>Velocity at channel centerline vs. time</td></tr>
+        <tr><td>outlet_fft.png</td><td>Frequency spectrum of outlet signal</td></tr>
+        <tr><td>frequency_response.png</td><td>Bar chart comparing 2 Hz vs 3 Hz amplitudes</td></tr>
+        <tr><td>velocity_snapshot.png</td><td>2D u-velocity field at final timestep</td></tr>
+      </table>
+
+      <h3>FFT Analysis</h3>
+      <p>The code discards the first half of the signal (transient) and FFTs the rest. The target frequencies (2 Hz and 3 Hz) are located by finding the nearest bin:</p>
+      <div class="equation">f_idx = argmin |freqs − F_target|</div>
+      <p>The ratio of amplitudes tells you how much the nonlinear thermoviscous effect has altered the frequency mixing.</p>
+
+      <div class="note">
+        <strong>Note on diffusion:</strong> The code uses <code>diff = nu * ∇²ω</code>, which is correct for <strong>uniform</strong> viscosity.
+        If strips have different ν values, the full thermoviscous diffusion is <code>∇·(ν∇ω)</code> and requires face-flux discretization.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header" onclick="toggle(this)">
+          <span>📄 Post-processing code</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <pre><code><span class="c"># FFT on second half (discard transient)</span>
+t0 = n_record // <span class="n">2</span>
+u_fft = u_outlet_center[t0:]
+dt_rec = DT * RECORD_EVERY
+freqs = np.fft.rfftfreq(<span class="f">len</span>(u_fft), d=dt_rec)
+spec = np.abs(np.fft.rfft(u_fft))
+
+f1_idx = np.argmin(np.abs(freqs - F1))
+f2_idx = np.argmin(np.abs(freqs - F2))
+p1 = spec[f1_idx]
+p2 = spec[f2_idx]
+
+<span class="f">print</span>(<span class="s">f"2 Hz amplitude: </span>{p1:<span class="n">.4e</span>}<span class="s">"</span>)
+<span class="f">print</span>(<span class="s">f"3 Hz amplitude: </span>{p2:<span class="n">.4e</span>}<span class="s">"</span>)
+<span class="f">print</span>(<span class="s">f"2 Hz / 3 Hz ratio:  </span>{p1/p2:<span class="n">.4f</span>}<span class="s">"</span>)</code></pre>
+      </div>
+    </section>
+
+    <section id="figures">
+      <h2>Latest Figures</h2>
+      <p>From the most recent run (uniform viscosity, cold):</p>
+      <div class="fig-grid">
+        <div class="fig-single"><img src="figures/viscosity_field.png" alt="Viscosity field"><div class="fig-caption">Viscosity field ν/ν_cold</div></div>
+        <div class="fig-single"><img src="figures/velocity_snapshot.png" alt="Velocity snapshot"><div class="fig-caption">u-velocity snapshot</div></div>
+        <div class="fig-single"><img src="figures/outlet_time_trace.png" alt="Outlet trace"><div class="fig-caption">Outlet centerline velocity</div></div>
+        <div class="fig-single"><img src="figures/outlet_fft.png" alt="FFT"><div class="fig-caption">Frequency spectrum</div></div>
+        <div class="fig-single"><img src="figures/frequency_response.png" alt="Frequency response"><div class="fig-caption">Frequency response (2 vs 3 Hz)</div></div>
+      </div>
+    </section>
+
+    <section id="concept-stream">
+      <h2>Appendix: Streamfunction ψ</h2>
+      <p>For 2D incompressible flow, the continuity equation ∇·u = 0 is automatically satisfied if we define:</p>
+      <div class="equation">u = ∂ψ/∂y,   v = −∂ψ/∂x</div>
+      <p>ψ is a scalar field. Lines of constant ψ are <strong>streamlines</strong> — the paths fluid particles follow.</p>
+    </section>
+
+    <section id="concept-vort">
+      <h2>Appendix: Vorticity ω</h2>
+      <p>Vorticity is the curl of velocity. In 2D, only the z-component is non-zero:</p>
+      <div class="equation">ω = ∂v/∂x − ∂u/∂y</div>
+      <p>Substituting the streamfunction definitions gives the <strong>Poisson equation</strong>:</p>
+      <div class="equation">∇²ψ = −ω</div>
+      <p>This is the fundamental link between ψ and ω that the solver exploits.</p>
+    </section>
+
+    <section id="concept-re">
+      <h2>Appendix: Reynolds Number</h2>
+      <p>Re = U·L/ν characterizes the ratio of inertial to viscous forces. Here Re = 10, which is <strong>laminar</strong> flow — viscous effects dominate, and the flow is stable.</p>
+    </section>
+
+    <section id="concept-lu">
+      <h2>Appendix: LU Factorisation</h2>
+      <p>LU factorisation decomposes a matrix <strong>A</strong> into a lower-triangular matrix <strong>L</strong> (with 1s on the diagonal) and an upper-triangular matrix <strong>U</strong>:</p>
+      <div class="equation">A = L · U</div>
+
+      <h3>What L and U look like</h3>
+      <p>For a 3×3 system, the decomposition looks like this:</p>
+      <div class="equation">
+        ⎡ a₁₁  a₁₂  a₁₃ ⎤   ⎡ 1    0    0   ⎤   ⎡ u₁₁  u₁₂  u₁₃ ⎤<br>
+        ⎢ a₂₁  a₂₂  a₂₃ ⎥ = ⎢ l₂₁  1    0   ⎥ · ⎢ 0    u₂₂  u₂₃ ⎥<br>
+        ⎣ a₃₁  a₃₂  a₃₃ ⎦   ⎣ l₃₁  l₃₂  1   ⎦   ⎣ 0    0    u₃₃ ⎦
+      </div>
+      <p><strong>L</strong> holds the "elimination multipliers" — the numbers you multiply a row by before subtracting it from a row below during Gaussian elimination. <strong>U</strong> is the resulting upper-triangular matrix after all those subtractions.</p>
+
+      <h3>The algorithm (Doolittle)</h3>
+      <p>The entries are computed row-by-row:</p>
+      <div class="equation">u₁ⱼ = a₁ⱼ  &nbsp;&nbsp;(first row of U is just the first row of A)</div>
+      <div class="equation">lᵢ₁ = aᵢ₁ / u₁₁  &nbsp;&nbsp;(first column of L, below diagonal)</div>
+      <div class="equation">uᵢⱼ = aᵢⱼ − Σₖ lᵢₖ · uₖⱼ  &nbsp;&nbsp;(fill U, going right)</div>
+      <div class="equation">lᵢⱼ = (aᵢⱼ − Σₖ lᵢₖ · uₖⱼ) / uⱼⱼ  &nbsp;&nbsp;(fill L, going down)</div>
+      <p>The <code>Σₖ</code> sum runs over already-computed entries. In code, this is a double loop over <code>i</code> and <code>j</code>.</p>
+
+      <h3>Why it is faster for repeated solves</h3>
+      <p>For our Poisson equation <code>A·x = b</code>, once we have <code>A = L·U</code>:</p>
+      <div class="equation">L · U · x = b</div>
+      <p>We solve in two cheap steps:</p>
+      <ol>
+        <li><strong>Forward substitution</strong> — solve <code>L·y = b</code> for <code>y</code>. Because <code>L</code> is lower-triangular, you start at the top row and work down:<br>
+          <code>y₁ = b₁</code>, &nbsp;<code>y₂ = b₂ − l₂₁·y₁</code>, &nbsp;<code>y₃ = b₃ − l₃₁·y₁ − l₃₂·y₂</code>, ...</li>
+        <li><strong>Back substitution</strong> — solve <code>U·x = y</code> for <code>x</code>. Because <code>U</code> is upper-triangular, you start at the bottom row and work up:<br>
+          <code>xₙ = yₙ / uₙₙ</code>, &nbsp;<code>xₙ₋₁ = (yₙ₋₁ − uₙ₋₁,ₙ·xₙ) / uₙ₋₁,ₙ₋₁</code>, ...</li>
+      </ol>
+
+      <h3>Cost comparison (for our 9,751×9,751 matrix)</h3>
+      <table>
+        <tr><th>Operation</th><th>Cost</th><th>Time (approx)</th></tr>
+        <tr><td>LU factorisation (once)</td><td>O(n³) dense, O(n)–O(n²) sparse</td><td>~0.5 s</td></tr>
+        <tr><td>Forward + back solve (each step)</td><td>O(n) — only nonzeros touched</td><td>~0.001 s</td></tr>
+        <tr><td>Naïve Gaussian elimination (each step)</td><td>O(n³) — start from scratch</td><td>~0.1 s</td></tr>
+        <tr><td><strong>30,000 solves total</strong></td><td>1× factorise + 30k× solve</td><td><strong>~30 s</strong></td></tr>
+        <tr><td>30,000 solves without LU</td><td>30k× factorise</td><td><strong>~50 min</strong></td></tr>
+      </table>
+      <p>The speedup comes from <strong>reusing the factorisation</strong>. Our Laplacian matrix <strong>never changes</strong> — it is the same at step 1 and step 30,000 — so we pay the expensive factorisation cost <em>once</em> and get 30,000 cheap triangular solves.</p>
+
+      <div class="note">
+        <strong>Analogy:</strong> Factorising is like building a machine. Solving is like pressing the button. Building takes time; pressing the button is instant.
+      </div>
+    </section>
+
+    <section id="concept-csr">
+      <h2>Appendix: CSR (Compressed Sparse Row)</h2>
+      <p>A dense matrix stores <strong>every</strong> entry, including zeros:</p>
+      <div class="equation">Dense: 10,000 × 10,000 = 100,000,000 entries ≈ 800 MB</div>
+      <p>Our Laplacian matrix is <strong>sparse</strong> — each row has only ~5 nonzeros (the 5-point stencil). CSR stores only the nonzero values and their positions:</p>
+      <ul>
+        <li><code>data</code> — the nonzero values</li>
+        <li><code>indices</code> — column index of each nonzero</li>
+        <li><code>indptr</code> — where each row starts in <code>data</code></li>
+      </ul>
+      <div class="equation">CSR: ~50,000 entries ≈ 400 KB</div>
+      <p>This is a <strong>2000× memory saving</strong>. Matrix-vector multiplication and LU factorisation are also much faster on sparse formats because they skip the zeros.</p>
+      <div class="note">
+        <strong>Analogy:</strong> A dense matrix is a printed spreadsheet with every cell filled. CSR is a Rolodex — it only stores the cards that actually have information on them.
+      </div>
+    </section>
+
+    <section id="bugs">
+      <h2>Bugs & Fixes Log</h2>
+      <table>
+        <tr><th>Bug</th><th>Symptom</th><th>Fix</th></tr>
+        <tr>
+          <td>Poisson matrix / RHS ordering mismatch</td>
+          <td><code>spsolve</code> returned garbage (ψ 7× too large, vorticity ~35k)</td>
+          <td>Use <code>flatten(order='F')</code> and <code>reshape(..., order='F')</code> to match matrix row indexing</td>
+        </tr>
+        <tr>
+          <td>Slow sparse direct solve</td>
+          <td>30k steps would take ~1 hour</td>
+          <td>Pre-factorize with <code>splu()</code> once, then <code>lu.solve()</code> each step (~28 s total)</td>
+        </tr>
+        <tr>
+          <td>Inlet treated as no-slip wall</td>
+          <td>NaN at step 10; max|ω| exploded</td>
+          <td>Replace Thom's formula at inlet with zero-gradient: <code>ω[0,:] = ω[1,:]</code></td>
+        </tr>
+        <tr>
+          <td>Wall flux mismatch in diffusion</td>
+          <td>diff = 51.2 at first interior cell, causing instability</td>
+          <td>Switch from face-flux diffusion to standard 5-point Laplacian</td>
+        </tr>
+        <tr>
+          <td>Time-loop order</td>
+          <td>1-step lag between ψ and ω, amplifying oscillations</td>
+          <td>New order: Poisson solve → wall ω → compute RHS → update ω</td>
+        </tr>
+        <tr>
+          <td>Inconsistent initialization</td>
+          <td>Corner vorticity singularities at t=0</td>
+          <td>Initialize ψ as fully developed parabolic across entire domain; derive ω from discrete Laplacian</td>
+        </tr>
+      </table>
+    </section>
+
+    <footer style="margin-top:4rem; padding-top:2rem; border-top:1px solid var(--border); color:var(--text2); font-size:0.85rem;">
+      Generated for IRP study. Open this file in any browser — no server needed.
+    </footer>
+  </main>
+</div>
+
+<script>
+  // Collapsible code blocks
+  function toggle(header) {
+    const block = header.parentElement;
+    block.classList.toggle('collapsed');
+    header.classList.toggle('collapsed');
+  }
+
+  // Sidebar active link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop;
+      if (scrollY >= top - 100) cur = sec.getAttribute('id');
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
+    });
+  });
+
+  // Start with code blocks expanded
+  document.querySelectorAll('.code-block').forEach(b => b.classList.remove('collapsed'));
+</script>
+</body>
+</html>

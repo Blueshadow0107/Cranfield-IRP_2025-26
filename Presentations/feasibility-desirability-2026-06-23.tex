@@ -1,0 +1,653 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% THEME & COLOURS (matched to GDP PowerPoint)
+% ============================================================
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{gdpPurple}{HTML}{633E88}
+\definecolor{gdpDarkBlue}{HTML}{0C406D}
+\definecolor{gdpNavy}{HTML}{091932}
+\definecolor{gdpOrange}{HTML}{DD7A0F}
+\definecolor{gdpSlate}{HTML}{3B4950}
+\definecolor{gdpLightGray}{HTML}{E7E6E6}
+\definecolor{gdpBurgundy}{HTML}{820E21}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=gdpSlate}
+\setbeamercolor{frametitle}{fg=gdpPurple,bg=white}
+\setbeamercolor{framesubtitle}{fg=gdpDarkBlue,bg=white}
+\setbeamercolor{title}{fg=gdpPurple}
+\setbeamercolor{subtitle}{fg=gdpDarkBlue}
+\setbeamercolor{author}{fg=gdpSlate}
+\setbeamercolor{institute}{fg=gdpSlate}
+\setbeamercolor{date}{fg=gdpSlate}
+\setbeamercolor{item}{fg=gdpDarkBlue}
+\setbeamercolor{subitem}{fg=gdpPurple}
+\setbeamercolor{block title}{fg=white,bg=gdpDarkBlue}
+\setbeamercolor{block body}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{block title alerted}{fg=white,bg=gdpBurgundy}
+\setbeamercolor{block body alerted}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{footline}{fg=gdpSlate}
+\setbeamercolor{headline}{fg=white,bg=gdpPurple}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb,graphicx,booktabs,array}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\setlength{\tabcolsep}{3pt}
+\setbeamertemplate{itemize/enumerate body begin}{\small}
+\setbeamertemplate{itemize/enumerate subbody begin}{\footnotesize}
+\addtolength{\leftmargini}{-0.3cm}
+\addtolength{\leftmarginii}{-0.2cm}
+
+\setbeamertemplate{frametitle}{%
+  \vspace{0.1cm}
+  \textbf{\large\insertframetitle}
+  \vspace{0.05cm}
+  \par\textcolor{gdpDarkBlue}{\rule{\textwidth}{1.2pt}}
+  \vspace{-0.3cm}
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,leftskip=0.3cm]{footline}%
+      \insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,rightskip=0.3cm]{footline}%
+      \insertframenumber{}
+    \end{beamercolorbox}%
+  }%
+}
+
+\setbeamertemplate{title page}{
+  \vspace{1.5cm}
+  \begin{center}
+    {\Huge\bfseries\textcolor{gdpPurple}{\inserttitle}}\\[0.4cm]
+    {\Large\textcolor{gdpDarkBlue}{\insertsubtitle}}\\[1.2cm]
+    {\large\textcolor{gdpSlate}{\insertauthor}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertinstitute}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertdate}}
+  \end{center}
+}
+
+\title{Feasibility / Desirability Study}
+\subtitle{Justifying the Pivot from Acoustic Wave Computing to Chemical / Ionic Computation}
+\author{S. Venugopal}
+\institute{Cranfield University\hspace{0.3cm}|\hspace{0.3cm}Supervisors: Prof. Weisi Guo, Prof. Takis Tsoutsanis}
+\date{23 June 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ============================================================
+\begin{frame}{Purpose of this deck}
+  This deck is a working document. It collects all the numbers, arguments, and caveats needed to decide whether to continue with acoustic porous wave computing or pivot to a chemical / ionic continuous-computing direction.
+
+  \vspace{0.15cm}
+  \textbf{Two questions:}
+  \begin{enumerate}
+    \item Is the current acoustic direction physically and strategically viable?
+    \item If not, what is the best replacement within the remaining MSc timeline?
+  \end{enumerate}
+
+  \vspace{0.15cm}
+  \textcolor{gdpSlate}{\small Approach: first-principles energy and length-scale estimates, plus scored feasibility/desirability metrics for each candidate.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Why the acoustic direction is now in doubt}
+  During the progress presentation and subsequent review, three issues emerged:
+  \begin{enumerate}
+    \item \textbf{Length scale:} at 2 kHz the acoustic wavelength in air is 17 cm, forcing a device that is tens of centimetres long.
+    \item \textbf{Energy scale:} a quiet 1 Pa wave in a 1 cm$^2$ area for 1 ms costs $\sim$0.24 nJ, orders of magnitude above digital.
+    \item \textbf{Model validity:} the Zwikker-Kosten (ZK) model is invalid at 2 kHz for typical foam pore sizes; the Johnson-Champoux-Allard (JCA) model is needed.
+  \end{enumerate}
+
+  \vspace{0.15cm}
+  The supervisor's feedback: wave-physics physical neural networks are already well-covered; the project should return to concentrations, reactions, and ion-channel-like dynamics.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Metrics for comparison}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \textbf{Physical performance}
+      \begin{itemize}
+        \item Energy per operation (J/op)
+        \item Operation delay (s)
+        \item Energy-delay product (J$\cdot$s)
+        \item Device volume / density
+        \item Wavelength or pattern length scale
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \textbf{Implementation feasibility}
+      \begin{itemize}
+        \item Forward model maturity
+        \item Parameter availability
+        \item Numerical tractability
+        \item Experimental feasibility
+        \item Readout / I/O feasibility
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \textbf{Research desirability}
+      \begin{itemize}
+        \item Novelty / differentiation
+        \item Supervisor alignment
+        \item Thesis coherence
+        \item Timeline risk
+        \item Defensibility at viva
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Reference baselines}
+  \small
+  \begin{center}
+    \begin{tabular}{lccc}
+      \toprule
+      System & Energy per op & Delay & Notes \\
+      \midrule
+      Thermodynamic minimum & $3 \times 10^{-21}$ J & -- & Landauer limit \\
+      Biological synapse & $10^{-16}$ to $10^{-15}$ J & $\sim$1 ms & Nature's reference \\
+      Digital MAC (7 nm AI accelerator) & $10^{-15}$ to $10^{-12}$ J & $\sim$1 ns & Current silicon baseline \\
+      Digital SRAM access & $\sim 10^{-15}$ J & $\sim$1 ns & Memory reference \\
+      Human brain (whole-system) & $\sim 10^{-14}$ J & $\sim$10 ms & Includes support metabolism \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.15cm}
+  \textbf{Rule of thumb:} any physical computing substrate above $10^{-12}$ J per operation needs a very strong justification to compete with digital silicon.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 1: Acoustic Porous Wave Computing -- Energy}
+  \small
+  For a 1 Pa RMS acoustic wave in air:
+  \[
+    I = \frac{p_{\text{rms}}^2}{\rho_0 c_0} = \frac{1^2}{1.225 \times 343} \approx 2.4\ \text{mW/m}^2
+  \]
+
+  For a 1 cm$^2$ cross-section and a 1 ms operation:
+  \[
+    E_{\text{op}} \approx I \, A \, t = 2.4\ \text{mW/m}^2 \times 10^{-4}\ \text{m}^2 \times 10^{-3}\ \text{s} \approx 2.4 \times 10^{-10}\ \text{J} = 0.24\ \text{nJ}
+  \]
+
+  \vspace{0.1cm}
+  \textbf{Context:}
+  \begin{itemize}
+    \item 0.24 nJ is about $10^2$ to $10^5$ times worse than a digital MAC.
+    \item 1 Pa is already quiet; a louder source makes it worse.
+    \item Most acoustic energy simply propagates through; only a small fraction is redirected to probes.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 1: Acoustic Porous Wave Computing -- Length Scale}
+  \small
+  At 2 kHz:
+  \[
+    \lambda = \frac{c_0}{f} = \frac{343}{2000} = 0.1715\ \text{m} = 17.15\ \text{cm}
+  \]
+
+  Simulation geometry from \texttt{fdtd\_zk\_mxv\_v2.py}:
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lcc}
+      \toprule
+      Feature & Physical size & In wavelengths \\
+      \midrule
+      Full domain & 0.50 m & 2.9 $\lambda$ \\
+      Design region width & 0.20 m & 1.2 $\lambda$ \\
+      Each 3x3 design block in x & 0.067 m & 0.39 $\lambda$ \\
+      Source-to-probe distance & 0.34 m & 2.0 $\lambda$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.1cm}
+  \textbf{Issue:} a diffractive computer usually needs many wavelengths to accumulate useful phase shifts. Here the whole device is only a few wavelengths long, and each design block is nearly half a wavelength wide. The geometry is too compact for the chosen frequency.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 1: Acoustic Porous Wave Computing -- Model Issues}
+  \small
+  \textbf{ZK vs JCA regime}
+  \[
+    \delta_v = \sqrt{\frac{2\eta}{\rho_0 \omega}} \approx 48.5\ \mu\text{m}
+    \qquad
+    Wo = \Lambda \sqrt{\frac{\rho_0 \omega}{\eta}} \approx 2.9\ \text{for}\ \Lambda = 100\ \mu\text{m}
+  \]
+  ZK assumes $Wo \ll 1$. At 2 kHz with 100 $\mu$m pores we are in the JCA regime.
+
+  \vspace{0.15cm}
+  \textbf{Sound-speed discontinuity in \texttt{fdtd\_zk\_2d\_v2.py}}
+  \[
+    K_{\text{eff}} = \frac{p_0}{\phi}\ \text{in porous region},
+    \qquad
+    K_{\text{eff}} = \rho_0 c_0^2\ \text{in air}
+  \]
+  This gives $c_{\text{eff}} \approx 288$ m/s in the porous region vs. 343 m/s in air. The discontinuity creates artificial reflections at interfaces.
+
+  \vspace{0.15cm}
+  \textbf{Thin absorbing sponge}
+  \[
+    \text{SPONGE\_WIDTH} = 10\ \text{cells} = 0.04\ \text{m} \approx 0.23\lambda
+  \]
+  A good sponge should be about one wavelength thick; the current one will reflect energy back.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 1: Acoustic Porous Wave Computing -- Summary}
+  \small
+  \textbf{Feasibility}
+  \begin{itemize}
+    \item Forward model: ZK solver exists but is invalid; JCA solver not yet implemented.
+    \item Parameter availability: good (porous acoustic properties are tabulated).
+    \item Numerical tractability: moderate (FDTD works, optimisation is slow).
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Desirability}
+  \begin{itemize}
+    \item Energy: 0.24 nJ per op is 2 to 5 orders of magnitude worse than digital.
+    \item Size: device must be 10 cm to 1 m because of long wavelength.
+    \item Speed: ms latency, kHz bandwidth.
+    \item Novelty: low; wave PNNs are well-covered.
+    \item Supervisor alignment: poor.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \begin{block}{Verdict}
+    Acoustic porous wave computing is a poor fit for the project goals and timeline.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 2: Chemical Reaction Networks (CRNs) -- Physics}
+  \small
+  A CRN is a set of reactions such as:
+  \[
+    A + B \xrightarrow{k_1} C,
+    \qquad
+    C \xrightarrow{k_2} D
+  \]
+
+  Under mass-action kinetics:
+  \[
+    \frac{d[C]}{dt} = k_1 [A][B] - k_2 [C]
+  \]
+
+  \vspace{0.1cm}
+  \textbf{Energy per molecular transformation}
+  \[
+    kT\ \text{at 300 K} \approx 4 \times 10^{-21}\ \text{J}
+    \qquad
+    E_{\text{op}} \approx N \times kT
+  \]
+
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{cc}
+      \toprule
+      Molecules per operation & Energy per operation \\
+      \midrule
+      1 (single-molecule limit) & $\sim$4 zJ \\
+      $10^3$ & $\sim$4 aJ \\
+      $10^6$ & $\sim$4 fJ \\
+      $10^9$ & $\sim$4 pJ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 2: Chemical Reaction Networks (CRNs) -- Mapping to NNs}
+  \small
+  \textbf{How a CRN can compute:}
+  \begin{itemize}
+    \item Input: initial concentration of species $X_1, X_2, \dots$.
+    \item Hidden state: concentrations of intermediate species during evolution.
+    \item Output: steady-state concentrations of readout species $Y_1, Y_2, \dots$.
+    \item Trainable parameters: rate constants $k_i$ and network topology.
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \textbf{Why this maps to a neural network}
+  \begin{itemize}
+    \item Mass-action ODEs are a continuous, nonlinear dynamical system.
+    \item The stoichiometry and rate constants define a fixed computational graph.
+    \item Supervised learning: choose $k_i$ so that target outputs match labels for training inputs.
+    \item Recent reference: Nagipogu \& Reif (2025), ``Neural CRNs'' in ACS Synthetic Biology.
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \begin{block}{Key advantage}
+    The forward model is a small system of ODEs; training uses standard SciPy + gradient descent.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 2: Chemical Reaction Networks (CRNs) -- Summary}
+  \small
+  \textbf{Feasibility}
+  \begin{itemize}
+    \item Forward model: mature (mass-action ODEs).
+    \item Parameter availability: excellent (rate constants are the design variables).
+    \item Numerical tractability: high (scales to 10s--100s of species on a laptop).
+    \item Experimental feasibility: moderate (DNA strand displacement, microfluidics, or well-mixed chemostats).
+    \item Readout: fluorescence, spectroscopy, or electrochemical probes.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Desirability}
+  \begin{itemize}
+    \item Energy: can approach aJ per operation if $N$ is small.
+    \item Size: microfluidic chambers or even single droplets.
+    \item Speed: ms to s, depending on rates.
+    \item Novelty: moderate; trainable CRNs are known but not saturated.
+    \item Supervisor alignment: high (concentrations, reactions, ion-channel analogy).
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 3: Reaction-Diffusion Computing -- Physics}
+  \small
+  Governed by reaction-diffusion PDEs:
+  \[
+    \frac{\partial u}{\partial t} = D_u \nabla^2 u + f(u,v)
+    \qquad
+    \frac{\partial v}{\partial t} = D_v \nabla^2 v + g(u,v)
+  \]
+
+  \vspace{0.1cm}
+  \textbf{Pattern-based computation}
+  \begin{itemize}
+    \item Inputs: initial concentrations or boundary stimuli.
+    \item Computation: spatiotemporal pattern formation (waves, spots, Turing patterns).
+    \item Outputs: presence/absence of a pattern at a probe location.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Energy and length scales}
+  \[
+    E_{\text{update}} \sim 2\ \text{nJ per mm}^3
+    \qquad
+    \lambda_{\text{pattern}} \approx \sqrt{D\tau} \sim 10\text{--}100\ \mu\text{m}
+  \]
+  \begin{itemize}
+    \item Closer to spatial computing; good if supervisor insists on pattern dynamics.
+    \item Harder to train because of PDE forward model and pattern sensitivity.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 3: Reaction-Diffusion Computing -- Summary}
+  \small
+  \textbf{Feasibility}
+  \begin{itemize}
+    \item Forward model: PDE solver needed (finite-difference or FEniCS).
+    \item Parameter availability: good for classical systems (Belousov-Zhabotinsky, Gray-Scott).
+    \item Numerical tractability: moderate (2D time stepping is slower than ODEs).
+    \item Experimental feasibility: moderate (BZ gel, microfluidic reactors).
+    \item Readout: imaging or local electrode.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Desirability}
+  \begin{itemize}
+    \item Energy: competitive at the molecular scale.
+    \item Size: mm-scale chips possible.
+    \item Speed: seconds to minutes.
+    \item Novelty: moderate; RD computing is well-known but trainable RD is less common.
+    \item Supervisor alignment: moderate (matches ``pattern'' and ``spatial'' language).
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 4: Ion Channels / Excitable Membranes -- Physics}
+  \small
+  Hodgkin-Huxley style kinetics:
+  \[
+    C_m \frac{dV}{dt} = -\sum_i g_i (V - E_i)
+  \]
+  \[
+    \frac{dg_i}{dt} = \alpha_i(V)(1 - g_i) - \beta_i(V)g_i
+  \]
+
+  \vspace{0.1cm}
+  \textbf{Energy scales}
+  \[
+    E_{\text{ion}} = qV \approx 1.6 \times 10^{-20}\ \text{J}
+    \qquad
+    E_{\text{pump}} \sim 10 kT \approx 4 \times 10^{-20}\ \text{J per ion}
+  \]
+  For $10^6$ ions: $E_{\text{op}} \sim 40$ fJ.
+
+  \vspace{0.1cm}
+  \textbf{Length / time scales}
+  \begin{itemize}
+    \item Channel size: $\sim$10 nm; membrane thickness: $\sim$5 nm.
+    \item Channel gating: $\mu$s; action-potential propagation: 0.1 to 100 m/s.
+    \item Device: $\mu$m to mm.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 4: Ion Channels / Excitable Membranes -- Summary}
+  \small
+  \textbf{Feasibility}
+  \begin{itemize}
+    \item Forward model: Hodgkin-Huxley or Markov-state ODEs are mature.
+    \item Parameter availability: good for known channels; custom channels need characterisation.
+    \item Numerical tractability: high (small ODE systems).
+    \item Experimental feasibility: low for a custom thesis device (lipid bilayers, patch-clamp).
+    \item Readout: electrical (pA currents) or fluorescence.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Desirability}
+  \begin{itemize}
+    \item Energy: extremely low per ion.
+    \item Size: nanoscale channels.
+    \item Speed: $\mu$s to ms.
+    \item Novelty: high if framed as neuromorphic ionic computing.
+    \item Supervisor alignment: high (explicitly requested ion-channel dynamics).
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 5: Organic / Iontronic Devices -- Physics}
+  \small
+  Examples: ion-gel transistors, electrochemical memristors, conducting-polymer devices.
+
+  \vspace{0.15cm}
+  \textbf{Governing physics}
+  \[
+    \sigma(x,t) = \sigma_{\text{max}}\, g(x,t)
+  \]
+  \[
+    \frac{\partial g}{\partial t} = f(\phi, c_{\text{ion}}, g)
+  \]
+
+  \vspace{0.15cm}
+  \textbf{Energy estimate}
+  \[
+    E = \tfrac{1}{2} C V^2 = 0.5 \times 1\ \text{fF} \times (0.1\ \text{V})^2 = 5 \times 10^{-18}\ \text{J} = 5\ \text{aJ (ideal)}
+  \]
+  Realistic devices: fJ to pJ per switching event.
+
+  \vspace{0.1cm}
+  \textbf{Why it is attractive}
+  \begin{itemize}
+    \item Direct bridge to electronics / neuromorphic hardware.
+    \item Ion migration gives intrinsic memory (hysteresis).
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Candidate 5: Organic / Iontronic Devices -- Summary}
+  \small
+  \textbf{Feasibility}
+  \begin{itemize}
+    \item Forward model: coupled electrochemistry, ion transport, polymer physics.
+    \item Parameters are device-specific and scarce.
+    \item Drift-diffusion-Poisson plus hysteresis is complex to implement.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Desirability}
+  \begin{itemize}
+    \item Energy: very low per switching event.
+    \item Size: thin-film devices, $\mu$m features.
+    \item Speed: kHz to MHz, limited by ion mobility.
+    \item Novelty: high; strong links to emerging neuromorphic iontronic literature.
+    \item Supervisor alignment: high (ion dynamics).
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \begin{block}{Caveat}
+    Best as a future direction; too device-specific and parameter-scarce for the remaining MSc timeline.
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Summary Scores}
+  \small
+  Score 1 (poor) to 5 (excellent). Mean rounded to one decimal.
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lcccccccc}
+      \toprule
+      Candidate & Energy & Speed & Size & Feas. & Novelty & Fit & Risk & \textbf{Mean} \\
+      \midrule
+      Acoustic porous & 1 & 2 & 1 & 3 & 2 & 1 & 4 & \textbf{1.7} \\
+      Reaction-diffusion & 2 & 1 & 3 & 3 & 3 & 4 & 3 & \textbf{2.7} \\
+      Organic / iontronic & 4 & 3 & 4 & 2 & 5 & 3 & 1 & \textbf{3.2} \\
+      Ion channels & 5 & 3 & 4 & 4 & 3 & 4 & 3 & \textbf{3.7} \\
+      \textbf{CRNs} & 4 & 2 & 4 & 5 & 3 & 5 & 5 & \textbf{4.0} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.15cm}
+  \textbf{Interpretation:}
+  \begin{itemize}
+    \item CRNs win on feasibility, supervisor fit, and timeline risk.
+    \item Ion channels are close but experimentally harder to realise within the MSc.
+    \item Acoustic porous is the weakest option on nearly every metric.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{What is salvageable from the acoustic work?}
+  \small
+  The acoustic month is not wasted. The following pieces transfer directly to a CRN project:
+  \begin{itemize}
+    \item \textbf{Design-parameter abstraction:} mapping a discrete design grid to continuous physical parameters.
+    \item \textbf{Forward-solver discipline:} time integration, CFL/stability checks, boundary-condition handling.
+    \item \textbf{Optimisation loop:} grid search / random search / gradient-based tuning of design variables.
+    \item \textbf{Readout abstraction:} probe concentrations (or pressures) at fixed locations and times.
+    \item \textbf{Loss-function design:} classification / regression objective with regularisation.
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \textbf{What gets discarded:}
+  \begin{itemize}
+    \item The ZK / JCA porous acoustic model.
+    \item The 2 kHz source frequency and cm-scale domain.
+    \item The interpretation of the device as a diffractive acoustic computer.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Recommendation}
+  \small
+  \begin{block}{Recommended direction}
+    Pivot the thesis to \textbf{trainable Chemical Reaction Networks (CRNs)} as a continuous analog computing substrate.
+  \end{block}
+
+  \vspace{0.15cm}
+  \textbf{Why CRNs?}
+  \begin{itemize}
+    \item Feasibility score 5/5: mass-action ODE forward model is immediate to implement.
+    \item Supervisor fit 5/5: concentrations, reactions, and rate-gating map naturally to ion-channel-like dynamics.
+    \item Timeline risk 5/5: first benchmark (XOR) can run within days; classifier benchmark within 1--2 weeks.
+    \item Energy story is compelling: aJ to fJ per operation for modest molecule counts.
+    \item Novelty is sufficient: trainable CRNs for neural computation are known but not saturated in the thesis literature.
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \textbf{Framing:} a ``single-pot'' continuous analog computer. Ion channels become the physical interpretation; CRNs become the tractable model system.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Proposed Timeline}
+  \small
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{lll}
+      \toprule
+      Week & Task & Deliverable \\
+      \midrule
+      23--26 June & Lock direction with supervisor & Approved pivot \\
+      29 June -- 3 July & CRN forward solver + XOR benchmark & Working Python code \\
+      6--10 July & Trainable 2x2 MxV / small classifier & Optimised CRN \\
+      13--17 July & Optional reaction-diffusion extension & Spatial logic gate \\
+      20--24 July & Compare to acoustic baseline + write-up & Methodology chapter \\
+      27--31 July & Final simulations + sensitivity study & Results chapter draft \\
+      3--7 Aug & Write conclusions + final report & Submission-ready thesis \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.15cm}
+  \textbf{Key assumption:} report chapters are modular; methodology and results can be rewritten without changing the introduction's framing of continuous analog computation.
+\end{frame}
+
+% ============================================================
+\begin{frame}{Risk Mitigation}
+  \small
+  \textbf{Risk: CRNs are too abstract / not spatial enough.}
+  \begin{itemize}
+    \item Mitigation: frame CRNs as a ``single-pot'' continuous analog computer; add reaction-diffusion extension if needed.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Risk: Optimisation does not converge.}
+  \begin{itemize}
+    \item Mitigation: start with tiny benchmarks (XOR, 2x2 MxV) where convergence is easier; scale up gradually.
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Risk: Supervisor wants ion channels specifically.}
+  \begin{itemize}
+    \item Mitigation: present CRNs as the tractable first step; ion channels become the aspirational physical interpretation (gated reaction rates).
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \textbf{Risk: Not enough time to rewrite report.}
+  \begin{itemize}
+    \item Mitigation: lock direction by end of June; keep report chapters modular so the methodology and results can be swapped without rewriting the entire thesis.
+  \end{itemize}
+\end{frame}
+
+\end{document}

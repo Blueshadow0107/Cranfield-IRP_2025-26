@@ -1,0 +1,289 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{Continuous Analog Computation}
+\subtitle{From Acoustic Waves to Chemical Reaction Networks}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025--26}
+
+\begin{document}
+
+% ---------------------------------------------------------------------
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Why the acoustic direction isn't the right fit}
+
+\begin{itemize}
+    \item Operating frequency: 2 kHz in air $\rightarrow$ wavelength $\lambda \approx 17$ cm.
+    \item Useful diffractive computing needs many wavelengths; device was only $\sim 3\lambda$ long.
+    \item Energy estimate: $E_{\text{op}} \approx 0.24$ nJ, far above a digital MAC.
+    \item A different model does not fix size or energy.
+    \item Prof. Guo explicitly wants reactions, concentrations, and ion-channel-like dynamics.
+\end{itemize}
+
+\vspace{0.5cm}
+\centering
+\textbf{The substrate is wrong.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Envelope study}
+
+Estimate physical limits \textit{before} detailed design.
+
+\vspace{0.3cm}
+Compare substrates on:
+\begin{itemize}
+    \item energy per operation,
+    \item operating delay,
+    \item device size,
+    \item experimental realizability.
+\end{itemize}
+
+\vspace{0.3cm}
+\centering
+\textbf{Question: even in the best case, is this worth building?}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Candidate 1: acoustic porous waves}
+
+\begin{columns}
+\begin{column}{0.55\textwidth}
+energy calculation:
+\begin{align*}
+    \lambda &= \frac{c_0}{f} = \frac{343}{2000} \approx 0.17\ \text{m} \\[0.3em]
+    E_{\text{op}} &\approx I A t \approx 0.24\ \text{nJ} \\[0.3em]
+    V &\approx 0.5 \times 0.5 \times 0.01 = 2.5\ \text{L}
+\end{align*}
+\end{column}
+\begin{column}{0.42\textwidth}
+\textbf{Pros:}
+\begin{itemize}
+    \item Mature I/O (speakers, microphones)
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Cons:}
+\begin{itemize}
+    \item Metre-scale device
+    \item Poor energy
+    \item Weak nonlinearity
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.4cm}
+\centering
+\textbf{Verdict: simulable, but physically unattractive.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Candidate 2: chemical reaction networks (CRNs)}
+
+\begin{columns}
+\begin{column}{0.55\textwidth}
+energy calculation:
+\begin{align*}
+    E_{\text{event}} &\approx kT \approx 4 \times 10^{-21}\ \text{J} \\[0.3em]
+    E_{\text{op}} \text{ for } 10^6 \text{ molecules} &\approx 4\ \text{fJ} \\[0.3em]
+    V &\sim \mu\text{L}
+\end{align*}
+Forward model: mass-action ODEs.
+\end{column}
+\begin{column}{0.42\textwidth}
+\textbf{Pros:}
+\begin{itemize}
+    \item Tiny energy at small molecule counts
+    \item Compact reactors
+    \item Natural nonlinear kinetics
+    \item Trivial solver
+    \item Matches supervisor direction
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Cons:}
+\begin{itemize}
+    \item Slower than electronics
+    \item Rate control and noise matter
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.4cm}
+\centering
+\textbf{Verdict: best trade-offs, aligns with supervisor.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Candidate 3: reaction-diffusion computing}
+
+\begin{columns}
+\begin{column}{0.55\textwidth}
+energy calculation:
+\begin{align*}
+    N &\sim 10^{-3}\ \text{mol/L} \times 10^{-9}\ \text{L} \times 6\times10^{23} \\
+      &\approx 6\times10^{11}\ \text{molecules} \\[0.3em]
+    E_{\text{op}} &\approx 6\times10^{11} \times 4\times10^{-21}\ \text{J} \\
+      &\approx 2\ \text{nJ} \\[0.3em]
+    \lambda &\approx \sqrt{D\tau} \approx 10\ \mu\text{m}
+\end{align*}
+\end{column}
+\begin{column}{0.42\textwidth}
+\textbf{Pros:}
+\begin{itemize}
+    \item Naturally spatial
+    \item Visual, intuitive dynamics
+    \item Good supervisor fit
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Cons:}
+\begin{itemize}
+    \item Slower and hungrier than well-mixed CRNs
+    \item PDE optimisation is fragile
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.4cm}
+\centering
+\textbf{Verdict: strong extension, not the primary model.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Candidate 4: ionic and electronic alternatives}
+
+\textbf{Ion channels}
+\begin{align*}
+    E_{\text{ion}} &\approx 10kT \approx 4\times10^{-20}\ \text{J} \\
+    E_{\text{op}} \text{ for } 10^6 \text{ ions} &\approx 40\ \text{fJ}
+\end{align*}
+\begin{itemize}
+    \item Energetically best, fast gating.
+    \item Hard to reconstitute artificial networks experimentally.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Organic / iontronic devices (OECTs, porous memristors)}
+\begin{align*}
+    E_{\text{ideal}} &= \tfrac{1}{2}CV^2 \approx 5\ \text{aJ}
+\end{align*}
+\begin{itemize}
+    \item Very novel, electrical readout.
+    \item Coupled electrochemistry + hysteresis; too risky for this timeline.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{The pivot}
+
+\begin{itemize}
+    \item Acoustic waves lose on size, energy, and alignment.
+    \item CRNs offer the best combination of feasibility, energy scaling, and supervisor fit.
+    \item Reaction-diffusion and ion channels are kept as extensions.
+    \item Iontronics is future work.
+\end{itemize}
+
+\vspace{0.5cm}
+\centering
+\Large
+\textbf{New direction: a trainable CRN-based Fluid Neural Network.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{CRN Fluid NN: core idea}
+
+State = vector of species concentrations $\mathbf{c}(t)$.
+
+\vspace{0.3cm}
+Dynamics = mass-action kinetics:
+\begin{equation*}
+    \frac{d\mathbf{c}}{dt} = \mathbf{S}\,\mathbf{r}(\mathbf{c}; \mathbf{k})
+\end{equation*}
+
+\vspace{0.2cm}
+where:
+\begin{itemize}
+    \item $\mathbf{S}$ = stoichiometry matrix,
+    \item $\mathbf{r}$ = reaction-rate vector,
+    \item $\mathbf{k}$ = trainable rate constants.
+\end{itemize}
+
+\vspace{0.3cm}
+Extension: add diffusion $\rightarrow$ reaction-diffusion PDE.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{First benchmark: trainable XOR}
+
+Reaction network:
+\begin{align*}
+    A + B &\rightarrow W \quad \text{(mutual annihilation)} \\
+    A &\rightarrow Y \quad \text{(A-only output)} \\
+    B &\rightarrow Y \quad \text{(B-only output)} \\
+    Y &\rightarrow W \quad \text{(output reset)}
+\end{align*}
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item Inputs: initial concentrations $[A, B]$
+    \item Output: final concentration $[Y]$
+    \item Trainable parameters: rate constants $k_1, k_2, k_3, k_4$
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Roadmap to submission}
+
+\begin{table}
+\centering
+\begin{tabular}{cl}
+\toprule
+\textbf{Week} & \textbf{Milestone} \\
+\midrule
+1--2  & Well-mixed CRN learns XOR and a simple classifier \\
+3     & Gating: one network, two functions via control species \\
+4--5  & 1D/2D reaction-diffusion spatial classifier \\
+6     & Orthogonal-species parallelism \\
+7     & Digital baseline comparison + physical scaling \\
+8     & Write-up, figures, conclusions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Conclusion}
+
+\begin{itemize}
+    \item Acoustic wave computing is abandoned on first-principles grounds.
+    \item CRNs provide a fast, valid, and supervisor-aligned path.
+    \item First simulations can run in days.
+    \item Target: trainable CRN Fluid NN, with gating, RD, and parallelism extensions.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

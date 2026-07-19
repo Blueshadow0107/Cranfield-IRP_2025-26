@@ -1,0 +1,127 @@
+% Chapter: Methodology
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Overview}
+\label{sec:meth_overview}
+
+The methodology follows a simulation-first pipeline: (1) build a modular first-order acoustic FDTD solver, (2) validate it against analytical and numerical benchmarks, (3) extend it to inhomogeneous and porous media, and (4) optimise a design region for a simple wave-computing task. \reffig{fig:methodology_pipeline} shows the overall workflow.
+
+[Insert a flowchart figure here once created.]
+
+\section{Governing Equations}
+\label{sec:governing_eqns}
+
+\subsection{Linearised Acoustics}
+\label{subsec:linear_acoustics}
+
+For small-amplitude acoustic waves in a quiescent fluid, the linearised Euler equations are
+\begin{align}
+    \rho_0 \frac{\partial \mathbf{u}}{\partial t} + \nabla p &= 0, \\
+    \frac{\partial p}{\partial t} + \rho_0 c_0^2 \nabla \cdot \mathbf{u} &= S(\mathbf{x}, t),
+\end{align}
+where $p$ is the acoustic pressure, $\mathbf{u}$ is the particle velocity, $\rho_0$ is the ambient density, $c_0$ is the speed of sound, and $S$ is a source term. In two dimensions, with $\mathbf{u} = (u, v)$, these become
+\begin{align}
+    \frac{\partial u}{\partial t} + \frac{1}{\rho_0}\frac{\partial p}{\partial x} &= 0, \\
+    \frac{\partial v}{\partial t} + \frac{1}{\rho_0}\frac{\partial p}{\partial y} &= 0, \\
+    \frac{\partial p}{\partial t} + \rho_0 c_0^2 \left(\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y}\right) &= S(x,y,t).
+\end{align}
+
+\subsection{Thermal Dependence of Sound Speed}
+\label{subsec:thermal_c}
+
+The speed of sound in an ideal gas depends on temperature as
+\begin{equation}
+    c(T) = \sqrt{\gamma R T},
+\label{eq:sound_speed_temperature}
+\end{equation}
+where $\gamma$ is the heat-capacity ratio and $R$ is the specific gas constant. In the present implementation, a steady-state temperature field is imposed and the local sound speed is computed from \refeqn{eq:sound_speed_temperature}.
+
+\subsection{Equivalent-Fluid Porous Models}
+\label{subsec:porous_models}
+
+For a rigid-framed porous medium, the air in the pores behaves as an equivalent fluid with complex, frequency-dependent effective density $\rho_\mathrm{eff}(\omega)$ and effective bulk modulus $K_\mathrm{eff}(\omega)$.
+
+\subsubsection{Zwikker--Kosten Model}
+
+The Zwikker--Kosten model gives
+\begin{equation}
+    \rho_\mathrm{eff}(\omega) = \rho_0 \alpha_\infty \left[ 1 + \frac{\sigma \phi}{\mathrm{i} \omega \rho_0 \alpha_\infty} \sqrt{1 + \frac{4 \mathrm{i} \omega \rho_0 \alpha_\infty^2 \eta}{\sigma^2 \phi^2 \Lambda^2}} \right],
+\end{equation}
+where $\phi$ is porosity, $\sigma$ is static flow resistivity, $\alpha_\infty$ is tortuosity, $\eta$ is dynamic viscosity, and $\Lambda$ is viscous characteristic length.
+
+[Check constants and definitions against your source.]
+
+\subsubsection{Johnson--Champoux--Allard Model}
+
+The JCA model extends the ZK description by including thermal effects through a complex effective bulk modulus. [Add equations once you have selected the exact JCA formulation.]
+
+\subsection{First-Order Acoustics as a Recurrent Neural Network}
+\label{subsec:acoustics_rnn}
+
+The first-order leapfrog update can be written in state-space form with $\mathbf{h} = [u, v, p]^\mathsf{T}$. Each time step applies a sparse linear operator that depends on the spatially varying material properties. In this view, the porous domain is a recurrent neural network whose weights are the finite-difference stencils and the local values of $c(x,y)$, $\rho_\mathrm{eff}$, and $K_\mathrm{eff}$.
+
+\section{Numerical Discretisation}
+\label{sec:fdtd_discretisation}
+
+\subsection{Staggered Grid}
+\label{subsec:staggered_grid}
+
+Pressure $p$ is stored at integer grid points $(i,j)$, while velocity components $u$ and $v$ are staggered at half-grid locations in $x$ and $y$, respectively. This arrangement naturally couples pressure and velocity gradients.
+
+\subsection{Leapfrog Time Stepping}
+\label{subsec:leapfrog}
+
+The first-order system is advanced with a leapfrog scheme:
+\begin{align}
+    u^{n+1/2}_{i+1/2,j} &= u^{n-1/2}_{i+1/2,j} - \frac{\Delta t}{\rho_0 \Delta x}\left(p^n_{i+1,j} - p^n_{i,j}\right), \\
+    v^{n+1/2}_{i,j+1/2} &= v^{n-1/2}_{i,j+1/2} - \frac{\Delta t}{\rho_0 \Delta y}\left(p^n_{i,j+1} - p^n_{i,j}\right), \\
+    p^{n+1}_{i,j} &= p^n_{i,j} - \rho_0 c^2_{i,j} \Delta t \left(\frac{u^{n+1/2}_{i+1/2,j} - u^{n+1/2}_{i-1/2,j}}{\Delta x} + \frac{v^{n+1/2}_{i,j+1/2} - v^{n+1/2}_{i,j-1/2}}{\Delta y}\right) + \Delta t \, S^n_{i,j}.
+\end{align}
+
+[Adapt indices to match your exact implementation.]
+
+\subsection{Stability Constraint}
+\label{subsec:cfl}
+
+The time step is constrained by the Courant--Friedrichs--Lewy condition. For the two-dimensional first-order system,
+\begin{equation}
+    \Delta t \leq \frac{C_\mathrm{CFL} \, \Delta x}{c_\mathrm{max} \sqrt{2}},
+\end{equation}
+where $c_\mathrm{max}$ is the maximum wave speed in the domain and $C_\mathrm{CFL} < 1$ is a safety factor. The present implementation uses $C_\mathrm{CFL} = 0.9$.
+
+\section{Boundary Conditions}
+\label{sec:bcs}
+
+\subsection{Absorbing Boundaries}
+\label{subsec:absorbing}
+
+A first-order Mur or perfectly matched layer (PML) boundary is applied to mimic an infinite domain. [Describe which boundary you implemented and the equations.]
+
+\subsection{Hard-Wall and Pressure-Release Boundaries}
+\label{subsec:wall_bc}
+
+A hard wall imposes zero normal velocity, while a pressure-release boundary sets $p = 0$ at the boundary face. On a staggered grid this requires careful handling of the ghost-cell values; the present implementation uses opposite-signed pressure values across the boundary to enforce $p=0$ at the face.
+
+\section{Source and Probe Models}
+\label{sec:src_probe}
+
+Sources are injected as pressure or velocity perturbations. The implemented waveforms include continuous sine tones, Gaussian pulses, and broadband pulses. Probes record the time history of pressure at fixed locations and are used both for visualisation and for computing objective functions during optimisation.
+
+\section{OpenFOAM Validation}
+\label{sec:openfoam_validation}
+
+Baseline acoustic propagation is validated using OpenFOAM's \texttt{rhoPimpleFoam} solver with wave-transmissive boundary conditions. The comparison focuses on pulse propagation speed, reflection from hard walls, and inhomogeneous-media behaviour before porous losses are introduced.
+
+[Expand with the exact OpenFOAM case setup once Validation/ is populated.]
+
+\section{Design-Region Optimisation}
+\label{sec:optimisation}
+
+A sub-domain of the FDTD grid is designated as the design region. Within this region, the porosity field $\phi(x,y)$ --- or equivalently the effective sound speed $c(x,y)$ --- is treated as the trainable parameter. The objective function measures the discrepancy between the probe signals and target outputs, for example the energy routed to one probe versus another.
+
+Because the forward solver is not yet differentiable in the present implementation, optimisation is performed with gradient-free methods such as grid search or random search. [Describe the chosen algorithm, parameterisation, and regularisation.]
+
+\section{Summary}
+\label{sec:meth_summary}
+
+The methodology combines a first-order acoustic FDTD solver, equivalent-fluid porous modelling, OpenFOAM validation, and gradient-free design-region optimisation. The next chapter presents the results of applying this pipeline to validation cases and to initial wave-computing demonstrations.

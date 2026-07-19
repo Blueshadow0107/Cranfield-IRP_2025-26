@@ -1,0 +1,406 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% THEME & COLOURS (matched to GDP PowerPoint)
+% ============================================================
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{gdpPurple}{HTML}{633E88}
+\definecolor{gdpDarkBlue}{HTML}{0C406D}
+\definecolor{gdpNavy}{HTML}{091932}
+\definecolor{gdpOrange}{HTML}{DD7A0F}
+\definecolor{gdpSlate}{HTML}{3B4950}
+\definecolor{gdpLightGray}{HTML}{E7E6E6}
+\definecolor{gdpBurgundy}{HTML}{820E21}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=gdpSlate}
+\setbeamercolor{frametitle}{fg=gdpPurple,bg=white}
+\setbeamercolor{framesubtitle}{fg=gdpDarkBlue,bg=white}
+\setbeamercolor{title}{fg=gdpPurple}
+\setbeamercolor{subtitle}{fg=gdpDarkBlue}
+\setbeamercolor{author}{fg=gdpSlate}
+\setbeamercolor{institute}{fg=gdpSlate}
+\setbeamercolor{date}{fg=gdpSlate}
+\setbeamercolor{item}{fg=gdpDarkBlue}
+\setbeamercolor{subitem}{fg=gdpPurple}
+\setbeamercolor{block title}{fg=white,bg=gdpDarkBlue}
+\setbeamercolor{block body}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{block title alerted}{fg=white,bg=gdpBurgundy}
+\setbeamercolor{block body alerted}{fg=gdpSlate,bg=gdpLightGray!30}
+\setbeamercolor{footline}{fg=gdpSlate}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb,graphicx,booktabs,array}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\setlength{\tabcolsep}{3pt}
+\setbeamertemplate{itemize/enumerate body begin}{\small}
+\setbeamertemplate{itemize/enumerate subbody begin}{\footnotesize}
+\addtolength{\leftmargini}{-0.3cm}
+\addtolength{\leftmarginii}{-0.2cm}
+
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2cm}
+  \textbf{\large\insertframetitle}
+  \vspace{0.05cm}
+  \par\textcolor{gdpDarkBlue}{\rule{\textwidth}{1.2pt}}
+  \vspace{-0.3cm}
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,leftskip=0.3cm]{footline}%
+      \insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333\paperwidth,ht=2.5ex,dp=1ex,rightskip=0.3cm]{footline}%
+      \insertframenumber{}
+    \end{beamercolorbox}%
+  }%
+}
+
+\setbeamertemplate{title page}{
+  \vspace{1.5cm}
+  \begin{center}
+    {\Huge\bfseries\textcolor{gdpPurple}{\inserttitle}}\\[0.4cm]
+    {\Large\textcolor{gdpDarkBlue}{\insertsubtitle}}\\[1.2cm]
+    {\large\textcolor{gdpSlate}{\insertauthor}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertinstitute}}\\[0.3cm]
+    {\normalsize\textcolor{gdpSlate}{\insertdate}}
+  \end{center}
+}
+
+\title{Obstacle-Array Computation in Fluids}
+\subtitle{From Acoustic Waves to Vortex Dynamics}
+\author{MSc Individual Research Project}
+\institute{Cranfield University\hspace{0.3cm}|\hspace{0.3cm}Supervisors: Prof. Weisi Guo, Prof. Takis Tsoutsanis}
+\date{1 June 2026}
+
+\begin{document}
+
+% ============================================================
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ============================================================
+\begin{frame}{Overview}
+  \textbf{A progress review and scope discussion.}
+
+  \vspace{0.4cm}
+  \begin{enumerate}
+    \item What I've built: acoustic wave logic (FDTD prototype)
+    \item Where I'm going next: velocity readout + thermal tuning
+    \item Another direction: vortex-based computation
+    \item Literature surveyed
+    \item The unification insight: all are obstacle arrays
+    \item The spectrum: where does an MSc thesis sit?
+    \item Two options going forward
+    \item What I need guidance on
+  \end{enumerate}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Acoustic Pressure Waves: What I Built}
+  \textbf{A 4-step MATLAB FDTD prototype:}
+
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \footnotesize
+      \begin{enumerate}
+        \item \textbf{Empty domain:} 2D scalar wave equation. Validated $1/\sqrt{r}$ amplitude decay.
+        \item \textbf{Sponge ABC:} Quadratic damping layer. Quantified reflection suppression.
+        \item \textbf{Y-junction:} Two 30\textdegree\ inlets $\rightarrow$ straight outlet. Hard walls + sinusoidal sources.
+        \item \textbf{Phase sweep:} Logic-gate demonstration (0\textdegree\ -- 360\textdegree\ phase difference).
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{\footnotesize Key Result}
+        \footnotesize
+        Logic contrast ratio at output probe:
+        \[
+          \frac{\text{RMS}(0^\circ) - \text{RMS}(180^\circ)}{\text{RMS}(0^\circ) + \text{RMS}(180^\circ)}
+        \]
+        Phase interference in a structured fluid domain implements a logic operation.
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \textcolor{gdpDarkBlue}{\small Literature: Hughes 2019 (wave = RNN), Lin 2018 (diffractive deep NN), Zuo 2018 (acoustic logic)}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Limitation I Hit}
+  \textbf{Pressure readout is clean but shallow:}
+
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Pressure is a \textbf{scalar} --- easy to measure, hard to spatially resolve
+    \item Thermal tuning affects $c(T)$ and $\rho(T)$, but the effect on the pressure field is indirect (phase shift only)
+    \item I asked: can I read out something that carries \textbf{more information} about the medium state?
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \begin{block}{\footnotesize The Question}
+    \footnotesize
+    If I change the temperature of the fluid, I change its acoustic impedance $Z = \rho c$. Can I make the \textbf{velocity field} --- not just pressure --- the readout, and use thermal tuning as a reconfiguration mechanism?
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Velocity Readout + Thermal Tuning}
+  \textbf{The physics:}
+  \[
+    \mathbf{v} = \frac{p}{\rho c}\,\hat{\mathbf{n}} \qquad \text{(plane wave)}
+  \]
+
+  \vspace{0.1cm}
+  \textbf{If I heat the medium:} $\rho \downarrow$, $c \downarrow$ $\Rightarrow$ $Z = \rho c$ changes $\Rightarrow$ reflection/transmission coefficients change
+
+  \vspace{0.2cm}
+  \textbf{Why velocity is better than pressure for this:}
+  \begin{itemize}
+    \item Velocity is a \textbf{vector field} --- richer spatial information than scalar pressure
+    \item Thermal tuning changes \textbf{impedance matching} at obstacles $\rightarrow$ reconfigures interference pattern
+    \item Same geometry, same wave equation, but readout modality and reconfiguration are now \textbf{coupled}
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{gdpBurgundy}{\small This is still linear acoustics (Helmholtz). The nonlinearity is in the boundary conditions, not the bulk fluid.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Is Linear Acoustics Enough?}
+  \textbf{Acoustic velocity is still:}
+
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \textbf{Linear} --- Helmholtz equation
+        \item \textbf{Irrotational} --- $\nabla \times \mathbf{v} = 0$
+        \item \textbf{Reversible} --- no memory, no dissipation
+        \item \textbf{Fast} ($\mu$s) but \textbf{shallow} dynamics
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{\footnotesize What's Missing?}
+        \footnotesize
+        \begin{itemize}
+          \item \textbf{Nonlinearity} in the bulk (not just boundaries)
+          \item \textbf{Memory} --- state that persists after input
+          \item \textbf{Dissipation} --- energy redistribution
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.4cm}
+  \begin{center}
+    \textcolor{gdpDarkBlue}{\large This led me to consider a different physics regime entirely.}
+  \end{center}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Vortex-Based Computation}
+  \textbf{Another paradigm: using Navier-Stokes dynamics directly.}
+
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{itemize}
+        \item \textbf{Strouhal--Reynolds relationship:} shedding frequency vs Re acts as a nonlinear activation
+        \item \textbf{Variable-diameter cylinders:} geometry as discrete weights
+        \item \textbf{Photoelasticity:} optical readout of stress reveals vortex pattern
+        \item \textbf{Critical regime:} Re $\approx$ 40 (twin-vortex, before Hopf bifurcation)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{\footnotesize The Appeal}
+        \footnotesize
+        Navier-Stokes is \textbf{inherently} nonlinear. No need to engineer nonlinearity into the material. Vortex shedding creates \textbf{memory} via advection and recirculation.
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \textcolor{gdpDarkBlue}{\small Literature: Goto 2021 (peak RC at Re$\approx$40), Roshko 1954 (Strouhal universality), Sharifi Ghazijahani 2025 (ESN behind 7-cylinder array)}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Literature Surveyed}
+  \footnotesize
+  \begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{}>{\raggedright}p{3.2cm}>{\raggedright}p{5.5cm}>{\raggedright\arraybackslash}p{4.8cm}@{}}
+      \toprule
+      \textbf{Paper} & \textbf{Contribution} & \textbf{Where it fits} \\
+      \midrule
+      Hughes et al.\ (2019) & Wave physics = recurrent NN & Acoustic wave \\
+      Lin et al.\ (2018) & Diffractive deep NN & Acoustic wave \\
+      Zuo et al.\ (2018) & Acoustic logic gates & Acoustic wave \\
+      \midrule
+      Goto et al.\ (2021) & Peak RC at Re$\approx$40; ESP breaks after bifurcation & Vortex \\
+      Sharifi Ghazijahani (2025) & ESN predicts flow behind 7-cylinder array & Vortex \\
+      Marcucci et al.\ (2023) & ``RC exploiting hydrodynamics'' & Vortex \\
+      \midrule
+      Zheng/Porter (JFM 2020--24) & Water-wave scattering by plate-array cylinders & Bridge \\
+      Adamatzky (2019) & Liquid computers survey & Context \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Unification Insight}
+  \begin{center}
+    \textcolor{gdpPurple}{\large All three approaches are the same structural object.}
+  \end{center}
+
+  \vspace{0.2cm}
+  \begin{block}{\footnotesize The Core Idea}
+    \footnotesize
+    A \textbf{2D array of obstacles in a fluid}, where obstacle geometry encodes trainable weights. The physics chosen --- linear wave, thermally-tuned wave, or vortex flow --- determines the computational complexity.
+  \end{block}
+
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \centering
+      \textbf{Pressure Wave}\\[0.1cm]
+      \footnotesize
+      Scalar Helmholtz\\
+      Clean, fast, shallow
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \centering
+      \textbf{Velocity + Thermal}\\[0.1cm]
+      \footnotesize
+      Vector Helmholtz\\
+      Reconfigurable, richer
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \centering
+      \textbf{Vortex Flow}\\[0.1cm]
+      \footnotesize
+      Navier-Stokes\\
+      Nonlinear, memory, slow
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \textcolor{gdpDarkBlue}{\small This geometric unification is my intellectual contribution so far.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Spectrum}
+  \footnotesize
+  \begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}>{\raggedright}p{3.0cm}>{\raggedright}p{3.3cm}>{\raggedright}p{3.3cm}>{\raggedright\arraybackslash}p{3.9cm}@{}}
+      \toprule
+      & \textbf{Acoustic Pressure} & \textbf{Velocity + Thermal} & \textbf{Vortex Flow} \\
+      \midrule
+      Equation & Helmholtz & Helmholtz & Navier-Stokes \\
+      Nonlinearity & None & None & Inherent (convective) \\
+      Vorticity & $\nabla \times \mathbf{v} = 0$ & $\nabla \times \mathbf{v} = 0$ & $\nabla \times \mathbf{v} \neq 0$ \\
+      Memory & Transit time only & Transit time only & Vortex advection \\
+      Thermal effect & Phase shift (weak) & Impedance tuning (medium) & $\rho(T)$, $\mu(T)$ change regime \\
+      Timescale & $\mu$s & $\mu$s & ms \\
+      Readout & Pressure probe & Velocity vector field & Photoelastic / PIV \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.2cm}
+  \textcolor{gdpBurgundy}{\small The deeper I go into fluid dynamics, the richer --- but slower --- the computation becomes.}
+\end{frame}
+
+% ============================================================
+\begin{frame}{The Critical Challenge: Timescale Mismatch}
+  \textbf{Could these ever be combined?}
+
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Acoustic waves: $\sim$ $\mu$s timescale
+    \item Vortex shedding: $\sim$ ms timescale
+    \item \textbf{Any hybrid acoustic $\rightarrow$ vortex readout is $\sim$1000$\times$ bottlenecked}
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \begin{block}{\footnotesize Consequence}
+    \footnotesize
+    They cannot be layers of the same system. They are \textbf{alternative substrates} for the same geometric paradigm. The choice is not ``both'' --- it is ``which one?''
+  \end{block}
+\end{frame}
+
+% ============================================================
+\begin{frame}{What I Need to Decide}
+  \textbf{The question is not ``acoustic or vortex?''}
+
+  \vspace{0.3cm}
+  \begin{center}
+    \textcolor{gdpPurple}{\large The question is: where on this spectrum does an MSc thesis sit?}
+  \end{center}
+
+  \vspace{0.3cm}
+  \footnotesize
+  \begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{}>{\raggedright}p{2.2cm}>{\raggedright}p{3.8cm}>{\raggedright}p{4.5cm}>{\raggedright\arraybackslash}p{2.8cm}@{}}
+      \toprule
+      \textbf{Depth} & \textbf{Physics} & \textbf{What I'd build} & \textbf{MSc feasibility} \\
+      \midrule
+      Shallow & Acoustic pressure & FDTD + OpenFOAM validation + logic gate & High \cmark \\
+      Medium & Acoustic velocity + thermal & Same + velocity readout + $c(T)$, $\rho(T)$ sweep & Medium \\
+      Deep & Vortex flow & OpenFOAM NS + cylinder array + photoelastic concept & Medium--Low \\
+      Very deep & Compare all three & All of the above + unified benchmark & \textbf{PhD scope} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+% ============================================================
+\begin{frame}{Two Concrete Options}
+  \footnotesize
+  \begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}>{\raggedright}p{1.8cm}>{\raggedright}p{3.8cm}>{\raggedright}p{4.5cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
+      \toprule
+      & \textbf{Focus} & \textbf{Deliverable} & \textbf{Honest assessment} \\
+      \midrule
+      \textbf{A. Acoustic + Thermal} & Velocity readout with thermal reconfiguration & FDTD/OpenFOAM acoustic velocity with thermal sweep; compare pressure vs velocity readout & \textbf{Doable.} Builds directly on working code. Novel: thermal reconfiguration of impedance. \\
+      \midrule
+      \textbf{B. Vortex} & Navier-Stokes obstacle-array computation & OpenFOAM cylinder array at Re$\approx$40; Strouhal analysis; photoelastic readout concept & \textbf{Risky.} New solver, new physics, no prototype. 3--4 months to first result. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+% ============================================================
+\begin{frame}{What I Need Guidance On}
+  \begin{enumerate}
+    \item \textbf{Depth:} Which approach is the right scope for an MSc? (A or B?)
+    \item \textbf{Thermal:} Is thermal tuning of acoustic velocity a meaningful research direction, or just an engineering detail?
+    \item \textbf{Vortex:} Is photoelastic readout essential, or one of several valid readout options?
+    \item \textbf{Solver:} Do I have OpenFOAM expertise / support in the group for Navier--Stokes?
+    \item \textbf{Framing:} If I pursue acoustic + thermal, should vortex be ``future work'' or ``motivation''?
+  \end{enumerate}
+\end{frame}
+
+\end{document}

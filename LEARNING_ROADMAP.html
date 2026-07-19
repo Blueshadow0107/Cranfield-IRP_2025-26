@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Roadmap: Physics of Fluid Neural Networks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #fafbfc;
+            border-radius: 10px;
+            border-left: 5px solid #1a237e;
+        }
+        
+        .section h2 {
+            color: #1a237e;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-number {
+            background: #1a237e;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .subsection {
+            margin: 15px 0;
+        }
+        
+        .subsection h3 {
+            color: #283593;
+            font-size: 1.15em;
+            margin-bottom: 8px;
+        }
+        
+        .resource-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .resource-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .resource-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #1a237e;
+            font-weight: bold;
+        }
+        
+        .resource-list a {
+            color: #1565c0;
+            text-decoration: none;
+        }
+        
+        .resource-list a:hover {
+            text-decoration: underline;
+        }
+        
+        .key-question {
+            background: #e8eaf6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3949ab;
+        }
+        
+        .key-question strong {
+            color: #1a237e;
+        }
+        
+        .priority-high {
+            border-left-color: #c62828;
+        }
+        
+        .priority-high h2 {
+            color: #c62828;
+        }
+        
+        .priority-high .section-number {
+            background: #c62828;
+        }
+        
+        .homework-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .homework-table th {
+            background: #1a237e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .homework-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .homework-table tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+        
+        .formula {
+            background: #263238;
+            color: #80cbc4;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .footer {
+            background: #f5f7fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Learning Roadmap</h1>
+            <p>Physics of Fluid Neural Networks &mdash; Cranfield IRP 2025-26</p>
+        </div>
+        
+        <div class="content">
+            
+            <div class="section">
+                <h2><span class="section-number">1</span> Fundamentals of Acoustics</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Wave equation (first-order and second-order forms)</li>
+                        <li>Sound speed in gases: <span class="formula">c = sqrt(gamma * R * T)</span></li>
+                        <li>Acoustic impedance: <span class="formula">Z = rho * c</span></li>
+                        <li>Reflection and transmission at interfaces</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Textbook:</strong> Kinsler &amp; Frey, "Fundamentals of Acoustics" &mdash; Chapters 1-4</li>
+                        <li><strong>Textbook:</strong> Beranek &amp; Mellow, "Acoustics" &mdash; Chapter 3 (reflection/transmission)</li>
+                        <li><strong>Online:</strong> <a href="https://sengpielaudio.com/TemperatureSound.htm">sengpielaudio.com &mdash; Temperature vs Sound Speed</a></li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> Derive <span class="formula">c = c0 * sqrt(T/T0)</span> for air from the ideal gas law. Show your steps.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><span class="section-number">2</span> FDTD Numerical Methods</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Yee staggered grid layout</li>
+                        <li>Leapfrog time stepping</li>
+                        <li>CFL stability condition: <span class="formula">dt &lt; dx / (c * sqrt(2))</span></li>
+                        <li>Numerical dispersion and grid resolution</li>
+                        <li>Absorbing boundary conditions</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Textbook:</strong> Taflove &amp; Hagness, "Computational Electrodynamics" &mdash; Chapter 1 (1D FDTD)</li>
+                        <li><strong>Lecture Notes:</strong> <a href="https://engineering.purdue.edu/wcchew/ece604s20/Lecture%20Notes/Lect37.pdf">Purdue ECE 604 &mdash; FDTD and Yee Algorithm (PDF)</a></li>
+                        <li><strong>Paper:</strong> arXiv 2025 &mdash; "Acoustic Wave Modeling Using 2D FDTD" (modern code examples)</li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> Why does the staggered grid eliminate the need for interpolation when computing spatial derivatives?
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><span class="section-number">3</span> Bragg Gratings &amp; Periodic Structures</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Bragg condition: <span class="formula">d = m * lambda / 2</span></li>
+                        <li>Band gaps in periodic media</li>
+                        <li>Coupling coefficient <span class="formula">kappa</span></li>
+                        <li>Reflection from finite gratings: <span class="formula">R = tanh^2(kappa * L)</span></li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Tutorial:</strong> <a href="https://www.photonics.intec.ugent.be/download/pub_1251.pdf">"Bragg waveguide grating as a 1D photonic band gap" (PDF)</a></li>
+                        <li><strong>Tutorial:</strong> <a href="https://optics.ansys.com/hc/en-us/articles/360042304394">Ansys &mdash; Bragg Grating Design with FDTD</a></li>
+                        <li><strong>Textbook:</strong> Joannopoulos et al., "Photonic Crystals" &mdash; Chapters 4-5</li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> For our 20-period grating with r=0.17, verify that <span class="formula">R = tanh^2(20 * 0.17) ≈ 0.997</span>. Why did the simulation give R ≈ 1?
+                </div>
+            </div>
+            
+            <div class="section priority-high">
+                <h2><span class="section-number">4</span> Physical Neural Networks (THE CORE)</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Wave propagation as neural network forward pass</li>
+                        <li>Material properties = network weights</li>
+                        <li>Training physical systems via optimization</li>
+                        <li>Types: diffractive networks, reservoir computing, mechanical networks</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Read In This Order</h3>
+                    <ul class="resource-list">
+                        <li><strong>1. Hughes et al. 2019</strong> (<code>hughes2019wave</code>) &mdash; "Wave physics as an analog recurrent neural network" (Sci. Adv.)<br>
+                            <em>START HERE. This is the foundation of your entire thesis. Read Sections 1-3 carefully.</em></li>
+                        <li><strong>2. Wright et al. 2022</strong> (<code>wright2022deep</code>) &mdash; "Deep physical neural networks trained with backpropagation" (Nature)<br>
+                            <em>How they physically built and trained a network. Focus on Methods.</em></li>
+                        <li><strong>3. Stern et al. 2021</strong> (<code>stern2021physical</code>) &mdash; "Supervised learning in physical networks" (Phys. Rev. X)<br>
+                            <em>Theoretical framework. Read the introduction and conclusions.</em></li>
+                        <li><strong>4. Zangeneh-Nejad et al. 2021</strong> (<code>zangenehnejad2021analogue</code>) &mdash; "Analogue computing with metamaterials" (Nat. Rev. Mater.)<br>
+                            <em>Broad review. Good for situating your work in the field.</em></li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> In Hughes' paper, what is the mathematical mapping between Maxwell's equations and the RNN state update? Write the correspondence for your acoustic variables (p, u, v).
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><span class="section-number">5</span> Porous Media Acoustics</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Biot theory: fast and slow waves</li>
+                        <li>Equivalent fluid models (Zwikker-Kosten, JCA)</li>
+                        <li>Darcy drag: <span class="formula">-(mu/K) * u</span></li>
+                        <li>Frequency-dependent attenuation</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Textbook:</strong> Allard &amp; Atalla, "Propagation of Sound in Porous Media" &mdash; Chapters 1-3</li>
+                        <li><strong>Paper:</strong> Zhao et al. 2018 &mdash; "Equivalent fluid model FDTD for porous material" (JASA)</li>
+                        <li><strong>Paper:</strong> Moufid et al. 2022 &mdash; "Time-domain EFM for rigid porous media"</li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> How does Darcy drag create frequency-dependent attenuation? (Hint: the drag force is proportional to velocity, but the pressure-velocity relationship depends on frequency.)
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><span class="section-number">6</span> Thermoacoustics</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Sound speed vs temperature</li>
+                        <li>Thermal diffusion timescale</li>
+                        <li>Steady-state heat equation</li>
+                        <li>Quasi-static approximation</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Textbook:</strong> Swift, "Thermoacoustics" &mdash; Chapter 2</li>
+                        <li><strong>Online:</strong> <a href="https://sengpielaudio.com/TemperatureSound.htm">sengpielaudio.com &mdash; Temperature calculator</a></li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> Show that <span class="formula">tau_thermal / tau_acoustic ~ 10^6</span> for air in your domain. This justifies the quasi-static assumption.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><span class="section-number">7</span> Optimization in Physical Systems</h2>
+                
+                <div class="subsection">
+                    <h3>What You Need to Know</h3>
+                    <ul class="resource-list">
+                        <li>Gradient-free methods: random search, Nelder-Mead</li>
+                        <li>Gradient-based: backpropagation through physics (adjoint method)</li>
+                        <li>Why L-BFGS-B for bounded, medium-dimensional problems</li>
+                        <li>Challenges: non-convexity, local minima</li>
+                    </ul>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources</h3>
+                    <ul class="resource-list">
+                        <li><strong>Review:</strong> <a href="https://hal.science/hal-04775753v1/file/2406.03372v1%20%281%29.pdf">Momeni et al. 2024 &mdash; "Training of Physical Neural Networks" (PDF)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="key-question">
+                    <strong>Key Question:</strong> Why can't we easily use gradient descent for FDTD? What would backpropagation through time require?
+                </div>
+            </div>
+            
+            <div class="section priority-high">
+                <h2><span class="section-number">8</span> This Week's Homework</h2>
+                
+                <table class="homework-table">
+                    <tr>
+                        <th>Day</th>
+                        <th>Task</th>
+                        <th>Deliverable</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Tomorrow</strong></td>
+                        <td>Read Hughes 2019, Sections 1-3</td>
+                        <td>1-page summary of the RNN mapping</td>
+                    </tr>
+                    <tr>
+                        <td>Day 2</td>
+                        <td>Read Purdue FDTD lecture</td>
+                        <td>Derivation of CFL condition</td>
+                    </tr>
+                    <tr>
+                        <td>Day 3</td>
+                        <td>Read Bragg grating tutorial</td>
+                        <td>Calculate kappa for our grating</td>
+                    </tr>
+                    <tr>
+                        <td>Day 4</td>
+                        <td>Read Wright 2022, Methods</td>
+                        <td>Compare training to your loop</td>
+                    </tr>
+                    <tr>
+                        <td>Day 5</td>
+                        <td>Start writing Methodology chapter</td>
+                        <td>Draft: FDTD solver description</td>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+        
+        <div class="footer">
+            <p>Compiled for Cranfield IRP 2025-26 &mdash; Continuous Analog Wave Computation in Porous Media</p>
+            <p>Last updated: 9 June 2026</p>
+        </div>
+    </div>
+</body>
+</html>

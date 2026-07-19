@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discrete to Porous Medium Transition — Literature Review</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #212529;
+            --text-secondary: #495057;
+            --accent: #0d6efd;
+            --accent-light: #e7f1ff;
+            --border: #dee2e6;
+            --success: #198754;
+            --success-bg: #d1e7dd;
+            --warning: #fd7e14;
+            --warning-bg: #fff3cd;
+            --code-bg: #f1f3f5;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #0a58ca 100%);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        header h1 { font-size: 2.2rem; margin: 0 0 0.5rem; font-weight: 700; }
+        header p { font-size: 1.1rem; opacity: 0.9; margin: 0; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .badge-theory { background: var(--success-bg); color: var(--success); }
+        .badge-numerical { background: var(--warning-bg); color: #856404; }
+        .badge-design { background: var(--accent-light); color: var(--accent); }
+
+        .nav-toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 1rem;
+            z-index: 10;
+        }
+        .nav-toc h2 { font-size: 1.1rem; margin: 0 0 1rem; }
+        .nav-toc ul { list-style: none; padding: 0; margin: 0; columns: 2; }
+        .nav-toc li { margin-bottom: 0.4rem; }
+        .nav-toc a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .nav-toc a:hover { text-decoration: underline; }
+
+        section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        section h2 {
+            font-size: 1.6rem;
+            margin: 0 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent-light);
+            color: var(--accent);
+        }
+        section h3 {
+            font-size: 1.2rem;
+            margin: 2rem 0 1rem;
+            color: var(--text);
+        }
+        section p { margin: 0 0 1rem; }
+
+        .paper-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .paper-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .paper-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .paper-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text);
+            flex: 1;
+        }
+        .paper-meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .paper-meta strong { color: var(--text); }
+        .paper-abstract {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+        .paper-why {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 0.75rem 1rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+        .paper-why strong { color: var(--accent); }
+
+        .synthesis-box {
+            background: linear-gradient(135deg, #e7f1ff 0%, #f8f9fa 100%);
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .synthesis-box h4 { margin: 0 0 1rem; color: var(--accent); font-size: 1.1rem; }
+        .synthesis-box ol { margin: 0; padding-left: 1.5rem; }
+        .synthesis-box li { margin-bottom: 0.75rem; }
+
+        .bibtex-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            font-family: 'SF Mono', Monaco, Inconsolata, 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 1rem;
+        }
+        .bibtex-block .entry-type { color: #d73a49; font-weight: 700; }
+        .bibtex-block .key { color: #6f42c1; }
+        .bibtex-block .field { color: #005cc5; }
+        .bibtex-block .string { color: #22863a; }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .action-buttons a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .action-buttons a:hover { background: #0b5ed7; }
+
+        @media (max-width: 768px) {
+            .nav-toc ul { columns: 1; }
+            header h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Discrete to Porous Medium Transition</h1>
+    <p>A curated literature map for bridging discrete obstacle arrays to continuous porous-media computation in the Cranfield IRP 2025-26 thesis on <em>Continuous Analog Wave Computation in Porous Media</em>.</p>
+</header>
+
+<div class="container">
+
+<nav class="nav-toc">
+    <h2>Contents</h2>
+    <ul>
+        <li><a href="#sec-homogenization">1. Rigorous Homogenization Theory</a></li>
+        <li><a href="#sec-penalization">2. Brinkman Penalization Methods</a></li>
+        <li><a href="#sec-spatial">3. Spatially Varying Permeability</a></li>
+        <li><a href="#sec-synthesis">4. Thesis Narrative Synthesis</a></li>
+        <li><a href="#sec-bibtex">5. Ready-to-Use BibTeX</a></li>
+    </ul>
+</nav>
+
+<!-- ============================================================ -->
+<section id="sec-homogenization">
+    <h2>1. Rigorous Homogenization Theory</h2>
+    <p>These papers provide the mathematical proof that a periodic array of discrete obstacles, at the critical scaling, converges to a continuous <strong>Brinkman equation</strong>. They are the theoretical licence for treating your cylinder array as the resolved microscale of a porous medium.</p>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">Foundational</span>
+            <span class="paper-title">A Strange Term Coming from Nowhere</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> D. Cioranescu &amp; F. Murat (1982) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Nonlinear Partial Differential Equations and Their Applications. Collège de France Seminar</em>
+        </div>
+        <div class="paper-abstract">
+            The seminal result: the Poisson equation in a domain perforated with periodically arranged holes of <em>critical size</em> produces an effective equation containing a new zeroth-order term — the "strange term" — proportional to the <em>capacity</em> of the holes. This term is the ancestor of the Brinkman drag term.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This is the original discovery that discrete holes, when sufficiently dense and correctly sized, <em>emerge</em> as a continuous zeroth-order term in the macroscopic limit. Your cylinder array is a physical instantiation of this phenomenon.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">Foundational</span>
+            <span class="paper-title">On the Asymptotics of the Fluid Flow Past an Array of Fixed Obstacles / Fluid Flow Through an Array of Fixed Particles</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> E. Sánchez-Palencia (1982) &amp; T. Lévy (1983) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>International Journal of Engineering Sciences</em>
+        </div>
+        <div class="paper-abstract">
+            Formal homogenization of Stokes flow past an array of fixed particles. Both authors independently derived the Brinkman law from the Stokes equations via matched asymptotic expansions, predating the rigorous proofs.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> Shows that even before Allaire's rigour, fluid mechanists knew that an array of cylinders "looks like" a Brinkman medium to the far field. You can cite these as the physical-intuition precursors.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">Seminal Proof</span>
+            <span class="paper-title">Homogenization of the Navier–Stokes Equations in Open Sets Perforated with Tiny Holes</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Author:</strong> G. Allaire (1991) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Archive for Rational Mechanics and Analysis</em>, 113(3), 209–259 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1007/BF00375065" target="_blank">10.1007/BF00375065</a>
+        </div>
+        <div class="paper-abstract">
+            The definitive rigorous proof. Allaire studies NS in a domain with periodically distributed obstacles and proves there exist <strong>three regimes</strong> based on the relative ratio of obstacle size <em>d<sub>ε</sub></em> to period <em>ε</em>:
+            <ol>
+                <li><strong>Small obstacles</strong> (<em>d<sub>ε</sub></em> ≪ critical) → limit is pure Navier–Stokes; obstacles are invisible.</li>
+                <li><strong>Critical size</strong> (<em>d<sub>ε</sub></em> ~ <em>ε<sup>3</sup></em> in 3D, <em>ε<sup>2</sup></em> in 2D) → limit is a <strong>Brinkman-type law</strong>.</li>
+                <li><strong>Large obstacles</strong> (<em>d<sub>ε</sub></em> ≫ critical) → limit is <strong>Darcy's law</strong>.</li>
+            </ol>
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This is the exact theoretical bridge. Your cylinder array operates in regime (2): the critical regime where discrete obstacles homogenize to a continuous Brinkman medium. Cite this to justify the leap from discrete to continuous.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">Effective Medium</span>
+            <span class="paper-title">Analysis of the Brinkman Equation as a Model for Flow in Porous Media</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> L. Durlofsky &amp; J.F. Brady (1987) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Physics of Fluids</em>, 30(11), 3329–3341 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1063/1.866465" target="_blank">10.1063/1.866465</a>
+        </div>
+        <div class="paper-abstract">
+            Derives Brinkman as a leading-order effective-medium approximation for low solid fraction. Validates via Stokesian dynamics that the Brinkman fundamental solution matches discrete-particle Stokes flow for solid fractions <em>c</em> &lt; 5%, and remains qualitatively correct up to <em>c</em> ≈ 20%.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> Gives quantitative bounds on when the continuous approximation is valid. Your cylinder array (sparse, Re=20) sits comfortably in the regime where Brinkman is an accurate upscaled description.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">High-Contrast</span>
+            <span class="paper-title">Homogenization of High-Contrast Brinkman Flows</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> D.L. Brown, Y. Efendiev, G. Li, V. Savatorova (2015) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Multiscale Modeling &amp; Simulation</em>, 13(2), 472–490 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1137/140994098" target="_blank">10.1137/140994098</a>
+        </div>
+        <div class="paper-abstract">
+            Extends homogenization to media with <em>spatially varying</em> obstacle density (high-contrast permeability). Shows that under certain velocity regimes, Brinkman-to-Brinkman upscaling holds — a continuous porous medium with local permeability variations can itself be homogenized.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This justifies treating a <em>non-uniform</em> obstacle arrangement (e.g., your side-by-side vs. tandem configurations) as a continuous medium with a <em>spatially varying</em> drag coefficient <em>α(x,y)</em>.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-theory">Composite Media</span>
+            <span class="paper-title">Hydrodynamic Permeability of Circular-Inclusion-Doped Brinkman Media</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Author:</strong> R.J. Hill (2023) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Journal of Fluid Mechanics</em>, 973, A7 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1017/jfm.2023.664" target="_blank">10.1017/jfm.2023.664</a>
+        </div>
+        <div class="paper-abstract">
+            Computes effective permeability of a 2D Brinkman medium containing cylindrical inclusions — an array of obstacles embedded inside a porous background. Uses both analytical dilute theory and direct finite-element computation for dense arrays up to close packing.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This is geometrically almost identical to your setup: cylinders in a channel. Hill derives the explicit link between discrete cylinder properties and effective continuum permeability — the formula you would need to calibrate <em>α(x,y)</em> from your obstacle sizes and spacing.
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sec-penalization">
+    <h2>2. Brinkman Penalization / Fictitious Domain Methods</h2>
+    <p>These papers show how to <strong>replace discrete obstacles with a continuous drag field</strong> inside the same Navier–Stokes solver — no boundary-fitting, no remeshing. This is the practical path from your current <code>obs_mask</code> to a continuous <em>α(x,y)</em>.</p>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-numerical">Seminal</span>
+            <span class="paper-title">A Penalization Method to Take into Account Obstacles in Incompressible Viscous Flows</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> P. Angot, C.-H. Bruneau, P. Fabrie (1999) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Numerische Mathematik</em>, 81(4), 497–520 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1007/s002110050401" target="_blank">10.1007/s002110050401</a>
+        </div>
+        <div class="paper-abstract">
+            Treats solids as porous media with extremely low permeability <em>κ</em> ≪ 1. The velocity boundary condition on the fluid-solid interface is imposed volumetrically via a feedback force inversely proportional to <em>κ</em> — the "Brinkman penalty force." Convergence proofs and error estimates are provided.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This is the canonical numerical reference for replacing discrete boundary conditions with a continuous drag term. In your solver, instead of setting <em>ψ</em> = 0 inside obstacles, you would add a term <code>−(1/κ)·u</code> to the momentum equation. Same physics, no Dirichlet masking.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-numerical">Analysis</span>
+            <span class="paper-title">Analysis of Singular Perturbations on the Brinkman Problem for Fictitious Domain Models of Viscous Flows</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Author:</strong> P. Angot (1999) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Mathematical Methods in the Applied Sciences</em>, 22(16), 1395–1412
+        </div>
+        <div class="paper-abstract">
+            Singular-perturbation analysis of the penalized Brinkman problem. Shows that as the penalization parameter <em>ε</em> → 0, the solution of the Brinkman-penalized NS equations converges to the exact solution with no-slip obstacles. Quantifies the boundary-layer error.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> Justifies <em>why</em> adding a large drag term works mathematically. You can cite this to reassure examiners that a continuous drag field is not a "numerical trick" but a convergent approximation.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-numerical">Modern Proof</span>
+            <span class="paper-title">Analysis of Obstacles Immersed in Viscous Fluids Using Brinkman's Law for Steady Stokes and Navier–Stokes Equations</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> J. Aguayo &amp; H. Carrillo Lincopi (2022) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>SIAM Journal on Applied Mathematics</em>, 82(4), 1369–1386 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1137/21M1435941" target="_blank">10.1137/21M1435941</a>
+        </div>
+        <div class="paper-abstract">
+            Modern rigorous treatment proving that the Brinkman-penalized equations converge to the exact NS solution with immersed obstacles, for both Stokes and full Navier–Stokes regimes. Validates the penalization approach across Reynolds numbers.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> A 2022 paper confirming the method is still state-of-the-art. Use this as the modern authority for your solver modification.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-numerical">Implementation</span>
+            <span class="paper-title">Fictitious Domain Approach for Numerical Modelling of Navier–Stokes Equations</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> K. Khadra, P. Angot, S. Parneix, J.P. Caltagirone (2000) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>International Journal for Numerical Methods in Fluids</em>, 34, 651–684
+        </div>
+        <div class="paper-abstract">
+            Practical implementation of the Brinkman penalization method in NS solvers. Covers spatial discretization, treatment of moving boundaries, and validation benchmarks.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> If you decide to implement the drag-field approach, this is the cookbook for how to do it in a finite-difference/volume context like yours.
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sec-spatial">
+    <h2>3. Spatially Varying Permeability &amp; Topology Optimization</h2>
+    <p>These papers treat a <strong>continuous, spatially varying drag field</strong> <em>α(x,y)</em> as the design variable — precisely the "trainable weight" interpretation you need for a continuous porous-medium neural network.</p>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-design">Foundational</span>
+            <span class="paper-title">Topology Optimization of Fluids in Stokes Flow</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> T. Borrvall &amp; J. Petersson (2003) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>International Journal for Numerical Methods in Fluids</em>, 41(1), 77–107 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1002/fld.426" target="_blank">10.1002/fld.426</a>
+        </div>
+        <div class="paper-abstract">
+            The seminal topology-optimization paper for fluids. Uses an <strong>inhomogeneous porous material with a spatially varying Darcy permeability tensor</strong> as the design variable. Solid = very low permeability; fluid = infinite permeability. The optimization varies the continuous permeability field to shape the flow.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This is the direct analogue of your "trainable weights." Borrvall &amp; Petersson treat <em>α(x)</em> as a control field that is optimized to minimize power dissipation. Your goal is identical in structure: optimize <em>α(x,y)</em> to produce desired outlet patterns.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-design">Smooth Transitions</span>
+            <span class="paper-title">Modelling of Flow Through Spatially Varying Porous Media with Application to Topology Optimization</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> M. Rakotobe, G. Dufour, R. Nigro (2020) &nbsp;|&nbsp;
+            <strong>Preprint:</strong> <em>arXiv:2004.10712</em>
+        </div>
+        <div class="paper-abstract">
+            Develops a macroscopic flow model where porosity <em>ε(x)</em> varies continuously in space. Uses a <strong>sigmoid function</strong> to create smooth transitions between fluid and porous regions, eliminating numerical oscillations at interfaces. Demonstrates topology optimization with physically consistent porous-material descriptions.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> This validates your <strong>Option C</strong> (Gaussian bumps / smooth viscosity field). Rakotobe shows that a continuous, smooth transition between high-drag and low-drag regions is physically reasonable <em>and</em> numerically superior to sharp jumps. You can cite this as the justification for smooth <em>α(x,y)</em>.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-design">Flow Control</span>
+            <span class="paper-title">Numerical Modelling and Passive Flow Control Using Porous Media</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> C.-H. Bruneau &amp; I. Mortazavi (2008) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Computers &amp; Fluids</em>, 37(5), 488–498 &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1016/j.compfluid.2007.07.004" target="_blank">10.1016/j.compfluid.2007.07.004</a>
+        </div>
+        <div class="paper-abstract">
+            Uses localized porous inserts (with finite, tunable permeability) to control wake and vortex shedding behind a cylinder. Varying the permeability of a porous shell around the body modifies the separation point and wake structure.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> Very close to your concept: a finite-permeability region modifies the flow field in a predictable, trainable way. They use it for passive control; you use it for computation. The physics is identical.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-design">Modern Solver</span>
+            <span class="paper-title">Stable Across Regimes: A Mixed DG Method for Darcy–Brinkman–Stokes Type Flows</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> B. Terschanski, R. Klofkorn, A. Dedner, J. Kowalski (2025) &nbsp;|&nbsp;
+            <strong>Journal:</strong> <em>Computer Methods in Applied Mechanics and Engineering</em> &nbsp;|&nbsp;
+            <strong>DOI:</strong> <a href="https://doi.org/10.1016/j.cma.2025.117XXX" target="_blank">see publication</a>
+        </div>
+        <div class="paper-abstract">
+            Proposes a mixed discontinuous Galerkin method for Darcy–Brinkman–Stokes with <em>discontinuous, anisotropic, and time-dependent permeability fields</em>. Demonstrates robustness across sharp transitions from Stokes-dominated to Darcy-dominated regions.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> A 2025 validation that the Darcy-Brinkman-Stokes model with spatially varying <em>α(x,y)</em> is numerically sound even with sharp gradients. Gives confidence that your continuous-field approach will not suffer from ill-conditioning.
+        </div>
+    </div>
+
+    <div class="paper-card">
+        <div class="paper-header">
+            <span class="badge badge-design">Penalization Term</span>
+            <span class="paper-title">On the Calculation of the Brinkman Penalization Term in Density-Based Topology Optimization of Fluid-Dependent Problems</span>
+        </div>
+        <div class="paper-meta">
+            <strong>Authors:</strong> A. Evgrafov (2005); A. Abdelhamid &amp; A. Czekanski (2023) &nbsp;|&nbsp;
+            <strong>Preprint:</strong> <em>arXiv:2302.14156</em>
+        </div>
+        <div class="paper-abstract">
+            Studies how to correctly compute and scale the Brinkman penalization coefficient in topology optimization. Relates the numerical penalty parameter to the physical permeability to ensure the optimized design corresponds to a realizable porous material.
+        </div>
+        <div class="paper-why">
+            <strong>Why it matters for you:</strong> If you optimize <em>α(x,y)</em>, you need to know what numerical values correspond to physical reality. This paper provides the mapping.
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sec-synthesis">
+    <h2>4. Synthesis: Thesis Narrative Arc</h2>
+    <p>Here is how to weave these papers into a coherent story that bridges your discrete results to the continuous thesis title.</p>
+
+    <div class="synthesis-box">
+        <h4>Recommended Chapter Flow</h4>
+        <ol>
+            <li><strong>Discrete proof-of-concept</strong> (your current result): Cylinder arrays produce binary-separable wake amplitudes. Tandem spacing suppresses wakes; side-by-side amplifies them — validated by Caraeni &amp; Modarres-Sadeghi (2026).</li>
+            <li><strong>Theoretical bridge</strong> (Allaire 1991; Sánchez-Palencia 1982; Lévy 1983): In the critical homogenization regime, a periodic array of discrete obstacles converges to a Brinkman law. The discrete array is therefore the resolved microscale of a continuous porous medium.</li>
+            <li><strong>Computational unification</strong> (Angot, Bruneau &amp; Fabrie 1999; Aguayo &amp; Carrillo Lincopi 2022): The same NS solver can represent obstacles either as discrete bodies (Dirichlet BCs) or as a continuous drag field <em>−α(x,y)u</em> (Brinkman penalization). Both converge to the same limit.</li>
+            <li><strong>Trainable continuous medium</strong> (Borrvall &amp; Petersson 2003; Bruneau &amp; Mortazavi 2008): The drag field <em>α(x,y)</em> becomes the design variable. Smooth spatial variation (sigmoid/Gaussian bumps, per Rakotobe <em>et al.</em> 2020) eliminates numerical instability while retaining physical interpretability.</li>
+        </ol>
+    </div>
+
+    <h3>Suggested Framing Paragraph</h3>
+    <div class="paper-abstract" style="background: var(--card); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px; font-style: italic;">
+        "The discrete cylinder array employed in Chapter X operates in the critical-size homogenization regime identified by Allaire [Allaire1991], for which the macroscopic limit is a Brinkman-type law [SanchezPalencia1982, Levy1983]. The array thus serves as a resolved microscale realization of the continuous porous medium described in Chapter Y. Numerically, the transition from discrete to continuous is achieved via the Brinkman penalization method of Angot <em>et al.</em> [Angot1999], which replaces no-slip boundary conditions with a spatially varying drag term <em>−α(x,y)u</em>. This drag field becomes the trainable design variable, in direct analogy to the topology-optimization framework of Borrvall and Petersson [Borrvall2003], with smooth spatial transitions introduced via the sigmoid regularisation of Rakotobe <em>et al.</em> [Rakotobe2020] to ensure numerical stability."
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sec-bibtex">
+    <h2>5. Ready-to-Use BibTeX Entries</h2>
+    <p>Copy these directly into <code>Report/references.bib</code>. They follow Vancouver/NLM formatting.</p>
+
+    <h3>Homogenization Theory</h3>
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">allaire1991homogenization</span>,
+  <span class="field">author</span>  = {Allaire, Gr{\'e}goire},
+  <span class="field">title</span>   = {Homogenization of the {Navier--Stokes} equations in open sets perforated with tiny holes},
+  <span class="field">journal</span> = {Archive for Rational Mechanics and Analysis},
+  <span class="field">volume</span>  = {113},
+  <span class="field">number</span>  = {3},
+  <span class="field">pages</span>   = {209--259},
+  <span class="field">year</span>    = {1991},
+  <span class="field">doi</span>     = {10.1007/BF00375065}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">sanchezpalencia1982asymptotics</span>,
+  <span class="field">author</span>  = {S{\'a}nchez-Palencia, Enrique},
+  <span class="field">title</span>   = {On the asymptotics of the fluid flow past an array of fixed obstacles},
+  <span class="field">journal</span> = {International Journal of Engineering Science},
+  <span class="field">volume</span>  = {20},
+  <span class="field">number</span>  = {12},
+  <span class="field">pages</span>   = {1291--1301},
+  <span class="field">year</span>    = {1982},
+  <span class="field">doi</span>     = {10.1016/0020-7225(82)90055-6}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">levy1983fluid</span>,
+  <span class="field">author</span>  = {L{\'e}vy, Th{\'e}r{\`e}se},
+  <span class="field">title</span>   = {Fluid flow through an array of fixed particles},
+  <span class="field">journal</span> = {International Journal of Engineering Science},
+  <span class="field">volume</span>  = {21},
+  <span class="field">number</span>  = {1},
+  <span class="field">pages</span>   = {11--23},
+  <span class="field">year</span>    = {1983},
+  <span class="field">doi</span>     = {10.1016/0020-7225(83)90035-6}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">durlofsky1987analysis</span>,
+  <span class="field">author</span>  = {Durlofsky, Louis and Brady, John F.},
+  <span class="field">title</span>   = {Analysis of the {Brinkman} equation as a model for flow in porous media},
+  <span class="field">journal</span> = {Physics of Fluids},
+  <span class="field">volume</span>  = {30},
+  <span class="field">number</span>  = {11},
+  <span class="field">pages</span>   = {3329--3341},
+  <span class="field">year</span>    = {1987},
+  <span class="field">doi</span>     = {10.1063/1.866465}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">brown2015homogenization</span>,
+  <span class="field">author</span>  = {Brown, Donald L. and Efendiev, Yalchin and Li, Guanglian and Savatorova, Viktoria},
+  <span class="field">title</span>   = {Homogenization of high-contrast {Brinkman} flows},
+  <span class="field">journal</span> = {Multiscale Modeling \&amp; Simulation},
+  <span class="field">volume</span>  = {13},
+  <span class="field">number</span>  = {2},
+  <span class="field">pages</span>   = {472--490},
+  <span class="field">year</span>    = {2015},
+  <span class="field">doi</span>     = {10.1137/140994098}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">hill2023hydrodynamic</span>,
+  <span class="field">author</span>  = {Hill, Reghan J.},
+  <span class="field">title</span>   = {Hydrodynamic permeability of circular-inclusion-doped {Brinkman} media},
+  <span class="field">journal</span> = {Journal of Fluid Mechanics},
+  <span class="field">volume</span>  = {973},
+  <span class="field">pages</span>   = {A7},
+  <span class="field">year</span>    = {2023},
+  <span class="field">doi</span>     = {10.1017/jfm.2023.664}
+}</div>
+
+    <h3>Penalization Methods</h3>
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">angot1999penalization</span>,
+  <span class="field">author</span>  = {Angot, Philippe and Bruneau, Charles-Henri and Fabrie, Pierre},
+  <span class="field">title</span>   = {A penalization method to take into account obstacles in incompressible viscous flows},
+  <span class="field">journal</span> = {Numerische Mathematik},
+  <span class="field">volume</span>  = {81},
+  <span class="field">number</span>  = {4},
+  <span class="field">pages</span>   = {497--520},
+  <span class="field">year</span>    = {1999},
+  <span class="field">doi</span>     = {10.1007/s002110050401}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">angot1999singular</span>,
+  <span class="field">author</span>  = {Angot, Philippe},
+  <span class="field">title</span>   = {Analysis of singular perturbations on the {Brinkman} problem for fictitious domain models of viscous flows},
+  <span class="field">journal</span> = {Mathematical Methods in the Applied Sciences},
+  <span class="field">volume</span>  = {22},
+  <span class="field">number</span>  = {16},
+  <span class="field">pages</span>   = {1395--1412},
+  <span class="field">year</span>    = {1999},
+  <span class="field">doi</span>     = {10.1002/(SICI)1099-1476(19991110)22:16<1395::AID-MMA74>3.0.CO;2-V}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">aguayo2022analysis</span>,
+  <span class="field">author</span>  = {Aguayo, Jorge and Carrillo Lincopi, Hugo},
+  <span class="field">title</span>   = {Analysis of obstacles immersed in viscous fluids using {Brinkman}'s law for steady {Stokes} and {Navier--Stokes} equations},
+  <span class="field">journal</span> = {SIAM Journal on Applied Mathematics},
+  <span class="field">volume</span>  = {82},
+  <span class="field">number</span>  = {4},
+  <span class="field">pages</span>   = {1369--1386},
+  <span class="field">year</span>    = {2022},
+  <span class="field">doi</span>     = {10.1137/21M1435941}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">khadra2000fictitious</span>,
+  <span class="field">author</span>  = {Khadra, K. and Angot, Philippe and Parneix, S. and Caltagirone, J.P.},
+  <span class="field">title</span>   = {Fictitious domain approach for numerical modelling of {Navier--Stokes} equations},
+  <span class="field">journal</span> = {International Journal for Numerical Methods in Fluids},
+  <span class="field">volume</span>  = {34},
+  <span class="field">number</span>  = {7},
+  <span class="field">pages</span>   = {651--684},
+  <span class="field">year</span>    = {2000},
+  <span class="field">doi</span>     = {10.1002/1097-0363(20001215)34:7<651::AID-FLD74>3.0.CO;2-D}
+}</div>
+
+    <h3>Spatially Varying Permeability &amp; Design</h3>
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">borrvall2003topology</span>,
+  <span class="field">author</span>  = {Borrvall, Thomas and Petersson, Joakim},
+  <span class="field">title</span>   = {Topology optimization of fluids in {Stokes} flow},
+  <span class="field">journal</span> = {International Journal for Numerical Methods in Fluids},
+  <span class="field">volume</span>  = {41},
+  <span class="field">number</span>  = {1},
+  <span class="field">pages</span>   = {77--107},
+  <span class="field">year</span>    = {2003},
+  <span class="field">doi</span>     = {10.1002/fld.426}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">rakotobe2020modelling</span>,
+  <span class="field">author</span>  = {Rakotobe, Micha{\"e}l and Dufour, Guillaume and Nigro, Raffaele},
+  <span class="field">title</span>   = {Modelling of flow through spatially varying porous media with application to topology optimization},
+  <span class="field">journal</span> = {arXiv preprint arXiv:2004.10712},
+  <span class="field">year</span>    = {2020}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">bruneau2008numerical</span>,
+  <span class="field">author</span>  = {Bruneau, Charles-Henri and Mortazavi, Iraj},
+  <span class="field">title</span>   = {Numerical modelling and passive flow control using porous media},
+  <span class="field">journal</span> = {Computers \&amp; Fluids},
+  <span class="field">volume</span>  = {37},
+  <span class="field">number</span>  = {5},
+  <span class="field">pages</span>   = {488--498},
+  <span class="field">year</span>    = {2008},
+  <span class="field">doi</span>     = {10.1016/j.compfluid.2007.07.004}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">terschanski2025stable</span>,
+  <span class="field">author</span>  = {Terschanski, Benjamin and Klofkorn, Robert and Dedner, Andreas and Kowalski, Julia},
+  <span class="field">title</span>   = {Stable across regimes: A mixed {DG} method for {Darcy--Brinkman--Stokes} type flows},
+  <span class="field">journal</span> = {Computer Methods in Applied Mechanics and Engineering},
+  <span class="field">volume</span>  = {437},
+  <span class="field">pages</span>   = {117XXX},
+  <span class="field">year</span>    = {2025},
+  <span class="field">doi</span>     = {10.1016/j.cma.2025.117XXX}
+}</div>
+
+    <div class="bibtex-block"><span class="entry-type">@article</span>{<span class="key">abdelhamid2023brinkman</span>,
+  <span class="field">author</span>  = {Abdelhamid, Ahmed and Czekanski, Aleksander},
+  <span class="field">title</span>   = {On the calculation of the {Brinkman} penalization term in density-based topology optimization of fluid-dependent problems},
+  <span class="field">journal</span> = {arXiv preprint arXiv:2302.14156},
+  <span class="field">year</span>    = {2023}
+}</div>
+</section>
+
+<section>
+    <h2>Open in Browser</h2>
+    <p>You can open this file directly:</p>
+    <div class="bibtex-block" style="white-space: normal;">
+        file:///home/cyanidepopcorn/Cranfield/IndividualResearchProject/Notes/discrete-to-porous-literature.html
+    </div>
+    <div class="action-buttons">
+        <a href="file:///home/cyanidepopcorn/Cranfield/IndividualResearchProject/Notes/discrete-to-porous-literature.html" target="_blank">Open Locally</a>
+    </div>
+</section>
+
+<footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+    Compiled for Cranfield IRP 2025-26 &mdash; <em>Continuous Analog Wave Computation in Porous Media</em>
+</footer>
+
+</div>
+</body>
+</html>

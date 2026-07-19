@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collocated NS Solver — Results Viewer</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --fg: #c9d1d9;
+            --muted: #8b949e;
+            --accent: #58a6ff;
+            --border: #30363d;
+            --card: #161b22;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        h1 { color: var(--accent); margin-bottom: 0.5rem; }
+        .subtitle { color: var(--muted); margin-bottom: 2rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .card h2 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .card img {
+            width: 100%;
+            border-radius: 6px;
+            display: block;
+        }
+        .card p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin: 0.5rem 0 0 0;
+        }
+        .params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .param {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+        .param .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+        .param .value { color: var(--fg); font-size: 1.1rem; font-weight: 600; }
+        .timestamp {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Collocated NS Solver — Results</h1>
+    <p class="subtitle">Primitive-variable Navier–Stokes with incremental pressure correction &amp; Rhie-Chow interpolation</p>
+
+    <div class="params">
+        <div class="param">
+            <div class="label">Grid</div>
+            <div class="value">201 &times; 51</div>
+        </div>
+        <div class="param">
+            <div class="label">Reynolds</div>
+            <div class="value" id="re_val">—</div>
+        </div>
+        <div class="param">
+            <div class="label">U_max</div>
+            <div class="value">0.04 m/s</div>
+        </div>
+        <div class="param">
+            <div class="label">&nu;</div>
+            <div class="value" id="nu_val">—</div>
+        </div>
+        <div class="param">
+            <div class="label">dt</div>
+            <div class="value" id="dt_val">—</div>
+        </div>
+        <div class="param">
+            <div class="label">Steps</div>
+            <div class="value" id="steps_val">—</div>
+        </div>
+        <div class="param">
+            <div class="label">&alpha;_max</div>
+            <div class="value" id="alpha_val">—</div>
+        </div>
+        <div class="param">
+            <div class="label">Obstacles</div>
+            <div class="value" id="obs_val">—</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Final State — Velocity &amp; Streamlines</h2>
+            <img id="img_final" src="../Analysis/figures/collocated/final_summary.png" alt="Final summary" onerror="this.style.display='none'">
+            <p>Velocity magnitude with streamlines and vorticity overlay.</p>
+        </div>
+
+        <div class="card">
+            <h2>Probe Time Series</h2>
+            <img id="img_probes" src="../Analysis/figures/collocated/probes.png" alt="Probes" onerror="this.style.display='none'">
+            <p>Velocity and pressure history at probe locations.</p>
+        </div>
+
+        <div class="card">
+            <h2>Latest Snapshot — Velocity Magnitude</h2>
+            <img id="img_vel" src="" alt="Velocity" onerror="this.style.display='none'">
+            <p>Most recent timestep from simulation.</p>
+        </div>
+
+        <div class="card">
+            <h2>Latest Snapshot — Pressure</h2>
+            <img id="img_pres" src="" alt="Pressure" onerror="this.style.display='none'">
+            <p>Pressure correction field at most recent timestep.</p>
+        </div>
+    </div>
+
+    <p class="timestamp">Generated: <span id="gen_time"></span></p>
+
+    <script>
+        // Try to load the latest step image
+        async function findLatestImage() {
+            for (let n = 20000; n >= 0; n -= 100) {
+                const url = `../Analysis/figures/collocated/step_${String(n).padStart(6, '0')}.png`;
+                try {
+                    const resp = await fetch(url, { method: 'HEAD' });
+                    if (resp.ok) {
+                        document.getElementById('img_vel').src = url;
+                        // Pressure is in the same file (2x2 subplot), so use same
+                        document.getElementById('img_pres').src = url;
+                        break;
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // Try to load config.json for parameters
+        async function loadParams() {
+            try {
+                const resp = await fetch('../Analysis/config.json');
+                if (resp.ok) {
+                    const cfg = await resp.json();
+                    const nu = (cfg.U_max || 0.04) * (cfg.H || 0.00255) / (cfg.Re || 100);
+                    const dt = cfg.dt || 0.0005;
+                    const steps = Math.round((cfg.t_final || 10) / dt);
+                    document.getElementById('re_val').textContent = cfg.Re || 100;
+                    document.getElementById('nu_val').textContent = nu.toExponential(2);
+                    document.getElementById('dt_val').textContent = dt.toExponential(1);
+                    document.getElementById('steps_val').textContent = steps.toLocaleString();
+                    document.getElementById('alpha_val').textContent = (cfg.alpha_max || 1e6).toExponential(1);
+                    document.getElementById('obs_val').textContent = (cfg.CYLINDERS || []).length;
+                }
+            } catch (e) {}
+        }
+
+        document.getElementById('gen_time').textContent = new Date().toLocaleString();
+        findLatestImage();
+        loadParams();
+    </script>
+</body>
+</html>
