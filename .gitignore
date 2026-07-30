@@ -103,3 +103,10 @@ ThesisTemplate2025/
 # ============================================================
 *.upa
 *.upb
+
+# Report_acoustic: track only .tex, .bib, and final PDFs (aux/regenerables stay local)
+Report_acoustic/*
+!Report_acoustic/**/
+!Report_acoustic/**/*.tex
+!Report_acoustic/**/*.bib
+!Report_acoustic/*.pdf
