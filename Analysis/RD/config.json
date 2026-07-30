@@ -1,0 +1,19 @@
+{
+    "paths": {
+        "figures": "figures",
+        "protocol": "figures/rd_train_xor_protocol.json",
+        "eval_log": "figures/rd_train_xor_eval_log.jsonl",
+        "checkpoint": "figures/rd_train_xor_checkpoint.json",
+        "results": "figures/rd_train_xor_results.json"
+    },
+    "parameters": {
+        "lambda_tv": 1.0,
+        "seed": 20260720,
+        "fail_loss": 10.0,
+        "phi0": 0.010,
+        "phi_max": 0.025,
+        "nb_blocks": 8,
+        "region_x": [44, 224],
+        "region_y": [64, 176]
+    }
+}

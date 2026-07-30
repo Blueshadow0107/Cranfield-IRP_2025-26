@@ -1,0 +1,38 @@
+{
+  "kinetics": "Oregonator Candidate A (f=1.4375, eps=0.0501, q=0.002)",
+  "phi0": 0.01,
+  "phi_max": 0.025,
+  "rest_u_star": 0.003082099932938156,
+  "geometry": "256x200, W=20, TJ=96, A port x[25,43), B port y[140,158), B channel y<172, probe strip x=240",
+  "tA_arrival": 31.950000000000003,
+  "tB_arrival": 26.950000000000003,
+  "window_tu": [
+    24.450000000000003,
+    34.45
+  ],
+  "window_rule": "[min(tA,tB)-2.5, max(tA,tB)+2.5] t.u.; final2 half-window extended to cover both lone-input arrivals so XOR true cases are both readable",
+  "A0_lone_peak": 0.7067937790398473,
+  "nsteps_train": 739,
+  "nsteps_full": 1000,
+  "design_region": {
+    "x": [
+      44,
+      224
+    ],
+    "y": [
+      64,
+      176
+    ],
+    "blocks": 8
+  },
+  "lambda_tv": 1.0,
+  "baseline_truth_windowed": {
+    "00": 0.0030820999329396943,
+    "10": 0.7082048068537731,
+    "01": 0.7053827512259216,
+    "11": 0.7053686302152752
+  },
+  "baseline_separation_xor": 1.000020019334631,
+  "baseline_note": "windowed baseline reads OR: p10~p01~p11~A0, separation ~1",
+  "protocol_wall_s": 200.77370357513428
+}

@@ -1,0 +1,88 @@
+% Chapter: Literature Review
+% Continuous Analog Wave Computation in Porous Media
+
+\section{Introduction}
+\label{sec:lit_intro}
+
+The remarkable success of artificial neural networks in tasks such as image classification, natural language processing, and scientific prediction has been built on digital hardware that discretises computation into clocked arithmetic operations. As models grow in size and inference is pushed toward edge devices, the energy cost, latency, and chip area of this approach have motivated a search for alternative computational substrates in which the physics of the device itself performs useful transformations. This chapter reviews the literature on such physical neural networks, with particular attention to wave-based systems and to the porous acoustic medium proposed in this thesis. The review begins with the broad idea of physical computation, narrows to acoustic wave computers, then to equivalent-fluid porous acoustics, and concludes with inverse-design methods and the specific research gap addressed by this project.
+
+\section{Physical Neural Networks}
+\label{sec:lit_pnn}
+
+A physical neural network is a material or device whose internal physical dynamics implement the mathematical operations of a neural network. Rather than simulating those dynamics in software, the network is the physical system itself: inputs are encoded as fields or excitations, the material transforms them through its natural evolution, and outputs are read from probes or detectors. The appeal of this approach is that computation can occur in parallel across space and continuously in time, without the repeated memory transfers that dominate digital inference.
+
+Optical systems have been among the most prominent demonstrations. Lin et al showed that a stack of diffractive surfaces can be trained to perform image classification and other tasks entirely through light propagation \cite{lin2018alloptical}. The layers modulate the phase of the optical field, and interference in free space produces the desired mapping. This work established that a physical wave system can be designed as a deep neural network, with the geometry of the diffractive elements serving as the trainable weights.
+
+Mechanical systems provide a complementary view. Stern et al demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader theoretical framework for learning in physical networks \cite{stern2021physical}. In these systems the equilibrium or linear response of the network encodes the learned function, and training adjusts physical parameters such as spring constants rather than digital weights.
+
+More recently, Wright et al extended the physical neural network idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}. Momeni et al addressed a key practical difficulty of that approach, namely that real physical systems are noisy and difficult to differentiate through, by proposing a backpropagation-free training method for deep physical neural networks \cite{momeni2023backpropagation}. Together these works show that physical networks can be both deep and trainable, but they also highlight the challenge of transferring designs from simulation to physical hardware.
+
+A unifying theoretical perspective was provided by Hughes et al, who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}. In this view, the state of the wave field at each time step is the hidden state of the RNN, and the evolution operator is a sparse linear recurrence whose coefficients depend on the local material properties. This framework is relevant to the present work because it treats the acoustic field as the computational state and the material distribution as the trainable parameters. The present work does not implement the time-domain recurrent formulation directly; instead, it adopts a frequency-domain Helmholtz formulation as a tractable first step toward trainable acoustic processors of this kind.
+
+\section{Acoustic Wave Computing}
+\label{sec:lit_acoustic}
+
+Acoustic waves are an attractive substrate for physical computation because they propagate in ordinary fluids and solids, interact strongly with structured boundaries, and can be generated and detected with simple transducers. Early work in acoustic metamaterials showed that subwavelength scatterers can be arranged to perform mathematical operations on incident wave fields. Silva et al demonstrated that metamaterial slabs could implement spatial differentiation, integration, and other analog mathematical operations \cite{silva2014mathematical}, and Zangeneh-Nejad et al provided a broader review of analog computing with metamaterials \cite{zangenehnejad2021analogue}.
+
+Another line of research has pursued acoustic logic gates and routing. Zuo et al developed an acoustic analog computing system based on labyrinthine metasurfaces, in which phase manipulation in structured channels implements Boolean operations \cite{zuo2018acoustic}. Zhang et al used self-collimating acoustic beams in phononic crystals to construct AND, OR, NOT, and XOR gates \cite{zhang2015acoustic}, and later extended the idea to compact transformable logic gates based on density-near-zero metamaterials \cite{zhang2016compact}. Wang et al proposed binary-phase acoustic passive logic gates \cite{wang2019binary}, and Xia et al demonstrated an ultra-broadband acoustic logic gate using passive phase manipulation \cite{xia2026ultrabroadband}. Parsa et al used evolutionary search to embed AND and XOR gates in two-dimensional granular metamaterials by arranging mass- or stiffness-contrasting particles \cite{parsa2022evolution}. These papers establish that acoustic interference and scattering can produce useful computational primitives, but they rely on carefully engineered free-space, channel, or granular geometries rather than on continuously varying material properties.
+
+The present work differs from these acoustic logic-gate studies in two respects. First, the medium is a porous solid rather than a free-space or channel geometry, which changes the governing physics from ordinary acoustics to equivalent-fluid porous acoustics. Second, the design space is parameterised by continuous fields of porosity, flow resistivity, and tortuosity, allowing gradient-free optimisation to discover structures that would be difficult to design by hand.
+
+A final consideration is whether to formulate the problem in the time domain or the frequency domain. Hughes et al's RNN framework is naturally time-domain: the acoustic state evolves through discrete time steps, and the system can be trained like a recurrent neural network \cite{hughes2019wave}. Time-domain finite-difference methods are well developed for room acoustics and musical acoustics \cite{botteldooren1995finite, bilbao2009numerical, taflove2005computational, yee1966numerical}. However, the Johnson-Champoux-Allard model of porous acoustics is most naturally expressed in the frequency domain, because the effective density and bulk modulus are frequency-dependent complex quantities. For this reason the present work adopts a frequency-domain Helmholtz formulation, solving for each frequency independently and reconstructing time-domain signals through superposition.
+
+\section{Porous Media Acoustics}
+\label{sec:lit_porous}
+
+\subsection{Equivalent-Fluid Models}
+
+The acoustics of fluid-saturated porous media can be approached at two levels. The more general theory, due to Biot, treats both the fluid and the solid frame as elastic continuums coupled at the pore boundaries \cite{biot1956theory}. Biot's theory predicts two compressional waves and one shear wave in the porous medium, and it remains the foundation for poroelastic analysis. For many air-saturated materials with a heavy, stiff frame, however, the frame can be treated as rigid and motionless, and the air in the pores behaves as an equivalent fluid with frequency-dependent effective properties. This equivalent-fluid approximation greatly simplifies the governing equations and is accurate when the acoustic wavelength is much larger than the pore size.
+
+The earliest equivalent-fluid model for sound absorbing materials was developed by Zwikker and Kosten \cite{zwikker1949sound}. Their model accounts for viscous losses in the pores through a complex effective density and forms the basis for later, more detailed descriptions. The Johnson-Champoux-Allard (JCA) model extends this approach by including both dynamic tortuosity and dynamic bulk modulus, with separate viscous and thermal characteristic lengths \cite{johnson1987dynamic, champoux1991dynamic}. The full theory and its applications are described in the reference text by Allard and Atalla \cite{allard2009propagation}. The JCA model is used in the present work because it captures the frequency-dependent damping and dispersion of sound in rigid-frame porous materials with a small number of measurable parameters.
+
+Nonlinear extensions of porous acoustics exist, including Biot's own nonlinear theory of porous solids \cite{biot1973nonlinear} and more recent work on nonlinear wave propagation in porous materials. These are not considered here because the speech-band amplitudes of interest are small enough that linear acoustics is an excellent approximation.
+
+\subsection{Porous Materials in Computing Contexts}
+
+Porous materials have been used in several computing-related contexts, though rarely as continuous acoustic inference substrates. Jaafar et al demonstrated mesoporous silica memristors for neuromorphic switching and reservoir computing \cite{jaafar2022mesoporous}, and Ding et al reviewed porous crystalline materials for memories and neuromorphic computing systems \cite{ding2023porous}. These works exploit the pore structure for electronic or ionic switching rather than for acoustic wave interference. They nevertheless support the broader motivation that porous media are a promising, manufacturable platform for unconventional computing.
+
+\subsection{Metaporous Materials}
+
+The term \emph{metaporous} refers to engineered porous structures that combine a porous substrate with resonant or structured elements to obtain acoustic behaviour beyond that of ordinary porous materials. Typical examples include perforated or micro-perforated face plates backed by porous layers, porous matrices with embedded Helmholtz resonators, and periodic three-dimensional lattice cells. These structures are designed at the unit-cell or microstructure level and are usually analysed with finite-element or acoustic-structural models rather than with an equivalent-fluid approximation. Metaporous absorbers can achieve broadband or deep-subwavelength absorption by tuning the geometry of the resonant features, and inverse-design studies such as Pan et al have optimised metaporous topologies for target absorption spectra. The present work differs from metaporous design because it treats the porous medium as a continuous equivalent fluid described by the JCA model. The design variables are macroscopic effective properties rather than unit-cell geometry, and the objective is wave-based computation rather than absorption.
+
+Other physical computing substrates provide useful context. Adamatzky reviewed the history of liquid computers, in which fluids or chemical reactions perform computation \cite{adamatzky2019liquid}. Baltussen et al demonstrated chemical reservoir computation in a self-organizing reaction network \cite{baltussen2024chemical}, and Prakash and Gershenfeld developed microfluidic bubble logic, in which gas bubbles in channels carry and process information \cite{prakash2007bubble}. These systems are not acoustic, but they illustrate a long tradition of using physical and chemical media for computation. The gap addressed by this thesis is the use of porous acoustic media specifically as a trainable wave-computing substrate.
+
+\section{Inverse Design and Optimisation}
+\label{sec:lit_inverse}
+
+Designing a wave-computing device by hand becomes difficult as the number of design parameters grows, so inverse design methods are essential. Topology optimisation is a well-established approach in which a design field is allowed to vary continuously across the domain and is driven toward an optimal configuration by gradients of an objective function \cite{zangenehnejad2021analogue}. Density-based methods use a filtered and projected material distribution to obtain manufacturable binary or multi-material designs. These methods are powerful but typically require adjoint gradients and careful regularisation to avoid small-scale features.
+
+Inverse design has also been applied to conventional porous and metaporous materials, although with objectives quite different from wave computing. Boulvert et al optimised one-dimensional through-thickness gradients of Johnson-Champoux-Allard-Lafarge parameters to achieve broadband perfect absorption \cite{boulvert2019optimally}. Pan et al used a convolutional-neural-network surrogate coupled to a genetic algorithm to inversely design two-dimensional metaporous geometries for target sound-absorption spectra \cite{pan2023accelerated}. These studies demonstrate that spatially varying porous parameters can be optimised, but they do so for absorption or transmission rather than for analog computation.
+
+When gradients are unavailable or unreliable, gradient-free optimisation becomes attractive. This is the case in the present work, where the design variables are coarse blocks of porous parameters and the objective function is evaluated by solving the Helmholtz equation. Gradient-free methods such as differential evolution, covariance matrix adaptation, or Bayesian optimisation can explore small design spaces without requiring derivatives. They scale poorly to very large numbers of variables, but for a block-wise parameterisation with tens or hundreds of variables they are practical and robust.
+
+Adjoint-based and differentiable solvers represent the state of the art for larger design spaces. In the frequency-domain Helmholtz setting, the adjoint method allows the gradient of an objective function with respect to many design parameters to be computed at the cost of one additional solve. Physics-informed neural networks and automatic differentiation provide alternative routes to gradient-based design. These approaches are not used in the present work, but they define the direction in which future work could scale the design space.
+
+\section{Synthesis and Research Gap}
+\label{sec:lit_synthesis}
+
+The literature reviewed above establishes three important points. First, physical neural networks are a viable alternative to digital inference, with demonstrations in optics, mechanics, and acoustics. Second, acoustic waves can be used to implement computational primitives such as logic gates and mathematical operations through interference and scattering. Third, porous media have well-developed equivalent-fluid models and are increasingly used in neuromorphic and unconventional computing contexts.
+
+What is missing is an inverse-designed two-dimensional rigid-frame porous acoustic processor in which the medium is parameterised by continuous effective-fluid properties and optimised for a wave-computing task such as frequency classification or routing. Existing acoustic computers rely on free-space, channel, or granular geometries, while existing porous-media inverse design focuses on graded absorption layers or metaporous unit-cell topologies for absorption. This project addresses that gap by formulating the JCA Helmholtz equation in a design region, parameterising the medium by blocks of porosity, flow resistivity, and tortuosity, and optimising those blocks for a simple wave-computing task.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of the present work with the closest related approaches.}
+\label{tab:closest_work}
+\begin{tabular}{@{}>{\raggedright}p{2.4cm}>{\raggedright}p{2.8cm}>{\raggedright}p{2.8cm}>{\raggedright}p{2.8cm}>{\raggedright\arraybackslash}p{2.4cm}@{}}
+\toprule
+& \textbf{Boulvert et al 2019} & \textbf{Pan et al 2023} & \textbf{Parsa et al 2022} & \textbf{This work} \\
+\midrule
+Substrate & Graded porous layer & 2D metaporous structure & Granular metamaterial & Rigid-frame porous equivalent fluid \\
+Dimension & 1D through-thickness & 2D unit-cell geometry & 2D discrete particles & 2D continuous effective medium \\
+Design variables & JCAL parameters vs. depth & Unit-cell topology & Particle positions & $\phi$, $\sigma$, $\alpha_\infty$ blocks \\
+Objective & Broadband absorption & Target absorption spectra & AND / XOR logic gates & Wave-computing task \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+ 

@@ -1,293 +1,237 @@
 % Chapter: Methodology
-% Continuous Analog Wave Computation in Porous Media
+% Reaction-diffusion excitable media as substrates for analog physical computation
 
 \section{Overview}
 \label{sec:meth_overview}
 
-The methodology follows a simulation-first pipeline. A two-dimensional acoustic source injects time-harmonic waves into a domain that contains a design region. The design region is parameterised by coarse blocks of porosity, flow resistivity, and high-frequency tortuosity, which are mapped smoothly onto the simulation grid. For each frequency of interest, the Helmholtz equation is solved with spatially varying Johnson-Champoux-Allard (JCA) effective properties. Probe pressures are extracted, and a gradient-free optimiser adjusts the block values to minimise a task-specific objective. The resulting designs are validated against analytical transfer-matrix predictions for uniform porous slabs. The overall workflow is shown in \reffig{fig:methodology_flowchart}.
+The methodology of this thesis follows a characterise-before-train philosophy: before asking how a structured excitable medium might be optimised for a computational task, we first measure, in a controlled and reproducible way, what the unoptimised medium already does. 
+The methodology therefore has three layers.
+The first is the model layer: the Belousov--Zhabotinsky (BZ) medium is described by two-variable reaction--diffusion kinetics, extended with three substrate parameterisations - wall geometry, a light-suppression field, and an anisotropic diffusion tensor that act as the candidate ``weights'' of the substrate. 
+The second is the solver layer: an explicit finite-difference scheme with adaptive reaction subcycling, verified against known excitable-media phenomenology and convergence-tested in space and time. 
+The third is the protocol layer: a black-box characterisation protocol in which the substrate is stimulated at defined input ports and its response is recorded at fixed probes, yielding transfer functions rather than snapshots. 
+Two kinetics are used in pairing throughout: the Barkley model \cite{barkley1991model}, a computationally cheap literature-standard workhorse used for the headline measurements, and the chemically grounded Oregonator model \cite{field1974oregonator, tyson1980target}, used to corroborate them. 
+Agreement between two kinetics with different mathematical structure and different physical provenance is taken as evidence that a measured transfer function is a property of excitable media generally, rather than an artefact of one model's parameterisation.
+
+\section{The Oregonator Model}
+\label{sec:meth_oregonator}
+
+\subsection{Two-Variable Reduction}
+\label{sec:meth_oregonator_2var}
+
+The chemical basis of the substrate is the Field-K\"or\"os-Noyes mechanism of the BZ reaction, reduced by Field and Noyes to the three-variable Oregonator \cite{field1974oregonator} and further reduced by Tyson and Fife to a two-variable activator-recovery form \cite{tyson1980target, tyson1988singular}. 
+In the scaled Tyson-Fife form used throughout this thesis, the kinetics of the activator $u$ and recovery variable $v$ are:
+\begin{equation}
+\frac{\partial u}{\partial t} = \frac{1}{\varepsilon}\left[\,u - u^{2} - \left(f v + \phi\right)\frac{u - q}{u + q}\,\right] + \nabla\!\cdot\!\left(\mathbf{D}\,\nabla u\right),
+\label{eq:oregonator_u}
+\end{equation}
+\begin{equation}
+\frac{\partial v}{\partial t} = u - v + D_{v}\,\nabla^{2} v,
+\label{eq:oregonator_v}
+\end{equation}
+where $u$ represents the scaled concentration of the autocatalytic activator species HBrO$_{2}$, $v$ the scaled concentration of the oxidised metal catalyst, and $\phi$ the intensity of illumination in the photosensitive ruthenium-catalysed variant of the reaction, in which light produces bromide and thereby suppresses excitability \cite{sakurai2002design}. 
+The parameter $\varepsilon \ll 1$ sets the timescale separation between the fast activator and the slow recovery dynamics, $f$ is a stoichiometric factor controlling the position of the rest state and hence the excitability, and $q \ll 1$ is a small scaling ratio arising from the disparity of the reaction rates. 
+This singularly perturbed structure - a fast excitation variable with a cubic-like nullcline and a slow linear recovery variable - is what gives the medium its excitable pulse dynamics \cite{tyson1988singular}.
+
+Alongside the Oregonator, the Barkley model \cite{barkley1991model} is used as a phenomenological alternative designed explicitly for fast simulation of excitable-media phenomenology:
+\begin{equation}
+\frac{\partial u}{\partial t} = \frac{1}{\varepsilon}\,u\left(1 - u\right)\left(u - \frac{v + b}{a}\right) + D_{u}\,\nabla^{2}u,
+\qquad
+\frac{\partial v}{\partial t} = u - v.
+\label{eq:barkley}
+\end{equation}
+The Barkley kinetics retain the essential structure of an excitable medium but replace the Oregonator's rational nonlinearity with polynomial terms, eliminating the division by $u + q$ and the associated numerical stiffness near $u = 0$. 
+The parameters used here are $a = 0.75$, $b = 0.01$, $\varepsilon = 0.02$, $D_{u} = 1$, and $D_{v} = 0$, a standard excitable parameter set from the literature. 
+Because \refeqn{eq:barkley} carries no chemical interpretation of its parameters, it serves purely as a fast workhorse; every headline result measured with it is cross-checked against the Oregonator, whose parameters map onto identifiable chemical rates.
+
+\subsection{Reaction-Diffusion Formulation}
+\label{sec:meth_rd}
+
+Spatial coupling enters only through diffusion, and asymmetrically: the activator, a small and mobile species, diffuses with coefficient $D_{u}$ (generalised to a tensor field $\mathbf{D}(x,y)$ in \refSec{sec:meth_anisotropy}), while the recovery variable - the oxidised form of a bulky metal-complex catalyst, immobilised in the gel matrices used in quasi-two-dimensional BZ experiments - is taken to be effectively immobile, $D_{v} = 0$ in the working configuration. Channel walls and domain boundaries are treated as impermeable, imposing no-flux (homogeneous Neumann) conditions on the diffusing species; 
+from the physics side this is the statement that neither reactants nor products cross the wall, and from the computing side it is what makes walls act as waveguides for chemical pulses. 
+All simulations are performed in the model's nondimensional units: space is measured in grid cells and time in model time units, so that propagation speeds are reported in cells per time unit; the mapping to physical units (millimetres and minutes for a real BZ layer) is a fixed rescaling that does not affect any of the dimensionless transfer functions measured in this thesis.
+
+\section{Regime Identification}
+\label{sec:meth_regime}
+
+The BZ reaction is most famous as an \emph{oscillatory} medium, but computation with pulses requires an \emph{excitable} one: the rest state must be stable, so that waves exist only where and when they are deliberately injected, rather than arising spontaneously as target patterns. 
+Regime identification was therefore the first methodological task. 
+A linear stability scan of the Oregonator rest state over the $(\varepsilon, \phi)$ parameter plane, computed from the analytic Jacobian of the kinetics in \refeqn{eq:oregonator_u}-\refeqn{eq:oregonator_v}, is summarised in \reffig{fig:regime_map}. 
+The literature-standard baseline parameters $f = 1.4$, $\varepsilon = 0.05$, $q = 0.002$, $\phi = 0$ produce a rest state that is an unstable node (eigenvalues $+10.84$ and $+0.67$): the medium oscillates spontaneously and is useless as a signal-carrying substrate. 
+Raising the background illumination stabilises the rest state; at the adjusted stoichiometric factor $f = 1.4375$, illumination levels $\phi \geq 0.01$ yield a stable, excitable regime across the scanned range of $\varepsilon$.
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[
-    node distance=1.2cm and 0.9cm,
-    box/.style={rectangle, draw, rounded corners, fill=gray!10, text width=2.8cm, minimum height=1cm, align=center, font=\small},
-    arrow/.style={-{Stealth[length=2mm]}, thick}
-]
-\node[box] (vars) {Block design variables $(\phi, \sigma, \alpha_\infty)$};
-\node[box, right=of vars] (jca) {JCA effective properties};
-\node[box, right=of jca] (solve) {Helmholtz solve};
-\node[box, below=of solve] (probes) {Probe pressures};
-\node[box, below=of probes] (obj) {Objective function};
-\node[box, left=of obj] (opt) {Gradient-free optimiser};
-
-\draw[arrow] (vars) -- (jca);
-\draw[arrow] (jca) -- (solve);
-\draw[arrow] (solve) -- (probes);
-\draw[arrow] (probes) -- (obj);
-\draw[arrow] (obj) -- (opt);
-\draw[arrow] (opt) -- (vars);
-\end{tikzpicture}
-\caption{Simulation-first optimisation pipeline.}
-\label{fig:methodology_flowchart}
+\IfFileExists{../Analysis/figures/oregonator_regime_map.png}{%
+\includegraphics[width=0.8\textwidth]{../Analysis/figures/oregonator_regime_map.png}}{%
+[figure pending]}
+\caption{Regime map of the Tyson--Fife Oregonator kinetics in the $(\varepsilon, \phi)$ plane at $f = 1.4375$, $q = 0.002$, classified by the eigenvalues of the rest-state Jacobian. Background illumination $\phi$ stabilises the rest state, converting the spontaneously oscillatory baseline medium into a stable-excitable one suitable for pulse-based computation. The two validated working points A ($\varepsilon = 0.0501$) and B ($\varepsilon = 0.0199$) at $\phi = 0.010$ are marked.}
+\label{fig:regime_map}
 \end{figure}
 
-\section{Computational Domain}
-\label{sec:domain}
+Two excitable working points were validated in full two-dimensional simulations and are used for all Oregonator measurements in this thesis: candidate A ($\varepsilon = 0.0501$, $\phi = 0.010$), which supports pulses travelling at $6.22$ cells per time unit, and candidate B ($\varepsilon = 0.0199$, $\phi = 0.010$), which supports faster pulses at $11.70$ cells per time unit; candidate B pairs naturally with the Barkley kinetics, whose $\varepsilon = 0.02$ is nearly identical. 
+The usable illumination window is narrow, approximately $\phi \in (0.005, 0.02)$: below it the rest state loses stability and the medium reverts to oscillation, while above it the medium is so strongly suppressed that injected perturbations decay instead of triggering pulses. 
+One practical subtlety proved important throughout: with $\phi > 0$ the rest state $(u^{*}, v^{*})$ of \refeqn{eq:oregonator_u}-\refeqn{eq:oregonator_v} is shifted away from the origin, so every simulation must be initialised at the numerically computed rest state rather than at $(0,0)$; initialising at the origin amounts to applying a finite perturbation everywhere at once and contaminates the measurement before it begins.
 
-The computational domain is a bounded, connected region $\Omega \subset \mathbb{R}^2$ with boundary $\partial \Omega$. The boundary is partitioned into two disjoint subsets:
-\begin{itemize}
-    \item $\Gamma_\mathrm{abs}$: the absorbing boundary, where a PML mimics free-field radiation;
-    \item $\Gamma_\mathrm{wall}$: the hard-wall boundary, where the normal particle velocity vanishes.
-\end{itemize}
-Thus $\partial \Omega = \Gamma_\mathrm{abs} \cup \Gamma_\mathrm{wall}$ and the two subsets intersect only at corners. In a duct configuration the left and right ends are absorbing, while the top and bottom are hard walls. In a free-field configuration all four sides are absorbing. The duct configuration used in this work is illustrated in \reffig{fig:domain_sketch}.
+\section{Numerical Solver and Verification}
+\label{sec:meth_solver}
 
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[scale=0.9]
-% Outer domain
-\draw[thick] (0,0) rectangle (10,4);
+\subsection{Discretisation}
+\label{sec:meth_discretisation}
 
-% PML layers
-%\fill[gray!20] (0,0) rectangle (1.5,4);
-%\fill[gray!20] (8.5,0) rectangle (10,4);
+The governing equations are discretised on a regular two-dimensional Cartesian grid with spacing $\Delta x = 1$ cell, integrated forward in time with an explicit scheme at a nominal time step $\Delta t = 0.05$ time units. 
+The diffusion term is discretised in divergence (flux) form: fluxes are computed on cell faces using face-averaged diffusion tensors and central differences of the field, then diverged back onto cell centres. 
+This form handles the anisotropic tensor field of \refSec{sec:meth_anisotropy} without special cases, and reduces exactly to the standard five-point Laplacian when the tensor is isotropic, $\mathbf{D} = D_{u}\mathbf{I}$. 
+No-flux walls are enforced at the flux level rather than by modifying field values: fluxes on wall-adjacent faces are set identically to zero, which conserves the diffusing species exactly and makes a wall cell behave as a true impermeable boundary rather than a damped or clipped region. 
+The diffusion stability constraint for an explicit two-dimensional scheme, $D\,\Delta t / \Delta x^{2} \leq 1/4$, is comfortably satisfied at the working resolution ($D_{u} = 1$ gives $0.05 \leq 0.25$).
 
-% Design region
-\fill[blue!10] (3.5,0) rectangle (6.5,4);
-\draw[thick] (3.5,0) rectangle (6.5,4);
-\node[blue!60!black] at (5,2) {Design region};
+The fast activator kinetics are the stiff part of the problem: at the working time step, $\Delta t/\varepsilon$ is $2.5$ for the Barkley model and of order unity for the Oregonator, well outside the stability region of a single forward-Euler reaction step. 
+Time integration therefore uses first-order operator splitting - one diffusion step followed by reaction - with the reaction stage advanced by \emph{adaptive subcycling}. 
+Within each outer step, the reaction substep $h$ is chosen pointwise from the analytic Jacobian of the kinetics: $h \leq 0.5 / \max(-\partial F/\partial u,\,0)$, bounding the local explicit-Euler amplification factor of the fastest contracting mode, together with a relative-accuracy limit $h \leq 0.1 / \max|\mathrm{d}u/\mathrm{d}t|$ and an absolute step-size limiter that prevents $u$ from being pushed below $-q/2$, where the rational term $(u-q)/(u+q)$ of the Oregonator becomes singular in behaviour. 
+A NaN/Inf tripwire aborts any run in which a field leaves the finite range, so that numerical failure is always loud rather than silently absorbed.
 
-% Source
-\fill[red] (2.2,2) circle (0.1);
-\node[red!70!black, above] at (2.2,2.1) {Source};
+This integration scheme is the result of removing a hack, and the episode is worth recording because it changed the results. 
+The original demonstration scripts clipped $u$ and $v$ to a fixed box after every time step (\texttt{np.clip}), a common expediency in excitable-media demos. 
+The clipping had two distinct sins. First, it concealed genuine explicit-Euler instability: the Barkley kinetics at $\Delta t/\varepsilon = 2.5$ diverge within a few steps when integrated unclipped, and the Oregonator's recovery-manifold Jacobian reaches approximately $-7000$ during the fast upstroke, far stiffer than any fixed substep count had budgeted for. 
+Second, and worse, it distorted the dynamics it purported to protect: at the baseline parameters the clipped solver recorded $1741$ firing events in a run where the correctly integrated dynamics fire approximately $780$ times - the clip was injecting enough error to more than double the medium's activity. 
+Clipping was removed entirely and replaced by the adaptive subcycling described above, whose reaction stage was validated against \texttt{scipy}'s LSODA integrator to agreement of order $10^{-6}$ on the slow phases of the cycle. 
+All results reported in this thesis were produced by the de-hacked solver.
 
-% Probes
-\fill[green!60!black] (7.8,1.2) circle (0.08);
-\fill[green!60!black] (7.8,2.8) circle (0.08);
-\node[green!40!black, right] at (7.9,2) {Probes};
+\subsection{Verification Cases}
+\label{sec:meth_verification}
 
-% Labels
-%\node at (0.75,2) {\rotatebox{90}{PML}};
-%\node at (9.25,2) {\rotatebox{90}{PML}};
-\node[above] at (5,4) {Hard wall ($\partial p/\partial n = 0$)};
-\node[below] at (5,0) {Hard wall ($\partial p/\partial n = 0$)};
-\node[below left] at (0,0) {$\Gamma_\mathrm{abs}$};
-\node[below right] at (10,0) {$\Gamma_\mathrm{abs}$};
-\end{tikzpicture}
-\caption{Computational domain sketch for the duct configuration. The left and right ends are absorbing PMLs; the top and bottom boundaries are hard walls. The design region sits between the source and the probe array.}
-\label{fig:domain_sketch}
-\end{figure}
-
-Inside the domain lies the design region $\Omega_\mathrm{design} \subset \Omega$, a rectangular sub-domain in which the porous material properties may vary. The complement $\Omega \setminus \Omega_\mathrm{design}$ is filled with air, so that
-\begin{equation}
-    \phi(\mathbf{x}) = 1, \quad \sigma(\mathbf{x}) = 0, \quad \alpha_\infty(\mathbf{x}) = 1
-    \qquad \text{for } \mathbf{x} \in \Omega \setminus \Omega_\mathrm{design}.
-\end{equation}
-Within $\Omega_\mathrm{design}$ the fields are parameterised by coarse blocks as described in \refsec{sec:design_param}.
-
-The source is located a short distance inside the domain, at position $\mathbf{x}_s \in \Omega$, and is represented as a source term in the Helmholtz equation. A set of $N_p$ probe locations $\{ \mathbf{x}_p \}_{p=1}^{N_p}$ is fixed in $\Omega$. These probes record the complex pressure $p(\omega, \mathbf{x}_p)$ for each frequency. The source amplitude $S(\omega)$ is normalised so that the transfer function $H(\omega, \mathbf{x}_p) = p(\omega, \mathbf{x}_p) / S(\omega)$ is independent of source strength.
-
-\section{Governing Equations}
-\label{sec:governing_eqns}
-
-\subsection{Linear Acoustic Helmholtz Equation}
-\label{subsec:helmholtz}
-
-For time-harmonic acoustic pressure $p(\mathbf{x})$ at angular frequency $\omega$, the Helmholtz equation in an inhomogeneous effective fluid is
-\begin{equation}
-    \nabla \cdot \left( \frac{1}{\tilde{\rho}(\omega, \mathbf{x})} \nabla p \right) + \frac{\omega^2}{\tilde{K}(\omega, \mathbf{x})} p = S(\omega) \delta(\mathbf{x} - \mathbf{x}_s),
-\label{eq:helmholtz_general}
-\end{equation}
-where $\tilde{\rho}$ is the complex effective density, $\tilde{K}$ is the complex effective bulk modulus, and the right-hand side represents a point source at $\mathbf{x}_s$ with frequency-domain amplitude $S(\omega)$. When the coefficients vary with position they must remain inside the divergence operator; pulling them outside would neglect the gradient terms that arise at material interfaces.
-
-\subsection{Johnson-Champoux-Allard Effective Properties}
-\label{subsec:jca}
-
-The JCA model treats the air in a rigid-frame porous medium as an equivalent fluid with frequency-dependent complex properties. The effective density is
-\begin{equation}
-    \tilde{\rho}(\omega, \mathbf{x}) = \frac{\rho_0 \alpha_\infty(\mathbf{x})}{\phi(\mathbf{x})}
-    \left[
-        1 + \frac{\sigma(\mathbf{x}) \phi(\mathbf{x})}{j \omega \rho_0 \alpha_\infty(\mathbf{x})}
-        \sqrt{1 + j \frac{4 \alpha_\infty(\mathbf{x})^2 \eta \rho_0 \omega}{\sigma(\mathbf{x})^2 \phi(\mathbf{x})^2 \Lambda(\mathbf{x})^2}}
-    \right],
-\label{eq:jca_density}
-\end{equation}
-and the effective bulk modulus is
-\begin{equation}
-    \tilde{K}(\omega, \mathbf{x}) = \frac{\gamma P_0}{\phi(\mathbf{x})}
-    \left[
-        \gamma - \frac{\gamma - 1}{1 + \frac{8 \eta}{j \omega \rho_0 Pr \Lambda'(\mathbf{x})^2} \sqrt{1 + j \frac{\omega \rho_0 Pr \Lambda'(\mathbf{x})^2}{16 \eta}}}
-    \right]^{-1}.
-\label{eq:jca_bulk}
-\end{equation}
-
-The symbols in these equations are listed in \reftab{tab:jca_symbols}. The model assumes a rigid, motionless frame and cylindrical pore geometry. It is valid when the acoustic wavelength is much larger than the pore size, which holds comfortably for speech-band frequencies in air and pore scales of tens of micrometres.
+The solver was verified against the canonical phenomenology of two-dimensional excitable media before any characterisation measurement was trusted: radially expanding target waves from a point stimulus, head-on collision of two pulses followed by annihilation, diffraction of a pulse through a gap in an occluding wall, and timing control of pulse emission. 
+Quantitatively, verification rested on convergence rather than on matching single runs. 
+\refTab{tab:timestep_convergence} summarises the temporal convergence check: at the working step $\Delta t = 0.05$, measured quantities (pulse speed and timing) agree with a fine-$\Delta t$ reference to within $x\%$ for both kinetics, so the nominal step is not a significant error source. 
+\refTab{tab:grid_convergence} reports the spatial convergence study at $\Delta x = 1$, $0.5$, and $0.25$ cells. The Oregonator candidate-A speed varies only within a $y\%$ band across this refinement range, indicating that the working resolution is close to converged for that kinetics. 
+The Barkley speeds, by contrast, rise monotonically from $4.151$ to $4.603$ cells per time unit; a Richardson extrapolation gives an asymptote of approximately $4.82$, so the working resolution underestimates the continuum Barkley speed by about $z\%$ and the refinement sequence is still pre-asymptotic. \
+This deficit is carried openly: all measurements reported in \refChap{chap:results} share the same working resolution ($\Delta x = 1$, $\Delta t = 0.05$), so they are internally consistent as relative transfer-function measurements, and the absolute Barkley spatial deficit is stated as an explicit error bar wherever absolute speeds are quoted.
 
 \begin{table}[htbp]
 \centering
-\caption{Symbols used in the Johnson-Champoux-Allard model.}
-\label{tab:jca_symbols}
-\begin{tabular}{@{}lll@{}}
+\caption{Timestep convergence at the working grid spacing $\Delta x = 1$: relative error of measured pulse speed and timing at the working step $\Delta t = 0.05$ against a fine-$\Delta t$ reference, for both kinetics.}
+\label{tab:timestep_convergence}
+\small
+\begin{tabular}{@{}lcc@{}}
 \toprule
-Symbol & Meaning & Units \\
+\textbf{Kinetics} & \textbf{Working $\Delta t$} & \textbf{Relative error vs.\ reference} \\
 \midrule
-$\rho_0$ & Ambient air density & kg~m$^{-3}$ \\
-$\eta$ & Dynamic viscosity of air & Pa~s \\
-$\gamma$ & Heat capacity ratio of air & -- \\
-$P_0$ & Ambient pressure & Pa \\
-$Pr$ & Prandtl number of air & -- \\
-$\phi$ & Porosity & -- \\
-$\sigma$ & Static flow resistivity & Pa~s~m$^{-2}$ \\
-$\alpha_\infty$ & High-frequency tortuosity & -- \\
-$\Lambda$ & Viscous characteristic length & m \\
-$\Lambda'$ & Thermal characteristic length & m \\
+Barkley ($\varepsilon = 0.02$) & 0.05 & $\leq x\%$ \\
+Oregonator, candidate A & 0.05 & $\leq y\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Zwikker-Kosten Simplification}
-\label{subsec:zk}
+\begin{table}[htbp]
+\centering
+\caption{Grid convergence of the plane-pulse speed (cells per time unit) at $\Delta t = 0.05$. The Barkley sequence is pre-asymptotic; a Richardson extrapolation gives a continuum asymptote of $\approx 4.82$, implying a $\approx z\%$ deficit at the working resolution $\Delta x = 1$. The Oregonator candidate-A speeds lie within a $x\%$ band.}
+\label{tab:grid_convergence}
+\small
+\begin{tabular}{@{}ccc@{}}
+\toprule
+\textbf{$\Delta x$ (cells)} & \textbf{Barkley speed} & \textbf{Oregonator A speed} \\
+\midrule
+1.00 & 4.151 & 6.224 \\
+0.50 & 4.439 & 6.048 \\
+0.25 & 4.603 & 6.049 \\
+\midrule
+Richardson asymptote & $\approx 4.82$ & n/a \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The Zwikker-Kosten (ZK) model is the low-frequency limit of the JCA model, obtained when the viscous penetration depth is much larger than the pore size. In this limit the effective density and bulk modulus become real and frequency independent:
-\begin{align}
-    \rho_\mathrm{eff}(\mathbf{x}) &= \frac{\rho_0 \alpha_\infty(\mathbf{x})}{\phi(\mathbf{x})}, \\
-    K_\mathrm{eff}(\mathbf{x}) &= \frac{\rho_0 c_0^2}{\phi(\mathbf{x})},
-\end{align}
-where $c_0$ is the ambient sound speed. The corresponding time-domain equations are
-\begin{align}
-    \rho_\mathrm{eff} \frac{\partial \mathbf{u}}{\partial t} + \sigma \mathbf{u} &= -\nabla p, \\
-    \frac{1}{K_\mathrm{eff}} \frac{\partial p}{\partial t} &= -\nabla \cdot \mathbf{u}.
-\end{align}
-The ZK model is useful as a computationally inexpensive design tool because its time-domain finite-difference formulation avoids assembling and solving a complex sparse linear system at each frequency. It does not capture the frequency-dependent viscous and thermal losses of the full JCA model, and its validity should be checked against the JCA model for any design that is carried forward.
+Finally, a set of runtime invariants was monitored in every reported simulation as a guard against silent numerical corruption: the NaN/Inf tripwire never fired in any run underlying the results of \refChap{chap:results}; the step-size limiter recorded zero guard trips outside the fast upstroke it was designed for; and both fields remained within their physical bounds throughout. 
+The adaptive subcycling behaves as intended - the substep count stays at one on the slow recovery manifold and peaks at $155$ substeps within a single outer step during the firing excursion, exactly where the analytic Jacobian predicts the stiffness to lie. 
+The verification suite as a whole is reported with its figures in the results chapter. 
+% TODO: restore \refSec{sec:res_verification} when results chapter is uncommented
 
-\subsection{Complex Wavenumber and Characteristic Impedance}
-\label{subsec:wavenumber_impedance}
+\section{Substrate Parameterisation}
+\label{sec:meth_parameterisation}
 
-From the effective density and bulk modulus, the complex wavenumber and characteristic impedance are
-\begin{align}
-    k(\omega, \mathbf{x}) &= \omega \sqrt{\frac{\tilde{\rho}(\omega, \mathbf{x})}{\tilde{K}(\omega, \mathbf{x})}}, \\
-    Z_c(\omega, \mathbf{x}) &= \sqrt{\tilde{\rho}(\omega, \mathbf{x}) \tilde{K}(\omega, \mathbf{x})}.
-\end{align}
-These quantities are used when comparing numerical results against analytical transfer-matrix predictions for uniform porous slabs.
+A computing substrate is only useful if something about it can be changed - if it exposes structure that can play the role of weights. 
+This substrate exposes three physically distinct parameterisations, described in the following subsections: the binary wall geometry, the graded light-suppression field $\phi(x,y)$, and the anisotropic diffusion tensor field $\mathbf{D}(x,y)$. 
+All three enter the same solver (\refSec{sec:meth_solver}) without modification to its core loop, and all three have direct experimental counterparts in structured and photosensitive BZ media \cite{sakurai2002design, steinbock1995anisotropy}.
 
-\section{Numerical Discretisation}
-\label{sec:numerical}
+\subsection{Wall Geometry}
+\label{sec:meth_walls}
 
-\subsection{Spatial Discretisation and Boundary Conditions}
+Walls are represented as a boolean mask on the computational grid: masked cells are impermeable, and the no-flux condition is enforced by zeroing diffusive fluxes on every wall-adjacent face (\refSec{sec:meth_discretisation}). 
+Walls are the coarsest and most intuitive substrate knob - a binary, geometric parameterisation that defines the input ports, the channels that carry pulses between them, and the junctions where pulses collide, annihilate, or diffract. 
+In the collision-computing tradition reviewed in \refSec{sec:lit_chemical}, the wall geometry is effectively the entire program \cite{toth1995logic, adamatzky2002xor}; in the present framework it is one of three parameterisations, and the one whose discrete, non-differentiable nature most strongly motivates gradient-free, black-box characterisation.
 
-The computational domain is a rectangular region in two dimensions, discretised on a structured Cartesian grid. The grid spacing is chosen to resolve the shortest wavelength of interest. At 4~kHz the acoustic wavelength in air is approximately 86~mm; a grid spacing of 2~mm gives more than forty points per wavelength, which is sufficient for the second-order finite-difference approximation used here.
+\subsection{Light-Suppression Field}
+\label{sec:meth_light}
 
-On the absorbing boundary $\Gamma_\mathrm{abs}$ a Robin-type Absorbing Boundary condition (might change to a perfectly matched layer) is used to mimic free-field radiation \cite{berenger1994perfectly}. The layer has a width of approximately one wavelength at the highest frequency of interest.  On the hard-wall boundary $\Gamma_\mathrm{wall}$ the normal particle velocity vanishes, which in pressure form is the Neumann condition $\partial p / \partial n = 0$.
+The light-suppression field $\phi(x,y)$ enters the activator equation through the term $(f v + \phi)(u-q)/(u+q)$ in \refeqn{eq:oregonator_u}: locally increasing $\phi$ raises the effective threshold and slows the excitable dynamics, exactly as illumination suppresses excitability in the photosensitive ruthenium-catalysed BZ reaction \cite{sakurai2002design}. 
+The field plays a dual role in this thesis: 
+Globally, a uniform background value of $\phi$ sets the operating regime of the medium - it is the knob that converts the oscillatory baseline into the stable-excitable substrate of \refSec{sec:meth_regime}. 
+Locally, spatial modulation of $\phi$ about that background is a graded, rewritable substrate parameterisation: brighter regions transmit pulses more slowly or not at all, so a light pattern can sculpt channels, barriers, and delays without any physical wall. 
+Unlike the binary wall mask, $\phi(x,y)$ is continuous-valued and experimentally rewritable in real time by a projected light pattern, which makes it the most plausible trainable knob for any future closed-loop optimisation.
 
-\subsection{Frequency-Domain Solver}
+\subsection{Anisotropic Diffusion Tensor}
+\label{sec:meth_anisotropy}
 
-For each frequency $\omega$ the Helmholtz equation \refeqn{eq:helmholtz_general} is assembled into a sparse linear system. The spatially varying coefficients $\tilde{\rho}(\omega, \mathbf{x})$ and $\tilde{K}(\omega, \mathbf{x})$ are evaluated at each grid point using the local block-interpolated values of $\phi$, $\sigma$, and $\alpha_\infty$. The system is solved with a direct sparse solver for small to moderate grid sizes, or with an iterative solver for larger problems. Direct solvers are preferred here because the number of frequency samples is modest and each solve must be reliable during optimisation.
+The third parameterisation replaces the scalar activator diffusivity with a symmetric positive-definite tensor field, so that the diffusion term of \refeqn{eq:oregonator_u} becomes $\nabla\!\cdot\!(\mathbf{D}(x,y)\,\nabla u)$ with the divergence-form discretisation of \refSec{sec:meth_discretisation}. 
+The tensor is parameterised by its two eigenvalues $D_{\parallel} \geq D_{\perp} > 0$ and a fibre-direction field $\theta(x,y)$ giving the orientation of the fast axis. 
+The physical motivation is twofold: anisotropic excitable media are realisable experimentally by patterning the catalyst or printing oriented microstructure \cite{steinbock1995anisotropy}, and eikonal-curvature theory predicts a definite, testable signature - the pulse speed along the fast axis exceeds that along the slow axis by a factor $\sqrt{r}$, where $r = D_{\parallel}/D_{\perp}$ \cite{keener1991eikonal}. 
+Anisotropy thus offers a routing knob that neither walls nor light provide: it steers propagation direction continuously, in the interior of the medium, without blocking it. 
+The explicit diffusion stability constraint tightens accordingly to $D_{\parallel}\,\Delta t/\Delta x^{2} \leq 1/4$, using the largest eigenvalue of the tensor field.
 
-\subsection{Source Injection and Probe Readout}
+\section{Black-Box Characterisation Protocol}
+\label{sec:meth_protocol}
 
-The source is a point source located inside the domain, represented by the delta-function term in \refeqn{eq:helmholtz_general}. For broadband signals the Helmholtz equation is solved at a set of discrete frequencies that span the signal bandwidth, and the probe responses are combined by inverse Fourier transform or convolution with the input spectrum. Probes record the complex pressure $p(\omega, \mathbf{x}_\mathrm{probe})$ at fixed locations. The time-domain probe signal $p(t, \mathbf{x}_\mathrm{probe})$ for an input $s(t)$ is obtained from
-\begin{equation}
-    p(t, \mathbf{x}_\mathrm{probe}) = \mathcal{F}^{-1} \left\{ H(\omega, \mathbf{x}_\mathrm{probe}) \, S(\omega) \right\},
-\label{eq:time_reconstruction}
-\end{equation}
-where $S(\omega)$ is the Fourier transform of the input, $H(\omega, \mathbf{x}_\mathrm{probe}) = p(\omega, \mathbf{x}_\mathrm{probe}) / p_\mathrm{source}(\omega)$ is the transfer function at the probe, and $\mathcal{F}^{-1}$ denotes the inverse Fourier transform. This frequency-domain superposition is valid because the JCA medium is linear and time-invariant.
+All four experiments share a single measurement protocol, designed so that the substrate is treated strictly as a black box. 
+Inputs are applied at \emph{ports}: small fixed regions of the grid where the activator is driven above the threshold for a fixed duration, either as a single \texttt{fire} event (one pulse) or as a \texttt{pulse\_train} (a periodic train at a prescribed frequency). 
+Outputs are recorded at \emph{probes}: fixed locations storing the mean activator value $u(t)$ over a small mask, yielding time series from which arrival times, amplitudes, and transmission booleans are extracted. 
+The internal state of the medium away from ports and probes is never inspected for the purpose of a measurement; every reported result is an input-output transfer function in the sense of \refSec{sec:meth_overview}. 
+Every simulation is initialised at the rest state $(u^{*}, v^{*})$ appropriate to the working $\phi$ (\refSec{sec:meth_regime}), and each experiment includes a rest-initialised no-stimulus control run, which must show zero probe activity; a check that the medium is genuinely excitable and that no spontaneous firing contaminates the measurement.
 
-\section{Design Parameterisation}
-\label{sec:design_param}
+One protocol decision requires justification: probe readouts are evaluated within defined time windows rather than over the whole record. 
+The reason is physical, At an open junction, an incoming pulse diffracts into \emph{all} connected branches, so a naive whole-record readout at a downstream probe fires whenever \emph{either} input fires - it computes OR, regardless of what the junction was designed to do. 
+The computation of interest lives in the collision: when both inputs arrive within the coincidence interval, their pulses annihilate and the output branch stays silent. 
+The probe record is therefore read within a window aligned to the expected collision outcome, isolating the annihilation event from the unconditional diffraction background. 
+This windowed-readout construction follows the logic of the T-shaped coincidence detectors and collision gates of the excitable-media literature \cite{gorecka2003tshaped, toth1995logic}, and the window widths are set from the measured pulse speeds and refractory times of the same substrate, so the protocol is calibrated on the substrate's own dynamics rather than imposed from outside.
 
-\subsection{Block-Based Design Variables}
+\section{The Four Experiments}
+\label{sec:meth_experiments}
 
-The design region is divided into $N_x \times N_y$ coarse rectangular blocks. Each block $b$ carries three design variables whose values are uniform within the block:
-\begin{itemize}
-    \item porosity $\phi_b \in [0.30, 0.95]$,
-    \item static flow resistivity $\sigma_b \in [0, 10^5]$ Pa~s~m$^{-2}$,
-    \item high-frequency tortuosity $\alpha_{\infty,b} \in [1.0, 2.5]$.
-\end{itemize}
-The bounds are chosen to keep the JCA equivalent-fluid model physically valid. The lower porosity bound ensures that the air-filled pore space remains connected enough for the equivalent-fluid assumption to hold, while the upper bound prevents the limit of pure air. The resistivity range spans from effectively lossless air to highly resistive porous materials typical of dense acoustic foams. The tortuosity range covers straight pores ($\alpha_\infty = 1$) to moderately tortuous pore networks.
+\subsection{Channel Pulse Transfer}
+\label{sec:meth_exp_channel}
 
-\subsection{Smooth Mapping to the Simulation Grid}
 
-Block-centred values are mapped onto the fine simulation grid by bilinear interpolation. Each fine-grid point receives a weighted average of the four nearest block values, so jumps between adjacent blocks become smooth ramps on the simulation grid. This parameterisation has three advantages. First, it reduces the number of optimisation variables from thousands of grid points to tens or hundreds of blocks. Second, it suppresses the small-scale checkerboard patterns that often appear in unrestricted topology optimisation. Third, it produces designs that are easier to interpret as a manufacturable arrangement of porous blocks.
+The first experiment characterises the substrate's most primitive component: a wire. 
+A straight channel of fixed width is cut between two parallel walls, a single pulse is injected at the input port, and a probe at the far end records the arrival. 
+Four quantities are measured, The propagation speed in the channel, from port-to-probe delay over a known path length; 
+The delay linearity, confirming that travel time grows linearly with channel length so that speed is a well-defined constant of the medium; 
+The transmission behaviour as the channel width is swept, locating the width-induced wave-block threshold below which lateral confinement and front curvature extinguish the pulse; 
+And, around that threshold, the sharpness of the transition from transmission to block. 
+The results are reported in the results chapter. 
+% TODO: restore \refSec{sec:res_channel} when results chapter is uncommented
 
-\subsection{Fixed Geometric Parameters}
+\subsection{Frequency Response}
+\label{sec:meth_exp_frequency}
 
-The viscous and thermal characteristic lengths are fixed throughout the domain at
-\begin{equation}
-    \Lambda = 30~\mu\mathrm{m}, \qquad \Lambda' = 60~\mu\mathrm{m},
-\end{equation}
-corresponding to a target pore scale of approximately 30~$\mu$m. In reality the viscous and thermal characteristic lengths are not independent of porosity and tortuosity; they are set by the microstructure. Fixing them here reduces the design space and avoids non-physical combinations of the five JCA parameters. The values are representative of sintered metals, foams, or 3D-printed lattices with a controllable pore size. A manufacturable interpretation of an optimised design therefore requires selecting a family of microstructures that realises the optimised $(\phi, \sigma, \alpha_\infty)$ at the fixed characteristic lengths. This is a deliberate simplification that treats the medium as an effective-fluid design space rather than as a family of real microstructures, and it limits the physical realism of the resulting designs.
+The second experiment measures the substrate's bandwidth, which is set by refractoriness: behind every pulse lies a zone that cannot be re-excited until the recovery variable has decayed, so a channel acts as a low-pass device for pulse trains. 
+A pulse train of prescribed frequency is injected at the input port and the probe records which pulses transmit. 
+The experiment is run in two forms: a two-pulse measurement, in which the interval between two successive pulses is swept to locate the absolute refractory period directly; and a sustained-train measurement, in which the output frequency $f_{\mathrm{out}}$ is recorded against the input frequency $f_{\mathrm{in}}$, giving the transmission ratio curve and the maximum 1:1 following rate above which pulses begin to be dropped. 
+The results are reported in the results chapter. 
+% TODO: restore \refSec{sec:res_frequency} when results chapter is uncommented
 
-\section{Optimisation Framework}
-\label{sec:optimisation}
+\subsection{Two-Input Collision Logic}
+\label{sec:meth_exp_logic}
 
-\subsection{Wave-Computing Task}
+The third experiment measures the substrate's native logic. 
+Two input channels converge on a T-junction, with probes on the output branch downstream of the collision region; the two inputs, A and B, are each either pulse-present or pulse-absent, giving the four input combinations of a two-input truth table. 
+With the windowed readout of \refSec{sec:meth_protocol}, the probe record is converted into truth-table entries: lone pulses that reach the junction propagate or diffract onward, while coincident pulses collide, annihilate, and leave the output silent. 
+Three figures of merit are measured: the truth table itself at each probe; the separation ratio between the weakest ``true'' output signal and the strongest ``false'' one, which quantifies the noise margin of the gate; and the inhibition window - the range of relative input timings within which the trailing pulse is still annihilated - which quantifies the gate's tolerance to clock skew. 
+The results are reported in the results chapter. 
+% TODO: restore \refSec{sec:res_logic} when results chapter is uncommented
 
-The demonstration task used in this work is a frequency binary classifier. Two pure-tone inputs, at frequencies $f_1$ and $f_2$, are injected from the same source location. The optimised medium should route acoustic energy so that one frequency produces a larger response at probe A and the other produces a larger response at probe B. The readout is therefore the complex pressure amplitude at two fixed probe locations. This task is chosen because it requires the medium to exploit frequency-dependent interference and damping, while remaining simple enough for a gradient-free optimiser to converge. Other tasks, such as spatial source classification or logic gates, can be addressed with the same forward model by changing only the objective function and the probe configuration.
+\subsection{Anisotropic Substrate}
+\label{sec:meth_exp_anisotropy}
 
-\subsection{Objective Function}
-
-For the frequency binary classifier the objective is the mean-squared error between the normalised probe energies and a target distribution. Let $P_A(\omega)$ and $P_B(\omega)$ be the complex pressures at probes A and B for input frequency $\omega$, and let $E_A = |P_A|^2$ and $E_B = |P_B|^2$ be the corresponding energies. The total energy is $E_\mathrm{tot} = E_A + E_B$. The target for frequency $f_1$ is that most of the energy arrives at probe A, while for $f_2$ most should arrive at probe B. The objective for a single frequency is
-\begin{equation}
-    \mathcal{L}(\omega) = \left( \frac{E_A}{E_\mathrm{tot}} - t_A(\omega) \right)^2 + \left( \frac{E_B}{E_\mathrm{tot}} - t_B(\omega) \right)^2,
-\end{equation}
-where $t_A(\omega)$ and $t_B(\omega)$ are the target energy fractions. The total objective is the sum over the two frequencies. The same forward model and solver are used for both frequencies; only the right-hand side source term changes.
-
-\subsection{Parameter Bounds and Transforms}
-
-During optimisation the block variables are kept within their bounds. One approach is to apply smooth parameter transforms, for example
-\begin{align}
-    \phi_b &= 0.30 + \frac{0.65}{1 + \exp(-u_b)}, \\
-    \sigma_b &= \sigma_\mathrm{min} \exp(v_b), \\
-    \alpha_{\infty,b} &= 1.0 + \mathrm{softplus}(w_b),
-\end{align}
-where $u_b$, $v_b$, and $w_b$ are the unconstrained optimisation variables. Alternatively, box constraints can be passed directly to the optimiser. The transform approach is more robust against boundary violations during line searches.
-
-\subsection{Optimisation Algorithm}
-
-Because the forward solver is not differentiated in this work, optimisation is performed with a gradient-free method. For the block-wise parameterisation considered here, with tens to hundreds of variables, differential evolution is the chosen algorithm. The objective landscape for porous block parameters is expected to be multimodal because small changes in geometry can create or destroy resonant paths, and differential evolution handles this better than local methods such as Nelder-Mead. The population size and number of generations are chosen to give the optimiser enough evaluations to converge while remaining within the computational budget. The run terminates when the objective function reaches a plateau or the budget is exhausted.
-
-%\subsection{Design-Space Reductions?}
-
-%To understand which design variables matter, three optimisation studies are carried out:
-%\begin{enumerate}
-%    \item Porosity only: $\phi$ varies, $\sigma = 0$, $\alpha_\infty = 1.0$.
-%    \item Porosity and resistivity: $\phi$ and $\sigma$ vary, $\alpha_\infty = 1.0$.
-%    \item Full set: $\phi$, $\sigma$, and $\alpha_\infty$ vary.
-%\end{enumerate}
-Comparing the final losses and optimised patterns answers whether adding flow resistivity and tortuosity improves the design.
-
-%\section{Validation Strategy}
-%\label{sec:validation_strategy}
-
-%\subsection{Free-Air Propagation}
-
-%In a homogeneous air-filled domain the numerical phase speed is compared against the analytical speed $c_0 = \sqrt{\gamma P_0 / \rho_0}$. A plane wave or point source is injected and the pressure phase along a line of probes is checked against the expected propagation delay.
-
-%\subsection{Hard-Wall Cavity Modes}
-
-%A two-dimensional rectangular cavity with hard walls supports analytical modal frequencies
-%\begin{equation}
-%    f_{mn} = \frac{c_0}{2} \sqrt{\left(\frac{m}{L_x}\right)^2 + \left(\frac{n}{L_y}\right)^2},
-%\end{equation}
-%where $m$ and $n$ are mode indices and $L_x$ and $L_y$ are the cavity dimensions. The numerical resonant frequencies are extracted from the pressure response and compared against these analytical values.
-
-%\subsection{Uniform Porous Slab}
-
-%A uniform JCA slab of thickness $d$ is placed in air. The transmission coefficient versus frequency is computed from the Helmholtz solver and compared against the transfer-matrix prediction. For a uniform layer the transfer matrix is
-%\begin{equation}
-%    \mathbf{T} =
-%    \begin{bmatrix}
-%        \cos(k_c d) & j Z_c \sin(k_c d) \\
-%       \frac{j}{Z_c}\sin(k_c d) & \cos(k_c d)
-%    \end{bmatrix},
-%\end{equation}
-%where $Z_c$ and $k_c$ are the characteristic impedance and wavenumber of the porous material. This test directly validates the JCA implementation in the solver.
-
-%\subsection{Convergence Checks}
-%\label{sec:convergence_checks}
-
-%Mesh refinement and frequency sampling are varied to ensure that the reported results are insensitive to these numerical choices. The PML width is increased until the probe pressures change by less than 1\%; this confirms that reflected energy from the absorbing boundary does not contaminate the readouts. A coarser grid or narrower PML is accepted only if the quantities of interest change by less than a specified tolerance.
-
-%\section{Summary}
-%\label{sec:meth_summary}
-
-%The methodology combines a frequency-domain JCA Helmholtz solver with a block-wise design parameterisation and gradient-free optimisation. The forward model captures the frequency-dependent damping and dispersion of sound in rigid-frame porous media, while the block parameterisation keeps the design space small and physically interpretable. Validation against analytical benchmarks ensures that the numerical implementation is reliable before optimisation is attempted.
+The fourth experiment characterises the anisotropic parameterisation of \refSec{sec:meth_anisotropy}. 
+In a uniform tensor field with anisotropy ratio $r = D_{\parallel}/D_{\perp}$, a point stimulus is fired and the expanding pulse is tracked: theory predicts an elliptical front whose axis ratio and speed ratio between the fast and slow directions both scale as $\sqrt{r}$ \cite{keener1991eikonal}, providing a direct quantitative check of the tensor discretisation. 
+The directional speed profile $c(\theta)$ is measured by probing along rays at several orientations to the fibre direction. 
+Finally, a patch of anisotropic medium embedded in the isotropic substrate is used to measure how propagation delay across the patch depends on the orientation of its fibres relative to the incident wave direction - the routing signature that anisotropy adds to the design space beyond walls and light. 
+The results are reported in the results chapter. 
+% TODO: restore \refSec{sec:res_anisotropy} when results chapter is uncommented

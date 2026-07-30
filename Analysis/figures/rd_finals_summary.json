@@ -1,0 +1,208 @@
+{
+  "tolerances": {
+    "spatial": 0.14,
+    "temporal": 0.015
+  },
+  "kinetics": {
+    "barkley": {
+      "label": "Barkley (a=0.75, b=0.01, eps=0.02, Dv=0)",
+      "test1_channel": {
+        "free_medium_speed_cells_per_tu": {
+          "new": 4.15083515259688,
+          "old": 4.15083515259688,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "old = de-hacked channel_final with (0,0)-clamp"
+        },
+        "channel_speed_equality_ratio_W60": {
+          "new": 1.0,
+          "old": 1.0,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "channel(W=60)/free speed; 1.0 = geometry-free"
+        },
+        "min_width_transmitted": {
+          "new": 1,
+          "old": 1
+        },
+        "control_quiet": true
+      },
+      "test2_frequency": {
+        "reference_provenance": "OLD CLIPPED solver, 256x256 W=32 geometry",
+        "refractory_period_tu": {
+          "new": 2.8000000000000003,
+          "old": 3.0,
+          "rel_change": -0.06666666666666658,
+          "moved_beyond_tol": true,
+          "tol": 0.015,
+          "note": ""
+        },
+        "max_1to1_following_rate_per_tu": {
+          "new": 0.2631578947368421,
+          "old": 0.2898550724637681,
+          "rel_change": -0.09210526315789481,
+          "moved_beyond_tol": true,
+          "tol": 0.015,
+          "note": ""
+        },
+        "control_quiet": true,
+        "single_pulse_crossings": 1
+      },
+      "test3_logic": {
+        "reference_provenance": "OLD CLIPPED solver",
+        "truth_table_window_peaks": {
+          "00": 0.0,
+          "10": 0.9999731995484815,
+          "01": 6.605743511091897e-14,
+          "11": 6.591996901589835e-14
+        },
+        "separation_ratio": {
+          "new": 999.9731995484815,
+          "old": 997.1833050306595,
+          "rel_change": 0.0027977749965801633,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "false peak sits at the rest-state floor; ratio is scale-free, treat movement qualitatively"
+        },
+        "inhibition_window_tu": {
+          "new": 4.0,
+          "old": 6.0,
+          "rel_change": -0.3333333333333333,
+          "moved_beyond_tol": true,
+          "tol": 0.015,
+          "note": ""
+        },
+        "control_quiet": true,
+        "single_pulse_crossings": 1
+      },
+      "test4a_sqrt_r_deviation_pct": {
+        "1": {
+          "new": 0.0,
+          "old": 0.0,
+          "rel_change": null,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "deviation of c_par/c_perp from sqrt(r); old (barkley) from aniso_final"
+        },
+        "2": {
+          "new": 4.610259327186073,
+          "old": 4.610259327186073,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "deviation of c_par/c_perp from sqrt(r); old (barkley) from aniso_final"
+        },
+        "4": {
+          "new": 9.616165718927693,
+          "old": 9.616165718927693,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "deviation of c_par/c_perp from sqrt(r); old (barkley) from aniso_final"
+        }
+      }
+    },
+    "oregonator": {
+      "label": "Oregonator A (f=1.4375, eps=0.0501, phi=0.010)",
+      "test1_channel": {
+        "free_medium_speed_cells_per_tu": {
+          "new": 6.223118111949211,
+          "old": 6.223118111949214,
+          "rel_change": -4.2816723243354707e-16,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "old = de-hacked channel_final with (0,0)-clamp"
+        },
+        "channel_speed_equality_ratio_W60": {
+          "new": 1.0,
+          "old": 1.0,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "channel(W=60)/free speed; 1.0 = geometry-free"
+        },
+        "min_width_transmitted": {
+          "new": 1,
+          "old": 1
+        },
+        "control_quiet": true
+      },
+      "test2_frequency": {
+        "reference_provenance": "de-hacked, (0,0)-clamp artifact",
+        "refractory_period_tu": {
+          "new": 3.1,
+          "old": 3.1,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.015,
+          "note": ""
+        },
+        "max_1to1_following_rate_per_tu": {
+          "new": 0.2816901408450704,
+          "old": 0.2816901408450704,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.015,
+          "note": ""
+        },
+        "control_quiet": true,
+        "single_pulse_crossings": 1
+      },
+      "test3_logic": {
+        "reference_provenance": "de-hacked, (0,0)-clamp artifact",
+        "truth_table_window_peaks": {
+          "00": 0.0,
+          "10": 0.7082048068537731,
+          "01": 0.003055417120116957,
+          "11": 0.003055419028800951
+        },
+        "separation_ratio": {
+          "new": 231.7864751702147,
+          "old": 231.78734758210132,
+          "rel_change": -3.763846024095624e-06,
+          "moved_beyond_tol": false,
+          "tol": 0.14,
+          "note": "false peak sits at the rest-state floor; ratio is scale-free, treat movement qualitatively"
+        },
+        "inhibition_window_tu": {
+          "new": 2.0,
+          "old": 2.0,
+          "rel_change": 0.0,
+          "moved_beyond_tol": false,
+          "tol": 0.015,
+          "note": ""
+        },
+        "control_quiet": true,
+        "single_pulse_crossings": 1
+      },
+      "test4a_sqrt_r_deviation_pct": {
+        "1": {
+          "new": 0.0,
+          "old": null,
+          "rel_change": null,
+          "moved_beyond_tol": null,
+          "tol": 0.14,
+          "note": "no old oregonator reference"
+        },
+        "2": {
+          "new": 0.24212274012923074,
+          "old": null,
+          "rel_change": null,
+          "moved_beyond_tol": null,
+          "tol": 0.14,
+          "note": "no old oregonator reference"
+        },
+        "4": {
+          "new": 0.34008612252891535,
+          "old": null,
+          "rel_change": null,
+          "moved_beyond_tol": null,
+          "tol": 0.14,
+          "note": "no old oregonator reference"
+        }
+      }
+    }
+  }
+}

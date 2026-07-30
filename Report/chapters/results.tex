@@ -1,73 +1,33 @@
 % Chapter: Results and Discussion
-% Continuous Analog Wave Computation in Porous Media
-
-\section{Overview}
-\label{sec:res_overview}
-
-% NOTE: Brief roadmap of the chapter. Mention that validation comes first, then demonstrations.
-
-[What this chapter contains.]
-
-\section{Helmholtz Solver Validation}
-\label{sec:validation}
-
-% NOTE: This section proves your solver is correct. Use figures with captions that state
-% the expected value and the observed value. Quantify error.
-
-\subsection{Free-Air Propagation}
-% KEY POINTS: Inject a plane wave or point source in free air. Compare numerical phase speed
-% to c0. Plot real/imag pressure along a line. Error metric: relative phase speed error.
-[Compare numerical wave speed and phase against analytical solution.]
-
-\subsection{Hard-Wall Cavity Modes}
-% KEY POINTS: 2D rectangular cavity with hard walls. Compare numerical eigenfrequencies
-% to analytical f_mn. Table of modes vs error.
-[Compare resonant frequencies against analytical 2D cavity modes.]
-
-\subsection{Uniform Porous Slab}
-% KEY POINTS: A single uniform JCA slab in air. Compare transmission coefficient versus
-% frequency against TMM. This is the strongest validation for the porous model.
-[Compare transmission/reflection against transfer-matrix reference for a uniform JCA slab.]
-
-\section{Design-Region Demonstrations}
-\label{sec:demonstrations}
-
-% NOTE: This is where you show the actual wave-computing task. Be explicit about what
-% the task is and why it matters.
-
-\subsection{Task Definition}
-% KEY POINTS: Logic gate, frequency router, or binary classification? Input definition,
-% target output, loss function, probe placement.
-[Describe the chosen wave-computing task: e.g. two-frequency routing, logic gate, or binary classification.]
-
-\subsection{Baseline Designs}
-% KEY POINTS: Show results for a trivial design (all air, or uniform porous) and a simple
-% hand-designed structure. Establishes that optimisation is actually needed.
-[Results for homogeneous or simple periodic designs.]
-
-\subsection{Optimised Designs}
-% KEY POINTS: Convergence plot. Final block pattern visualised as a heatmap. Field snapshot
-% at a key frequency. Performance table: loss, accuracy, energy ratio, etc.
-[Convergence plots, final block patterns, field snapshots, performance metrics.]
-
-\section{Design-Space Ablations}
-\label{sec:ablations}
-
-% NOTE: This section answers the question "which design variables matter?" It is central
-% to the thesis contribution. Use a table comparing the three cases.
-% Metrics: final loss, number of variables, pattern complexity, physical interpretability,
-% training time.
-
-[Compare $\phi$-only, $\phi+\sigma$, and $\phi+\sigma+\alpha_\infty$ designs in terms of final loss, pattern complexity, and physical interpretability.]
-
-\section{Discussion}
-\label{sec:discussion}
-
-% NOTE: Interpret the results. Do not just repeat numbers. Address:
-% - Why did the optimiser produce the patterns it did?
-% - What physical mechanism is being exploited (reflection, absorption, interference)?
-% - How sensitive are results to block count, bounds, frequency sampling?
-% - What are the main limitations?
-% Connect back to the literature review.
-
-[Interpret results, limitations, relation to literature.]
+% PARKED 2026-07-20: entire chapter commented out at user request.
+% Uncomment and fill in as results are integrated.
+%
+% \section{Solver Verification}
+% \label{sec:res_verification}
+%
+% [EXEMPLAR TODO: one paragraph reporting the verification results --- target waves with measured speed, head-on collision annihilation, gap diffraction below/above the critical gap width, timing control; reference the verification figure(s) with \textbackslash reffig and state that the solver reproduces the BZ phenomenology required for the characterisation experiments.]
+%
+% \section{Channel Pulse Transfer}
+% \label{sec:res_channel}
+%
+% [EXEMPLAR TODO: one paragraph on the measured channel transfer function: pulse speed in the channel, transmission as a function of channel width, the observed width-induced wave block; interpret physically (curvature and lateral confinement) and as a device characteristic (a wire with a minimum feature size).]
+%
+% \section{Frequency Response}
+% \label{sec:res_frequency}
+%
+% [EXEMPLAR TODO: one paragraph on the refractory-limited frequency response: transmission ratio vs.\ input pulse frequency, the effective bandwidth set by the refractory period; interpret as the substrate's native sampling/clock limit and its implication for signal encoding.]
+%
+% \section{Two-Input Collision Logic}
+% \label{sec:res_logic}
+%
+% [EXEMPLAR TODO: one paragraph on the collision-logic result: measured truth table at the output probes, XOR-like behaviour from annihilation, achieved signal separation; include a booktabs truth table (caption above, referenced with \textbackslash reftab); discuss noise margins and timing constraints.]
+%
+% \section{Anisotropic Substrate}
+% \label{sec:res_anisotropy}
+%
+% [EXEMPLAR TODO: one paragraph on the anisotropy results: measured speed ratio along vs.\ across the fibre direction, deflection or block at tensor-field boundaries; discuss what anisotropy adds to the trainable design space relative to walls and the light field.]
+%
+% \section{Discussion}
+% \label{sec:res_discussion}
+%
+% [EXEMPLAR TODO: one paragraph synthesising the four transfer functions into a component-level picture of the substrate --- a slow, parallel, threshold-logic medium with wires, bandwidth limits, and native XOR --- and assessing which computational tasks it natively supports; connect back to the PNN framing (what would training walls / phi / D buy on top of the native behaviour?) and forward to the limitations in \refChap{chap:conclusions}.]

@@ -1,0 +1,227 @@
+{
+  "free_medium": {
+    "label": "free",
+    "peak_mid": 0.8541056636451148,
+    "peak_far": 0.8023099013632687,
+    "t_mid_steps": 315.2059193764213,
+    "t_far_steps": 562.7313033536782,
+    "speed": 0.35955908266837594,
+    "transmitted": true
+  },
+  "sweep": [
+    {
+      "label": "W=60",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 60
+    },
+    {
+      "label": "W=48",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 48
+    },
+    {
+      "label": "W=40",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 40
+    },
+    {
+      "label": "W=32",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 32
+    },
+    {
+      "label": "W=24",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 24
+    },
+    {
+      "label": "W=20",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 20
+    },
+    {
+      "label": "W=16",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 16
+    },
+    {
+      "label": "W=14",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 14
+    },
+    {
+      "label": "W=12",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 12
+    },
+    {
+      "label": "W=10",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 10
+    },
+    {
+      "label": "W=8",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 8
+    },
+    {
+      "label": "W=6",
+      "peak_mid": 0.8541056636451148,
+      "peak_far": 0.8023099013632687,
+      "t_mid_steps": 315.2059193764213,
+      "t_far_steps": 562.7313033536782,
+      "speed": 0.35955908266837594,
+      "transmitted": true,
+      "W": 6
+    },
+    {
+      "label": "W=4",
+      "peak_mid": 0.8419478022822077,
+      "peak_far": 0.7966904553084649,
+      "t_mid_steps": 315.33277095351525,
+      "t_far_steps": 562.8489942370138,
+      "speed": 0.35957239012192643,
+      "transmitted": true,
+      "W": 4
+    },
+    {
+      "label": "W=3",
+      "peak_mid": 0.8275794206714994,
+      "peak_far": 0.7900492917891512,
+      "t_mid_steps": 315.5263177346984,
+      "t_far_steps": 563.0407465295842,
+      "speed": 0.3595749970348352,
+      "transmitted": true,
+      "W": 3
+    },
+    {
+      "label": "W=2",
+      "peak_mid": 0.7845423274024229,
+      "peak_far": 0.7581882038877499,
+      "t_mid_steps": 315.8083164167977,
+      "t_far_steps": 563.3527011611743,
+      "speed": 0.35953148398782975,
+      "transmitted": true,
+      "W": 2
+    },
+    {
+      "label": "W=1",
+      "peak_mid": 0.6898607222104547,
+      "peak_far": 0.6955352868290334,
+      "t_mid_steps": 317.235293076539,
+      "t_far_steps": 564.7432649074653,
+      "speed": 0.3595843775924771,
+      "transmitted": true,
+      "W": 1
+    }
+  ],
+  "block_threshold": {
+    "min_width_transmitted": 1,
+    "max_width_blocked": null
+  },
+  "eikonal_estimate": {
+    "c0_cells_per_time_unit": 7.191181653367519,
+    "kappa_star_per_cell": 7.191181653367519,
+    "critical_channel_width_cells": 0.27811840896321
+  },
+  "phi_scan": [
+    {
+      "phi": 0.0,
+      "peak_free": 0.8023099013632687,
+      "peak_W8": 0.8023099013632687,
+      "free_transmits": true,
+      "W8_transmits": true
+    },
+    {
+      "phi": 0.01,
+      "peak_free": 1.0,
+      "peak_W8": 1.0,
+      "free_transmits": true,
+      "W8_transmits": true
+    },
+    {
+      "phi": 0.02,
+      "peak_free": 1.0,
+      "peak_W8": 1.0,
+      "free_transmits": true,
+      "W8_transmits": true
+    },
+    {
+      "phi": 0.03,
+      "peak_free": 1.0,
+      "peak_W8": 1.0,
+      "free_transmits": true,
+      "W8_transmits": true
+    },
+    {
+      "phi": 0.04,
+      "peak_free": 0.04388619403231854,
+      "peak_W8": 0.04388619403231854,
+      "free_transmits": false,
+      "W8_transmits": false
+    },
+    {
+      "phi": 0.05,
+      "peak_free": 0.05134615384615383,
+      "peak_W8": 0.05134615384615383,
+      "free_transmits": false,
+      "W8_transmits": false
+    }
+  ],
+  "note": "Oregonator baseline is oscillatory (unstable rest state): port wake re-fires spontaneously, so traces are trains; all reported metrics use leading-edge first crossings."
+}

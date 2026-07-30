@@ -1,0 +1,310 @@
+{
+  "grid": {
+    "barkley": {
+      "runs": [
+        {
+          "kinetics": "barkley",
+          "DX": 1.0,
+          "DT": 0.05,
+          "diffusion_number": 0.05,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 1000,
+          "t1": 17.628409417668106,
+          "t2": 32.08385248281171,
+          "dist": 60.0,
+          "c_phys": 4.150685643436136,
+          "c_cells_per_tu": 4.150685643436136,
+          "peak_p2": 0.9999734907601826
+        },
+        {
+          "kinetics": "barkley",
+          "DX": 0.5,
+          "DT": 0.0125,
+          "diffusion_number": 0.05,
+          "grid": [
+            400,
+            80
+          ],
+          "nsteps": 4000,
+          "t1": 16.359295147810258,
+          "t2": 29.875631297860892,
+          "dist": 60.0,
+          "c_phys": 4.439072788210822,
+          "c_cells_per_tu": 8.878145576421645,
+          "peak_p2": 0.9999910982739767
+        },
+        {
+          "kinetics": "barkley",
+          "DX": 0.25,
+          "DT": 0.003125,
+          "diffusion_number": 0.05,
+          "grid": [
+            800,
+            160
+          ],
+          "nsteps": 16000,
+          "t1": 15.720612412880026,
+          "t2": 28.755306092853385,
+          "dist": 60.0,
+          "c_phys": 4.603100116743414,
+          "c_cells_per_tu": 18.412400466973654,
+          "peak_p2": 0.9999952177390413
+        }
+      ],
+      "richardson": {
+        "levels": [
+          4.150685643436136,
+          4.439072788210822,
+          4.603100116743414
+        ],
+        "change_1_2_pct": 6.4965626502133045,
+        "change_2_3_pct": 3.5634099709444684,
+        "monotonic": true,
+        "observed_order": 0.8140706542810261,
+        "c_extrapolated": 4.819447851233161,
+        "est_error_at_coarse_pct": 13.876324185682549
+      }
+    },
+    "oregonator": {
+      "runs": [
+        {
+          "kinetics": "oregonator",
+          "DX": 1.0,
+          "DT": 0.05,
+          "diffusion_number": 0.05,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 700,
+          "t1": 11.820916339109434,
+          "t2": 21.461601609601583,
+          "dist": 60.0,
+          "c_phys": 6.223623976569982,
+          "c_cells_per_tu": 6.223623976569982,
+          "peak_p2": 0.7086894438240366
+        },
+        {
+          "kinetics": "oregonator",
+          "DX": 0.5,
+          "DT": 0.0125,
+          "diffusion_number": 0.05,
+          "grid": [
+            400,
+            80
+          ],
+          "nsteps": 2800,
+          "t1": 12.073808285496511,
+          "t2": 21.995252450168213,
+          "dist": 60.0,
+          "c_phys": 6.047506694000066,
+          "c_cells_per_tu": 12.095013388000131,
+          "peak_p2": 0.6956352016135887
+        },
+        {
+          "kinetics": "oregonator",
+          "DX": 0.25,
+          "DT": 0.003125,
+          "diffusion_number": 0.05,
+          "grid": [
+            800,
+            160
+          ],
+          "nsteps": 11200,
+          "t1": 12.031774897962315,
+          "t2": 21.950184294488615,
+          "dist": 60.0,
+          "c_phys": 6.0493570693919585,
+          "c_cells_per_tu": 24.197428277567834,
+          "peak_p2": 0.6936331296201971
+        }
+      ],
+      "richardson": {
+        "levels": [
+          6.223623976569982,
+          6.047506694000066,
+          6.0493570693919585
+        ],
+        "change_1_2_pct": 2.9122296424185574,
+        "change_2_3_pct": 0.030587967790084488,
+        "monotonic": false,
+        "spread_pct": 2.8839398558001763,
+        "note": "non-monotonic (temporal and splitting errors comparable); spread reported instead of an order",
+        "est_error_at_coarse_pct": 2.8839398558001763
+      }
+    }
+  },
+  "dt": {
+    "barkley": {
+      "runs": [
+        {
+          "kinetics": "barkley",
+          "DX": 1.0,
+          "DT": 0.05,
+          "diffusion_number": 0.05,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 1000,
+          "t1": 17.628409417668106,
+          "t2": 32.08385248281171,
+          "dist": 60.0,
+          "c_phys": 4.150685643436136,
+          "c_cells_per_tu": 4.150685643436136,
+          "peak_p2": 0.9999734907601826
+        },
+        {
+          "kinetics": "barkley",
+          "DX": 1.0,
+          "DT": 0.025,
+          "diffusion_number": 0.025,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 2000,
+          "t1": 17.721533820150555,
+          "t2": 32.249238957233295,
+          "dist": 60.0,
+          "c_phys": 4.130039771171209,
+          "c_cells_per_tu": 4.130039771171209,
+          "peak_p2": 0.9999438023098874
+        },
+        {
+          "kinetics": "barkley",
+          "DX": 1.0,
+          "DT": 0.0125,
+          "diffusion_number": 0.0125,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 4000,
+          "t1": 17.615081472999865,
+          "t2": 32.050046839788116,
+          "dist": 60.0,
+          "c_phys": 4.156573879840896,
+          "c_cells_per_tu": 4.156573879840896,
+          "peak_p2": 0.9999104774341127
+        }
+      ],
+      "richardson": {
+        "levels": [
+          4.150685643436136,
+          4.130039771171209,
+          4.156573879840896
+        ],
+        "change_1_2_pct": 0.4998952409378896,
+        "change_2_3_pct": 0.6383648994758868,
+        "monotonic": false,
+        "spread_pct": 0.6400290298119204,
+        "note": "non-monotonic (temporal and splitting errors comparable); spread reported instead of an order",
+        "est_error_at_coarse_pct": 0.6400290298119204
+      }
+    },
+    "oregonator": {
+      "runs": [
+        {
+          "kinetics": "oregonator",
+          "DX": 1.0,
+          "DT": 0.05,
+          "diffusion_number": 0.05,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 700,
+          "t1": 11.820916339109434,
+          "t2": 21.461601609601583,
+          "dist": 60.0,
+          "c_phys": 6.223623976569982,
+          "c_cells_per_tu": 6.223623976569982,
+          "peak_p2": 0.7086894438240366
+        },
+        {
+          "kinetics": "oregonator",
+          "DX": 1.0,
+          "DT": 0.025,
+          "diffusion_number": 0.025,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 1400,
+          "t1": 11.91831201695756,
+          "t2": 21.646739816656545,
+          "dist": 60.0,
+          "c_phys": 6.167491935526982,
+          "c_cells_per_tu": 6.167491935526982,
+          "peak_p2": 0.7033598411860128
+        },
+        {
+          "kinetics": "oregonator",
+          "DX": 1.0,
+          "DT": 0.0125,
+          "diffusion_number": 0.0125,
+          "grid": [
+            200,
+            40
+          ],
+          "nsteps": 2800,
+          "t1": 11.951461419426154,
+          "t2": 21.71480508723142,
+          "dist": 60.0,
+          "c_phys": 6.145435625486654,
+          "c_cells_per_tu": 6.145435625486654,
+          "peak_p2": 0.7012993359737217
+        }
+      ],
+      "richardson": {
+        "levels": [
+          6.223623976569982,
+          6.167491935526982,
+          6.145435625486654
+        ],
+        "change_1_2_pct": 0.9101275142276087,
+        "change_2_3_pct": 0.35890555827898646,
+        "monotonic": true,
+        "observed_order": 1.3476330665266076,
+        "c_extrapolated": 6.131159165428997,
+        "est_error_at_coarse_pct": 1.508113044305797
+      }
+    }
+  },
+  "invariants": {
+    "barkley": {
+      "kinetics": "barkley",
+      "geometry": "256x256 walled channel W=16, dt=0.05, 1500 steps",
+      "u_min": 0.0,
+      "u_max": 0.9999743115818006,
+      "v_min": 0.0,
+      "v_max": 0.733863030909649,
+      "nan_or_inf": false,
+      "guard_trips": 0,
+      "max_react_substeps": 5,
+      "barkley_expected_u_range": [
+        -0.05,
+        1.05
+      ]
+    },
+    "oregonator": {
+      "kinetics": "oregonator",
+      "geometry": "300x48 walled channel W=16, dt=0.05, 1500 steps",
+      "u_min": 0.0,
+      "u_max": 0.7087617195460953,
+      "v_min": 0.0,
+      "v_max": 0.23351414038918342,
+      "nan_or_inf": false,
+      "guard_trips": 0,
+      "max_react_substeps": 155,
+      "barkley_expected_u_range": [
+        -0.05,
+        1.05
+      ]
+    }
+  }
+}

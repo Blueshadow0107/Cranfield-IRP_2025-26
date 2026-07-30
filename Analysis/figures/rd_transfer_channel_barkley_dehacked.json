@@ -1,0 +1,35 @@
+{
+  "free_medium": {
+    "label": "free",
+    "peak_mid": 0.9986281924094483,
+    "peak_far": 0.998678136581035,
+    "t_mid_steps": 534.6065447287027,
+    "t_far_steps": 963.4414306425522,
+    "speed": 0.20753908537627605,
+    "transmitted": true
+  },
+  "W=16": {
+    "label": "W=16",
+    "peak_mid": 0.9986281924094483,
+    "peak_far": 0.998678136581035,
+    "t_mid_steps": 534.6065447287027,
+    "t_far_steps": 963.4414306425522,
+    "speed": 0.20753908537627605,
+    "transmitted": true
+  },
+  "W=8": {
+    "label": "W=8",
+    "peak_mid": 0.9986281924094483,
+    "peak_far": 0.998678136581035,
+    "t_mid_steps": 534.6065447287027,
+    "t_far_steps": 963.4414306425522,
+    "speed": 0.20753908537627605,
+    "transmitted": true
+  },
+  "comparison_with_pre_dehack": {
+    "old_free_medium_speed_cells_per_step": 0.17229717840159783,
+    "new_free_medium_speed_cells_per_step": 0.20753908537627605,
+    "abs_speed_change_pct": 20.454140515600795,
+    "note": "Old number was produced by unstable coarse explicit Euler (dt/eps=2.5) patched by np.clip; de-hacked value is dt-converged (4.14-4.16 cells/t.u. at dt=0.05/0.02/0.01) and matches unclipped fine-dt Euler (4.11)."
+  }
+}

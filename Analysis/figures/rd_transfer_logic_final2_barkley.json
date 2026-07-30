@@ -1,0 +1,94 @@
+{
+  "gate": "A AND (NOT B) -- inhibition via head-on collision",
+  "kinetics": "Barkley (a=0.75, b=0.01, eps=0.02, Dv=0), de-hacked rd_core + clamp-rest fix",
+  "rest_state_u_star": 0.0,
+  "control_max_dev_50tu": 0.0,
+  "control_quiet": true,
+  "single_pulse_crossings": 1,
+  "geometry": "256x256, W=20, TJ=96, A port x(25, 43), B port y(163, 181), probe strip x=240",
+  "readout": "windowed probe peak, window = 2.5 t.u. around A-alone arrival t=47.75 t.u.",
+  "naive_readout_crossings": {
+    "00": 0,
+    "10": 1,
+    "01": 1,
+    "11": 1
+  },
+  "naive_readout_note": "whole-trace threshold readout gives OR, not XOR: B diffracts into the output channel and reaches the probe even when A is annihilated",
+  "truth_table": {
+    "00": 0.0,
+    "10": 0.9999731995484815,
+    "01": 6.605743511091897e-14,
+    "11": 6.591996901589835e-14
+  },
+  "separation_ratio": 999.9731995484815,
+  "decision_threshold": 0.4999865997742738,
+  "timing_sweep": [
+    {
+      "dB_steps": 0,
+      "window_peak": 6.591996901589835e-14,
+      "blocked": true
+    },
+    {
+      "dB_steps": 20,
+      "window_peak": 2.398623202721196e-13,
+      "blocked": true
+    },
+    {
+      "dB_steps": 40,
+      "window_peak": 2.4399389548192698e-12,
+      "blocked": true
+    },
+    {
+      "dB_steps": 60,
+      "window_peak": 2.663123268798619e-10,
+      "blocked": true
+    },
+    {
+      "dB_steps": 80,
+      "window_peak": 2.478443649838064e-06,
+      "blocked": true
+    },
+    {
+      "dB_steps": 100,
+      "window_peak": 0.9901153700765956,
+      "blocked": false
+    },
+    {
+      "dB_steps": 110,
+      "window_peak": 0.9999727538736174,
+      "blocked": false
+    },
+    {
+      "dB_steps": 120,
+      "window_peak": 0.9999726945043935,
+      "blocked": false
+    },
+    {
+      "dB_steps": 140,
+      "window_peak": 0.9999724061636325,
+      "blocked": false
+    },
+    {
+      "dB_steps": 160,
+      "window_peak": 0.9999721261092223,
+      "blocked": false
+    },
+    {
+      "dB_steps": 200,
+      "window_peak": 0.9999735581453817,
+      "blocked": false
+    },
+    {
+      "dB_steps": 260,
+      "window_peak": 0.9999736807615834,
+      "blocked": false
+    },
+    {
+      "dB_steps": 320,
+      "window_peak": 0.9999734626315249,
+      "blocked": false
+    }
+  ],
+  "inhibition_window_steps": 80,
+  "inhibition_window_time": 4.0
+}

@@ -1,0 +1,105 @@
+{
+  "kinetics": "Barkley (a=0.75, b=0.01, eps=0.02, Dv=0), de-hacked rd_core + clamp-rest fix",
+  "rest_state_u_star": 0.0,
+  "control_max_dev_100tu": 0.0,
+  "control_quiet": true,
+  "single_pulse_crossings": 1,
+  "geometry": "300x48 channel, W=16, far probe strip x=240",
+  "refractory_period_steps": 56,
+  "refractory_period_time": 2.8000000000000003,
+  "two_pulse_scan": {
+    "20": 1,
+    "40": 1,
+    "42": 1,
+    "44": 1,
+    "46": 1,
+    "48": 1,
+    "50": 1,
+    "52": 1,
+    "54": 1,
+    "56": 2,
+    "60": 2,
+    "80": 2,
+    "120": 2,
+    "160": 2,
+    "240": 2,
+    "320": 2,
+    "480": 2,
+    "640": 2
+  },
+  "train_results": [
+    {
+      "period_steps": 25,
+      "fired": 6,
+      "transmitted": 2,
+      "f_in": 0.8,
+      "f_out": 0.15999999999997438
+    },
+    {
+      "period_steps": 34,
+      "fired": 6,
+      "transmitted": 3,
+      "f_in": 0.588235294117647,
+      "f_out": 0.23529411764703115
+    },
+    {
+      "period_steps": 42,
+      "fired": 6,
+      "transmitted": 3,
+      "f_in": 0.47619047619047616,
+      "f_out": 0.19047619047617234
+    },
+    {
+      "period_steps": 50,
+      "fired": 6,
+      "transmitted": 3,
+      "f_in": 0.4,
+      "f_out": 0.1599999999999872
+    },
+    {
+      "period_steps": 56,
+      "fired": 6,
+      "transmitted": 4,
+      "f_in": 0.3571428571428571,
+      "f_out": 0.21428571428569898
+    },
+    {
+      "period_steps": 64,
+      "fired": 6,
+      "transmitted": 5,
+      "f_in": 0.3125,
+      "f_out": 0.2499999999999844
+    },
+    {
+      "period_steps": 76,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.2631578947368421,
+      "f_out": 0.26315789473682827
+    },
+    {
+      "period_steps": 90,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.2222222222222222,
+      "f_out": 0.22222222222221236
+    },
+    {
+      "period_steps": 112,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.17857142857142855,
+      "f_out": 0.1785714285714222
+    },
+    {
+      "period_steps": 140,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.14285714285714285,
+      "f_out": 0.14285714285713877
+    }
+  ],
+  "max_following_rate": 0.2631578947368421,
+  "saturated_output_rate": 0.26315789473682827,
+  "slope1_region": true
+}

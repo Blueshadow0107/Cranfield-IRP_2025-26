@@ -1,0 +1,87 @@
+[run_de] starting
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+[run_case] starting sim: A=False, B=False
+[run_case] starting sim: A=True, B=False
+[run_case] starting sim: A=False, B=True
+[run_case] starting sim: A=True, B=True
+Traceback (most recent call last):
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 859, in <module>
+    main()
+    ~~~~^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 854, in main
+    {'protocol': cmd_protocol, 'smoke': cmd_smoke, 'train': cmd_train,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     'robust': cmd_robust, 'demux': cmd_demux}[args.cmd](args)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 624, in cmd_train
+    out = run_de(proto, popsize=args.popsize, maxiter=args.maxiter,
+                 tag='train')
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 470, in run_de
+    result = differential_evolution(
+        objective, bounds=[(PHI0, PHI_MAX)] * (NB * NB),
+    ...<5 lines>...
+        x0=np.full(NB * NB, PHI0),
+        callback=logger, disp=False)
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/scipy/_lib/_util.py", line 365, in wrapper
+    return fun(*args, **kwargs)
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/scipy/optimize/_differentialevolution.py", line 533, in differential_evolution
+    ret = solver.solve()
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/scipy/optimize/_differentialevolution.py", line 1219, in solve
+    self._calculate_population_energies(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.population[self.feasible]))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/scipy/optimize/_differentialevolution.py", line 1395, in _calculate_population_energies
+    calc_energies = list(
+        self._mapwrapper(self.func, parameters_pop[0:S])
+    )
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/scipy/_lib/_util.py", line 588, in __call__
+    return self.f(x, *self.args)
+           ~~~~~~^^^^^^^^^^^^^^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 330, in objective
+    pk = truth_table_peaks(phi, proto['nsteps_train'], win_lo, win_hi)
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 317, in truth_table_peaks
+    data = run_case(phi, fa, fb, nsteps=nsteps)
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_train_xor_phi_debug.py", line 202, in run_case
+    return rd.run(nsteps)
+           ~~~~~~^^^^^^^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_core.py", line 542, in run
+    self._step()
+    ~~~~~~~~~~^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_core.py", line 477, in _step
+    self._react_adaptive(self.dt)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/rd_core.py", line 452, in _react_adaptive
+    h_dom = float(((u - u_dom) / (-react))[falling].min())
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv/lib/python3.14/site-packages/numpy/_core/_methods.py", line 43, in _amin
+    def _amin(a, axis=None, out=None, keepdims=False,
+    
+KeyboardInterrupt

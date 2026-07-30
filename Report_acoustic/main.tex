@@ -11,10 +11,8 @@
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric}
 
 %% --- THESIS METADATA --- %%
-% TODO(user): choose final title. Placeholder below reflects the current
-% framing (characterising RD substrates for analog computation).
-\title{[Title to be decided: reaction-diffusion computing theme]}
-\author{Srivijayesh Venugopal}
+\title{Continuous Analog Wave Computation in Porous Media}
+\author{[Srivijayesh Venugopal]}
 \date{September 2026}
 \faculty{\FEAS}
 \course{[Computational Fluid Dynamics]}
@@ -29,18 +27,16 @@
 
 %% --- ABSTRACT --- %%
 \begin{abstract}
-[Write abstract here (not more than 300 words), to be written last,
-once results are final.]
+[Write abstract here (not more than 300 words.)]
 \end{abstract}
 
 \begin{keywords}
-physical neural networks, reaction-diffusion computing, excitable media,
-Belousov--Zhabotinsky reaction, Oregonator model, analog computation,
-unconventional computing, neuromorphic engineering
+physical neural networks, acoustic wave computing, inverse design, Johnson--Champoux--Allard model,
+Helmholtz equation, porous media, equivalent-fluid models, neuromorphic engineering
 \end{keywords}
 
 %% --- ACKNOWLEDGEMENTS --- %%
-\chapter*{Acknowledgements}
+\chapter{Acknowledgements}
 [Optional: acknowledge support, supervisors, funding bodies, etc.]
 
 %% --- FRONT MATTER --- %%
@@ -55,17 +51,20 @@ unconventional computing, neuromorphic engineering
 }
 
 \begin{listofabbreviations}
-    \abbrev{RD}{Reaction--Diffusion}
-    \abbrev{BZ}{Belousov--Zhabotinsky}
-    \abbrev{CRN}{Chemical Reaction Network}
-    \abbrev{RNCRN}{Recurrent Neural Chemical Reaction Network}
-    \abbrev{PNN}{Physical Neural Network}
-    \abbrev{RNN}{Recurrent Neural Network}
-    \abbrev{ODE}{Ordinary Differential Equation}
-    \abbrev{PDE}{Partial Differential Equation}
-    \abbrev{BC}{Boundary Condition}
     \abbrev{FDTD}{Finite-Difference Time-Domain}
     \abbrev{CFD}{Computational Fluid Dynamics}
+    \abbrev{BC}{Boundary Condition}
+    \abbrev{PML}{Perfectly Matched Layer}
+    \abbrev{CFL}{Courant--Friedrichs--Lewy}
+    \abbrev{PDE}{Partial Differential Equation}
+    \abbrev{ODE}{Ordinary Differential Equation}
+    \abbrev{RNN}{Recurrent Neural Network}
+    \abbrev{PNN}{Physical Neural Network}
+    \abbrev{ZK}{Zwikker--Kosten}
+    \abbrev{JCA}{Johnson--Champoux--Allard}
+    \abbrev{TMM}{Transfer-Matrix Method}
+    \abbrev{MOF}{Metal--Organic Framework}
+    \abbrev{PINN}{Physics-Informed Neural Network}
 \end{listofabbreviations}
 
 %% --- MAIN MATTER --- %%
@@ -78,14 +77,11 @@ unconventional computing, neuromorphic engineering
 \label{chap:introduction}
 \input{chapters/introduction}
 
-\chapter{Candidate Substrates}
-\label{chap:substrates}
-\input{chapters/substrates}
+\chapter{Literature Review}
+\label{chap:literature_review}
+\input{chapters/literature_review}
 
-% NOTE (2026-07-30): the former "Literature Review" chapter was merged into
-% the Introduction chapter above; chapters/literature_review.tex is now a stub.
-
-\chapter{Methods}
+\chapter{Methodology}
 \label{chap:methodology}
 \input{chapters/methodology}
 

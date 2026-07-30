@@ -1,0 +1,6 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv, got /home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/RD/../../.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv, got /home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/RD/../../.venv
+[obj_vec] evaluating 4 candidates over pool
+[obj_vec] generation batch done in 2.8 min
+4 candidates wall=165s (2.75 min) -> 41.3s/candidate
+losses: [0.4934, 0.4884, 0.4631, 0.4858]

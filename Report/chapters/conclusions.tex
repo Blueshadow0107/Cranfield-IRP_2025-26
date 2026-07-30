@@ -1,46 +1,23 @@
 % Chapter: Conclusions and Future Work
-% Continuous Analog Wave Computation in Porous Media
-
-\section{Summary of Contributions}
-\label{sec:contributions}
-
-% NOTE: Mirror the objectives from the introduction. State what was actually achieved.
-% Be honest: if something is preliminary, say so. Use the same language as the objectives.
-
-[Bullet summary of what was achieved.]
-
-\section{Limitations}
-\label{sec:limitations}
-
-% NOTE: Be direct about weaknesses. This strengthens the thesis because it shows critical
-% awareness. Do not be apologetic, just factual.
-
-\begin{itemize}
-    \item Frequency-domain formulation assumes linear time-invariant steady-state response; transient and nonlinear effects are not captured.
-    \item Gradient-free optimisation limits design-space size and convergence speed.
-    \item 2D approximation; real porous devices are three-dimensional.
-    \item Fixed Lambda and Lambda' reduce the physical realism of the design space.
-    \item Mapping from optimised effective properties to a manufacturable geometry is not addressed.
-\end{itemize}
-
-\section{Future Work}
-\label{sec:future}
-
-% NOTE: Future work should be concrete and extend naturally from the limitations.
-% Avoid vague "more research is needed." Specify what kind and why.
-
-\begin{enumerate}
-    \item Extend to time-domain FDTD or auxiliary differential equations for broadband transient signals.
-    \item Implement adjoint-based gradient optimisation for larger design regions.
-    \item Relax fixed Lambda/Lambda' or link them to a pore-scale geometric model.
-    \item Validate select designs in OpenFOAM or experimentally.
-    \item Demonstrate a concrete classification or routing task with quantified accuracy and generalisation.
-\end{enumerate}
-
-\section{Concluding Remarks}
-\label{sec:concluding}
-
-% NOTE: One paragraph closing the thesis. Restate the aim, the main finding, and the
-% broader implication. End with a forward-looking sentence.
-
-[Final paragraph.]
+% PARKED 2026-07-20: entire chapter commented out at user request.
+% Uncomment and fill in as results are integrated.
+%
+% \section{Summary of Contributions}
+% \label{sec:conc_summary}
+%
+% [EXEMPLAR TODO: one paragraph restating the aim and listing the contributions: a verified 2D Oregonator solver with structured boundaries and property fields; a black-box port/probe characterisation protocol for RD substrates; the four measured transfer functions (channel, frequency, logic, anisotropy); the substrate-selection methodology and its conclusion.]
+%
+% \section{Limitations}
+% \label{sec:conc_limitations}
+%
+% [EXEMPLAR TODO: one paragraph on the limitations: 2D idealised geometry; Oregonator as a reduced model of full BZ chemistry; explicit solver resolution and timestep constraints; slow physical speed of chemical waves; no closed training loop --- characterisation only; all results numerical, no wet-lab validation.]
+%
+% \section{Future Work}
+% \label{sec:conc_future}
+%
+% [EXEMPLAR TODO: one paragraph on future directions: closing the loop --- gradient-free or surrogate-based training of wall geometry, phi(x,y), and the diffusion tensor field for target input--output maps; scaling to multi-gate circuits; experimental validation in photosensitive BZ; hybrid characterisation-then-train workflow as a general recipe for physical neural networks.]
+%
+% \section{Concluding Remarks}
+% \label{sec:conc_remarks}
+%
+% [EXEMPLAR TODO: one short closing paragraph returning to the Project 11 premise: a fluid medium can compute continuously and in parallel, ``programming'' it means shaping its structure, and characterising the medium's native transfer functions is the necessary first engineering step toward programming it deliberately.]

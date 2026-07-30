@@ -1,0 +1,38 @@
+{
+  "kinetics": "Oregonator Candidate A (f=1.4375, eps=0.0501, q=0.002)",
+  "phi0": 0.01,
+  "phi_max": 0.025,
+  "rest_u_star": 0.003082099932938156,
+  "geometry": "CROPPED 237x132 (x[14,251), y[54,186) of 256x200), W=20, TJ=96->82, A port x[25,43)->[11,29), B port y[140,158)->[86,104), B channel y<172->118, probe strip x=240->226",
+  "tA_arrival": 31.950000000000003,
+  "tB_arrival": 26.950000000000003,
+  "window_tu": [
+    24.450000000000003,
+    34.45
+  ],
+  "window_rule": "[min(tA,tB)-2.5, max(tA,tB)+2.5] t.u.; final2 half-window extended to cover both lone-input arrivals so XOR true cases are both readable",
+  "A0_lone_peak": 0.7067933997684301,
+  "nsteps_train": 739,
+  "nsteps_full": 1000,
+  "design_region": {
+    "x": [
+      30,
+      210
+    ],
+    "y": [
+      10,
+      122
+    ],
+    "blocks": 8
+  },
+  "lambda_tv": 1.0,
+  "baseline_truth_windowed": {
+    "00": 0.0030820999329396943,
+    "10": 0.7082047959897068,
+    "01": 0.7053820035471535,
+    "11": 0.7053686276062402
+  },
+  "baseline_separation_xor": 1.0000189630505099,
+  "baseline_note": "windowed baseline reads OR: p10~p01~p11~A0, separation ~1",
+  "protocol_wall_s": 94.59336066246033
+}

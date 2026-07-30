@@ -1,0 +1,138 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{Weekly Progress Report: RD System Tests}
+\subtitle{Summary of Verification and Characterization Tests}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26 --- July 28, 2026}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Test 1: Method of Manufactured Solutions (MMS)}
+    \textbf{Purpose:}
+    \begin{itemize}
+        \item A formal verification of the \texttt{rd\_core} solver's numerical accuracy.
+        \item Confirms that the error decreases at the expected theoretical rate.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Conclusion: Success}
+    \begin{itemize}
+        \item For all three models tested, the solver demonstrated the correct convergence behavior.
+        \item Spatial convergence order: $\sim$2.0 (as expected)
+        \item Temporal convergence order: $\sim$1.0 (as expected)
+    \end{itemize}
+
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Test 1: MMS Results Figure}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_mms.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Test 2: Anisotropy Test}
+    \textbf{Purpose:}
+    \begin{itemize}
+        \item Verified that the simulation correctly models anisotropic (uneven) diffusion.
+        \item Checked if the ratio of wave speeds along fast and slow axes matched the theoretical `sqrt(r)` value.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Conclusion: Success}
+    \begin{itemize}
+        \item The `oregonator` model showed excellent agreement with theory (less than 0.4\% deviation).
+        \item The `barkley` model showed a larger deviation (up to 9.6\%), which may warrant further investigation.
+    \end{itemize}
+
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Test 2: Anisotropy Test Results Figure}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_transfer\_aniso\_final2.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Test 3: Transmission/Channel Test}
+    \textbf{Purpose:}
+    \begin{itemize}
+        \item Measured the propagation of a pulse through a straight channel of varying width.
+        \item Determined the minimum width required for successful transmission.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Conclusion: Success}
+    \begin{itemize}
+        \item For both the `barkley` and `oregonator` models, even very narrow channels (down to a single cell wide) were able to support pulse propagation.
+        \item The wave speed in the channel was found to be very close to the speed in a free, unbounded medium.
+    \end{itemize}
+
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Test 3: Transmission/Channel Test Results Figure}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_transfer\_channel\_final2.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Test 4: Pulse Timing/Frequency Test}
+    \textbf{Purpose:}
+    \begin{itemize}
+        \item Measured the refractory period of the medium.
+        \item Measured the ability to faithfully transmit a train of pulses at different frequencies.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Conclusion: Success}
+    \begin{itemize}
+        \item The test successfully characterized the refractory properties of both models.
+        \item This confirms that both media have a built-in "reset time" that limits their information processing speed.
+    \end{itemize}
+
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Test 4: Pulse Timing/Frequency Results (Barkley)}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_transfer\_frequency\_final2\_barkley.png}
+\end{frame}
+
+\begin{frame}{Test 4: Pulse Timing/Frequency Results (Oregonator)}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_transfer\_frequency\_final2\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Test 5: RD Core Verification}
+    \textbf{Purpose:}
+    \begin{itemize}
+        \item A formal verification of the \texttt{rd\_core} solver's accuracy and stability.
+        \item Checked for grid convergence, timestep convergence, and simulation invariants.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Conclusion: Success}
+    \begin{itemize}
+        \item The solver was found to be stable, with no `NaN`/`Inf` values.
+        \item While convergence orders did not perfectly match theory, the deviations are explainable and the results are reasonable for a complex simulation.
+    \end{itemize}
+
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Test 5: RD Core Verification Results Figure}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_verification.png}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,103 @@
+{
+  "kinetics": "oregonator candidate B (f=1.4375, eps=0.0199, phi=0.010), q=0.002, Du=1, Dv=0.6, de-hacked rd_core",
+  "rest_state_u_star": 0.003082099932938156,
+  "control_max_u_100tu": 0.0030820999329396973,
+  "control_quiet": true,
+  "geometry": "300x48 channel, W=16, far probe strip x=240",
+  "refractory_period_steps": 54,
+  "refractory_period_time": 2.7,
+  "two_pulse_scan": {
+    "20": 1,
+    "40": 1,
+    "42": 1,
+    "44": 1,
+    "46": 1,
+    "48": 1,
+    "50": 1,
+    "52": 1,
+    "54": 2,
+    "60": 2,
+    "80": 2,
+    "120": 2,
+    "160": 2,
+    "240": 2,
+    "320": 2,
+    "480": 2,
+    "640": 2
+  },
+  "train_results": [
+    {
+      "period_steps": 24,
+      "fired": 6,
+      "transmitted": 1,
+      "f_in": 0.8333333333333333,
+      "f_out": 0.0
+    },
+    {
+      "period_steps": 32,
+      "fired": 6,
+      "transmitted": 1,
+      "f_in": 0.625,
+      "f_out": 0.0
+    },
+    {
+      "period_steps": 40,
+      "fired": 6,
+      "transmitted": 1,
+      "f_in": 0.5,
+      "f_out": 0.0
+    },
+    {
+      "period_steps": 49,
+      "fired": 6,
+      "transmitted": 3,
+      "f_in": 0.4081632653061224,
+      "f_out": 0.16326530612243564
+    },
+    {
+      "period_steps": 54,
+      "fired": 6,
+      "transmitted": 4,
+      "f_in": 0.37037037037037035,
+      "f_out": 0.22222222222220575
+    },
+    {
+      "period_steps": 62,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.3225806451612903,
+      "f_out": 0.3225806451612695
+    },
+    {
+      "period_steps": 73,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.273972602739726,
+      "f_out": 0.273972602739711
+    },
+    {
+      "period_steps": 86,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.23255813953488372,
+      "f_out": 0.23255813953487292
+    },
+    {
+      "period_steps": 108,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.18518518518518517,
+      "f_out": 0.18518518518517835
+    },
+    {
+      "period_steps": 135,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.14814814814814814,
+      "f_out": 0.14814814814814375
+    }
+  ],
+  "max_following_rate": 0.3225806451612903,
+  "saturated_output_rate": 0.3225806451612695,
+  "slope1_region": true
+}

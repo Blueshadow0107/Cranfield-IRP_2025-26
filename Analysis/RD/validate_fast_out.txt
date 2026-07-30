@@ -1,0 +1,26 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv, got /home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/RD/../../.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/cyanidepopcorn/Cranfield/IndividualResearchProject/.venv, got /home/cyanidepopcorn/Cranfield/IndividualResearchProject/Analysis/RD/../../.venv
+==============================================================================
+CHECK 1: cropped-domain protocol vs frozen full-grid protocol
+==============================================================================
+  (protocol sims took 95s on the cropped domain)
+  [PASS] tA_arrival                         fast=                   31.95 frozen=                   31.95 |d|=0.0000 < 0.3
+  [PASS] tB_arrival                         fast=                   26.95 frozen=                   26.95 |d|=0.0000 < 0.3
+  [PASS] A0_lone_peak                       fast=                0.706793 frozen=                0.706794 rel diff=5.37e-07 < 0.02
+  [PASS] baseline peak 00                   fast=                0.003082 frozen=                0.003082 |d|=0.00e+00 < 0.02
+  [PASS] baseline peak 10                   fast=                0.708205 frozen=                0.708205 |d|=1.09e-08 < 0.02
+  [PASS] baseline peak 01                   fast=                0.705382 frozen=                0.705383 |d|=7.48e-07 < 0.02
+  [PASS] baseline peak 11                   fast=                0.705369 frozen=                0.705369 |d|=2.61e-09 < 0.02
+  window(fast)=[24.450000000000003, 34.45]  window(frozen)=[24.450000000000003, 34.45]
+  nsteps_train: fast=739 frozen=739
+
+==============================================================================
+CHECK 2: random candidate (seed 0) through debug vs fast objective
+==============================================================================
+  debug objective: loss=0.495155  (177s, full grid)
+  fast  objective: loss=0.495154  (107s, cropped)
+  [PASS] objective loss                     fast=                0.495154 frozen=                0.495155 |d|=4.78e-07 < 0.01
+
+==============================================================================
+VALIDATION PASSED (total wall time 6.3 min)
+==============================================================================

@@ -1,0 +1,82 @@
+{
+  "gate": "A AND (NOT B) -- inhibition via head-on collision",
+  "kinetics": "barkley (a=0.75, b=0.01, eps=0.02, Du=1, Dv=0)",
+  "readout": "windowed probe peak, window = 2.5 t.u. around A-alone arrival t=57.55 t.u.",
+  "truth_table": {
+    "00": 0.0,
+    "10": 0.9971833050306596,
+    "01": 3.597217991405673e-11,
+    "11": 3.597217991405673e-11
+  },
+  "separation_ratio": 997.1833050306595,
+  "decision_threshold": 0.4985916525333159,
+  "timing_sweep": [
+    {
+      "dB_steps": 0,
+      "window_peak": 3.597217991405673e-11,
+      "blocked": true
+    },
+    {
+      "dB_steps": 20,
+      "window_peak": 7.784429176554917e-11,
+      "blocked": true
+    },
+    {
+      "dB_steps": 40,
+      "window_peak": 2.1115352036368526e-10,
+      "blocked": true
+    },
+    {
+      "dB_steps": 60,
+      "window_peak": 1.1298770946403349e-09,
+      "blocked": true
+    },
+    {
+      "dB_steps": 80,
+      "window_peak": 4.7850928831664705e-08,
+      "blocked": true
+    },
+    {
+      "dB_steps": 100,
+      "window_peak": 0.0005862531353951942,
+      "blocked": true
+    },
+    {
+      "dB_steps": 110,
+      "window_peak": 0.007270831060103951,
+      "blocked": true
+    },
+    {
+      "dB_steps": 120,
+      "window_peak": 0.09228758400020681,
+      "blocked": true
+    },
+    {
+      "dB_steps": 140,
+      "window_peak": 0.9657094211465438,
+      "blocked": false
+    },
+    {
+      "dB_steps": 160,
+      "window_peak": 0.9965513046649066,
+      "blocked": false
+    },
+    {
+      "dB_steps": 200,
+      "window_peak": 0.9905899060998518,
+      "blocked": false
+    },
+    {
+      "dB_steps": 260,
+      "window_peak": 0.9971833050397082,
+      "blocked": false
+    },
+    {
+      "dB_steps": 320,
+      "window_peak": 0.9971833050306596,
+      "blocked": false
+    }
+  ],
+  "inhibition_window_steps": 120,
+  "xor_note": "naive annihilation-XOR is not realisable: junctions diffract waves into all connected channels (OR), and any readout at the collision zone is fired by the collision cusp; see Notes/oregonator-oscillatory-regime-2026-07-20.md and the script header"
+}
