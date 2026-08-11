@@ -1,5 +1,7 @@
 % Chapter: Introduction
 % Reaction-diffusion excitable media as substrates for analog physical computation
+% SHORTENED COPY-EDIT (Report/edits/, 2026-08-03): exemplar paragraphs tightened.
+% Original untouched at chapters/introduction.tex.
 % NOTE (2026-07-30): this chapter merges the former separate "Introduction" and
 % "Literature Review" chapters into one. The literature narrative now sits
 % between the background (sec:background) and the research aim (sec:aim), so
@@ -9,164 +11,110 @@
 \section{Background and Motivation}
 \label{sec:background}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-Digital computers perform every operation by shuttling data between memory and processor, and this von Neumann bottleneck means that even the most efficient inference hardware pays an energy and latency tax on every arithmetic step. 
-As machine-learning workloads grow, a growing body of work asks whether the physics of a material can perform computation directly, without clocked digital arithmetic. 
-In such physical neural networks, inputs are encoded as physical excitations, the medium transforms them through its own natural dynamics, and outputs are read from probes; computation happens continuously in time and in parallel across space, with the medium's structure playing the role of the network's weights. 
-Demonstrations in optics, mechanics, and electronics have shown that this is not merely a thought experiment but a practical route to inference hardware \cite{lin2018alloptical, wright2022deep, hughes2019wave}.
-% --- END EXEMPLAR ---
+Digital computers shuttle data between memory and processor for every operation and this von Neumann bottleneck taxes every arithmetic step in energy and latency.
+As machine-learning workloads grow, there is increasing interest in leveraging the physics of materials to compute directly, without clocked digital arithmetic.
+In such physical neural networks, inputs are encoded as physical excitations, the medium transforms them through its own dynamics, and outputs are read from probes.
+Computation is continuous in time and parallel across space, with the medium's structure acting as the network's weights.
+Demonstrations in optics, mechanics, and electronics confirm this is a practical route to inference hardware \cite{lin2018alloptical, wright2022deep, hughes2019wave}.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-This project begins from a deliberately open premise: can a fluid or chemical medium compute continuously and in parallel, and what would it even mean to \emph{program} such a medium? 
-In a digital computer, programming means writing instructions; in a physical medium, the analogue of a program is the arrangement of the medium itself, its boundaries, its internal structure, and any spatially varying properties. 
-If the medium's dynamics transform injected signals in a useful way, then shaping the medium \emph{is} writing the program. 
-Making this idea precise requires two things: a candidate medium whose dynamics are rich enough to compute, and a systematic way to describe what computations a given arrangement of that medium actually performs.
-% --- END EXEMPLAR ---
+This project begins from an open premise: can a fluid or chemical medium compute continuously and in parallel, and what would it even mean to \emph{program} such a medium?
+In a digital computer a program is a list of instructions; in a physical medium, the analogue of a program is the arrangement of the medium itself - its boundaries, internal structure, and spatially varying properties.
+If the dynamics transform injected signals usefully, shaping the medium \emph{is} writing the program.
+Making this precise requires a medium rich enough to compute, and a systematic way to describe what a given arrangement of it computes.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The remainder of this chapter builds the case for one particular answer, and the rest of the thesis puts it to the test. 
-\refSec{sec:lit_pnn} reviews the physical-neural-network idea and the demonstrations that established it. 
-\refSec{sec:lit_chemical} follows the chemical route, in which excitable media compute through propagating waves and their collisions. 
-\refSec{sec:lit_bz} introduces the Belousov--Zhabotinsky reaction and the Oregonator model as the practical realisation of that route. 
-\refSec{sec:lit_synthesis} draws the threads together into the specific research gap, from which the aim and objectives of the thesis then follow.
-% --- END EXEMPLAR ---
+This chapter builds the case for one answer, and the rest of the thesis tests it.
+\refSec{sec:lit_pnn} reviews the physical-neural-network idea and its landmark demonstrations, 
+\refSec{sec:lit_chemical} the chemical route, in which excitable media compute through propagating waves and their collisions.
+\refSec{sec:lit_bz} the Belousov--Zhabotinsky reaction and Oregonator model as the practical realisation of that route.
+\refSec{sec:lit_synthesis} draws the threads together into the research gap, from which the aim and objectives follow.
 
 \section{Physical Neural Networks}
 \label{sec:lit_pnn}
 
 A physical neural network is a material or device whose internal physical dynamics implement the mathematical operations of a neural network. Rather than simulating those dynamics in software, the network is the physical system itself: inputs are encoded as fields or excitations, the material transforms them through its natural evolution, and outputs are read from probes or detectors. The appeal of this approach is that computation can occur in parallel across space and continuously in time, without the repeated memory transfers that dominate digital inference.
 
-Optical systems have been among the most prominent demonstrations. Lin et al showed that a stack of diffractive surfaces can be trained to perform image classification and other tasks entirely through light propagation \cite{lin2018alloptical}. The layers modulate the phase of the optical field, and interference in free space produces the desired mapping. This work established that a physical wave system can be designed as a deep neural network, with the geometry of the diffractive elements serving as the trainable weights.
+Optical systems have been among the most prominent demonstrations. Lin et al. showed that a stack of diffractive surfaces can be trained to perform image classification and other tasks entirely through light propagation \cite{lin2018alloptical}. The layers modulate the phase of the optical field, and interference in free space produces the desired mapping. This work established that a physical wave system can be designed as a deep neural network, with the geometry of the diffractive elements serving as the trainable weights.
 
-Mechanical systems provide a complementary view. Stern et al demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader theoretical framework for learning in physical networks \cite{stern2021physical}. In these systems the equilibrium or linear response of the network encodes the learned function, and training adjusts physical parameters such as spring constants rather than digital weights.
+Mechanical systems provide a complementary view. Stern et al. demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader theoretical framework for learning in physical networks \cite{stern2021physical}. In these systems the equilibrium or linear response of the network encodes the learned function, and training adjusts physical parameters such as spring constants rather than digital weights.
 
-More recently, Wright et al extended the physical neural network idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}. Momeni et al addressed a key practical difficulty of that approach, namely that real physical systems are noisy and difficult to differentiate through, by proposing a backpropagation-free training method for deep physical neural networks \cite{momeni2023backpropagation}. Together these works show that physical networks can be both deep and trainable, but they also highlight the challenge of transferring designs from simulation to physical hardware.
+More recently, Wright et al. extended the physical neural network idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}. Momeni et al. addressed a key practical difficulty of that approach, namely that real physical systems are noisy and difficult to differentiate through, by proposing a backpropagation-free training method for deep physical neural networks \cite{momeni2023backpropagation}. Together these works show that physical networks can be both deep and trainable, but they also highlight the challenge of transferring designs from simulation to physical hardware.
 
-A unifying theoretical perspective was provided by Hughes et al, who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}. In this view, the state of the wave field at each time step is the hidden state of the RNN, and the evolution operator is a sparse linear recurrence whose coefficients depend on the local material properties.
+A unifying theoretical perspective was provided by Hughes et al., who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}. In this view, the state of the wave field at each time step is the hidden state of the RNN, and the evolution operator is a sparse linear recurrence whose coefficients depend on the local material properties.
 
 The present work adopts the same conceptual stance - the physical field is the computational state and the material distribution is the trainable parameter set, but moves from linear wave physics to a nonlinear, excitable chemical medium, in which the propagating quantity is a self-sustaining chemical pulse rather than a decaying or superposing wave.
+This move also situates the work within molecular communication: the substrate is a fluid channel whose input is a spatially patterned chemical excitation and whose output is a measured concentration signal, and the trainable structure plays the role of a physical encoder/decoder.
+Experimental tabletop molecular communication has already demonstrated digital messages carried by chemical signals \cite{farsad2013tabletop}, and the field's surveys identify reaction--diffusion transport as a physically realistic channel model \cite{farsad2016comprehensive}.
+More recent work argues that molecular signals are especially attractive for wave-denied environments where conventional electromagnetic propagation fails \cite{guo2021molecular}.
+The present thesis treats the reaction--diffusion channel not merely as a passive communication link, but as a programmable analog computing substrate.
 
 
 \section{Chemical and Excitable-Media Computing}
 \label{sec:lit_chemical}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-Computation in fluid and chemical media has a long history, and its enduring appeal is that matter itself stores and transforms information: signals travel, interact, and are processed by the physics of the substrate rather than by an external arithmetic unit. 
-Surveys of liquid computers trace this lineage from hydraulic analog machines to modern molecular and microfluidic systems, while demonstrated platforms span microfluidic bubble logic, in which gas bubbles travelling through channel networks carry, route, and process discrete bits, and self-organising chemical reaction networks that classify temporal inputs as reservoir computers, without any designed circuit structure \cite{adamatzky2019liquid, prakash2007bubble, baltussen2024chemical}. 
-Together these works establish fluid and chemical media not as exotic curiosities but as a credible class of computing substrates, covering both discrete digital-like logic and analog reservoir computation.
-% --- END EXEMPLAR ---
+Computation in fluid and chemical media has a long history: matter itself stores and transforms information, so signals are processed by the physics of the substrate rather than by an external arithmetic unit.
+The lineage runs from hydraulic analog machines to modern molecular and microfluidic systems \cite{adamatzky2019liquid}. Demonstrated platforms include microfluidic bubble logic, in which gas bubbles carry, route, and process discrete bits through channel networks \cite{prakash2007bubble}, and self-organising chemical reaction networks that classify temporal inputs as reservoir computers \cite{baltussen2024chemical}.
+Fluid and chemical media are thus a credible computing substrate class, spanning discrete digital-like logic and analog reservoir computation.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-Within this tradition, excitable chemical media offer a particularly direct route to computation, because their elementary phenomena map one-to-one onto computational primitives. 
-A supra-threshold perturbation launches a self-sustaining pulse, a signal that propagates without attenuation; the refractory zone behind each pulse enforces one-way propagation and sets a maximum signalling rate; and the annihilation of colliding wave fronts supplies a native, energy-dissipating nonlinearity of exactly the kind that logic requires. 
-These primitives have been turned into working devices: colliding-pulse logic gates first shown numerically and then realised experimentally in Belousov--Zhabotinsky solutions, an experimental XOR gate in a reaction--diffusion medium, logical functions of structured channel junctions, general-purpose information processing in deliberately structured excitable media, and even a single oscillating BZ droplet operating as a binary and fuzzy logic processor \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, adamatzky2002collision, sielewiesiuk2001logical, gorecki2009information, gentili2012chemical}. 
-A common feature of this body of work is that each gate or circuit is designed by hand, geometry by geometry, for one logical function at a time: the medium demonstrably computes, but nobody asks systematically \emph{what} a given arrangement of it computes.
-% --- END EXEMPLAR ---
+Within this tradition, excitable chemical media offer a direct route to computation: their elementary phenomena map one-to-one onto computational primitives.
+These primitives have produced working devices: colliding-pulse logic gates, an experimental XOR gate in a reaction--diffusion medium, logical functions of structured channel junctions, general-purpose processing in structured excitable media, and a single oscillating BZ droplet acting as a binary and fuzzy logic processor \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, adamatzky2002collision, sielewiesiuk2001logical, gorecki2009information, gentili2012chemical}.
+The common feature is hand design: each gate or circuit is built, geometry by geometry, for one logical function.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-A parallel line of research has pursued \emph{trainable} chemistry in well-mixed reactors, where a chemical reaction network plays the role of a neural network with reaction rates as the trainable weights. 
-The theoretical foundations, that chemical kinetics can implement neural networks, Turing machines, and indeed universal computation, were established early \cite{hjelmfelt1991chemical, magnasco1997chemical}, and recent work has made the programme concrete: recurrent neural chemical reaction networks that approximate arbitrary dynamical systems and can be trained as chemical classifiers, and DNA-based winner-take-all networks scaled to pattern-recognition tasks of practical size \cite{dack2024rncrn, cherry2018scaling}. 
-These systems are genuinely trainable, but they are well-mixed: all information resides in scalar concentrations evolving in time, with no spatial extent. 
-They therefore sacrifice the spatial continuity and parallelism that motivate physical neural networks in the first place, precisely the properties that structured excitable media possess natively.
-% --- END EXEMPLAR ---
-
-% ============================================================================
-% OPTIONAL SUBSECTION --- user undecided; uncomment to include.
-% Recurrent neural CRN (RNCRN) XOR result as a prior-paradigm subsection.
-% ============================================================================
-%\subsection{Prior Work: A Trained Recurrent Neural CRN}
-%\label{sec:lit_rncrn}
-%
-%% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-%As part of the substrate search underlying this thesis, the author implemented and trained a recurrent neural chemical reaction network of the type proposed by Dack \etal \cite{dack2024rncrn}, and verified that it solves the XOR classification task. The network operates in a well-mixed setting: inputs are encoded as initial concentrations, a fast neural subsystem of catalytic reactions transforms them, and the output is read from the sign of a concentration difference. The exercise confirmed that well-mixed chemistry is trainable end-to-end, but it also made the limitations concrete: there is no spatial structure to program, no parallel signal streams, and no continuum in which waves interact. This experience directly motivated the move to spatially extended reaction--diffusion media, where the geometry itself can serve as the trained object.
-%% --- END EXEMPLAR ---
-
-% ============================================================================
-% OPTIONAL SUBSECTION --- user undecided; uncomment to include.
-% Acoustic Y-junction FDTD logic as a prior-paradigm subsection.
-% ============================================================================
-%\subsection{Prior Work: Acoustic Wave Logic in a Y-Junction}
-%\label{sec:lit_yjunction}
-%
-%% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-%The earliest substrate investigated in this project was airborne sound in structured channel geometries. Using a finite-difference time-domain solver built by the author, acoustic pulses were routed through a Y-junction and their interference was shown to reproduce elementary logic behaviour at the junction output. The paradigm is genuinely continuous and parallel, and the physics is simple and well understood. It was set aside for two reasons: the mapping from material structure to computation is essentially linear and passive, so the medium contributes little nonlinearity of its own; and closely related acoustic logic had already been demonstrated extensively in the literature, leaving limited novelty headroom. The episode was nevertheless instructive: it established the pulse-in, probe-out experimental grammar that the present reaction--diffusion work retains.
-%% --- END EXEMPLAR ---
+A parallel line of research pursues \emph{trainable} chemistry in well-mixed reactors, where a reaction network plays the role of a neural network with reaction rates as the trainable weights.
+Neural-network behaviour, universal computation, and end-to-end training have all been demonstrated in such systems \cite{hjelmfelt1991chemical, magnasco1997chemical, dack2024rncrn, cherry2018scaling}, but they are well-mixed: all information resides in scalar concentrations, with no spatial extent.
+They sacrifice exactly the spatial continuity and parallelism that structured excitable media possess natively; what that limitation means for substrate selection is taken up in \refSec{sec:sub_crn}.
 
 \section{The Belousov--Zhabotinsky Reaction and the Oregonator Model}
 \label{sec:lit_bz}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The Belousov--Zhabotinsky (BZ) reaction, the metal-ion-catalysed oxidation of an organic substrate by bromate in acidic solution, is the canonical experimental excitable chemical medium. Under appropriate conditions it exhibits spontaneous temporal oscillations, visible as periodic colour changes, and in thin quasi-two-dimensional layers it supports propagating oxidation waves: expanding target patterns, rotating spirals, and complex interacting fronts. Its phenomenology is exceptionally well characterised experimentally, its ingredients are inexpensive and handled at room temperature, and its behaviour is faithfully reproduced by compact mathematical models. For these reasons the BZ reaction has become the standard testbed for chemical-wave computing studies, including most of the experimental logic-gate work reviewed in \refSec{sec:lit_chemical}.
-% --- END EXEMPLAR ---
+The Belousov--Zhabotinsky (BZ) reaction, the metal-ion-catalysed oxidation of an organic substrate by bromate in acidic solution, is the canonical experimental excitable chemical medium. It oscillates spontaneously under appropriate conditions, visible as periodic colour changes, and in thin quasi-two-dimensional layers it supports propagating oxidation waves: expanding target patterns, rotating spirals, and interacting fronts. Its phenomenology is exceptionally well characterised, its ingredients are inexpensive and handled at room temperature, and compact models reproduce its behaviour faithfully. It is therefore the standard testbed for chemical-wave computing, including most of the experimental logic-gate work reviewed in \refSec{sec:lit_chemical}.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The kinetic essence of the BZ reaction is captured by the Oregonator, a three-variable reduction of the detailed Field--K\"or\"os--Noyes mechanism due to Field and Noyes \cite{field1974oregonator}. Tyson and Fife showed that a further reduction to two variables, a fast activator (the autocatalytic bromous acid species) and a slow recovery variable (the oxidised catalyst), preserves the excitable dynamics while making the model analytically and numerically tractable \cite{tyson1980target}. The singular-perturbation structure of this two-variable form, reviewed by Tyson and Keener \cite{tyson1988singular}, underlies the classic understanding of pulse propagation in excitable media and is the form of the model used throughout this thesis, coupled to spatial diffusion of the activator.
-% --- END EXEMPLAR ---
+The kinetic essence of the BZ reaction is captured by the Oregonator, Field and Noyes's three-variable reduction of the detailed Field--K\"or\"os--Noyes mechanism \cite{field1974oregonator}, and by Tyson and Fife's further reduction to two variables: a fast activator (the autocatalytic bromous acid species) and a slow recovery variable (the oxidised catalyst), preserves the excitable dynamics while making the model analytically and numerically tractable \cite{tyson1980target}. The singular-perturbation structure of this two-variable form, reviewed by Tyson and Keener \cite{tyson1988singular}, underlies the classic understanding of pulse propagation in excitable media. It is the model used throughout this thesis, coupled to spatial diffusion of the activator.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-A variant of particular importance for computing applications is the photosensitive BZ reaction, in which the ruthenium-catalysed system is inhibited by illumination. Because light suppresses excitability, a spatial light field acts as a writable mask on the medium: illuminated regions slow or block wave propagation, dark regions transmit it. Sakurai \etal exploited this to design and control wave-propagation patterns in real time, routing chemical waves through optically defined channels and junctions \cite{sakurai2002design}. In the language of the present thesis, the photosensitive variant turns the substrate into a rewritable device, with the light field $\phi(x,y)$ playing the role of a programmable, and potentially trainable, property field.
-% --- END EXEMPLAR ---
+A variant of particular importance for computing is the photosensitive BZ reaction, in which the ruthenium-catalysed system is inhibited by illumination. A spatial light field then acts as a writable mask on the medium: illuminated regions slow or block wave propagation, dark regions transmit it. Sakurai \etal exploited this to route chemical waves through optically defined channels and junctions in real time \cite{sakurai2002design}. In the language of this thesis, the light field $\phi(x,y)$ turns the substrate into a rewritable device - a programmable, and potentially trainable, property field.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The computing-relevant phenomenology of excitable media follows from a small set of robust behaviours. A supra-threshold perturbation triggers a pulse that propagates at a characteristic speed; behind each pulse lies a refractory zone in which the medium cannot be re-excited, which sets a maximum signalling frequency. Colliding pulses annihilate, providing a native nonlinearity, while pulses encountering a narrowing gap or a high-curvature turn can be blocked entirely, a phenomenon quantified in the ring and cable studies of Courtemanche \etal \cite{courtemanche1993instabilities}. Structure can be exploited further: asymmetric junctions act as chemical diodes \cite{agladze1996chemical}, T-shaped junctions act as band-pass filters of pulse frequency \cite{gorecka2003tshaped}, and the response of an excitable cable to stochastic pacing can be described by measured transfer functions \cite{delange2009transfer}. Anisotropy adds another degree of control: patterned excitability creates preferred propagation directions and spiral organising centres \cite{steinbock1995anisotropy}, and eikonal-curvature theory relates front speed to curvature and medium properties \cite{keener1991eikonal}. These behaviours, propagation, refractoriness, annihilation, block, rectification, filtering, and anisotropic routing, constitute the native instruction set that the present work sets out to characterise.
-% --- END EXEMPLAR ---
+The computing-relevant phenomenology of excitable media follows from a small set of robust behaviours. A supra-threshold perturbation triggers a pulse travelling at a characteristic speed; behind it lies a refractory zone that cannot be re-excited, setting a maximum signalling frequency. Colliding pulses annihilate; pulses meeting a narrowing gap or a high-curvature turn can be blocked entirely \cite{courtemanche1993instabilities}. Structure adds more: asymmetric junctions act as chemical diodes \cite{agladze1996chemical}, T-shaped junctions as band-pass filters of pulse frequency \cite{gorecka2003tshaped}, and excitable cables under stochastic pacing admit measured transfer functions \cite{delange2009transfer}. Anisotropy adds directional control: patterned excitability creates preferred propagation directions and spiral organising centres \cite{steinbock1995anisotropy}, and eikonal-curvature theory relates front speed to curvature \cite{keener1991eikonal}. Propagation, refractoriness, annihilation, block, rectification, filtering, and anisotropic routing are the native instruction set this work characterises.
 
 % NOTE (2026-07-30): the Substrate Selection material that used to live here
 % was moved to the dedicated Candidate Substrates chapter
 % (chapters/substrates.tex, \label{chap:substrates}); the label
 % sec:lit_substrates and tab:substrate_comparison now live there.
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
 The comparative evaluation of the candidate substrate families that grounds this choice, and the reasons each alternative was set aside, is presented in \refChap{chap:substrates}.
-% --- END EXEMPLAR ---
 
 \section{Synthesis and Research Gap}
 \label{sec:lit_synthesis}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The literature reviewed above establishes four points. First, physical neural networks are a viable alternative to digital inference, with trained demonstrations in optics, mechanics, and wave physics \cite{lin2018alloptical, stern2021physical, wright2022deep, hughes2019wave}. Second, chemical and fluid media have a long computing pedigree, from liquid computers to bubble logic and chemical reservoirs \cite{adamatzky2019liquid, prakash2007bubble, baltussen2024chemical}. Third, excitable media in particular support wave-collision logic, diodes, filters, and routers, both in simulation and in BZ experiments \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, agladze1996chemical, gorecka2003tshaped}. Fourth, well-mixed chemistry is trainable in the neural-network sense, but only by abandoning the spatial continuity that makes physical substrates attractive \cite{dack2024rncrn, cherry2018scaling}.
-% --- END EXEMPLAR ---
+The literature reviewed above establishes five points. First, physical neural networks are a viable alternative to digital inference, with trained demonstrations in optics, mechanics, and wave physics \cite{lin2018alloptical, stern2021physical, wright2022deep, hughes2019wave}. Second, chemical and fluid media have a long computing pedigree, from liquid computers to bubble logic and chemical reservoirs \cite{adamatzky2019liquid, prakash2007bubble, baltussen2024chemical}. Third, excitable media in particular support wave-collision logic, diodes, filters, and routers, both in simulation and in BZ experiments \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, agladze1996chemical, gorecka2003tshaped}. Fourth, well-mixed chemistry is trainable in the neural-network sense, but only by abandoning the spatial continuity that makes physical substrates attractive \cite{dack2024rncrn, cherry2018scaling}. Fifth, molecular communication research has begun to treat reaction--diffusion transport as an information channel, with non-coherent detectors that exploit chemical diversity \cite{lin2023diversity} and polynomial-chaos methods that quantify uncertainty in the received signal \cite{abbaszadeh2019uncertainty}; programmable chemical computers built from arrays of oscillators have also demonstrated memory and pattern recognition \cite{parrilla2020programmable}.
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-What is missing is a systematic, device-oriented characterisation of what a structured reaction--diffusion substrate natively computes. Existing excitable-media computing work demonstrates isolated gates, each embedded in an ad hoc geometry designed for one function; the trainable-CRN work achieves learning but in a spaceless, well-mixed setting; and the physical-neural-network framework has not been carried into excitable chemical media. Nobody, to our knowledge, has treated a structured BZ-type substrate as a black box, with defined input ports, probe outputs, and measured transfer functions for transmission, frequency response, logic, and anisotropic routing, in the way an engineer would characterise a transistor before designing a circuit. This thesis addresses that gap: it characterises the substrate first, providing the component datasheet from which trained chemical processors could later be designed.
-% --- END EXEMPLAR ---
+What is missing is a systematic, device-oriented characterisation of what a structured reaction--diffusion substrate natively computes. Existing excitable-media work demonstrates isolated gates, each in an ad hoc geometry built for one function; trainable-CRN work achieves learning, but in a spaceless, well-mixed setting; and the physical-neural-network framework has not been carried into excitable chemical media. Nobody, to our knowledge, has treated a structured BZ-type substrate as a black box - defined input ports, probe outputs, measured transfer functions for transmission, frequency response, logic, and anisotropic routing - as an engineer would characterise a transistor before designing a circuit. This thesis addresses that gap: it characterises the substrate first, providing the component datasheet from which trained chemical processors could later be designed.
 
 \section{Research Aim}
 \label{sec:aim}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-The aim of this project is to characterise how a structured reaction--diffusion excitable medium processes information. 
-Rather than posing a yes-or-no question about whether such a medium can compute, the work maps out what it does natively: which transfer functions, between pulse inputs at defined ports and probe readouts at defined outputs, a structured substrate implements, and how the substrate's structure, through its geometry and its spatially varying property fields, shapes those transfer functions. 
-In doing so, the project treats the medium as an analog computing substrate whose structure can be understood, and ultimately designed, for computation.
-% --- END EXEMPLAR ---
+The aim of this project is to characterise how a structured reaction--diffusion excitable medium processes information.
+Rather than asking whether such a medium can compute, the work maps out what it does natively: which transfer functions, between pulse inputs at defined ports and probe readouts at defined outputs, a structured substrate implements, and how its geometry and spatially varying property fields shape them.
+In doing so, the medium is treated as an analog computing substrate whose structure can be understood, and ultimately designed, for computation.
 
 \section{Research Objectives}
 \label{sec:objectives}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
 To achieve this aim, the following objectives were set:
-% --- END EXEMPLAR ---
 
-% --- EXEMPLAR LIST (rewrite in your own words) ---
 \begin{enumerate}
     \item Formulate the two-variable reaction-diffusion model for a two-dimensional domain, extended with structured boundaries (channel walls), a spatial light-suppression field $\phi(x,y)$, and a spatially varying anisotropic diffusion tensor as substrate ``knobs''.
     \item Implement an explicit finite-difference solver for this model and verify it against known Belousov--Zhabotinsky phenomenology: target waves, wave-front collision and annihilation, gap diffraction, and propagation timing.
-    \item Design a black-box characterisation protocol in which the substrate is stimulated with pulses at input ports and its response is recorded at probe locations, without reference to the internal state of the medium.
+    \item Design a black-box characterisation protocol: the substrate is stimulated with pulses at input ports and its response recorded at probe locations, without reference to the internal state of the medium.
     \item Measure the substrate's native transfer functions: channel pulse transmission (speed, attenuation, width-induced wave block), refractory-limited frequency response (the substrate's effective bandwidth), two-input wave-collision logic, and the effect of anisotropic diffusion on routing.
-    \item Evaluate, from these measured transfer functions, which classes of computational task the substrate natively supports, and what this implies for the prospect of training the geometry or property fields as weights.
+    \item Evaluate which classes of computational task the substrate natively supports, and what this implies for the prospect of training the geometry or property fields as weights.
 \end{enumerate}
-% --- END EXEMPLAR ---
 
 \section{Scope and Delimitations}
 \label{sec:scope}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
 The scope of the work is delimited as follows.
-% --- END EXEMPLAR ---
 
-% --- EXEMPLAR LISTS (rewrite in your own words) ---
 In scope:
 \begin{itemize}
-    \item Two-dimensional reaction-diffusion dynamics described by two complementary two-variable models: the Barkley model, a reduced phenomenological excitable-media model used as a fast, literature-standard workhorse, and the Oregonator, the chemically grounded reduction of the Belousov--Zhabotinsky reaction mechanism, used to corroborate the Barkley measurements.
+    \item Two-dimensional reaction-diffusion dynamics in two complementary two-variable models: the Barkley model, a fast, literature-standard phenomenological workhorse, and the Oregonator, the chemically grounded reduction of the Belousov--Zhabotinsky mechanism, used to corroborate the Barkley measurements.
     \item Explicit finite-difference time integration on a regular Cartesian grid.
     \item Three substrate parameterisations: wall geometry, the light-suppression field $\phi(x,y)$, and an anisotropic diffusion tensor field.
     \item Pulse-based input/output: localised activator perturbations as inputs, time-series probe recordings as outputs.
@@ -180,16 +128,12 @@ Out of scope:
     \item Wet-lab chemical experiments; all results are numerical.
     \item Alternative chemical platforms such as DNA strand-displacement or enzymatic networks, which were evaluated and set aside during substrate selection (\refSec{sec:lit_substrates}).
 \end{itemize}
-% --- END EXEMPLAR ---
 
 \section{Thesis Structure}
 \label{sec:structure}
 
-% --- EXEMPLAR PARAGRAPH (rewrite in your own words) ---
-This chapter has introduced the physical-computing premise, reviewed the literature from physical neural networks through chemical and excitable-media computing to the Belousov--Zhabotinsky reaction, and stated the research gap, aim, and objectives. 
-The remainder of the thesis is organised as follows. 
-\refChap{chap:substrates} evaluates the candidate physical computing substrates, acoustic, thermal and optothermal, well-mixed chemical, and reaction--diffusion, against the project's selection criteria, recording what this project itself did with each, and justifies the choice of a structured Belousov--Zhabotinsky medium. 
-\refChap{chap:methodology} presents the model, the finite-difference solver and its verification, the parameterisation of the substrate, and the black-box characterisation protocol with the four experiments it comprises. 
-\refChap{chap:results} reports the solver verification and the measured transfer functions - channel pulse transmission, frequency response, two-input collision logic, and anisotropic routing - and discusses what they imply about the substrate's computational capability. 
-\refChap{chap:conclusions} summarises the contributions, states the limitations of the present work, and outlines future directions, in particular closing the loop from characterisation to training.
-% --- END EXEMPLAR ---
+This chapter has introduced the physical-computing premise, reviewed the literature from physical neural networks through chemical and excitable-media computing to the Belousov--Zhabotinsky reaction, and stated the gap, aim, and objectives.
+\refChap{chap:substrates} evaluates the candidate substrates: acoustic, thermal and optothermal, well-mixed chemical, and reaction-diffusion against the project's selection criteria and justifies the choice of a structured Belousov--Zhabotinsky medium.
+\refChap{chap:methodology} presents the model, the finite-difference solver and its verification, the substrate parameterisations, and the black-box characterisation protocol with its four experiments.
+\refChap{chap:results} reports the verification and the measured transfer functions and discusses their computational implications.
+\refChap{chap:conclusions} summarises the contributions, states the limitations, and outlines future directions, in particular closing the loop from characterisation to training.

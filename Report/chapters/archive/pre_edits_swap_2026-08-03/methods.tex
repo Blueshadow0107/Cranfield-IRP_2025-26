@@ -1,4 +1,4 @@
-% Chapter: Methodology
+% Chapter: Methods (file renamed from methodology.tex 2026-08-03)
 % Reaction-diffusion excitable media as substrates for analog physical computation
 
 \section{Overview}
@@ -89,12 +89,8 @@ Time integration therefore uses first-order operator splitting - one diffusion s
 Within each outer step, the reaction substep $h$ is chosen pointwise from the analytic Jacobian of the kinetics: $h \leq 0.5 / \max(-\partial F/\partial u,\,0)$, bounding the local explicit-Euler amplification factor of the fastest contracting mode, together with a relative-accuracy limit $h \leq 0.1 / \max|\mathrm{d}u/\mathrm{d}t|$ and an absolute step-size limiter that prevents $u$ from being pushed below $-q/2$, where the rational term $(u-q)/(u+q)$ of the Oregonator becomes singular in behaviour. 
 A NaN/Inf tripwire aborts any run in which a field leaves the finite range, so that numerical failure is always loud rather than silently absorbed.
 
-This integration scheme is the result of removing a hack, and the episode is worth recording because it changed the results. 
-The original demonstration scripts clipped $u$ and $v$ to a fixed box after every time step (\texttt{np.clip}), a common expediency in excitable-media demos. 
-The clipping had two distinct sins. First, it concealed genuine explicit-Euler instability: the Barkley kinetics at $\Delta t/\varepsilon = 2.5$ diverge within a few steps when integrated unclipped, and the Oregonator's recovery-manifold Jacobian reaches approximately $-7000$ during the fast upstroke, far stiffer than any fixed substep count had budgeted for. 
-Second, and worse, it distorted the dynamics it purported to protect: at the baseline parameters the clipped solver recorded $1741$ firing events in a run where the correctly integrated dynamics fire approximately $780$ times - the clip was injecting enough error to more than double the medium's activity. 
-Clipping was removed entirely and replaced by the adaptive subcycling described above, whose reaction stage was validated against \texttt{scipy}'s LSODA integrator to agreement of order $10^{-6}$ on the slow phases of the cycle. 
-All results reported in this thesis were produced by the de-hacked solver.
+The adaptive rule is a necessity rather than a refinement: the Oregonator's recovery-manifold Jacobian reaches approximately $-7000$ during the fast upstroke, far stiffer than any fixed explicit substep count can absorb.
+The subcycled reaction stage was validated against \texttt{scipy}'s LSODA integrator, with agreement of order $10^{-6}$ on the slow phases of the excitation cycle.
 
 \subsection{Verification Cases}
 \label{sec:meth_verification}
@@ -141,8 +137,7 @@ Richardson asymptote & $\approx 4.82$ & n/a \\
 
 Finally, a set of runtime invariants was monitored in every reported simulation as a guard against silent numerical corruption: the NaN/Inf tripwire never fired in any run underlying the results of \refChap{chap:results}; the step-size limiter recorded zero guard trips outside the fast upstroke it was designed for; and both fields remained within their physical bounds throughout. 
 The adaptive subcycling behaves as intended - the substep count stays at one on the slow recovery manifold and peaks at $155$ substeps within a single outer step during the firing excursion, exactly where the analytic Jacobian predicts the stiffness to lie. 
-The verification suite as a whole is reported with its figures in the results chapter. 
-% TODO: restore \refSec{sec:res_verification} when results chapter is uncommented
+The verification suite as a whole is reported with its figures in \refSec{sec:res_verification}.
 
 \section{Substrate Parameterisation}
 \label{sec:meth_parameterisation}
@@ -204,8 +199,7 @@ Four quantities are measured, The propagation speed in the channel, from port-to
 The delay linearity, confirming that travel time grows linearly with channel length so that speed is a well-defined constant of the medium; 
 The transmission behaviour as the channel width is swept, locating the width-induced wave-block threshold below which lateral confinement and front curvature extinguish the pulse; 
 And, around that threshold, the sharpness of the transition from transmission to block. 
-The results are reported in the results chapter. 
-% TODO: restore \refSec{sec:res_channel} when results chapter is uncommented
+The results are reported in \refSec{sec:res_channel}.
 
 \subsection{Frequency Response}
 \label{sec:meth_exp_frequency}
@@ -213,8 +207,7 @@ The results are reported in the results chapter.
 The second experiment measures the substrate's bandwidth, which is set by refractoriness: behind every pulse lies a zone that cannot be re-excited until the recovery variable has decayed, so a channel acts as a low-pass device for pulse trains. 
 A pulse train of prescribed frequency is injected at the input port and the probe records which pulses transmit. 
 The experiment is run in two forms: a two-pulse measurement, in which the interval between two successive pulses is swept to locate the absolute refractory period directly; and a sustained-train measurement, in which the output frequency $f_{\mathrm{out}}$ is recorded against the input frequency $f_{\mathrm{in}}$, giving the transmission ratio curve and the maximum 1:1 following rate above which pulses begin to be dropped. 
-The results are reported in the results chapter. 
-% TODO: restore \refSec{sec:res_frequency} when results chapter is uncommented
+The results are reported in \refSec{sec:res_frequency}.
 
 \subsection{Two-Input Collision Logic}
 \label{sec:meth_exp_logic}
@@ -223,8 +216,7 @@ The third experiment measures the substrate's native logic.
 Two input channels converge on a T-junction, with probes on the output branch downstream of the collision region; the two inputs, A and B, are each either pulse-present or pulse-absent, giving the four input combinations of a two-input truth table. 
 With the windowed readout of \refSec{sec:meth_protocol}, the probe record is converted into truth-table entries: lone pulses that reach the junction propagate or diffract onward, while coincident pulses collide, annihilate, and leave the output silent. 
 Three figures of merit are measured: the truth table itself at each probe; the separation ratio between the weakest ``true'' output signal and the strongest ``false'' one, which quantifies the noise margin of the gate; and the inhibition window - the range of relative input timings within which the trailing pulse is still annihilated - which quantifies the gate's tolerance to clock skew. 
-The results are reported in the results chapter. 
-% TODO: restore \refSec{sec:res_logic} when results chapter is uncommented
+The results are reported in \refSec{sec:res_logic}.
 
 \subsection{Anisotropic Substrate}
 \label{sec:meth_exp_anisotropy}
@@ -233,5 +225,4 @@ The fourth experiment characterises the anisotropic parameterisation of \refSec{
 In a uniform tensor field with anisotropy ratio $r = D_{\parallel}/D_{\perp}$, a point stimulus is fired and the expanding pulse is tracked: theory predicts an elliptical front whose axis ratio and speed ratio between the fast and slow directions both scale as $\sqrt{r}$ \cite{keener1991eikonal}, providing a direct quantitative check of the tensor discretisation. 
 The directional speed profile $c(\theta)$ is measured by probing along rays at several orientations to the fibre direction. 
 Finally, a patch of anisotropic medium embedded in the isotropic substrate is used to measure how propagation delay across the patch depends on the orientation of its fibres relative to the incident wave direction - the routing signature that anisotropy adds to the design space beyond walls and light. 
-The results are reported in the results chapter. 
-% TODO: restore \refSec{sec:res_anisotropy} when results chapter is uncommented
+The results are reported in \refSec{sec:res_anisotropy}.

@@ -11,37 +11,41 @@
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric}
 
 %% --- THESIS METADATA --- %%
-% TODO(user): choose final title. Placeholder below reflects the current
-% framing (characterising RD substrates for analog computation).
-\title{[Title to be decided: reaction-diffusion computing theme]}
+\title{Characterisation of a light-sensitive Belousov--Zhabotinsky reaction--diffusion medium as a molecular-communication substrate}
 \author{Srivijayesh Venugopal}
 \date{September 2026}
 \faculty{\FEAS}
-\course{[Computational Fluid Dynamics]}
+\course{Computational Fluid Dynamics}
 \degree{MSc}
-\supervisor{[Dr Supervisor Name]}
+\supervisor{Prof. Weisi Guo}
 \academicyear{2025--2026}
 \copyrightyear{2026}
 
 \begin{document}
 
 \maketitle
+\frontmatter
 
 %% --- ABSTRACT --- %%
 \begin{abstract}
-[Write abstract here (not more than 300 words), to be written last,
-once results are final.]
+This thesis characterises a light-sensitive Belousov--Zhabotinsky (BZ) reaction--diffusion medium as a structured molecular-communication substrate.
+The dynamics are modelled by the two-variable Tyson--Fife Oregonator with a spatial light-suppression field $\phi(x,y)$.
+A verified explicit finite-difference solver is used in a black-box protocol to measure native input--output transfer functions: pulse transmission along channels, refractory-limited frequency response, two-input collision logic, and anisotropic routing.
+Measurements show a near-ideal channel wire, a maximum 1:1 following rate of 0.28 per time unit, an inhibition gate A~AND~(NOT~B) with separation ratios above $200\times$, and anisotropic patch delays that vary continuously with fibre angle.
+Polynomial-chaos/Sobol sensitivity analysis quantifies how uncertainty in the kinetic parameters propagates into pulse speed and amplitude, giving the characterisation a robustness layer.
+A trainable light-field T-junction demonstrates that a static $\phi(x,y)$ can route single pulses, while a band-pass frequency-discrimination task returns a negative training result that marks the practical limit of simple light-field modulation.
+The work provides a component-level characterisation of the substrate---the prerequisite for designing trained chemical processors---and identifies physics-informed parameter inference and reduced-order modelling as the next steps toward closed-loop design.
 \end{abstract}
 
 \begin{keywords}
 physical neural networks, reaction-diffusion computing, excitable media,
 Belousov--Zhabotinsky reaction, Oregonator model, analog computation,
-unconventional computing, neuromorphic engineering
+molecular communication, unconventional computing, neuromorphic engineering
 \end{keywords}
 
 %% --- ACKNOWLEDGEMENTS --- %%
 \chapter*{Acknowledgements}
-[Optional: acknowledge support, supervisors, funding bodies, etc.]
+I would like to thank my supervisor, Professor Weisi Guo, for his guidance and support throughout this research project.
 
 %% --- FRONT MATTER --- %%
 {
@@ -87,7 +91,7 @@ unconventional computing, neuromorphic engineering
 
 \chapter{Methods}
 \label{chap:methodology}
-\input{chapters/methodology}
+\input{chapters/methods}
 
 \chapter{Results and Discussion}
 \label{chap:results}
@@ -105,6 +109,6 @@ unconventional computing, neuromorphic engineering
 \appendix
 \chapter{Additional Derivations}
 \label{app:derivations}
-[Insert supplementary derivations, proofs, or data here.]
+All derivations, model equations, and convergence data required to reproduce the reported transfer functions are presented in the main chapters. No supplementary derivations are needed.
 
 \end{document}
