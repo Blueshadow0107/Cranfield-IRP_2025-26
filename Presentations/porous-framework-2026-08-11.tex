@@ -1,0 +1,257 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\newcommand{\etal}{et al.}
+
+\title{Porous-Media Framing for BZ Reaction--Diffusion Computing}
+\subtitle{Micro-scale transfer functions as pore-scale physics}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26 --- Follow-up to 11 August 2026 meeting}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{The reframing idea}
+
+The structured BZ work is not a collection of logic gates; it is a **pore-scale characterisation** of a reaction-diffusion medium.
+
+\vspace{0.4cm}
+\textbf{Micro-scale (this thesis):}
+\begin{itemize}
+    \item Straight channels = pore throats
+    \item T-junctions = pore-network nodes
+    \item Wall collisions / annihilation = pore-throat switching
+    \item Light field $\phi(x,y)$ = spatially variable permeability / excitability
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Macro-scale (porous-media view):}
+\begin{itemize}
+    \item A network of pores filled with excitable BZ medium
+    \item Information carried by propagating chemical wavefronts
+    \item Computation emerges from network topology and local excitability
+\end{itemize}
+
+\vspace{0.2cm}
+{\small Direct link: Fang, Guo, Icardi, Noel \& Yang, \textit{Molecular Information Delivery in Porous Media}, IEEE T-MBMC 2019.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Current 2D setups as a pore-network prototype}
+
+Each transfer function measures an elemental pore-scale operator:
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{3.0cm}p{4.5cm}p{5.5cm}}
+\toprule
+\textbf{Transfer function} & \textbf{Pore-scale meaning} & \textbf{Headline result (dark-spot)} \\
+\midrule
+Channel wire & Single pore throat & 6.46 cells/t.u.; no width block down to $W=1$ \\
+Frequency response & Pore-throat bandwidth & Refractory 3.0 t.u.; max 0.167/t.u. \\
+Collision logic & Pore-node switching & Inhibition A AND (NOT B); 232$\times$ separation \\
+Anisotropic routing & Oriented pore/channel & $\sqrt{r}$ law verified; patch delay 644--836 steps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Take-away:} the substrate's ``instruction set'' is small --- wire, low-pass filter, inhibition, graded delay. Training can only reshuffle these primitives.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{From physical walls to light-defined barriers}
+
+In the current solver, channels are cut by hard no-flux walls.
+
+\vspace{0.3cm}
+\textbf{Alternative: replace walls by high-$\phi$ regions.}
+
+\vspace{0.2cm}
+\begin{itemize}
+    \item The regime map shows $\phi \gtrsim 0.030$ is non-propagating.
+    \item A high-$\phi$ region is therefore a **soft, rewritable barrier**: excitation enters and dies, rather than reflecting.
+    \item Channels become low-$\phi$ corridors; ``solid'' matrix becomes high-$\phi$ medium.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why this matters:}
+\begin{itemize}
+    \item Matches photosensitive BZ experiments, where projected light is the real control variable.
+    \item Removes the binary wall / free-space distinction.
+    \item Makes the porous-media analogy exact: $\phi(x,y)$ plays the role of a spatially variable permeability or excitability field.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Porous-medium analogue}
+
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{4.5cm}p{4.5cm}p{4.5cm}}
+\toprule
+\textbf{Porous-medium concept} & \textbf{Physical realisation} & \textbf{This model} \\
+\midrule
+Pore space & Channel / junction & Low-$\phi$ excitable region \\
+Solid matrix & Impermeable rock & High-$\phi$ suppressed region (or wall) \\
+Permeability field & Pore-throat conductivity & $D_u(x,y)$ / channel width \\
+Excitability field & Reaction rate modulation & $\phi(x,y)$ light field \\
+Solute pulse & Tracer / signal front & BZ activator wave \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Homogenisation step:} a dense network of these micro-scale elements can be upscaled to an effective Brinkman-like continuum, in the spirit of Allaire (1991) and Angot, Bruneau \& Fabrie (1999).
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Length scales: what does one grid cell mean?}
+
+The Tyson--Fife Oregonator is non-dimensional. The conversion to physical units comes from the standard scaling:
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item Length scale $x_0 \approx 0.018$~cm $= 180$~$\mu$m (Jahnke, Skaggs \& Winfree; used in Cliffe, Tavener \& Wilke 1998).
+    \item Time scale $t_0 \approx 50$--$60$~s, set by the autocatalytic rate $k_5$.
+\end{itemize}
+
+\vspace{0.3cm}
+With our grid spacing $\Delta x = 0.05$ (dimensionless):
+\begin{itemize}
+    \item One cell $\approx 9$~$\mu$m.
+    \item A $256 \times 256$ domain $\approx 2.3 \times 2.3$~mm.
+    \item One time unit $\approx 1$~minute.
+    \item Pulse speed 6.46 cells/t.u. $\approx 0.06$~mm/s, consistent with experimental BZ waves.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Can the length scale be arbitrarily small?}
+
+No --- the length scale is fixed by the chemistry, not by the numerics.
+
+\vspace{0.3cm}
+\textbf{The reaction-diffusion length is:}
+\[
+\ell_{\mathrm{RD}} \sim \sqrt{\frac{D_{\mathrm{HBrO_2}}}{k_5}}
+\]
+where $D_{\mathrm{HBrO_2}} \sim 10^{-9}$~m$^2$/s and $k_5$ is the autocatalytic rate. Both are set by reagent concentrations and temperature.
+
+\vspace{0.3cm}
+\textbf{Consequences:}
+\begin{itemize}
+    \item Features much smaller than $\ell_{\mathrm{RD}} \sim 100$--$200$~$\mu$m cannot sustain a propagating wavefront.
+    \item Channel widths below this scale are not independent computing knobs --- the front is essentially one-dimensional.
+    \item The ``arbitrarily small'' limit fails: BZ computing is bounded to sub-millimetre feature sizes by diffusion and reaction kinetics.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Extension to 3D}
+
+The 2D solver extends to 3D with minimal conceptual change:
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item Add $z$-derivative to the Laplacian (7-point stencil).
+    \item Stability limit tightens slightly: $D \Delta t / \Delta x^2 \leq 1/6$.
+    \item Boundary conditions: no-flux on all six faces.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Cost estimate:}
+\begin{itemize}
+    \item $128^3$ grid $\approx 2$~M cells vs $256^2 \approx 65$k in 2D --- ~30$\times$ memory.
+    \item Per time-step cost ~40--50$\times$ 2D.
+    \item A single moderate 3D run: 2--6 hours; a small sweep: overnight to 2 days.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why do it:} a 3D pore network is the natural macro-scale realisation; a 3D proof-of-concept would strengthen the porous-media framing.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What 3D changes and what does not}
+
+\textbf{Unchanged:}
+\begin{itemize}
+    \item Reaction kinetics (same Oregonator parameters).
+    \item Excitability regimes and the role of $\phi$.
+    \item Qualitative transfer-function behaviour (wire, low-pass, inhibition, delay).
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{New in 3D:}
+\begin{itemize}
+    \item Out-of-plane curvature and filament dynamics.
+    \item More complex pore-network topologies (interconnected throats in all directions).
+    \item Volume-rendered readout instead of 2D slices.
+    \item A single straight channel is still a 1-D cable; a 3D porous lattice is where the scaling story becomes real.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Practical first step:} a $128^3$ box with a simple cubic pore network --- verify that the same transfer functions survive.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Implications for the thesis reframe}
+
+\textbf{Hard reframe:}
+\begin{enumerate}
+    \item The thesis is not ``designing BZ logic gates.''
+    \item It is ``characterising the pore-scale physics of an excitable reaction-diffusion medium, with a view to porous-media information processing.''
+    \item The four transfer functions are the elementary operators of such a medium.
+    \item The light field $\phi(x,y)$ is the permeability / excitability knob.
+    \item Training attempts are feasibility studies: can $\phi$ reshape these operators usefully?
+\end{enumerate}
+
+\vspace{0.3cm}
+\textbf{New storyline:}
+\begin{itemize}
+    \item Characterise pore-throat (channel) and pore-node (junction) behaviour.
+    \item Quantify parameter sensitivity (UQ).
+    \item Attempt to train a simple porous device (diode / router).
+    \item Conclude with what is and is not trainable in this substrate.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Questions / next steps}
+
+\begin{enumerate}
+    \item Does the porous-media framing read as a coherent MSc contribution?
+    \item Should we replace physical walls with high-$\phi$ barriers in the reported simulations?
+    \item Should a 3D proof-of-concept be attempted, or left as explicitly scoped future work?
+    \item What is the most useful trainable device in this framework: diode, asymmetric router, or frequency filter?
+\end{enumerate}
+
+\vspace{0.4cm}
+{\small Supporting files: \texttt{Analysis/rd\_core.py} (2D solver), \texttt{Analysis/figures/rd\_phi\_regime\_map.png} (barrier regime), thesis chapters \texttt{methods.tex} and \texttt{results.tex}.}
+
+\end{frame}
+
+\end{document}
