@@ -1,0 +1,10 @@
+3D Oregonator pilot report
+grid: 64x64x64
+dt: 0.05
+steps: 400
+physical time: 20.00
+runtime: 130.4 s
+peak RSS: 100.8 MB
+diffusion number: 0.0500 (limit 1/6 = 0.1667)
+probe centre: max=0.6666, final=0.0031
+probe shell: max=0.4370, final=0.0031
