@@ -88,6 +88,18 @@ Report_backup*/
 *.swp
 
 # ============================================================
+# Large generated animation / snapshot outputs (kept locally)
+# ============================================================
+Analysis/figures/demux_baseline_anim/
+Analysis/figures/transfer_animations/
+Analysis/figures/rd_train_bandpass/snapshots.npz
+
+# ============================================================
+# Backup report directory (local draft, contains generated PDF/aux)
+# ============================================================
+Report_thatdidntgetthejobdone/
+
+# ============================================================
 # Reference templates (kept locally)
 # ============================================================
 ThesisTemplate2025/
