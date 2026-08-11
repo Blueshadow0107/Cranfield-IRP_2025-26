@@ -1,0 +1,67 @@
+{
+  "params": {
+    "nx": 256,
+    "ny": 128,
+    "channel_width": 16,
+    "dt": 0.05,
+    "phi0": 0.01,
+    "phi_barrier": 0.04,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0,
+    "spot_radius": 6,
+    "nsteps": 1200,
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "rest_u_star_channel": 0.003082099932938156,
+    "rest_u_star_barrier": 0.0022158351109650867
+  },
+  "case_a_physical_walls": {
+    "arrivals_steps": {
+      "near": 163.53410782423487,
+      "mid": 361.63611272814546,
+      "far": 636.7898825899849
+    },
+    "peak_near": 0.7267320620667469,
+    "peak_mid": 0.7258763938054246,
+    "peak_far": 0.7244110423514781,
+    "crossings": {
+      "near": 1,
+      "mid": 1,
+      "far": 1
+    },
+    "transmitted": true,
+    "speed_cells_per_tu": 6.4660529672148375,
+    "linearity_max_resid_steps": 0.09172038303563568,
+    "label": "physical walls",
+    "runtime_s": 49.331496477127075,
+    "max_outside_u": 0.0,
+    "max_outside_v": 0.0
+  },
+  "case_b_phi_barrier": {
+    "arrivals_steps": {
+      "near": 163.5343874810285,
+      "mid": 361.6631497858916,
+      "far": 636.9297323963569
+    },
+    "peak_near": 0.7267198599847533,
+    "peak_mid": 0.7253194540040967,
+    "peak_far": 0.7264461711036455,
+    "crossings": {
+      "near": 1,
+      "mid": 1,
+      "far": 1
+    },
+    "transmitted": true,
+    "speed_cells_per_tu": 6.464099907270981,
+    "linearity_max_resid_steps": 0.07082310686070059,
+    "label": "high-phi barrier",
+    "runtime_s": 47.48738646507263,
+    "max_outside_u": 0.00308209993293969,
+    "max_outside_v": 0.003082099938120305,
+    "mean_barrier_u_final": 0.0030820999329284247,
+    "mean_barrier_v_final": 0.003082099932983059
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "test": "3D channel pulse transfer (dark-spot Oregonator)",
+  "grid": [
+    64,
+    64,
+    64
+  ],
+  "channel_width": 16,
+  "dx": 1.0,
+  "dt": 0.05,
+  "nsteps": 500,
+  "physical_time_tu": 25.0,
+  "runtime_s": 247.08766087700496,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.0501,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0,
+    "spot_radius": 4
+  },
+  "rest_state_u_star": 0.003082099932938156,
+  "diffusion_number": 0.05,
+  "probes": {
+    "near": {
+      "peak": 0.4515322642793451,
+      "final": 0.0030820999328878833,
+      "arrival_tu": null
+    },
+    "mid": {
+      "peak": 0.6548719980362316,
+      "final": 0.0030820999320281834,
+      "arrival_tu": 3.989674784240204
+    },
+    "far": {
+      "peak": 0.7015308057437128,
+      "final": 0.00308209991351312,
+      "arrival_tu": 6.406722713972839
+    }
+  },
+  "speed_cells_per_tu": 6.619645313268517,
+  "linearity_max_resid_tu": 1.7763568394002505e-15,
+  "matches_2d": null
+}
