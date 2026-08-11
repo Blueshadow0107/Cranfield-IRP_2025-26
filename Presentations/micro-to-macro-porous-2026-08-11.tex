@@ -1,0 +1,229 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\newcommand{\etal}{et al.}
+
+\title{From Micro-Scale Junctions to Macro-Scale Porous Media}
+\subtitle{A reframing of the BZ reaction--diffusion work}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{The core idea}
+
+The structured BZ medium is not a digital circuit. It is a **porous reaction-diffusion substrate** viewed at the pore scale.
+
+\vspace{0.4cm}
+\textbf{Scale correspondence:}
+\begin{itemize}
+    \item A straight channel = a pore throat
+    \item A T-junction = a pore-network node
+    \item A collision/annihilation event = pore-node switching
+    \item The light field $\phi(x,y)$ = spatially variable matrix permeability or excitability
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Claim:} the four transfer functions measure the elementary transport operators of a chemical porous medium.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Micro-scale element $\rightarrow$ macro-scale function}
+
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{3.5cm}p{4.5cm}p{5.0cm}}
+\toprule
+\textbf{Micro-scale element} & \textbf{What it does} & \textbf{Macro-scale analogue} \\
+\midrule
+Straight channel & Carries a pulse with fixed speed & Pore throat conducting a signal \\
+T-junction & Splits, merges, or vetoes pulses & Pore-node junction \\
+Collision of two pulses & Annihilation $\rightarrow$ inhibition & Inter-pore destructive interference \\
+High-$\phi$ barrier & Blocks excitation & Low-permeability matrix \\
+Anisotropic patch & Delays pulses directionally & Oriented pore structure \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+The device primitives are therefore not gates but **transport operators**: conduction, filtering, inhibition, and delay.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What we currently measure (pore scale)}
+
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{3.2cm}p{5.0cm}p{5.0cm}}
+\toprule
+\textbf{Operator} & \textbf{Pore-scale measurement} & \textbf{Headline result} \\
+\midrule
+Conduction & Channel speed vs width & 6.46 cells/t.u.; no block down to $W=1$ \\
+Filtering & Refractory bandwidth & 3.0 t.u.; max 0.167/t.u. \\
+Inhibition & A AND (NOT B) at T-junction & 232$\times$ separation \\
+Delay & Anisotropic patch routing & 644--836 steps over $0$--$90^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+These are the same quantities one would need to parameterise a continuum model of a BZ-impregnated porous scaffold.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{From a designed network to a porous continuum}
+
+\textbf{Designed micro network:}
+\begin{itemize}
+    \item Hand-placed walls / channels / junctions
+    \item Each element measured separately
+    \item Useful for proof-of-principle and solver validation
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Porous continuum:}
+\begin{itemize}
+    \item Random or structured pore space
+    \item Effective properties: tortuosity, permeability, excitability
+    \item Wave propagation described by upscaled reaction-diffusion equations
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Homogenisation bridge:} Allaire (1991), Angot--Bruneau--Fabrie (1999), Fang \etal{} (2019) show how critical-size obstacles in a fluid lead to Brinkman-type effective equations. The micro measurements are the input to that upscaling.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Light-defined porous matrix}
+
+In a photosensitive BZ medium, projected light replaces solid walls.
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item Background $\phi = 0.010$: excitable ``pore space''
+    \item High-$\phi$ region ($\gtrsim 0.030$): non-propagating ``solid matrix''
+    \item Channels become low-$\phi$ corridors; barriers become high-$\phi$ surroundings
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why this is better than physical walls:}
+\begin{itemize}
+    \item Rewritable in real time by a projector
+    \item Continuous gradients possible (no binary mask)
+    \item Matches the actual experimental control variable
+    \item Makes the porous-media analogy exact
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Validation: light barriers work like walls}
+
+2D pilot comparing physical walls vs high-$\phi$ barriers in a straight channel:
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Quantity} & \textbf{Physical walls} & \textbf{High-$\phi$ barrier} \\
+\midrule
+Pulse speed & 6.466 cells/t.u. & 6.464 cells/t.u. \\
+Far peak & 0.724 & 0.726 \\
+Leakage outside channel & $<10^{-3}$ & $\sim 0.003$ (rest-state level) \\
+Transmitted & Yes & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.2cm}
+The high-$\phi$ barrier is effectively a wall: same speed, same amplitude, negligible leakage.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Extension to 3D porous networks}
+
+3D is the natural setting for a real porous medium.
+
+\vspace{0.3cm}
+\textbf{What we checked:}
+\begin{itemize}
+    \item Minimal 3D solver: expanding spherical wave is stable.
+    \item 3D straight channel: speed 6.62 cells/t.u., within 2.5\% of 2D.
+    \item 3D T-junction: A AND (NOT B) still works; windowed readout separates true/false states.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Cost:} $64^3$ runs take a few minutes; $96^3$ take ~5 min. A small 3D pore-network sweep is feasible overnight.
+
+\vspace{0.3cm}
+\textbf{Next:} a simple cubic / random pore network in 3D to show scaling from designed junctions to a disordered porous scaffold.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{How this reframes the thesis}
+
+\textbf{Old framing:} ``We build BZ logic gates and try to train them.''
+
+\vspace{0.3cm}
+\textbf{New framing:} ``We characterise the pore-scale physics of an excitable reaction-diffusion medium, as a step toward information processing in porous chemical substrates.''
+
+\vspace{0.4cm}
+\textbf{Thesis arc:}
+\begin{enumerate}
+    \item Measure pore-throat and pore-node operators in 2D.
+    \item Quantify their parameter sensitivity (UQ).
+    \item Replace walls with light-defined barriers.
+    \item Attempt to train a simple porous device (diode / router).
+    \item Scope 3D porous networks as future work.
+\end{enumerate}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Why this fits Guo's research}
+
+\begin{itemize}
+    \item Molecular communication in porous media (Fang \etal{} 2019): information carried by diffusing/reacting molecules in structured geometries.
+    \item Uncertainty quantification (Abbaszadeh--Thomas--Guo line): propagate parameter uncertainty to pulse speed and amplitude.
+    \item Physics-informed inference: recover effective kinetic parameters from sparse probes --- exactly what a porous-medium readout would need.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Bottom line:} the BZ substrate is a physically realisable instance of the porous reaction-diffusion channels that molecular-communication theory already studies.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Questions}
+
+\begin{enumerate}
+    \item Does the micro-to-macro porous reframing strengthen the thesis contribution?
+    \item Should the reported simulations use high-$\phi$ barriers instead of physical walls going forward?
+    \item Is a 3D pore-network proof-of-concept worth the time, or should it remain future work?
+    \item What is the most useful trainable porous device: diode, asymmetric router, or frequency-selective channel?
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
