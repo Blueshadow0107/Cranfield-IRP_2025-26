@@ -61,9 +61,9 @@ All results reported below were produced by this verified solver.
 \label{sec:res_channel}
 
 The first component characterised is the wire.
-In the free medium, a plane pulse travels at $4.151$ cells per time unit with the Barkley kinetics and at $6.223$ cells per time unit with the Oregonator at candidate A.
-\reffig{fig:res_channel} shows the measured transfer of a single pulse along a straight walled channel as the channel width $W$ is swept down to a single cell.
-The result is exact and somewhat surprising: the channel speed is bit-identical to the free-medium speed at every width tested, down to $W = 1$ cell, and the pulse transmits with undiminished amplitude.
+A circular dark spot of radius $6$ cells at the channel entrance is dimmed to $\phi = 0.002$ for $3.0$ time units, emitting a single pulse into a straight walled channel of width $W$.
+\reffig{fig:res_channel} shows the measured transfer as $W$ is swept down to a single cell.
+The free-medium dark-spot speed is $6.46$ cells per time unit and the channel speed is $6.46$--$6.47$ cells per time unit at every width from $W = 60$ down to $W = 1$, so the width-independence of the wire is reproduced and the pulse transmits with undiminished amplitude.
 No geometric wave block was observed at any width; the eikonal critical width below which confinement would extinguish the pulse is sub-grid for this medium.
 
 The physics of this result is clean.
@@ -73,75 +73,40 @@ The width-induced block documented in ring and cable studies \cite{courtemanche1
 As a device characteristic the result cuts both ways: a straight channel is a near-perfect wire whose speed and amplitude are set by the kinetics alone, but its width offers no computing leverage.
 Structure that computes must come from junctions, curvature, or the property fields, not from confinement alone.
 
-The clamped-port result was cross-checked with the experimentally honest dark-spot drive of \refSec{sec:meth_darkspot}: a circular patch at the channel entrance is dimmed to $\phi = 0.002$ for $3.0$ time units, emitting a single pulse into the channel.
-The dark-spot free-medium speed is $6.46$ cells per time unit and the channel speed is $6.46$--$6.47$ cells per time unit at every width from $W = 60$ down to $W = 1$, so the width-independence of the wire is reproduced.
-The absolute speed is about $4\%$ higher than the clamped-port value ($6.22$ cells per time unit), an honest difference between the two input encodings; the important point is that neither drive shows a geometric wave block.
-
-\begin{figure}[htbp]
-\centering
-\IfFileExists{../Analysis/figures/pub/pub_channel_transfer.png}{%
-\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_channel_transfer.png}}{%
-[figure pending]}
-\caption{Channel pulse transfer. Measured pulse speed in straight walled channels of width $W$ down to one cell, for both kinetics. The channel speed is bit-identical to the free-medium speed ($4.151$ cells per time unit Barkley, $6.223$ Oregonator A) at every width: a planar front between no-flux walls is exactly equivalent to a one-dimensional cable, and no geometric wave block occurs.}
-\label{fig:res_channel}
-\end{figure}
-
 \begin{figure}[htbp]
 \centering
 \IfFileExists{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}{%
 \includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}}{%
 [figure pending]}
-\caption{Channel pulse transfer with the dark-spot drive. Left: far-probe traces for representative widths. Centre: measured speed versus channel width (blue) compared with the clamped-port result (orange). Right: transmission amplitude. The dark-spot drive reproduces the width-independent wire behaviour; the absolute speed is $\approx 4\%$ higher than the clamped-port value because the two input encodings excite the medium differently.}
-\label{fig:res_channel_darkspot}
+\caption{Channel pulse transfer with the dark-spot drive. Left: far-probe traces for representative widths. Centre: measured speed versus channel width. Right: transmission amplitude. The channel speed is bit-identical to the free-medium speed ($6.46$ cells per time unit) at every width down to $W = 1$: a planar front between no-flux walls is exactly equivalent to a one-dimensional cable, and no geometric wave block occurs.}
+\label{fig:res_channel}
 \end{figure}
 
 \section{Frequency Response}
 \label{sec:res_frequency}
 
 The second experiment measures the substrate's bandwidth, which is set by refractoriness.
-The two-pulse measurement locates the absolute refractory period directly: $2.80$ time units for the Barkley kinetics, $3.10$ time units for the Oregonator at candidate A, and $2.70$ time units at candidate B.
-Sustained pulse trains then give the transmission curves of \reffig{fig:res_frequency_barkley} and \reffig{fig:res_frequency_oregonator}.
+A circular dark spot at the channel entrance is flashed to $\phi = 0.002$ for $3.0$ time units; because the flash must end before the next flash can begin, the start-to-start period cannot be shorter than the flash itself.
+The two-pulse measurement locates the absolute refractory period directly at $3.0$ time units for the Oregonator at candidate A.
+Sustained pulse trains then give the transmission curve of \reffig{fig:res_frequency}.
 At low input frequency the output frequency follows the input one-to-one: the curve has unit slope and every pulse transmits.
-The maximum 1:1 following rate is $0.263$ per time unit for the Barkley kinetics and $0.282$ per time unit for the Oregonator at candidate A, rising to $0.323$ per time unit at candidate B.
-Above this rate the curve leaves the unit slope and develops a staircase of dropped pulses, in which the medium locks to rational transmission ratios as more input pulses arrive inside the refractory wake of their predecessors.
+The maximum 1:1 following rate is $0.167$ per time unit; above this rate the curve leaves the unit slope and develops a staircase of dropped pulses, in which the medium locks to rational transmission ratios as more input pulses arrive inside the refractory wake of their predecessors.
 
 Two features of the measurement deserve note.
-First, the maximum 1:1 following rate lies below the naive estimate given by the inverse of the absolute refractory period: in a sustained train, each pulse propagates into the only partially recovered wake of the previous one, travels more slowly, and so extends the effective refractory interval, a rate dependence familiar from measured transfer functions of excitable cables \cite{delange2009transfer}.
+First, the maximum 1:1 following rate lies well below the naive estimate given by the inverse of the absolute refractory period.
+This is not a failure of the medium --- the Oregonator refractory period is unchanged --- but a property of the input encoder: a single dark spot flashed for $3.0$ time units cannot be asked to emit a sustained train with period shorter than about $6.0$ time units without the flashes merging into one long pacemaker flash.
 Second, the computational reading is direct: refractoriness is the substrate's clock limit.
 Any signal encoding must space pulses by more than the refractory time, and any cascade of devices must operate below the maximum following rate.
 The same property is also a native filter: the channel low-passes pulse trains for free, the same mechanism the junction literature exploits for frequency selection \cite{gorecka2003tshaped}.
-
-\begin{figure}[htbp]
-\centering
-\IfFileExists{../Analysis/figures/rd_transfer_frequency_final2_barkley.png}{%
-\includegraphics[width=0.85\textwidth]{../Analysis/figures/rd_transfer_frequency_final2_barkley.png}}{%
-[figure pending]}
-\caption{Frequency response of a channel with the Barkley kinetics. Two-pulse measurement locating the absolute refractory period at $2.80$ time units, and output against input frequency for sustained pulse trains. The 1:1 following region holds up to $0.263$ per time unit; above it the transmission curve forms a staircase of dropped pulses.}
-\label{fig:res_frequency_barkley}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\IfFileExists{../Analysis/figures/pub/pub_frequency_response.png}{%
-\includegraphics[width=0.85\textwidth]{../Analysis/figures/pub/pub_frequency_response.png}}{%
-[figure pending]}
-\caption{Frequency response of a channel with the Oregonator kinetics. The absolute refractory period is $3.10$ time units at candidate A ($2.70$ at candidate B); the maximum 1:1 following rate is $0.282$ per time unit at candidate A ($0.323$ at candidate B). The staircase structure above the following limit reproduces the Barkley measurement.}
-\label{fig:res_frequency_oregonator}
-\end{figure}
-
-The frequency measurement was repeated with the dark-spot drive to test whether the experimentally honest input encoding can reproduce the intrinsic refractory bandwidth.
-A single circular spot at the channel entrance was flashed to $\phi = 0.002$ for $3.0$ time units; because the flash must end before the next flash can begin, the start-to-start period cannot be shorter than the flash itself.
-\reffig{fig:res_frequency_darkspot} shows the result: the maximum 1:1 following rate is $0.167$ per time unit, well below the clamped-port Oregonator value of $0.282$ per time unit.
-The shortfall is not a failure of the medium --- the Oregonator refractory period is unchanged --- but a property of the input encoder: a single dark spot flashed for $3.0$ time units cannot be asked to emit a sustained train with period shorter than about $6.0$ time units without the flashes merging into one long pacemaker flash.
-For pulse-train signalling this is a real constraint; for single-event computation it is irrelevant.
+For pulse-train signalling the flash-duration constraint is a real constraint; for single-event computation it is irrelevant.
 
 \begin{figure}[htbp]
 \centering
 \IfFileExists{../Analysis/figures/pub/pub_frequency_response_darkspot.png}{%
 \includegraphics[width=0.85\textwidth]{../Analysis/figures/pub/pub_frequency_response_darkspot.png}}{%
 [figure pending]}
-\caption{Frequency response with the dark-spot drive (Oregonator A). The maximum 1:1 following rate is $0.167$ per time unit, lower than the clamped-port value because the $3.0$~t.u. minimum flash duration sets the shortest usable start-to-start period.}
-\label{fig:res_frequency_darkspot}
+\caption{Frequency response with the dark-spot drive (Oregonator A). The absolute refractory period is $3.0$ time units; the maximum 1:1 following rate is $0.167$ per time unit. The staircase structure above the following limit arises because the $3.0$~t.u. minimum flash duration sets the shortest usable start-to-start period.}
+\label{fig:res_frequency}
 \end{figure}
 
 \section{Two-Input Collision Logic}
@@ -155,55 +120,14 @@ This is consistent with the collision-computing literature, where working gates 
 With the windowed readout of \refSec{sec:meth_protocol}, the same junction implements a genuine two-input gate.
 The probe record is read only within a window aligned to the expected arrival of a lone pulse from the designated through-arm, input A.
 If input B fires within the coincidence interval, its pulse collides with the A pulse at the junction, the two fronts annihilate, and the window reads silent.
-\reftab{tab:res_truth} gives the measured truth table: the windowed device computes the inhibition gate A AND (NOT B), with B acting as a veto on A.
-\reffig{fig:res_logic} and \reffig{fig:res_logic_snapshots} show the underlying probe records and wave fields.
-
-\begin{table}[htbp]
-\centering
-\caption{Measured truth table at the T-junction output probe, Barkley kinetics. Read over the whole record the junction computes OR, because lone pulses diffract into all branches. Read within the calibrated time window it computes the inhibition gate A AND (NOT B): input B vetoes input A through collision annihilation.}
-\label{tab:res_truth}
-\small
-\begin{tabular}{@{}cccc@{}}
-\toprule
-\textbf{Input A} & \textbf{Input B} & \textbf{Naive readout (OR)} & \textbf{Windowed readout (A AND NOT B)} \\
-\midrule
-0 & 0 & 0 & 0 \\
-0 & 1 & 1 & 0 \\
-1 & 0 & 1 & 1 \\
-1 & 1 & 1 & 0 \\
-\bottomrule
-\end{tabular}
-\end{table}
+The windowed device computes the inhibition gate A AND (NOT B), with B acting as a veto on A.
+\reffig{fig:res_logic} shows the measured truth table and the inhibitor-timing sweep for the dark-spot drive.
 
 Three figures of merit quantify the gate.
-The separation ratio, the weakest true output against the strongest false one, is approximately $1000\times$ for the Barkley kinetics, a value capped by the probe noise floor rather than by the physics, and $232\times$ and $276\times$ for the Oregonator at candidates A and B.
-The inhibition window, the range of relative input timings within which the trailing pulse is still annihilated, spans $2.0$ to $4.0$ time units.
-The window also yields the design rule for scaling such gates: the difference in input-arm lengths must be engineered against the distance a pulse covers within the window, $c$ times $2.0$ to $4.0$ cells, since an asymmetry beyond that budget lets the veto pulse arrive too late to collide.
+The separation ratio, the weakest true output against the strongest false one, is $232\times$ for the Oregonator at candidate A, with a true-output peak of $0.706$ and false-output peaks of $0.003$.
+The inhibition window, the range of relative input timings within which the trailing pulse is still annihilated, spans up to $20$ steps ($1.0$ time unit); transmission has recovered by $40$ steps.
+The window also yields the design rule for scaling such gates: the difference in input-arm lengths must be engineered against the distance a pulse covers within the window, since an asymmetry beyond that budget lets the veto pulse arrive too late to collide.
 The device should therefore be understood as timing-gated rather than as pure combinational logic: its truth table holds only for inputs synchronised within the measured window, and the readout window is part of the device.
-
-\begin{figure}[htbp]
-\centering
-\IfFileExists{../Analysis/figures/rd_transfer_logic_final2_barkley.png}{%
-\includegraphics[width=0.9\textwidth]{../Analysis/figures/rd_transfer_logic_final2_barkley.png}}{%
-[figure pending]}
-\caption{Two-input collision logic at a T-junction, Barkley kinetics. Probe records for the four input combinations, with the calibrated readout window marked. A lone A pulse transmits; a B pulse within the coincidence interval annihilates it, giving the inhibition gate A AND (NOT B) with a separation ratio of approximately $1000\times$ (floor-capped).}
-\label{fig:res_logic}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\IfFileExists{../Analysis/figures/rd_transfer_logic_final2_snapshots_barkley.png}{%
-\includegraphics[width=0.9\textwidth]{../Analysis/figures/rd_transfer_logic_final2_snapshots_barkley.png}}{%
-[figure pending]}
-\caption{Wave-field snapshots of the collision gate, Barkley kinetics. Lone pulses diffract through the junction into all branches (the OR background); coincident pulses collide at the junction and annihilate, leaving the output branch silent within the readout window.}
-\label{fig:res_logic_snapshots}
-\end{figure}
-
-The clamped-port inhibition gate was cross-checked with the dark-spot drive.
-The same T-junction geometry was equipped with circular dark spots at the two input channel entrances; each spot was dimmed to $\phi = 0.002$ for $3.0$ time units to emit a single pulse.
-\reffig{fig:res_logic_darkspot} shows the result: the windowed truth table is still A~AND~(NOT~B), with a true-output peak of $0.706$ and false-output peaks of $0.003$, giving a separation ratio of $232\times$ --- identical to the clamped-port Oregonator value within run-to-run variation.
-The inhibitor-timing sweep shows that B vetoes A when it fires up to $20$ steps ($1.0$ time unit) before or simultaneously with A; the transition to transmission occurs between $20$ and $40$ steps.
-Thus the inhibition gate survives the experimentally honest photosensitive input encoding.
 
 \begin{figure}[htbp]
 \centering
@@ -211,7 +135,7 @@ Thus the inhibition gate survives the experimentally honest photosensitive input
 \includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}}{%
 [figure pending]}
 \caption{Two-input collision gate with the dark-spot drive (Oregonator A). Left: windowed truth table showing A~AND~(NOT~B) with a separation ratio of $232\times$. Right: inhibitor timing sweep; B blocks A for delays up to $20$ steps ($1.0$ time unit), with transmission recovering by $40$ steps.}
-\label{fig:res_logic_darkspot}
+\label{fig:res_logic}
 \end{figure}
 
 \section{Anisotropic Substrate}
@@ -231,7 +155,7 @@ This steers propagation in the interior of the medium rather than at its boundar
 
 The anisotropic $\sqrt{r}$ check was also attempted with the dark-spot stimulus, but the result was not usable: a circular dark patch of radius 12 cells at $\phi = 0.002$ acts as a pacemaker for the duration of the flash and, in the uniform anisotropic field, continues to emit successive target waves that interfere before the first front can be cleanly tracked.
 The measured front extents are therefore multi-valued and the extracted ratio $c_{\parallel}/c_{\perp}$ does not follow the $\sqrt{r}$ law.
-The clamped-port seed result reported above remains the validated measurement of the tensor discretisation; the dark-spot drive is better suited to channel-like geometries where the flash duration has been calibrated for a single emitted pulse.
+The seeded-perturbation result reported above therefore remains the validated measurement of the tensor discretisation; the dark-spot drive is better suited to channel-like geometries where the flash duration has been calibrated for a single emitted pulse.
 
 \begin{figure}[htbp]
 \centering

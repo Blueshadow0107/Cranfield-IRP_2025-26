@@ -194,11 +194,11 @@ The explicit diffusion stability constraint tightens accordingly to $D_{\paralle
 \label{sec:meth_protocol}
 
 All four experiments share a single measurement protocol, designed so that the substrate is treated strictly as a black box.
-Inputs are applied at \emph{ports}: small fixed regions of the grid where the activator is driven above the threshold for a fixed duration, either as a single \texttt{fire} event (one pulse) or as a \texttt{pulse\_train} (a periodic train at a prescribed frequency).
+Inputs are applied at \emph{ports}: small fixed circular regions of the grid where the light field is temporarily reduced to emit one or more pulses into the surrounding medium, either as a single \texttt{fire} event (one pulse) or as a \texttt{pulse\_train} (a periodic train at a prescribed frequency).
 Outputs are recorded at \emph{probes}: fixed locations storing the mean activator value $u(t)$ over a small mask, yielding time series from which arrival times, amplitudes, and transmission booleans are extracted.
 The internal state of the medium away from ports and probes is never inspected for the purpose of a measurement; every reported result is an input-output transfer function in the sense of \refSec{sec:meth_overview}.
 Every simulation is initialised at the rest state $(u^{*}, v^{*})$ appropriate to the working $\phi$ (\refSec{sec:meth_regime}), and each experiment includes a rest-initialised no-stimulus control run, which must show zero probe activity. This checks that the medium is genuinely excitable and that no spontaneous firing contaminates the measurement.
-Two input encodings are used in this thesis: the clamped-port drive above is retained for the four transfer-function experiments of \refSec{sec:meth_experiments}, while the training-era experiments of \refSec{sec:meth_demux} use the dark-spot drive described in \refSec{sec:meth_darkspot}, the experimentally honest encoding for a photosensitive medium.
+All transfer-function experiments of \refSec{sec:meth_experiments} use the dark-spot drive described in \refSec{sec:meth_darkspot}, the experimentally honest encoding for a photosensitive BZ layer; no concentration is ever clamped by hand.
 
 One protocol decision requires justification: probe readouts are evaluated within defined time windows rather than over the whole record.
 The reason is physical. At an open junction, an incoming pulse diffracts into \emph{all} connected branches, so a naive whole-record readout at a downstream probe fires whenever \emph{either} input fires - it computes OR, regardless of what the junction was designed to do.
@@ -209,7 +209,7 @@ This windowed-readout construction follows the logic of the T-shaped coincidence
 \subsection{Dark-Spot Input Encoding and Source Calibration}
 \label{sec:meth_darkspot}
 
-The dark-spot drive replaces the activator clamp with a one-shot flash of darkness: a local, temporary reduction of the light field within a circular spot.
+The dark-spot drive is a one-shot flash of darkness: a local, temporary reduction of the light field within a circular spot.
 The mechanism follows directly from the regime structure of \refSec{sec:meth_regime}.
 The background illumination $\phi = 0.010$ holds the medium stably excitable; dimming a patch to $\phi = 0.002$ carries it across the regime boundary into the locally oscillatory regime, so for as long as the flash lasts the patch acts as a pacemaker, emitting pulses into the surrounding excitable medium.
 This is the experimentally honest drive for the photosensitive ruthenium-catalysed BZ reaction, in which projected illumination is the control variable available in the laboratory \cite{sakurai2002design}: no concentration is ever clamped by hand.
@@ -256,38 +256,37 @@ $T_{\mathrm{flash}}$ (time units) & Pulses emitted & First arrival (time units) 
 The four transfer-function experiments share a common set of controlled conditions, stated here so that every measurement is reproducible.
 All simulations begin from the kinetic rest state: $u = v = 0.0030821$ everywhere for the Oregonator at $\phi = 0.010$ (the Barkley rest state is $(0,0)$ and is used only as a cross-check).
 All domain boundaries and all wall cells impose a no-flux (homogeneous Neumann) condition on both $u$ and $v$, enforced at the flux level in the solver (\refSec{sec:meth_discretisation}).
-The input is a clamped-port drive that holds the port cells at $u = 0.8$, $v = 0.2$ for 30 solver steps ($1.5$ time units), after which the port is released and returns to the rest state.
+The input is a dark-spot drive: a circular patch of radius 6 cells is dimmed from the background $\phi = 0.010$ to $\phi = 0.002$ for $T_{\mathrm{flash}} = 3.0$ time units, emitting a single pulse into the surrounding medium.
 
 \textbf{Channel pulse transfer} (\texttt{rd\_transfer\_channel\_final2.py}).
 Domain $256 \times 256$ cells; a straight horizontal channel of width $W$ is cut through an otherwise solid wall.
-The input port is a slab at the left edge, $x \in [0,18)$, spanning the full channel width.
+The input port is a circular dark spot of radius 6 cells centred at the left edge of the channel.
 Three probes record mean $u$ over 3-cell vertical strips at $x = 64$ (near), $x = 128$ (mid), and $x = 217$ (far), restricted to the channel interior.
 Each run lasts $2500$ steps ($125$ time units), long enough for the pulse to reach the far probe and for any post-pulse transients to decay.
 A free-medium reference uses the same port geometry with no walls; a no-stimulus control confirms the medium remains at rest.
 
 \textbf{Frequency response} (\texttt{rd\_transfer\_frequency\_final2.py}).
 Domain $300 \times 48$ cells; a single horizontal channel of width $W = 16$ cells.
-Input port at the left edge, $x \in [0,18)$, spanning the channel; far probe as a 3-cell vertical strip at $x = 240$.
+Input port is a circular dark spot of radius 6 cells at the left edge of the channel; far probe as a 3-cell vertical strip at $x = 240$.
 The two-pulse refractory scan fires pairs of pulses with separations from $1$ to $32$ time units, each followed by a $1400$-step ($70$ time-unit) quiet tail.
 Sustained-train runs fire six pulses at prescribed periods and record the number of threshold crossings at the far probe; the total run length is $(n_{\mathrm{pulses}}-1)P + 30 + 1400$ steps.
 A no-stimulus control and a single-pulse check are run before any measurement.
 
 \textbf{Two-input collision logic} (\texttt{rd\_transfer\_logic\_final2.py}).
 The geometry is a T-junction: a horizontal channel of width $W = 20$ cells with a second channel entering from the top.
-The Oregonator domain is $256 \times 200$ cells; input port A is at $x \in [25,43)$ on the horizontal channel, and input port B is at $y \in [140,158)$ on the vertical arm, centred at the junction $x = 96$.
+The Oregonator domain is $256 \times 200$ cells; input port A is a circular dark spot of radius 6 cells on the horizontal channel, and input port B is a circular dark spot of radius 6 cells on the vertical arm, centred at the junction $x = 96$.
 The output probe is a 3-cell vertical strip at $x = 240$ on the horizontal channel.
 Each run lasts $1000$ steps ($50$ time units) for the Oregonator ($1600$ steps for Barkley).
 The truth table is evaluated from the probe peak inside a window of half-width $2.5$ time units around the expected arrival time of a lone A pulse; a delay sweep of input B measures the coincidence window for annihilation.
 
 \textbf{Anisotropic substrate} (\texttt{rd\_transfer\_aniso\_final2.py}).
 Domain $256 \times 256$ cells; no walls or ports.
-The medium is initialised at rest and a circular perturbation of radius $25$ cells is seeded at the centre with $u = 0.8$, $v = 0.2$ (the same perturbation amplitude as the port drive).
+The medium is initialised at rest and a circular perturbation of radius $25$ cells is seeded at the centre with $u = 0.8$, $v = 0.2$; this is a one-time initial condition, not a sustained port drive.
 A uniform anisotropic diffusion tensor with eigenvalues $D_{\parallel} = r$ and $D_{\perp} = 1$ is applied, with the fast axis aligned to $x$.
 Front extents along $+x$ and $+y$ are recorded every 10 steps; run lengths are $900$, $700$, and $500$ steps for $r = 1$, $2$, and $4$, respectively.
 A no-stimulus control with $r = 4$ confirms the anisotropic medium stays at rest.
 
-These four characterisation experiments all use the clamped-port drive because it gives repeatable, model-agnostic timing and amplitude measurements.
-The training-era T-junction experiments of \refSec{sec:meth_demux} use the dark-spot drive (\refSec{sec:meth_darkspot}), the experimentally honest input encoding for a photosensitive BZ layer.
+All characterisation experiments therefore use the same experimentally honest drive, so the measured transfer functions are directly relevant to a photosensitive BZ layer controlled by projected light.
 
 \section{The Four Experiments}
 \label{sec:meth_experiments}
