@@ -1,0 +1,243 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\newcommand{\etal}{et al.}
+
+\title{BZ Reaction--Diffusion: Transfer Functions, UQ, and a Search for the Right Training Task}
+\subtitle{Characterisation-first thesis reframe for supervisor discussion}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26 --- Supervisor Meeting, 11 August 2026}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Meeting summary --- decision}
+
+\textbf{Path A: characterisation-first thesis.}
+
+\begin{itemize}
+    \item Claim: the structured light-sensitive Oregonator BZ medium is a \emph{quantifiable molecular-communication substrate}.
+    \item Proof: verified solver + four transfer functions + Sobol/PCE sensitivity over $\varepsilon$, $f$, $\phi$, $D_u$.
+    \item Training update: CMA-ES band-pass filter (208 evals) returned no improvement over uniform $\phi \approx 0.010$.
+    \item Conclusion: the value is the \emph{datasheet and its uncertainty}, not a trained end-to-end circuit.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Ask Guo today:}
+\begin{enumerate}
+    \item Is this framing acceptable for submission?
+    \item Should anisotropy stay in the body or move to appendix?
+    \item If one quick task remains, chemical diode or none?
+\end{enumerate}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Headline claim}
+
+\textbf{Thesis claim:} characterise a structured BZ reaction--diffusion medium as a \emph{trainable analog substrate}, then quantify its native transfer functions and their parameter sensitivity \emph{before} attempting training.
+
+\vspace{0.4cm}
+\textbf{What we deliver today:}
+\begin{enumerate}
+    \item A verified Oregonator solver and four measured transfer functions.
+    \item A first Sobol sensitivity / UQ pass over the kinetic parameters.
+    \item An honest assessment of why the first training attempt was trivial.
+    \item A proposal for a non-trivial, literature-backed training task we can still attempt.
+\end{enumerate}
+
+\vspace{0.3cm}
+{\small The value is the datasheet, not a trained end-to-end circuit.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Four measured transfer functions}
+
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{3.2cm}p{4.5cm}p{5.5cm}}
+\toprule
+\textbf{Function} & \textbf{What it measures} & \textbf{Oregonator-A headline} \\
+\midrule
+Channel wire & Pulse speed and attenuation vs width & 6.22 cells/t.u., width-independent down to $W=1$ \\
+Frequency response & Refractory bandwidth & 3.10 t.u. refractory; 0.282/t.u. max 1:1 rate \\
+Collision logic & Native two-input gate & A AND (NOT B); true peak 0.708, false peaks $\sim$0.003 (rest-state floor), 232$\times$ separation \\
+Anisotropic routing & Directional steering & $\sqrt{r}$ law verified; patch delay 644--836 steps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.2cm}
+{\small All four are native properties of the Oregonator excitable medium at the working point. False logic states sit at the rest-state noise floor ($\sim$0.003), not at exactly zero.}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What the transfer functions tell us}
+
+\begin{itemize}
+    \item \textbf{Channel:} walls are just wiring --- width carries almost no computing leverage.
+    \item \textbf{Frequency:} refractoriness is a built-in low-pass filter; the medium has a hard clock ceiling.
+    \item \textbf{Logic:} collisions annihilate; the native Boolean primitive is \textbf{inhibition}, not AND/OR/XOR directly.
+    \item \textbf{Anisotropy:} the only graded, non-blocking routing knob, but experimentally harder to realise than $\phi(x,y)$.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Bottom line:} the substrate's ``instruction set'' is small and constrained. Training can only reshuffle these primitives.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Uncertainty quantification: first Sobol pass}
+
+Four parameters perturbed $\pm 10\%$ around the working point; 384 forward solves.
+
+\vspace{0.3cm}
+\textbf{Pulse speed:} dominated by $\varepsilon$ ($S_1 \approx 0.59$), then $D_u$ ($\approx 0.32$), $\phi$ ($\approx 0.11$), $f$ ($\approx 0.08$).
+
+\vspace{0.2cm}
+\textbf{Probe peak:} dominated by $f$ ($\approx 0.65$), then $\varepsilon$ ($\approx 0.37$), with $\phi$ and $D_u$ almost inactive.
+
+\vspace{0.3cm}
+\textbf{Take-away:} speed and amplitude have different dominant parameters; a calibration or training loop must target the right QoI. This is the UQ step that should precede any trained BZ experiment.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{The old training task was trivial}
+
+\textbf{T-junction directionality routing:}
+\begin{itemize}
+    \item Single input, two outputs; train a $4 \times 4$ $\phi(x,y)$ grid.
+    \item CMA-ES and DE found zero-hard-loss fields in $\leq 20$ evaluations.
+    \item The trained solution: a high-$\phi$ barrier on one branch.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why it was always going to be trivial:}
+\begin{itemize}
+    \item The transfer functions already showed that $\phi$ mostly blocks or passes.
+    \item Directionality is therefore just ``block the branch you do not want.''
+    \item The optimizer rediscovered the hand-designed solution.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Demux V5} (64 parameters) did not converge within budget.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Training is now a feasibility/negative-result note}
+
+\textbf{What we tried:} CMA-ES band-pass filter, 8 control segments, 208 evaluations.
+\begin{itemize}
+    \item Best loss $\approx 1.0000$; optimised control stayed at $\phi \approx 0.010$ everywhere.
+    \item No better solution than the uniform channel found within this budget.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why this is informative, not a failure:}
+\begin{itemize}
+    \item The transfer functions already showed refractoriness is a hard ceiling.
+    \item If the uniform channel is already near-optimal for rate shaping, the optimizer correctly returns it.
+    \item It bounds how much $\phi(x,y)$ can reshape a single-channel pulse train.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Path A framing:} report the attempt honestly as evidence that training this substrate is non-trivial, then close with the diode/asymmetry task as future work.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{If one task remains: trainable chemical diode}
+
+The diode is the best remaining hedge if Guo wants a trained-device chapter:
+\begin{itemize}
+    \item Input from either end of a channel; output at the opposite end.
+    \item Target: high transmission one way, low transmission the other.
+    \item Lever: asymmetric $\phi(x)$ profile along the channel.
+    \item Literature precedent: Agladze \etal{} 1996; G\'{o}recka \etal{} 2009.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Why it is sharper than the band-pass:}
+\begin{itemize}
+    \item Requires \emph{asymmetric dynamical response}, not just a static barrier.
+    \item Single channel, 1-D $\phi$ profile --- cheap enough for a 1--2 day CMA-ES run.
+    \item Success or failure both teach us something about the substrate's trainable degrees of freedom.
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Budget:} $\leq$ 200 evaluations; if no improvement, stop and fold into the characterisation story.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Why this fits your research}
+
+Your work treats molecular communication and diffusion/reaction as information channels (Farsad \etal{} COMST 2016; Lin \etal{} IEEE Trans. Commun. 2023); Parrilla-Gutierrez \etal{} (Nat. Commun. 2020) showed a real programmable chemical computer.
+
+\vspace{0.3cm}
+This thesis takes the next step:
+\begin{itemize}
+    \item The channel is not only carrying messages --- its geometry and property fields \emph{are} the program.
+    \item The measured transfer functions are the instruction set of a spatial, analog, chemical computer.
+    \item The limitations (refractory clock, OR background at junctions, bounded $\phi$ window) are exactly the constraints a channel designer must respect.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Direct connection points:}
+\begin{itemize}
+    \item Molecular-comm channel view: encode/decode in wavefront arrival and pulse count.
+    \item UQ: local sensitivity and first Sobol indices done (Abbaszadeh--Thomas--Guo line).
+    \item Physics-informed inference: recover effective $\varepsilon$, $f$, $\phi$ from sparse probes.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Questions for you}
+
+\begin{enumerate}
+    \item Does the ``characterisation + UQ + one trained device'' framing read as a coherent MSc contribution?
+    \item Which training task should I attempt in the remaining days: band-pass filter, diode, or something else?
+    \item Should anisotropy stay as a third substrate knob, or be demoted to a solver-validation / theoretical extension?
+    \item For the viva: is ``the substrate's instruction set is too constrained for complex trained logic'' an acceptable conclusion?
+\end{enumerate}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Timeline to submission}
+
+\begin{itemize}
+    \item Thesis draft: clean compile; Sobol/UQ section in place.
+    \item PPT restructured to lead with transfer functions and UQ.
+    \item Training update: band-pass CMA-ES completed; no improvement over uniform $\phi$.
+    \item Pending decision from Guo:
+    \begin{itemize}
+        \item Accept characterisation + UQ + negative training result as submission framing?
+        \item Demote anisotropy to appendix / future work?
+        \item Authorise one 1--2 day chemical-diode run, or stop training now?
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{If the answer is yes/yes/stop:} the thesis can be closed within 10 days.
+
+\end{frame}
+
+\end{document}

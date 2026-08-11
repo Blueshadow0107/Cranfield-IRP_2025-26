@@ -1,0 +1,236 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{Weekly Progress Report}
+\subtitle{Solver convergence, transfer-test results, and the training campaign}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26, August 4, 2026}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{This Week}
+    \textbf{Report:}
+    \begin{itemize}
+        \item Full chapter rewrite pass completed and swapped in: tightened prose, duplicated content removed, front-matter numbering fixed.
+        \item Current draft: 42 pages, clean compile. Remaining: training results section + conclusions.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Simulation:}
+    \begin{itemize}
+        \item Complete convergence picture now quantified: space, time, and the joint $(\Delta x, \Delta t)$ map.
+        \item Four transfer tests measured (channel, frequency, logic, anisotropy).
+        \item Input encoding moved to the experimentally honest dark-spot drive; calibration of the new source underway.
+        \item First training campaign (demux routing) running.
+    \end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Physical Units: What a Cell and a Time Unit Mean}
+    Tyson--Fife scaling of the Oregonator (FKN rate constants, $[\mathrm{H}^+] = 0.8$ M):
+    \begin{itemize}
+        \item Time: $\tau = k_c B t = 0.02\,t$, so \textbf{1 t.u. $\approx$ 50 s} (recipe-dependent).
+        \item Length: $L_0 = \sqrt{D\,T_0}$ with $D \approx 2\times10^{-5}$ cm$^2$/s, so \textbf{1 cell $\approx$ 0.3 mm}.
+        \item Cross-check: model speed $6.2$ cells/t.u.\ maps to $\approx 0.04$ mm/s, within a factor $\approx 4$ of measured photosensitive-BZ wave speeds ($0.15$--$0.2$ mm/s, Suematsu 2021).
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{In plain terms:}
+    \begin{itemize}
+        \item The $200 \times 200$ demux medium is a $\approx 6 \times 6$ cm dish; probes sit millimetres apart.
+        \item The refractory period ($\approx 3.1$ t.u.) is $\approx 2.5$ minutes; a gate answers in minutes.
+        \item We use the computational parameter set ($\varepsilon = 0.05$, $q = 0.002$, $f = 1.4$), so the SI mapping is a calibration, not an FKN identity.
+    \end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Solver Verification: Method of Manufactured Solutions}
+    \textbf{Design:} analytic source term makes a known smooth field exact; measure discrete error as $\Delta x$, $\Delta t$ refine. Verifies the \emph{implementation} converges at design order.
+
+    \vspace{0.2cm}
+    \begin{itemize}
+        \item Two configurations (fresh runs, current solver): Oregonator A isotropic, Oregonator A with tilted anisotropic tensor.
+        \item Observed spatial orders: $1.99$ and $2.00$ (design order $2$).
+        \item Observed temporal orders: $1.00$ and $1.00$ (first-order operator splitting).
+        \item Tilted tensor converges exactly like the isotropic case: the divergence-form tensor discretisation the anisotropy experiment relies on is sound.
+        \item Note: reference slopes are anchored at the data. MMS certifies the convergence \emph{rate}; the error magnitude is solution-dependent and not a prediction of physical-run error.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MMS Results}
+    \centering
+    \includegraphics[width=0.85\textwidth]{../Analysis/figures/rd\_mms\_oregonator.png}
+
+    \vspace{0.15cm}
+    {\small Spatial protocol: $\Delta t = 0.05\,\Delta x^2$ (fixed diffusion number). Temporal protocol: $\Delta x = 0.5$ fixed. Errors are $u$-field L2 norms against the manufactured field at $t = 20$ t.u.}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Convergence in Space: Pulse Speed vs $\Delta x$}
+    \begin{columns}
+    \column{0.45\textwidth}
+    \begin{table}
+    \centering
+    \small
+    \begin{tabular}{@{}cc@{}}
+    \toprule
+    $\Delta x$ & Oregonator A \\
+    \midrule
+    1.00 & 6.224 \\
+    0.50 & 6.048 \\
+    0.25 & 6.049 \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+    (cells per time unit, $\Delta t = 0.05$; current-solver data)
+
+    \column{0.55\textwidth}
+    \begin{itemize}
+        \item Speeds flat within a $2.8\%$ band across the refinement, so the medium is close to grid-converged at the working resolution.
+        \item The residual $\approx 3\%$ offset between $\Delta x = 1$ and the refined levels is systematic, not noise: it is carried as an explicit error bar wherever absolute speeds are quoted.
+        \item All comparative measurements share $\Delta x = 1$, so relative results are internally consistent.
+    \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Convergence in Time: Pulse Speed vs $\Delta t$}
+    \begin{itemize}
+        \item Timestep refinement ($\Delta t = 0.05 \to 0.0125$ at $\Delta x = 1$) changes the measured speed by $\approx 1.3\%$; the working step is not a significant error source.
+        \item Diffusion stability ($D\,\Delta t/\Delta x^2 \le 1/4$) comfortably satisfied everywhere.
+    \end{itemize}
+
+    \vspace{0.2cm}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Analysis/figures/rd\_verification\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Convergence in Space-Time: the Joint $(\Delta x, \Delta t)$ Map}
+    \begin{columns}
+    \column{0.55\textwidth}
+    \includegraphics[width=\textwidth]{../Analysis/figures/rd\_convergence\_map\_oregonator.png}
+
+    \column{0.45\textwidth}
+    \begin{itemize}
+        \item $3 \times 3$ map: $\Delta x \in \{1, 0.5, 0.25\}$, timestep factor $\{1, 0.5, 0.25\}$.
+        \item At fixed $\Delta x$, refining $\Delta t$ moves the speed by $\le 1.27\%$ at $\Delta x = 1$, and $\le 0.14\%$ on the finer grids.
+        \item Error is \textbf{space-dominated and separable}: one knob ($\Delta x$) carries the error budget.
+    \end{itemize}
+    \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Input Encoding: Dark-Spot Drive}
+    \begin{columns}
+    \column{0.5\textwidth}
+    \begin{itemize}
+        \item Inputs are now one-shot dark flashes (locally lowered $\phi$), the experimentally realisable drive for photosensitive BZ.
+        \item Dark patch acts as a pacemaker; firing threshold at $\approx 60\%$ dimming; response monotone above threshold.
+        \item The source itself is being characterised (flash duration $\to$ pulses emitted, ignition latency); it enters the Methods as part of the protocol.
+        \item All four transfer tests below are being re-run with this source; figures and numbers shown are the clamp-era versions, to be replaced.
+    \end{itemize}
+
+    \column{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.92\textwidth]{../Analysis/figures/rd\_darkspot.png}
+    \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Transfer Test 1: Channel Wire}
+    \begin{itemize}
+        \item Straight channel, width swept $W = 60 \to 1$; single pulse in, three probes (speed + arrival linearity).
+        \item Channel speed $\approx$ free-medium speed ($6.22$ cells/t.u., Oregonator A).
+        \item Transmission down to $W = 1$ cell: no practical width-induced block at these parameters.
+        \item Consequence: wires are near-ideal; channel \emph{width} carries no computing leverage.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Transfer Test 1: Channel Results}
+    \includegraphics[width=0.9\textwidth]{../Analysis/figures/rd\_transfer\_channel\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Transfer Test 2: Frequency Response (Refractory Bandwidth)}
+    \begin{itemize}
+        \item Two-pulse interval sweep + sustained-train transmission ratio.
+        \item Absolute refractory period $\approx 3.1$ t.u.; maximum 1:1 following rate $\approx 0.28$ pulses/t.u.\, the medium's clock limit.
+        \item A channel is a native low-pass filter for pulse trains.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Transfer Test 2: Frequency Results}
+    \centering
+    \includegraphics[width=0.62\textwidth]{../Analysis/figures/rd\_transfer\_frequency\_final2\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Transfer Test 3: Two-Input Collision Logic (T-Junction)}
+    \begin{itemize}
+        \item Naive whole-record readout computes OR: lone pulses diffract into every branch (honest negative result).
+        \item Windowed readout (calibrated to the substrate's own speeds) gives the inhibition gate \textbf{A AND (NOT B)}: B vetoes A by collision annihilation.
+        \item Separation ratio $232$--$1000\times$ between weakest true and strongest false output, a large noise margin.
+        \item Tolerance to input clock skew measured as the inhibition window; the logic is timing-gated.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Transfer Test 3: Logic Results}
+    \centering
+    \includegraphics[width=0.48\textwidth]{../Analysis/figures/rd\_transfer\_logic\_final2\_oregonator.png}%
+    \includegraphics[width=0.48\textwidth]{../Analysis/figures/rd\_transfer\_logic\_final2\_snapshots\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Transfer Test 4: Anisotropic Substrate}
+    \begin{itemize}
+        \item Uniform tensor field, ratio $r = D_\parallel / D_\perp$: elliptical fronts follow the $\sqrt{r}$ eikonal law.
+        \item Deviations from $\sqrt{r}$: $0.24\%$ at $r{=}2$, $0.34\%$ at $r{=}4$ (Oregonator A).
+        \item Directional speed profile $c(\theta)$ matches theory to $1.2\%$.
+        \item Embedded anisotropic patch = continuously tunable delay: $644 \to 836$ steps as fibres rotate $0 \to 90^\circ$: routing without blocking.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Transfer Test 4: Anisotropy Results}
+    \centering
+    \includegraphics[height=0.72\textheight]{../Analysis/figures/rd\_transfer\_aniso\_oregonator.png}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Training Campaign: Demux Routing (Running)}
+    \begin{columns}
+    \column{0.5\textwidth}
+    \begin{itemize}
+        \item Train $\phi(x,y)$ so one-shot dark-spot patterns route to assigned probes: $(10){\to}$PA1, $(01){\to}$PA5, $(11){\to}$PA3, window $[2,8]$ t.u.
+        \item 64 parameters ($8{\times}8$ blocks), differential evolution, $\approx 1280$ simulations.
+        \item Ungameable loss: presence required + wrong-channel count + timing; attenuation cannot cheat.
+        \item Baseline (uniform $\phi$): loss $2.5$: every pattern floods all probes.
+    \end{itemize}
+
+    \column{0.5\textwidth}
+    \includegraphics[width=\textwidth]{../Analysis/figures/rd\_demux\_geometry\_v5.png}
+    \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Next Steps}
+    \begin{enumerate}
+        \item Finish source calibration $\to$ re-run all transfer tests with dark-spot inputs (new numbers replace the clamp-era ones above).
+        \item Demux campaign completes ($\sim$hours): trained $\phi$ map, routing truth table, jitter robustness.
+        \item Write training results + conclusions chapters.
+    \end{enumerate}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guo × BZ/RD Thesis Clarity — 10-Day Decision</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --surface: #111827;
+      --surface-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --line: #374151;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11,18,32,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 1rem 1.25rem;
+    }
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.15rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+    header .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: var(--good);
+      color: #022c22;
+      font-weight: 700;
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 1.25rem; }
+    .lead { color: var(--muted); font-size: 1.05rem; margin-top: 0.25rem; }
+
+    .decision {
+      background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(56,189,248,0.08));
+      border: 1px solid rgba(34,197,94,0.35);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+    .decision h2 { margin: 0 0 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .decision p { margin: 0; }
+
+    section { margin: 2rem 0; }
+    h2.section-title {
+      font-size: 1.25rem;
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h2.section-title::after {
+      content: "−";
+      color: var(--muted);
+      font-weight: 400;
+    }
+    h2.section-title.collapsed::after { content: "+"; }
+    .section-body { display: block; }
+    .section-body.hidden { display: none; }
+
+    h3 { font-size: 1.05rem; color: var(--accent); margin: 1.25rem 0 0.5rem; }
+    h4 { font-size: 0.95rem; color: var(--text); margin: 1rem 0 0.4rem; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .card h4 { margin-top: 0; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      margin: 0.15rem 0.15rem 0 0;
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    .tag.p0 { background: rgba(34,197,94,0.15); color: #86efac; border-color: rgba(34,197,94,0.35); }
+    .tag.p1 { background: rgba(245,158,11,0.15); color: #fcd34d; border-color: rgba(245,158,11,0.35); }
+    .tag.p2 { background: rgba(129,140,248,0.15); color: #c7d2fe; border-color: rgba(129,140,248,0.35); }
+    .tag.risk-g { background: rgba(34,197,94,0.15); color: #86efac; }
+    .tag.risk-a { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .tag.risk-r { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+
+    .paper-list { list-style: none; padding: 0; margin: 0; }
+    .paper-list li {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.85rem 0.95rem;
+      margin-bottom: 0.65rem;
+    }
+    .paper-list .title { font-weight: 600; }
+    .paper-list .steal { color: var(--muted); margin-top: 0.35rem; font-size: 0.92rem; }
+
+    .path-card { border-left: 4px solid var(--accent); }
+    .path-card.recommended { border-left-color: var(--good); background: rgba(34,197,94,0.06); }
+    .path-card h4 { display: flex; justify-content: space-between; align-items: center; }
+
+    .matrix th, .matrix td { text-align: center; }
+    .matrix td:first-child { text-align: left; font-weight: 600; }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.5rem 0; border-bottom: 1px solid var(--line);
+    }
+    .checklist input { margin-top: 0.25rem; accent-color: var(--accent); }
+    .checklist label { flex: 1; }
+    .checklist .day { font-weight: 700; color: var(--accent); min-width: 3.2rem; }
+
+    .email-box {
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      margin: 0.75rem 0;
+    }
+    .btn {
+      background: var(--accent-2);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn:hover { background: #6366f1; }
+
+    .anti { border-left: 3px solid var(--bad); padding-left: 0.85rem; margin: 0.6rem 0; }
+    .note { background: rgba(245,158,11,0.08); border-left: 3px solid var(--warn); padding: 0.65rem 0.9rem; border-radius: 0 8px 8px 0; margin: 0.75rem 0; }
+    .source { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin: 3rem 0 1.5rem; }
+
+    @media print {
+      :root {
+        --bg: #fff;
+        --surface: #f8fafc;
+        --surface-2: #f1f5f9;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #0369a1;
+        --accent-2: #4338ca;
+        --line: #cbd5e1;
+      }
+      body { background: #fff; color: #0f172a; }
+      header { position: static; background: #fff; border-bottom: 2px solid #000; }
+      a { color: #0369a1; text-decoration: underline; }
+      .section-body { display: block !important; }
+      h2.section-title::after { content: none; }
+      .btn { display: none; }
+      .card { break-inside: avoid; box-shadow: none; }
+      .decision { background: #f0fdf4; border: 1px solid #166534; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>Guo × BZ/RD Thesis Clarity</h1>
+      <div class="lead">10-day decision instrument for a molecular-communication framing of BZ reaction–diffusion</div>
+    </div>
+    <span class="badge">RECOMMEND PATH A</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 1. STICKY EXECUTIVE DECISION -->
+  <div class="decision">
+    <h2><span>🎯</span> Executive decision</h2>
+    <p>
+      <strong>Take Pathway A: a characterisation-first thesis.</strong> Claim: the light-sensitive Oregonator BZ medium is a <em>structured molecular-communication substrate</em> whose native transfer functions (wire, refractory bandwidth, collision logic, light-routing) can be quantified and made robust via uncertainty quantification. Frame training as a feasibility/negative-result closing section, not the main proof. You already own the numerics, the solver verification, the Sobol sensitivity study, and a clean negative training result. Do not try to invent a working trained circuit in 10 days.
+    </p>
+    <div class="source">Confidence: high. Grounded in Report/main.tex, Analysis/rd_core.py, Analysis/figures/rd_pce_sensitivity/results.json, and Analysis/figures/rd_train_bandpass/result.json.</div>
+  </div>
+
+  <!-- 2. GUO-FOR-MY-THESIS -->
+  <section>
+    <h2 class="section-title">Guo’s research DNA, translated for a BZ/RD thesis</h2>
+    <div class="section-body">
+      <p>Professor Guo is not a classical physical chemist. His home language is <strong>molecular communication, complex networked systems, physics-informed ML, and uncertainty quantification</strong>. The thesis must speak that language while keeping the BZ physics honest. Below are the clusters that matter, with the bridge to your project.</p>
+      <table>
+        <tr><th>Cluster</th><th>What Guo does</th><th>What it means for your BZ/RD thesis</th></tr>
+        <tr>
+          <td><strong>Molecular comms via diffusion &amp; reaction–diffusion</strong></td>
+          <td>Information encoded in diffusing/reacting molecules; reaction-diffusion detectors; tabletop chemical messaging; wave-denied molecular PHY.</td>
+          <td>Your BZ wavefront is a <em>nonlinear RD information carrier</em>. A pulse = packet; excitability threshold = non-coherent detector; phi(x,y) = programmable channel.</td>
+        </tr>
+        <tr>
+          <td><strong>Fluid/porous chemical transport as channels</strong></td>
+          <td>Signal tracking in fluid-dynamic channels; molecular delivery in porous media; turbulence–information dissipation.</td>
+          <td>Adds advection/convection as a future channel knob; for now, wall geometry is your static porous-like structure and diffusion ratio is the “channel condition”.</td>
+        </tr>
+        <tr>
+          <td><strong>Uncertainty quantification</strong></td>
+          <td>Polynomial-chaos expansion (PCE) on molecular signals; arbitrary PCE on networked nonlinear dynamics.</td>
+          <td>You have already run Sobol/PCE on eps, f, phi, Du. This is the most Guo-aligned, defensible novelty in the room.</td>
+        </tr>
+        <tr>
+          <td><strong>Physics-informed ML / inverse problems</strong></td>
+          <td>Control-physics-informed ML for drone intent; closed-loop output-error trajectory inference; DMD/Koopman reduced models.</td>
+          <td>Use PIML to <em>infer</em> Oregonator parameters from wavefront data, or DMD/Koopman to build a reduced model of spiral/target dynamics from snapshots.</td>
+        </tr>
+        <tr>
+          <td><strong>Network/graph dynamics &amp; sparse sensing</strong></td>
+          <td>Log-Koopman nonlinear graph Fourier transform; sparse sampling of networked dynamics; resilience of nonlinear networks.</td>
+          <td>Treat a grid of BZ cells/patches as a graph. Sparse probes recover the concentration field; pattern statistics are graph signals.</td>
+        </tr>
+        <tr>
+          <td><strong>Vision / positioning / 6G</strong></td>
+          <td>Framing papers on wave-denied environments, 6G molecular physical layer, trustworthy AI.</td>
+          <td>Use only for motivation: BZ chemical computing is a candidate primitive when RF is denied or when you want a physical, not digital, processor.</td>
+        </tr>
+      </table>
+      <div class="source">Source: <a href="https://www.weisiguo.com/publications" target="_blank">weisiguo.com/publications</a>, filtered for molecular communication, UQ, physics-informed ML, and networked-dynamics papers.</div>
+    </div>
+  </section>
+
+  <!-- 3. OVERLAP RADAR -->
+  <section>
+    <h2 class="section-title">Overlap radar: your skills × Guo’s clusters</h2>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="card">
+          <h4>What you already have</h4>
+          <ul>
+            <li>Verified 2D Oregonator solver (operator-split explicit Euler, adaptive reaction subcycling, no clipping) — <code>Analysis/rd_core.py</code>.</li>
+            <li>MMS + grid/timestep convergence: spatial order ~2, temporal order ~1; Oregonator speed within 2.8% band.</li>
+            <li>Four transfer-function experiments: channel, frequency/refractory, T-junction logic, anisotropy.</li>
+            <li>Dark-spot drive calibration (T_FLASH = 3.0 t.u. gives one pulse).</li>
+            <li>Sobol sensitivity on eps, f, phi, Du for pulse speed and peak — 384 evaluations.</li>
+            <li>One training attempt: CMA-ES band-pass routing, 208 evals, returned flat/unimproved control.</li>
+            <li>Thesis draft with title/abstract already framed around “trainable analog computing substrate”.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>What Guo values most</h4>
+          <ul>
+            <li><strong>Information-theoretic/systems framing</strong> of physical processes.</li>
+            <li><strong>Trustworthy quantification</strong>: UQ, convergence, sensitivity, error bars.</li>
+            <li><strong>Multi-scale links</strong>: from kinetic parameters to device behaviour.</li>
+            <li><strong>Physics-informed learning</strong>: use known PDE structure, don’t black-box blindly.</li>
+            <li><strong>Clear deliverables</strong>: measured quantities, metrics, reproducible scripts.</li>
+          </ul>
+          <p class="muted">Best overlap: UQ/sensitivity + channel/transfer-function characterisation. Weakest overlap: end-to-end trained circuit / pure ML black-box.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. P0–P2 HIT-LIST -->
+  <section>
+    <h2 class="section-title">P0–P2 hit-list: papers to steal from</h2>
+    <div class="section-body">
+      <p>Filter chips: <span class="tag p0">P0 — cite directly</span> <span class="tag p1">P1 — method transfer</span> <span class="tag p2">P2 — framing only</span>.</p>
+      <ul class="paper-list">
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/10054480" target="_blank">Lin et al. — Diversity-Based Non-Coherent Signal Detector for Molecular Communication via Reaction–Diffusion (IEEE Trans. Commun., 2023)</a></div>
+          <div class="steal">Steal: BZ wavefront detection can be framed as a non-coherent detector on a reaction–diffusion channel; you do not need to know the instantaneous phase, only the arrival/peak envelope.</div>
+        </li>
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/8807269" target="_blank">Abbaszadeh, Moutsinas, Thomas &amp; Guo — Uncertainty Quantification in Molecular Signals using Polynomial Chaos Expansion (IEEE T-MBMC, 2019)</a></div>
+          <div class="steal">Steal: PCE/Sobol over kinetic parameters is a direct, Guo-validated method. Map eps/f/phi/Du uncertainty onto pulse speed/amplitude uncertainty.</div>
+        </li>
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0082935" target="_blank">Farsad, Guo &amp; Eckford — Tabletop Molecular Communication: Text Messages Through Chemical Signals (PLOS ONE, 2013)</a></div>
+          <div class="steal">Steal: The “tabletop chemical messaging” precedent justifies your numerical BZ channel as a realisable physical communication substrate.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=7405285" target="_blank">Farsad et al. — A Comprehensive Survey of Recent Advancements in Molecular Communication (IEEE Commun. Surv. Tuts., 2016)</a></div>
+          <div class="steal">Steal: Use as a review anchor; your BZ device fits the “reaction–diffusion MC with no external energy” branch.</div>
+        </li>
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/9446692" target="_blank">Guo et al. — Molecular Physical Layer for 6G in Wave-Denied Environments (IEEE Commun. Mag., 2021)</a></div>
+          <div class="steal">Steal: Motivation slide only — when RF is denied, chemical/reaction-diffusion channels become a physical-layer option.</div>
+        </li>
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="http://onlinelibrary.wiley.com/doi/10.1002/ett.3106/full" target="_blank">Cho, Yilmaz, Guo &amp; Chae — Effective ISI Mitigation with a Limited Amount of Enzymes (Trans. Emerging Tel. Tech., 2016)</a></div>
+          <div class="steal">Steal: The light-suppression term phi and the refractory recovery act like an “enzyme” that clears old excitation; frame refractory reset as ISI management.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://arxiv.org/abs/1703.06384" target="_blank">Cho et al. — Effective Enzyme Deployment for Degradation of Interference Molecules (WCNC 2017 / arXiv:1703.06384)</a></div>
+          <div class="steal">Steal: Spatial deployment of a control field (phi) to manage interference is analogous to your spatial light field; use only as method analogy.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/9359660" target="_blank">Abbaszadeh et al. — Kolmogorov Turbulence and Information Dissipation in Molecular Communication (IEEE T-MBMC, 2021)</a></div>
+          <div class="steal">Steal: “Information dissipation” language for numerical dissipation/loss of pulse contrast at junctions; use carefully and label as analogy.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/9143182" target="_blank">Abbaszadeh, Atthanayake, Thomas &amp; Guo — Molecular Signal Tracking and Detection Methods in Fluid Dynamic Channels (IEEE T-MBMC, 2020)</a></div>
+          <div class="steal">Steal: Future extension: add advection to your RD solver and treat the BZ channel as a fluid-dynamic molecular channel.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/8813106" target="_blank">Fang, Guo, Icardi, Noel &amp; Yang — Molecular Information Delivery in Porous Media (IEEE T-MBMC, 2019)</a></div>
+          <div class="steal">Steal: Wall/channel geometry in your substrate is a deterministic porous medium; cite for structured-geometry molecular transport.</div>
+        </li>
+        <li>
+          <span class="tag p0">P0</span>
+          <div class="title"><a href="https://www.nature.com/articles/s41598-022-27025-w" target="_blank">Zou, Fragonara, Qiu &amp; Guo — Uncertainty Quantification of Multi-Scale Resilience in Networked Systems with Nonlinear Dynamics using Arbitrary Polynomial Chaos (Sci. Rep., 2022)</a></div>
+          <div class="steal">Steal: Justifies using PCE beyond molecular signals — on nonlinear RD pattern dynamics. Good if you extend to spiral/target stability.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://www.nature.com/articles/s44172-024-00179-3" target="_blank">Perrusquía, Guo, Fraser &amp; Wei — Uncovering Drone Intentions using Control Physics Informed Machine Learning (Nat. Commun. Eng., 2024)</a></div>
+          <div class="steal">Steal: Model structure + data = PIML. Use the same logic to infer Oregonator parameters from wavefront arrival snapshots.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/abstract/document/10689671?casa_token=k6fmSDmZz90AAAAA:kOF_nRo4U2XUVeiMmsj5IXr28yrGKsF_8nQupKkGkH-CEsw81hB2Rxr787AtWjYfEg9J_9Ce" target="_blank">Perrusquía, Wei &amp; Guo — Trajectory Intent Prediction of Autonomous Systems using Dynamic Mode Decomposition (IEEE TSMC, 2024)</a></div>
+          <div class="steal">Steal: DMD on BZ snapshot sequences → reduced-order model of spiral tip meander or target-wave nucleation.</div>
+        </li>
+        <li>
+          <span class="tag p1">P1</span>
+          <div class="title"><a href="https://ieeexplore.ieee.org/document/9234614" target="_blank">Wei, Li, Sun &amp; Guo — Sampling and Inference of Networked Dynamics using Log-Koopman Nonlinear Graph Fourier Transform (IEEE Trans. Signal Process., 2020)</a></div>
+          <div class="steal">Steal: Coupled BZ cells / probe networks as a graph; sparse sampling + Koopman for pattern prediction.</div>
+        </li>
+        <li>
+          <span class="tag p2">P2</span>
+          <div class="title"><a href="https://www.nature.com/articles/s41467-020-15190-3" target="_blank">Parrilla-Gutierrez et al. — A Programmable Chemical Computer with Memory and Pattern Recognition (Nat. Commun., 2020)</a></div>
+          <div class="steal">Steal: Benchmark/limitation reference — a real chemical computer exists; your thesis explains the RD physics and quantifies how hard training such a substrate is.</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. HINTS & CLUES -->
+  <section>
+    <h2 class="section-title">Hints &amp; clues: concrete technical moves</h2>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="card">
+          <h4>Channel / signal framing</h4>
+          <ul>
+            <li><strong>Treat wavefront arrival as first-hitting time (FHT).</strong> Your probe time series is a molecular receiver; report mean arrival and its std under parameter uncertainty.</li>
+            <li><strong>Peak = symbol amplitude.</strong> Use the PCE results: f dominates peak (S1 ≈ 0.65), eps dominates speed (S1 ≈ 0.59). This is your “channel parameter” story.</li>
+            <li><strong>Non-coherent detection.</strong> You do not decode a phase; you decode whether a pulse arrived above a threshold within a window. Aligns with Lin et al. 2023.</li>
+            <li><strong>Refractory = ISI.</strong> The 3.10 t.u. absolute refractory and 0.282/t.u. max 1:1 rate are the channel’s inter-symbol-interference budget.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>UQ / PIML / reduced-order moves</h4>
+          <ul>
+            <li><strong>Keep the Sobol/PCE result front and centre.</strong> It is the most Guo-aligned quantitative result you have and it is already computed.</li>
+            <li><strong>Build a cheap surrogate.</strong> From the 384 PCE samples, fit a Gaussian process from (eps, f, phi, Du) → (speed, peak). Use it for fast inverse calibration to literature values.</li>
+            <li><strong>Inverse recovery of eps/f/q.</strong> Given measured wave speed and peak, solve the inverse problem via the surrogate or closed-loop output error (Perrusquía–Guo style).</li>
+            <li><strong>DMD/Koopman of snapshots.</strong> Run one spiral or target-wave case, save u/v snapshots, and compute DMD modes. Even one figure shows you can reduce the PDE to a modal picture.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Geometry / training moves</h4>
+          <ul>
+            <li><strong>Demote anisotropy.</strong> It is realizable numerically but hard to control experimentally. Move it to “solver validation / future work”.</li>
+            <li><strong>Pick one non-trivial training task.</strong> Band-pass/demux did not improve. Try a chemical diode (asymmetric transmission) or a pulse-routing T-junction with a genuinely non-uniform phi landscape.</li>
+            <li><strong>Use CMA-ES, not DE, for small budgets.</strong> CMA adapts covariance; with ~200 evals it is your best shot at finding structure. But if it returns flat again, report it as evidence of weak trainability.</li>
+            <li><strong>Keep walls + phi as separate controls.</strong> Walls give geometry; phi gives a continuous, experimentally relevant (photosensitive BZ) control field.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>What to avoid</h4>
+          <ul>
+            <li>Do not claim you built a full chemical processor. You characterised components and attempted training.</li>
+            <li>Do not over-cite the Nature Cronin paper as if you reproduced it. Cite it as a benchmark and contrast your parameter-sensitivity approach.</li>
+            <li>Do not introduce 80-reaction FKN. Oregonator is enough for the thesis scope.</li>
+            <li>Do not drift into drone RL / 6G AI-RAN. Keep those as Guo’s other clusters only.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note">
+        The PCE file already tells you the dominant knobs: eps and Du for speed; f and eps for peak. Build the thesis narrative around “who controls what” rather than around an untrained end-to-end gate.
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. THREE PATHWAYS -->
+  <section>
+    <h2 class="section-title">Three pathways</h2>
+    <div class="section-body">
+      <div class="grid-3">
+        <div class="card path-card recommended">
+          <h4>Pathway A <span class="tag risk-g">LOW RISK</span></h4>
+          <p><strong>Characterisation + UQ thesis.</strong></p>
+          <p>“A structured light-sensitive Oregonator BZ medium is a quantifiable molecular-communication substrate; its native transfer functions and parameter sensitivities determine what it can compute.”</p>
+          <p><strong>Why Guo buys it:</strong></p>
+          <ul>
+            <li>Lin 2023 (RD non-coherent detector) = same channel language.</li>
+            <li>Abbaszadeh 2019 / Zou 2022 (PCE/UQ) = your method is in his group.</li>
+            <li>Farsad 2013 (tabletop chemical messaging) = physical realisability.</li>
+          </ul>
+          <p><strong>MVP:</strong> report channel, frequency, logic, optional anisotropy; lead with Sobol/PCE; close with training attempt as a negative/feasibility note.</p>
+          <p><strong>Kill criteria:</strong> if the PCE numbers are unstable or the solver verification is challenged. Both look solid.</p>
+        </div>
+        <div class="card path-card">
+          <h4>Pathway B <span class="tag risk-a">MEDIUM RISK</span></h4>
+          <p><strong>Quick trained-circuit push.</strong></p>
+          <p>“A spatial light field can train a simple BZ device; here is a working diode/routing task and the optimisation landscape.”</p>
+          <p><strong>Why Guo buys it:</strong></p>
+          <ul>
+            <li>Li 2023 / Perrusquía 2024 (physics-informed/evolutionary ML) = learning on physical systems.</li>
+            <li>Cho 2016–2017 (enzyme deployment) = spatial control of a chemical channel.</li>
+          </ul>
+          <p><strong>MVP:</strong> pick a task with a known exploitable nonlinearity, run CMA-ES for 1–2 days, report success or a clean negative result.</p>
+          <p><strong>Kill criteria:</strong> if 200+ evals again show no improvement, stop and fold into Pathway A.</p>
+        </div>
+        <div class="card path-card">
+          <h4>Pathway C <span class="tag risk-g">LOW RISK, LESS NOVEL</span></h4>
+          <p><strong>Guo-framed review + illustrations.</strong></p>
+          <p>“Physical neural networks in reaction–diffusion media: a conceptual map from BZ primitives to molecular-communication functions.”</p>
+          <p><strong>Why Guo buys it:</strong></p>
+          <ul>
+            <li>Farsad 2016 survey + Guo 2021 molecular PHY = framing authority.</li>
+            <li>Parrilla-Gutierrez 2020 = prior realisation of a chemical computer.</li>
+          </ul>
+          <p><strong>MVP:</strong> literature review + a few canonical sims (channel, spiral, target) + channel metrics. Light on original contribution.</p>
+          <p><strong>Kill criteria:</strong> a review-only thesis may not satisfy an MSc by research at Cranfield.</p>
+        </div>
+      </div>
+
+      <h3>Decision matrix</h3>
+      <table class="matrix">
+        <tr><th>Criterion</th><th>Path A</th><th>Path B</th><th>Path C</th></tr>
+        <tr><td>10-day feasibility</td><td class="risk-g">High</td><td class="risk-a">Tight</td><td class="risk-g">High</td></tr>
+        <tr><td>Guo-alignment</td><td class="risk-g">High</td><td class="risk-g">High</td><td class="risk-a">Medium</td></tr>
+        <tr><td>Original contribution</td><td class="risk-g">Solid</td><td class="risk-a">Uncertain</td><td class="risk-r">Weak</td></tr>
+        <tr><td>Local evidence ready</td><td class="risk-g">Yes</td><td class="risk-a">Partial</td><td class="risk-g">Yes</td></tr>
+        <tr><td>Viva defensibility</td><td class="risk-g">Strong</td><td class="risk-a">Depends on result</td><td class="risk-r">Risky</td></tr>
+        <tr><td>Training effort needed</td><td class="risk-g">Low</td><td class="risk-r">High</td><td class="risk-g">Low</td></tr>
+      </table>
+      <p><strong>Recommended path: A.</strong> It uses what you have, avoids a desperate training sprint, and still leaves room to fold in a Path-B result if a CMA-ES run unexpectedly succeeds.</p>
+    </div>
+  </section>
+
+  <!-- 7. 10-DAY CHECKLIST -->
+  <section>
+    <h2 class="section-title">10-day checklist</h2>
+    <div class="section-body">
+      <p>Checkboxes persist via localStorage (if your browser allows it on file://).</p>
+      <ul class="checklist" id="checklist">
+        <li><input type="checkbox" id="d1" data-key="d1" /><label for="d1"><span class="day">Day 1</span>Confirm framing with Guo: characterisation-first + UQ + training as feasibility note. Lock title/abstract.</label></li>
+        <li><input type="checkbox" id="d2a" data-key="d2a" /><label for="d2a"><span class="day">Day 2</span>Rewrite Introduction to foreground molecular-communication framing (Farsad 2013, Lin 2023, Guo 2021).</label></li>
+        <li><input type="checkbox" id="d2b" data-key="d2b" /><label for="d2b"><span class="day">Day 2</span>Insert PCE/Sobol methods and results into Methods + Results; generate clean bar/scatter figures.</label></li>
+        <li><input type="checkbox" id="d3" data-key="d3" /><label for="d3"><span class="day">Day 3</span>Polish transfer-function results: dark-spot channel (6.46 cells/t.u.), frequency (0.282/t.u. clamped / 0.167 dark-spot), logic (A AND NOT B, 232–276×), anisotropy demoted to appendix.</label></li>
+        <li><input type="checkbox" id="d4a" data-key="d4a" /><label for="d4a"><span class="day">Day 4</span>Write formal test-case spec (IC/BC, grid, probes, thresholds) in Methods.</label></li>
+        <li><input type="checkbox" id="d4b" data-key="d4b" /><label for="d4b"><span class="day">Day 4</span>Update figures to house style (vector PDF where possible, consistent colourmap, label u/v/phi).</label></li>
+        <li><input type="checkbox" id="d5" data-key="d5" /><label for="d5"><span class="day">Day 5</span>Run one optional CMA-ES task (chemical diode or non-trivial T-junction) with ≤200 evals as Path-B hedge.</label></li>
+        <li><input type="checkbox" id="d6" data-key="d6" /><label for="d6"><span class="day">Day 6</span>Compile thesis; fix all broken figure paths and missing citations (Field &amp; Försterling 1986, Suematsu 2021, Storn &amp; Price 1997).</label></li>
+        <li><input type="checkbox" id="d7" data-key="d7" /><label for="d7"><span class="day">Day 7</span>Draft Conclusions: contribution = verified solver + transfer-function catalogue + UQ + training outlook. Do not overclaim.</label></li>
+        <li><input type="checkbox" id="d8" data-key="d8" /><label for="d8"><span class="day">Day 8</span>Full read-through; check every claim against local files; label remaining gaps as ASSUMPTION.</label></li>
+        <li><input type="checkbox" id="d9" data-key="d9" /><label for="d9"><span class="day">Day 9</span>Final compile; produce PDF; prepare 5-slide meeting summary: PCE + transfer functions + decision.</label></li>
+        <li><input type="checkbox" id="d10" data-key="d10" /><label for="d10"><span class="day">Day 10</span>Submit / send to supervisor; sleep.</label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. EIGHT SHARP QUESTIONS -->
+  <section>
+    <h2 class="section-title">8 sharp questions for Guo</h2>
+    <div class="section-body">
+      <ol>
+        <li><strong>Scope:</strong> Is a characterisation-first thesis with a negative training result acceptable, or do you expect a demonstrably trained BZ circuit?</li>
+        <li><strong>Framing:</strong> Which of your clusters should lead the abstract: molecular communication, UQ, physics-informed ML, or networked dynamics?</li>
+        <li><strong>Anisotropy:</strong> Should the anisotropy transfer test stay in the main body or move to an appendix / future work?</li>
+        <li><strong>Units:</strong> Do you want a physical-units/calibration section (1 t.u. ≈ 50 s, 1 cell ≈ 0.3 mm), or is non-dimensional characterisation sufficient?</li>
+        <li><strong>UQ depth:</strong> Is the existing Sobol sensitivity on four parameters enough, or should I add a cheap surrogate / inverse-calibration step?</li>
+        <li><strong>ML expectation:</strong> How much learned modelling is enough to satisfy the “physics-informed ML” angle — a GP surrogate, DMD modes, or a full inverse problem?</li>
+        <li><strong>Viva defence:</strong> What is the weakest claim in the current draft that a reviewer/viva examiner is likely to attack?</li>
+        <li><strong>Training task:</strong> If I run one more 1–2 day optimisation, which task would you bet on: chemical diode, asymmetric T-junction, or pulse synchronisation detector?</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 9. ANTI-PATTERNS -->
+  <section>
+    <h2 class="section-title">Anti-patterns</h2>
+    <div class="section-body">
+      <div class="anti"><strong>Do not pivot to drone RL / 6G AI-RAN.</strong> Guo works there, but it is not your thesis. Mention only as his wider research context.</div>
+      <div class="anti"><strong>Do not start a wet-lab experiment in week 2.</strong> 10 days is numerics-only. Label any experimental claims as future work.</div>
+      <div class="anti"><strong>Do not drown in the FKN 80-reaction mechanism.</strong> Oregonator is validated and sufficient; cite FKN/Field–Noyes for chemistry grounding only.</div>
+      <div class="anti"><strong>Do not cite the wrong Weisi Guo.</strong> The organic-synthesis Guo is a different person; all papers above list Cranfield / Warwick / Turing-affiliated Weisi Guo.</div>
+      <div class="anti"><strong>Do not claim you reproduced the Nature Cronin chemical computer.</strong> Cite it as a benchmark and explain how your sensitivity/characterisation angle differs.</div>
+      <div class="anti"><strong>Do not hide the negative training result.</strong> A clean negative result (“uniform phi is already near-optimal for this task”) is publishable if framed honestly.</div>
+      <div class="anti"><strong>Do not overuse the “information dissipation” analogy.</strong> Numerical dissipation is not Kolmogorov turbulence; label the link as analogy/insight, not equivalence.</div>
+    </div>
+  </section>
+
+  <!-- 10. APPENDIX -->
+  <section>
+    <h2 class="section-title">Appendix</h2>
+    <div class="section-body">
+      <h3>A. Cluster map</h3>
+      <table>
+        <tr><th>Cluster</th><th>Key papers</th><th>Thesis wedge</th></tr>
+        <tr>
+          <td>RD molecular communication</td>
+          <td>Lin 2023 (J135), Farsad 2013 (J16), Guo 2021 (J115)</td>
+          <td>BZ wavefront = packet; phi = channel; probe = receiver</td>
+        </tr>
+        <tr>
+          <td>Enzyme / reactant control</td>
+          <td>Cho 2016 (J38), Cho 2017 arXiv (C47)</td>
+          <td>phi/refractory as ISI-clearing “enzyme” analogy</td>
+        </tr>
+        <tr>
+          <td>UQ / PCE</td>
+          <td>Abbaszadeh 2019 (J73), Zou 2022 (J130)</td>
+          <td>Sobol sensitivity of speed/peak to eps/f/phi/Du</td>
+        </tr>
+        <tr>
+          <td>Fluid/porous transport</td>
+          <td>Fang 2019 (J72), Abbaszadeh 2020 (J100)</td>
+          <td>Wall geometry = structured porous medium; future advection</td>
+        </tr>
+        <tr>
+          <td>Physics-informed ML</td>
+          <td>Perrusquía 2024 (J152/J167), Perrusquía 2023 (J145)</td>
+          <td>Inverse recovery of kinetic parameters; DMD reduced models</td>
+        </tr>
+        <tr>
+          <td>Networked dynamics / GSP</td>
+          <td>Wei 2020 (J106), Moutsinas 2020 (J107)</td>
+          <td>Coupled BZ cells as graph; sparse sensing of patterns</td>
+        </tr>
+      </table>
+
+      <h3>B. Local-file findings</h3>
+      <table>
+        <tr><th>File</th><th>What it proves</th></tr>
+        <tr><td><code>Report/main.tex</code></td><td>Title: “Characterisation of a structured BZ reaction–diffusion medium as a trainable analog computing substrate”. Abstract already uses molecular-communication framing.</td></tr>
+        <tr><td><code>Analysis/rd_core.py</code></td><td>Tyson–Fife light-sensitive Oregonator solver; operator-split explicit Euler; adaptive reaction subcycling; no clipping; no-flux walls.</td></tr>
+        <tr><td><code>Report/chapters/results.tex</code></td><td>Transfer functions: channel speed 6.46 cells/t.u. (dark-spot), refractory 3.10 t.u., max 1:1 rate 0.282/t.u., A AND NOT B separation 232–276×.</td></tr>
+        <tr><td><code>Analysis/figures/rd_pce_sensitivity/results.json</code></td><td>Sobol: speed dominated by eps (S1≈0.59) and Du (S1≈0.32); peak dominated by f (S1≈0.65) and eps (S1≈0.37). 384 evaluations, N=64.</td></tr>
+        <tr><td><code>Analysis/figures/rd_train_bandpass/result.json</code></td><td>CMA-ES band-pass training: 208 evals, best loss ≈1.0, control stays uniform at phi≈0.010 — a negative/improvement-free result.</td></tr>
+        <tr><td><code>Presentations/bz-thesis-reframe-2026-08-11.pdf</code></td><td>Meeting deck already leads with transfer functions + UQ.</td></tr>
+      </table>
+      <div class="note">Any claim not in the files above is labeled ASSUMPTION in the main text.</div>
+
+      <h3>C. Glossary: my term ↔ Guo term</h3>
+      <table>
+        <tr><th>Your term</th><th>Guo-aligned term</th><th>When to use</th></tr>
+        <tr><td>BZ pulse / wavefront</td><td>Chemical signal packet / nonlinear RD carrier</td><td>Introduction / framing</td></tr>
+        <tr><td>Channel wall / geometry</td><td>Structured molecular-transport medium / porous-like channel</td><td>Methods / results</td></tr>
+        <tr><td>Light field phi(x,y)</td><td>Programmable channel condition / spatial control field</td><td>Methods / training</td></tr>
+        <tr><td>Refractory period</td><td>ISI budget / inter-symbol interference</td><td>Frequency-response section</td></tr>
+        <tr><td>Rate constants (eps, f, q)</td><td>Channel parameters</td><td>UQ / sensitivity</td></tr>
+        <tr><td>Du / Dv ratio</td><td>Pattern-forming channel condition</td><td>Turing/spiral discussion</td></tr>
+        <tr><td>Numerical dissipation</td><td>Information-dissipation analogy (careful)</td><td>Only with caveat</td></tr>
+        <tr><td>Spiral / target pattern</td><td>Structured chemical signal / self-organised pattern</td><td>Pattern-formation section</td></tr>
+        <tr><td>Probes</td><td>Sparse molecular receivers</td><td>Experimental protocol</td></tr>
+        <tr><td>Transfer function</td><td>Input–output characteristic of the chemical channel</td><td>Everywhere</td></tr>
+      </table>
+
+      <h3>D. Draft email to Guo</h3>
+      <button class="btn" id="copyEmail">Copy email text</button>
+      <div class="email-box" id="emailText">Hi Prof. Guo,
+
+Ahead of our meeting I have mapped the thesis against your research clusters and would like to confirm the framing.
+
+Current direction: characterisation-first. I will lead with the verified Oregonator solver, the four transfer-function measurements (channel, refractory bandwidth, collision logic, anisotropy), and the Sobol/PCE sensitivity study, then close with the CMA-ES training attempt as a feasibility/negative-result note.
+
+Two quick questions:
+1. Is this characterisation + UQ framing acceptable for submission, or do you require a demonstrably trained circuit?
+2. Should anisotropy stay in the main body or move to appendix / future work?
+
+I have attached the decision one-pager (guo-bz-thesis-clarity.html) and the latest thesis PDF.
+
+Best,
+Srivijayesh</div>
+    </div>
+  </section>
+
+  <footer>
+    Built 2026-08-11 from local workspace and Guo’s publication list.<br/>
+    Sources: <a href="https://www.weisiguo.com/publications" target="_blank">weisiguo.com/publications</a>, <code>Report/main.tex</code>, <code>Analysis/rd_core.py</code>, <code>Analysis/figures/rd_pce_sensitivity/results.json</code>, <code>Analysis/figures/rd_train_bandpass/result.json</code>.
+  </footer>
+</div>
+
+<script>
+  // Collapsible sections
+  document.querySelectorAll('.section-title').forEach(title => {
+    title.addEventListener('click', () => {
+      const body = title.nextElementSibling;
+      if (!body) return;
+      body.classList.toggle('hidden');
+      title.classList.toggle('collapsed', body.classList.contains('hidden'));
+    });
+  });
+
+  // localStorage checkboxes
+  const checks = document.querySelectorAll('#checklist input[type="checkbox"]');
+  checks.forEach(box => {
+    const key = 'bz-check-' + box.dataset.key;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved === 'true') box.checked = true;
+    } catch (e) {}
+    box.addEventListener('change', () => {
+      try {
+        localStorage.setItem(key, box.checked ? 'true' : 'false');
+      } catch (e) {}
+    });
+  });
+
+  // Copy email
+  document.getElementById('copyEmail').addEventListener('click', () => {
+    const text = document.getElementById('emailText').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyEmail');
+      const old = btn.innerText;
+      btn.innerText = 'Copied';
+      setTimeout(() => btn.innerText = old, 1200);
+    }).catch(() => alert('Copy failed'));
+  });
+</script>
+</body>
+</html>

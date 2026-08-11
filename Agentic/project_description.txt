@@ -1,0 +1,34 @@
+Project 11: Fluid Neural Networks – Computing over Continuous Reactions
+Company: Research
+Supervisors:
+Prof. Weisi Guo
+Prof. Takis Tsoutsanis
+
+Project Details (~150 words): traditional silicon-based neural networks (NN) have discrete
+processing units (neurons with activation functions) and connecting weights. The architecture
+is usually fixed and layer-by-layer (liquid NN have flexible architecture). The parameters of
+weights are trained over sample data. The problem with this approach is that for each NN, it
+can only make batched inference in sequence. This means a high number of users will have a
+queue issue and this has raised the demand for global investment in GPU/CPU at edge. This
+research proposes to examine the possibility of a completely different NN formulation, one
+that is based in fluid dynamics and fluid reactions:
+
+A. Continuous rather than discrete, where the mathematical processing takes place across
+the whole architecture space
+B. Parallelism rather than sequential processing, where parallel non-reactive chemicals
+can allow multiple inference processes
+
+Point A) has the potential of bringing new ML capability that is beyond current discrete NNs,
+and Point B) can reduce the time of batch inference.
+
+This involves 3 phases:
+1. Modeling a controllable physical space (with input fluids and output detection of
+mixture) that can control how reactive fluids mix.
+2. Train the control units of physical space to learn to encode the network for parallel
+tasks.
+3. Test this performance on real settings against silicon networks.
+
+The student should be highly motivated with a very strong CFD background and a passion for
+basic machine learning.
+
+Source: CFD Project List for IRP 2025-2026.pdf (Downloads)
