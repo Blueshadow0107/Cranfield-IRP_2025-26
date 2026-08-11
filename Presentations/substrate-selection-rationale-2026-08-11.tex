@@ -1,0 +1,233 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\newcommand{\etal}{et al.}
+
+\title{Why this substrate?}
+\subtitle{An evidence-driven selection for Project 11}
+\author{Srivijayesh Venugopal}
+\date{Cranfield IRP 2025-26 --- 11 August 2026}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What Project 11 asks for}
+
+The brief calls for a **fluid-based neural computation** substrate. That imposes four non-negotiable requirements:
+
+\vspace{0.4cm}
+\begin{enumerate}
+    \item \textbf{Continuity:} computation happens over a spatial field, not at discrete nodes.
+    \item \textbf{Parallelism:} independent signal streams can evolve simultaneously.
+    \item \textbf{Trainability:} some spatial property of the medium acts as the weights.
+    \item \textbf{Native nonlinearity:} the physics itself supplies decision/activation behaviour, not just the readout.
+\end{enumerate}
+
+\vspace{0.3cm}
+These four requirements are the filter through which every candidate was judged.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{The actual search path (not a pre-planned grid search)}
+
+The project moved through candidates as evidence killed them or redirected the focus:
+
+\vspace{0.3cm}
+\begin{enumerate}
+    \item \textbf{Acoustic waves in channels / porous media} --- implemented, but linear and already well-covered in the literature.
+    \item \textbf{Thermal / optothermal modulation} --- own null result: the intended tuning knob did not change the output.
+    \item \textbf{Recurrent neural chemical reaction networks} --- trained XOR end-to-end, but no spatial extent.
+    \item \textbf{DNA strand-displacement winner-take-all} --- experimentally proven, but spaceless and single-use.
+    \item \textbf{Reaction--diffusion excitable media (current)} --- spatial, nonlinear, trainable geometry/light field.
+\end{enumerate}
+
+\vspace{0.3cm}
+\textbf{Point:} BZ/RD was not the first assumption. It is where the constraints pushed the project.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Selection criteria and their weighting}
+
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{p{4.0cm}p{2.0cm}p{7.0cm}}
+\toprule
+\textbf{Criterion} & \textbf{Weight} & \textbf{Rationale} \\
+\midrule
+Spatial continuity & Hard requirement & Brief says ``fluid-based'' computation, not discrete reservoirs \\
+Parallelism & Hard requirement & Multiple independent streams must coexist \\
+Native nonlinearity & High & Otherwise the readout/training carries all the computation \\
+Trainable spatial weights & High & Geometry or property fields must be the program \\
+Simulation tractability & Medium & Must be verifiable within MSc time \\
+Experimental realisability & Medium & Room-temperature, cheap chemistry preferred \\
+Speed & Low & Slow is acceptable if the physics is right \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.2cm}
+\textbf{Hard requirements} eliminate any substrate that fails them regardless of other merits.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Wave-based candidates}
+
+\textbf{Acoustic waves (free-field / channel / porous)}
+\begin{itemize}
+    \item Pros: fast, tractable, FDTD solver implemented.
+    \item Cons: passive linear physics; nonlinearity must be imported; field is crowded.
+    \item Verdict: \textbf{set aside}. Does not satisfy native nonlinearity; limited novelty headroom.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Thermal / optothermal media}
+\begin{itemize}
+    \item Pros: continuous field, easy to simulate.
+    \item Cons: own null result showed the heat pattern did not modulate the acoustic signal; diffusive slowness scales as $L^2$.
+    \item Verdict: \textbf{set aside}. Fails trainability and speed.
+\end{itemize}
+
+\vspace{0.2cm}
+Both are continuous, but neither has the required built-in nonlinearity.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Chemistry-based candidates}
+
+\textbf{Well-mixed CRNs / recurrent neural CRNs}
+\begin{itemize}
+    \item Pros: genuinely trainable; solved XOR end-to-end.
+    \item Cons: scalar concentrations only --- no spatial extent, no parallelism across streams.
+    \item Verdict: \textbf{set aside}. Fails the hard requirement of spatial continuity.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{DNA strand-displacement winner-take-all}
+\begin{itemize}
+    \item Pros: experimentally demonstrated pattern recognition.
+    \item Cons: spaceless, consumable, weak link to fluid mechanics.
+    \item Verdict: \textbf{set aside}. Fails spatial continuity.
+\end{itemize}
+
+\vspace{0.2cm}
+Trainability is excellent, but these are not \emph{spatial} computers.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Elimination decision tree}
+
+\textbf{Start:} all candidates that can in principle compute.
+
+\vspace{0.2cm}
+\begin{enumerate}
+    \item \textbf{Is it spatially continuous?}
+    \begin{itemize}
+        \item No $\rightarrow$ CRN, DNA eliminated.
+    \end{itemize}
+    \item \textbf{Does it have native nonlinearity?}
+    \begin{itemize}
+        \item No $\rightarrow$ acoustic, thermal eliminated.
+    \end{itemize}
+    \item \textbf{What remains?} Reaction--diffusion excitable media.
+\end{enumerate}
+
+\vspace{0.3cm}
+\textbf{RD checks the remaining boxes:}
+\begin{itemize}
+    \item Strong native nonlinearity: excitation threshold, refractoriness, annihilation.
+    \item Trainable weights: wall geometry, light field $\phi(x,y)$, anisotropic diffusion tensor.
+    \item Compact verified model: Oregonator / Barkley.
+    \item Experimental path: room-temperature photosensitive BZ layers.
+\end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Why BZ reaction--diffusion, honestly}
+
+It is not because BZ is the fastest or easiest. It is because it is the only candidate left that satisfies the hard requirements:
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Candidate} & \textbf{Continuous} & \textbf{Parallel} & \textbf{Nonlinear} & \textbf{Trainable space} \\
+\midrule
+Acoustic & Yes & Yes & No & Geometry \\
+Thermal & Yes & Yes & No & Own null result \\
+Well-mixed CRN & No & No & Yes & Rates \\
+DNA WTA & No & No & Yes & Sequences \\
+BZ/RD & Yes & Yes & Yes & Geometry / $\phi$ / tensor \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+The admitted cost is speed: chemical waves travel at mm/min. That is accepted as a substrate limitation, not a flaw in the premise.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What each abandoned path contributed}
+
+\begin{itemize}
+    \item \textbf{Acoustics:} established the pulse-in / probe-out experimental grammar and the black-box protocol.
+    \item \textbf{Thermal:} showed that a continuous field alone is not enough; the tuning knob must actually change the dynamics.
+    \item \textbf{CRN XOR:} proved trainability is possible, but also proved that trainability without space is not what Project 11 asks for.
+    \item \textbf{DNA WTA:} confirmed that well-mixed chemistry is experimentally real, but consumable and spaceless.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Each failure sharpened the criteria.} The pivot to RD was not retreat; it was the elimination of everything that could not meet the brief.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{What would change our mind?}
+
+If any of the following were true, the selection would reopen:
+
+\vspace{0.3cm}
+\begin{enumerate}
+    \item A wave-based substrate with demonstrated \emph{native} nonlinearity at the signal amplitude.
+    \item A well-mixed chemistry platform with genuine spatial extent and parallel streams.
+    \item An experimental realisation showing the BZ phenomenology cannot be reproduced reliably.
+\end{enumerate}
+
+\vspace{0.3cm}
+Currently, none of these are the case. The RD/BZ choice stands as the most defensible path against the stated requirements.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Questions}
+
+\begin{enumerate}
+    \item Does this evidence-driven elimination read as a rigorous selection process?
+    \item Should the criteria weighting be made more explicit in the thesis?
+    \item Is the honest pivot history acceptable, or should it be reframed further?
+    \item Would a quantitative scoring matrix strengthen the argument?
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
