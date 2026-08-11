@@ -1,0 +1,72 @@
+{
+  "gate": "A AND (NOT B) -- inhibition via head-on collision",
+  "kinetics": "oregonator candidate A (f=1.4375, eps=0.0501, phi=0.010), q=0.002, Du=1, Dv=0, dark-spot drive",
+  "phi0": 0.01,
+  "phi_dark": 0.002,
+  "t_flash_tu": 3.0,
+  "spot_radius": 6,
+  "rest_state_u_star": 0.003082099932938156,
+  "control_max_u_50tu": 0.0030820999329396943,
+  "control_quiet": true,
+  "geometry": "256x200, W=20, TJ=96, A port x(25, 43), B port y(140, 158), probe strip x=240",
+  "readout": "windowed probe peak, window = 2.5 t.u. around A-alone arrival t=32.85 t.u.",
+  "naive_readout_crossings": {
+    "00": 0,
+    "10": 1,
+    "01": 1,
+    "11": 1
+  },
+  "naive_readout_note": "whole-trace threshold readout gives OR, not XOR: B diffracts into the output channel and reaches the probe even when A is annihilated",
+  "truth_table": {
+    "00": 0.0,
+    "10": 0.7061976066424126,
+    "01": 0.0030429303174552085,
+    "11": 0.003042930005755555
+  },
+  "separation_ratio": 232.0781394800401,
+  "decision_threshold": 0.3546202684799339,
+  "timing_sweep": [
+    {
+      "dB_steps": 0,
+      "window_peak": 0.003042930005755555,
+      "blocked": true
+    },
+    {
+      "dB_steps": 20,
+      "window_peak": 0.00297304839947991,
+      "blocked": true
+    },
+    {
+      "dB_steps": 40,
+      "window_peak": 0.6213010727675208,
+      "blocked": false
+    },
+    {
+      "dB_steps": 60,
+      "window_peak": 0.7054777465572554,
+      "blocked": false
+    },
+    {
+      "dB_steps": 80,
+      "window_peak": 0.7054706167907104,
+      "blocked": false
+    },
+    {
+      "dB_steps": 100,
+      "window_peak": 0.7064651344509758,
+      "blocked": false
+    },
+    {
+      "dB_steps": 120,
+      "window_peak": 0.7061449665987961,
+      "blocked": false
+    },
+    {
+      "dB_steps": 160,
+      "window_peak": 0.706137547917019,
+      "blocked": false
+    }
+  ],
+  "inhibition_window_steps": 20,
+  "inhibition_window_time": 1.0
+}

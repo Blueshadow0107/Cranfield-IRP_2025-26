@@ -1,0 +1,95 @@
+{
+  "phi": "right_block_high",
+  "results": [
+    {
+      "period_tu": 4.0,
+      "left_peak": 0.7053075433688204,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 5,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 5.0,
+      "left_peak": 0.7052896541746932,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 6.0,
+      "left_peak": 0.7053075433688204,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 7.0,
+      "left_peak": 0.7053075433688204,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 8.0,
+      "left_peak": 0.7058884016112572,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 10.0,
+      "left_peak": 0.7054991944202867,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 12.0,
+      "left_peak": 0.7053691738427581,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 16.0,
+      "left_peak": 0.7053729633806947,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 20.0,
+      "left_peak": 0.7053731053041181,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    },
+    {
+      "period_tu": 30.0,
+      "left_peak": 0.7053731069965551,
+      "right_peak": 0.0022158351109672256,
+      "left_present": true,
+      "right_present": false,
+      "left_crossings": 6,
+      "right_crossings": 0
+    }
+  ]
+}

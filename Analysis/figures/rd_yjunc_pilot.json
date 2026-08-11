@@ -1,0 +1,59 @@
+{
+  "geometry": {
+    "nx": 256,
+    "ny": 256,
+    "hw": 10,
+    "junction": [
+      128,
+      120
+    ],
+    "a_end": [
+      60,
+      210
+    ],
+    "b_end": [
+      196,
+      210
+    ],
+    "stem_end": [
+      128,
+      20
+    ]
+  },
+  "source": {
+    "dark": 0.002,
+    "phi0": 0.01,
+    "t_flash_tu": 3.0,
+    "src_len": 18
+  },
+  "kinetics": "oregonator_A",
+  "dt": 0.05,
+  "t_total_tu": 45.0,
+  "offset_b_tu": 5.0,
+  "cases": {
+    "A only": {
+      "seam_peak": 0.7038167557541363,
+      "stem_peak": 0.7074779927625232,
+      "stem_crossings": 1,
+      "stem_fired": true
+    },
+    "B only": {
+      "seam_peak": 0.7038167557541363,
+      "stem_peak": 0.7074779927625232,
+      "stem_crossings": 1,
+      "stem_fired": true
+    },
+    "A+B coincident": {
+      "seam_peak": 0.7176945924547858,
+      "stem_peak": 0.7106403053733261,
+      "stem_crossings": 1,
+      "stem_fired": true
+    },
+    "A+B offset +5 t.u.": {
+      "seam_peak": 0.7038177176578675,
+      "stem_peak": 0.7074740709383671,
+      "stem_crossings": 1,
+      "stem_fired": true
+    }
+  }
+}

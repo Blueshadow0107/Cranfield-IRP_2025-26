@@ -1,0 +1,251 @@
+{
+  "periods": [
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    8.0,
+    10.0
+  ],
+  "tflashes": [
+    1.0,
+    2.0,
+    3.0,
+    4.0
+  ],
+  "results": [
+    [
+      {
+        "period": 2.0,
+        "t_flash": 1.0,
+        "left_crossings": 2,
+        "right_crossings": 0,
+        "left_peak": 0.7053076773422524,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 3.0,
+        "t_flash": 1.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.7053076773422524,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 4.0,
+        "t_flash": 1.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.705882445749886,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 5.0,
+        "t_flash": 1.0,
+        "left_crossings": 4,
+        "right_crossings": 0,
+        "left_peak": 0.7053477785616313,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 6.0,
+        "t_flash": 1.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7053076773422524,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 8.0,
+        "t_flash": 1.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.705888782030873,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 10.0,
+        "t_flash": 1.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7054995465961713,
+        "right_peak": 0.0022158351109672256
+      }
+    ],
+    [
+      {
+        "period": 2.0,
+        "t_flash": 2.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 3.0,
+        "t_flash": 2.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 4.0,
+        "t_flash": 2.0,
+        "left_crossings": 4,
+        "right_crossings": 0,
+        "left_peak": 0.7053048258964089,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 5.0,
+        "t_flash": 2.0,
+        "left_crossings": 5,
+        "right_crossings": 0,
+        "left_peak": 0.7052898412144122,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 6.0,
+        "t_flash": 2.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 8.0,
+        "t_flash": 2.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7058887326309239,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 10.0,
+        "t_flash": 2.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7054993407783264,
+        "right_peak": 0.0022158351109672256
+      }
+    ],
+    [
+      {
+        "period": 2.0,
+        "t_flash": 3.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 3.0,
+        "t_flash": 3.0,
+        "left_crossings": 4,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 4.0,
+        "t_flash": 3.0,
+        "left_crossings": 4,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 5.0,
+        "t_flash": 3.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7052898309929279,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 6.0,
+        "t_flash": 3.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 8.0,
+        "t_flash": 3.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7058887151579901,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 10.0,
+        "t_flash": 3.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7054993329724956,
+        "right_peak": 0.0022158351109672256
+      }
+    ],
+    [
+      {
+        "period": 2.0,
+        "t_flash": 4.0,
+        "left_crossings": 3,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 3.0,
+        "t_flash": 4.0,
+        "left_crossings": 4,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 4.0,
+        "t_flash": 4.0,
+        "left_crossings": 5,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 5.0,
+        "t_flash": 4.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7052896541746932,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 6.0,
+        "t_flash": 4.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7053075433688204,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 8.0,
+        "t_flash": 4.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7058884016112572,
+        "right_peak": 0.0022158351109672256
+      },
+      {
+        "period": 10.0,
+        "t_flash": 4.0,
+        "left_crossings": 6,
+        "right_crossings": 0,
+        "left_peak": 0.7054991944202867,
+        "right_peak": 0.0022158351109672256
+      }
+    ]
+  ]
+}

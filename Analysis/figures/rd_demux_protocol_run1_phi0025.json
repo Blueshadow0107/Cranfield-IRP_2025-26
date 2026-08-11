@@ -1,0 +1,60 @@
+{
+  "window": [
+    2.0,
+    8.0
+  ],
+  "t_flash": 12.0,
+  "tu_after": 60.0,
+  "assign": {
+    "10": "PA1",
+    "01": "PA5",
+    "11": "PA3"
+  },
+  "design_region": [
+    [
+      55,
+      135
+    ],
+    [
+      20,
+      180
+    ]
+  ],
+  "nb": 8,
+  "phi_bounds": [
+    0.01,
+    0.025
+  ],
+  "halo": 10,
+  "lambda_tv": 0.02,
+  "baseline_loss": 2.5,
+  "baseline_record": {
+    "loss": 2.5,
+    "data_loss": 2.5,
+    "tv": 0.0,
+    "patterns": {
+      "10": {
+        "assigned": "PA1",
+        "present": true,
+        "arrival": 3.95,
+        "wrong": 5,
+        "loss": 2.5
+      },
+      "01": {
+        "assigned": "PA5",
+        "present": true,
+        "arrival": 3.95,
+        "wrong": 5,
+        "loss": 2.5
+      },
+      "11": {
+        "assigned": "PA3",
+        "present": true,
+        "arrival": 0.8,
+        "wrong": 5,
+        "loss": 2.5
+      }
+    }
+  },
+  "wall_s": 137.52492785453796
+}

@@ -1,0 +1,42 @@
+{
+  "0.01": {
+    "peak": 0.7087299377265683,
+    "transmitted": true,
+    "arrival_tu": 23.700000000000003
+  },
+  "0.015": {
+    "peak": 0.7086457000732812,
+    "transmitted": true,
+    "arrival_tu": 24.150000000000002
+  },
+  "0.02": {
+    "peak": 0.7063097713780462,
+    "transmitted": true,
+    "arrival_tu": 24.700000000000003
+  },
+  "0.025": {
+    "peak": 0.7043502854821612,
+    "transmitted": true,
+    "arrival_tu": 25.55
+  },
+  "0.03": {
+    "peak": 0.00308209993293968,
+    "transmitted": false,
+    "arrival_tu": null
+  },
+  "0.04": {
+    "peak": 0.0030820999329396748,
+    "transmitted": false,
+    "arrival_tu": null
+  },
+  "0.05": {
+    "peak": 0.00308209993293967,
+    "transmitted": false,
+    "arrival_tu": null
+  },
+  "0.06": {
+    "peak": 0.003082099932939665,
+    "transmitted": false,
+    "arrival_tu": null
+  }
+}

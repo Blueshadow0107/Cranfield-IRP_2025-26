@@ -1,0 +1,84 @@
+{
+  "kinetics": "oregonator candidate A (f=1.4375, eps=0.0501, phi=0.010), q=0.002, Du=1, Dv=0, dark-spot drive",
+  "phi0": 0.01,
+  "phi_dark": 0.002,
+  "t_flash_tu": 3.0,
+  "spot_radius": 6,
+  "rest_state_u_star": 0.003082099932938156,
+  "control_max_u_100tu": 0.003082099932940017,
+  "control_quiet": true,
+  "geometry": "300x48 channel, W=16, far probe strip x=240",
+  "refractory_period_steps": 60,
+  "refractory_period_time": 3.0,
+  "two_pulse_scan": {
+    "60": 2,
+    "80": 2,
+    "120": 2,
+    "160": 2,
+    "240": 2,
+    "320": 2,
+    "480": 2,
+    "640": 2
+  },
+  "train_results": [
+    {
+      "period_steps": 80,
+      "fired": 6,
+      "transmitted": 4,
+      "f_in": 0.25,
+      "f_out": 0.1499999999999925
+    },
+    {
+      "period_steps": 100,
+      "fired": 6,
+      "transmitted": 5,
+      "f_in": 0.2,
+      "f_out": 0.15999999999999362
+    },
+    {
+      "period_steps": 120,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.16666666666666666,
+      "f_out": 0.16666666666666113
+    },
+    {
+      "period_steps": 160,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.125,
+      "f_out": 0.12499999999999686
+    },
+    {
+      "period_steps": 240,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.08333333333333333,
+      "f_out": 0.08333333333333194
+    },
+    {
+      "period_steps": 320,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.0625,
+      "f_out": 0.06249999999999922
+    },
+    {
+      "period_steps": 480,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.041666666666666664,
+      "f_out": 0.041666666666666324
+    },
+    {
+      "period_steps": 640,
+      "fired": 6,
+      "transmitted": 6,
+      "f_in": 0.03125,
+      "f_out": 0.031249999999999806
+    }
+  ],
+  "max_following_rate": 0.16666666666666666,
+  "saturated_output_rate": 0.16666666666666113,
+  "slope1_region": true
+}

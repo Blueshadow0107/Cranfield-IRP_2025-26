@@ -1,0 +1,193 @@
+{
+  "config": {
+    "box": [
+      200,
+      200
+    ],
+    "A": [
+      40,
+      80
+    ],
+    "B": [
+      40,
+      120
+    ],
+    "probes": {
+      "PC": [
+        95,
+        100
+      ],
+      "PA1": [
+        82,
+        26
+      ],
+      "PA2": [
+        114,
+        58
+      ],
+      "PA3": [
+        125,
+        100
+      ],
+      "PA4": [
+        114,
+        142
+      ],
+      "PA5": [
+        82,
+        174
+      ]
+    },
+    "spot_r": 12,
+    "phi0": 0.01,
+    "dark": 0.002,
+    "t_flash": 12.0,
+    "tu_run": 100.0,
+    "u_thresh": 0.5,
+    "design_region_xy": [
+      [
+        55,
+        135
+      ],
+      [
+        20,
+        180
+      ]
+    ]
+  },
+  "calibration": {
+    "4.0": 0,
+    "8.0": 1,
+    "12.0": 1
+  },
+  "baseline": {
+    "00": {
+      "PC": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      },
+      "PA1": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      },
+      "PA2": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      },
+      "PA3": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      },
+      "PA4": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      },
+      "PA5": {
+        "first_arrival": null,
+        "n_crossings": 0,
+        "peak": 0.00308209993293969
+      }
+    },
+    "10": {
+      "PC": {
+        "first_arrival": 2.2,
+        "n_crossings": 2,
+        "peak": 0.6988878687577644
+      },
+      "PA1": {
+        "first_arrival": 3.9000000000000004,
+        "n_crossings": 2,
+        "peak": 0.6969709235918876
+      },
+      "PA2": {
+        "first_arrival": 5.3500000000000005,
+        "n_crossings": 2,
+        "peak": 0.702656354385993
+      },
+      "PA3": {
+        "first_arrival": 0.8,
+        "n_crossings": 3,
+        "peak": 0.7064737561036435
+      },
+      "PA4": {
+        "first_arrival": 2.45,
+        "n_crossings": 3,
+        "peak": 0.6997278203849306
+      },
+      "PA5": {
+        "first_arrival": 3.4000000000000004,
+        "n_crossings": 3,
+        "peak": 0.7032280399921672
+      }
+    },
+    "01": {
+      "PC": {
+        "first_arrival": 2.2,
+        "n_crossings": 2,
+        "peak": 0.6988883981470007
+      },
+      "PA1": {
+        "first_arrival": 3.4000000000000004,
+        "n_crossings": 3,
+        "peak": 0.7032282208590759
+      },
+      "PA2": {
+        "first_arrival": 2.45,
+        "n_crossings": 3,
+        "peak": 0.6997281418275396
+      },
+      "PA3": {
+        "first_arrival": 0.8,
+        "n_crossings": 3,
+        "peak": 0.7064729416243762
+      },
+      "PA4": {
+        "first_arrival": 5.3500000000000005,
+        "n_crossings": 2,
+        "peak": 0.7026563506112318
+      },
+      "PA5": {
+        "first_arrival": 3.9000000000000004,
+        "n_crossings": 2,
+        "peak": 0.6969706699481227
+      }
+    },
+    "11": {
+      "PC": {
+        "first_arrival": 4.95,
+        "n_crossings": 1,
+        "peak": 0.7070353480402845
+      },
+      "PA1": {
+        "first_arrival": 11.55,
+        "n_crossings": 1,
+        "peak": 0.7033688863549686
+      },
+      "PA2": {
+        "first_arrival": 10.850000000000001,
+        "n_crossings": 1,
+        "peak": 0.7029959101446249
+      },
+      "PA3": {
+        "first_arrival": 0.8500000000000001,
+        "n_crossings": 2,
+        "peak": 0.7063075732292774
+      },
+      "PA4": {
+        "first_arrival": 2.45,
+        "n_crossings": 2,
+        "peak": 0.7026329857040738
+      },
+      "PA5": {
+        "first_arrival": 3.35,
+        "n_crossings": 2,
+        "peak": 0.6969849382121702
+      }
+    }
+  }
+}

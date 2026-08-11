@@ -87,6 +87,10 @@ CASES = {
                            tensor=(2.5, 2.5, 1.5), Dv=0.0),
     'oregonator_A': dict(kinetics='oregonator', params=OREG_A,
                          tensor=(1.0, 1.0, 0.0), Dv=0.6),
+    # added 2026-08-03 for the Oregonator-only thesis: tilted-tensor
+    # validation of the divergence-form discretisation without Barkley
+    'oregonator_tilted': dict(kinetics='oregonator', params=OREG_A,
+                              tensor=(2.5, 2.5, 1.5), Dv=0.6),
 }
 
 

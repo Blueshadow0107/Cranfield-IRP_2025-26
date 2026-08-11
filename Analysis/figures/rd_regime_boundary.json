@@ -1,0 +1,38 @@
+{
+  "0.002": {
+    "rest_u": 0.007606405398768382,
+    "firings_at_site_80tu": 14,
+    "quiet_final_10tu": false,
+    "regime": "oscillatory"
+  },
+  "0.004": {
+    "rest_u": 0.005336828177148725,
+    "firings_at_site_80tu": 12,
+    "quiet_final_10tu": false,
+    "regime": "oscillatory"
+  },
+  "0.006": {
+    "rest_u": 0.004085455792344686,
+    "firings_at_site_80tu": 0,
+    "quiet_final_10tu": true,
+    "regime": "excitable/dying"
+  },
+  "0.008": {
+    "rest_u": 0.0034413622293027134,
+    "firings_at_site_80tu": 0,
+    "quiet_final_10tu": true,
+    "regime": "excitable/dying"
+  },
+  "0.01": {
+    "rest_u": 0.003082099932938156,
+    "firings_at_site_80tu": 0,
+    "quiet_final_10tu": true,
+    "regime": "excitable/dying"
+  },
+  "0.012": {
+    "rest_u": 0.0028604317348406728,
+    "firings_at_site_80tu": 0,
+    "quiet_final_10tu": true,
+    "regime": "excitable/dying"
+  }
+}

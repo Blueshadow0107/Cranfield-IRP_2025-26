@@ -1,0 +1,69 @@
+{
+  "config": {
+    "patch_centre_x": 25,
+    "patch_radius": 12,
+    "phi0": 0.01,
+    "probe_x": 240,
+    "tu_run": 200.0,
+    "tu_discard": 50.0,
+    "note": "dark-spot drive, no clamps"
+  },
+  "levels": [
+    {
+      "phi_patch": 0.01,
+      "n_pulses": 0,
+      "rate": 0.0,
+      "isi_mean": null,
+      "isi_cv": null,
+      "peak": 0.00308209993293969
+    },
+    {
+      "phi_patch": 0.008,
+      "n_pulses": 0,
+      "rate": 0.0,
+      "isi_mean": null,
+      "isi_cv": null,
+      "peak": 0.00308209993293969
+    },
+    {
+      "phi_patch": 0.006,
+      "n_pulses": 0,
+      "rate": 0.0,
+      "isi_mean": null,
+      "isi_cv": null,
+      "peak": 0.00308209993293969
+    },
+    {
+      "phi_patch": 0.004,
+      "n_pulses": 23,
+      "rate": 0.15333333333333332,
+      "isi_mean": 6.613636363636363,
+      "isi_cv": 0.0033669962100112303,
+      "peak": 0.7067158876618278
+    },
+    {
+      "phi_patch": 0.002,
+      "n_pulses": 27,
+      "rate": 0.18,
+      "isi_mean": 5.626923076923077,
+      "isi_cv": 0.008618947513956582,
+      "peak": 0.7018443577792102
+    },
+    {
+      "phi_patch": 0.001,
+      "n_pulses": 28,
+      "rate": 0.18666666666666668,
+      "isi_mean": 5.38148148148148,
+      "isi_cv": 0.012426338668456825,
+      "peak": 0.7018659968000571
+    },
+    {
+      "phi_patch": 0.0,
+      "n_pulses": 29,
+      "rate": 0.19333333333333333,
+      "isi_mean": 5.191071428571429,
+      "isi_cv": 0.017085966203216583,
+      "peak": 0.7022615044103109
+    }
+  ]
+}

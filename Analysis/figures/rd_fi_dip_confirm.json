@@ -1,0 +1,50 @@
+{
+  "config": {
+    "levels": [
+      0.2,
+      0.45,
+      0.65
+    ],
+    "tu_run": 2000.0,
+    "tu_discard": 200.0,
+    "width": 16,
+    "v_halo_region": "channel cells x in [20,40]",
+    "note": "rebuilt from stdout after save-path crash"
+  },
+  "results": [
+    {
+      "level": 0.2,
+      "n_pulses": 470,
+      "rate": 0.2611,
+      "rate_noise": 0.012,
+      "isi_cv": 0.0065,
+      "v_halo_mean": 0.0785,
+      "v_halo_max": 0.0984
+    },
+    {
+      "level": 0.45,
+      "n_pulses": 321,
+      "rate": 0.1783,
+      "rate_noise": 0.01,
+      "isi_cv": 0.0028,
+      "v_halo_mean": 0.0589,
+      "v_halo_max": 0.0917
+    },
+    {
+      "level": 0.65,
+      "n_pulses": 392,
+      "rate": 0.2178,
+      "rate_noise": 0.011,
+      "isi_cv": 0.0049,
+      "v_halo_mean": 0.0695,
+      "v_halo_max": 0.0802
+    }
+  ],
+  "verdict": {
+    "dip_real": true,
+    "dip_depth_frac": 0.3171198774415933,
+    "significance_sigma": 6.900000000000001,
+    "halo_mechanism_supported": false,
+    "halo_note": "v_halo at x=0.45 (0.0589) is LOWER than at x=0.20 (0.0785); overdrive-inhibitor hypothesis rejected"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "levels": [
+    {
+      "level": 0.03,
+      "rate": 0.0,
+      "n_pulses": 0
+    },
+    {
+      "level": 0.037,
+      "rate": 0.0,
+      "n_pulses": 0
+    },
+    {
+      "level": 0.046,
+      "rate": 0.0,
+      "n_pulses": 0
+    },
+    {
+      "level": 0.056,
+      "rate": 0.0067,
+      "n_pulses": 1
+    },
+    {
+      "level": 0.069,
+      "rate": 0.1533,
+      "n_pulses": 23
+    },
+    {
+      "level": 0.085,
+      "rate": 0.18,
+      "n_pulses": 27
+    },
+    {
+      "level": 0.105,
+      "rate": 0.2,
+      "n_pulses": 30
+    },
+    {
+      "level": 0.13,
+      "rate": 0.2133,
+      "n_pulses": 32
+    },
+    {
+      "level": 0.16,
+      "rate": 0.2267,
+      "n_pulses": 34
+    },
+    {
+      "level": 0.197,
+      "rate": 0.2333,
+      "n_pulses": 35
+    },
+    {
+      "level": 0.243,
+      "rate": 0.2333,
+      "n_pulses": 35
+    },
+    {
+      "level": 0.3,
+      "rate": 0.2,
+      "n_pulses": 30
+    }
+  ],
+  "onset_fit": {
+    "beta": 0.08,
+    "x_c": 0.068,
+    "rmse": 0.0133,
+    "note": "essentially discontinuous (hard) onset; power-law fit degenerates to beta~0"
+  },
+  "silent_max": 0.046
+}
