@@ -1,0 +1,127 @@
+{
+  "calibration": {
+    "speed": 6.46411888154886,
+    "tau_refract": 3.0,
+    "inhibition_window": 1.0,
+    "pulse_amp": 0.7264304595123359,
+    "source": "dark-spot transfer tests (Oregonator A, phi0=0.010)",
+    "input_method_citation": "Adamatzky A., De Lacy Costello B.P.J. \"Experimental logical gates in a reaction-diffusion medium: The XOR gate and beyond\", Phys Rev E 66, 046112 (2002); De Lacy Costello B., Adamatzky A. \"Experimental implementation of collision-based gates in Belousov-Zhabotinsky medium\", Chaos Solitons & Fractals 25, 535-544 (2005); Stevens W.M. arXiv:1204.5345 (2012) on projected-channel light-sensitive BZ circuits."
+  },
+  "geometry": {
+    "arm_length": 60.0,
+    "chamber_radius": 10.0,
+    "stem_length": 50.0
+  },
+  "truth_table": {
+    "00": {
+      "out_arrival": null,
+      "out_count": 0,
+      "fired": false
+    },
+    "01": {
+      "out_arrival": 20.1110162703027,
+      "out_count": 1,
+      "fired": true
+    },
+    "10": {
+      "out_arrival": 20.1110162703027,
+      "out_count": 1,
+      "fired": true
+    },
+    "11": {
+      "out_arrival": null,
+      "out_count": 0,
+      "fired": false
+    }
+  },
+  "chamber_radius_sweep": {
+    "5.0": {
+      "00": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      },
+      "01": {
+        "out_arrival": 18.564015018740953,
+        "out_count": 1,
+        "fired": true
+      },
+      "10": {
+        "out_arrival": 18.564015018740953,
+        "out_count": 1,
+        "fired": true
+      },
+      "11": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      }
+    },
+    "10.0": {
+      "00": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      },
+      "01": {
+        "out_arrival": 20.1110162703027,
+        "out_count": 1,
+        "fired": true
+      },
+      "10": {
+        "out_arrival": 20.1110162703027,
+        "out_count": 1,
+        "fired": true
+      },
+      "11": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      }
+    },
+    "15.0": {
+      "00": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      },
+      "01": {
+        "out_arrival": 21.658017521864444,
+        "out_count": 1,
+        "fired": true
+      },
+      "10": {
+        "out_arrival": 21.658017521864444,
+        "out_count": 1,
+        "fired": true
+      },
+      "11": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      }
+    },
+    "20.0": {
+      "00": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      },
+      "01": {
+        "out_arrival": 23.20501877342619,
+        "out_count": 1,
+        "fired": true
+      },
+      "10": {
+        "out_arrival": 23.20501877342619,
+        "out_count": 1,
+        "fired": true
+      },
+      "11": {
+        "out_arrival": null,
+        "out_count": 0,
+        "fired": false
+      }
+    }
+  }
+}
