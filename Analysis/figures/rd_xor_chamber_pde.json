@@ -1,0 +1,65 @@
+{
+  "geometry": {
+    "nx": 256,
+    "ny": 256,
+    "hw": 10,
+    "chamber_c": [
+      128,
+      120
+    ],
+    "chamber_r": 25,
+    "a_end": [
+      60,
+      210
+    ],
+    "b_end": [
+      196,
+      210
+    ],
+    "stem_end": [
+      128,
+      20
+    ],
+    "src_len": 18
+  },
+  "physics": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "u_star": 0.0030821,
+    "dt": 0.05,
+    "t_flash_tu": 3.0,
+    "t_total_tu": 60.0
+  },
+  "cases": {
+    "00": {
+      "out_arrival_tu": null,
+      "chamber_arrival_tu": null,
+      "out_peak": 0.00308209993293969,
+      "chamber_peak": 0.00308209993293969,
+      "out_fired": false
+    },
+    "01": {
+      "out_arrival_tu": 25.508609892928803,
+      "chamber_arrival_tu": 14.899375822748121,
+      "out_peak": 0.7075900457267041,
+      "chamber_peak": 0.7039027309474849,
+      "out_fired": true
+    },
+    "10": {
+      "out_arrival_tu": 25.508609892928803,
+      "chamber_arrival_tu": 14.899375822748121,
+      "out_peak": 0.7075900457267041,
+      "chamber_peak": 0.7039027309474849,
+      "out_fired": true
+    },
+    "11": {
+      "out_arrival_tu": 25.505443942765595,
+      "chamber_arrival_tu": 14.899362898258076,
+      "out_peak": 0.7104007531276126,
+      "chamber_peak": 0.7185556579452109,
+      "out_fired": true
+    }
+  }
+}
