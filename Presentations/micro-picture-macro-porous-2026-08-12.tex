@@ -319,11 +319,33 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 \vspace{0.4cm}
 \textbf{Advantages of the new framing:}
 \begin{itemize}
-    \item Connects to Guo's work on molecular communication in porous media.
+    \item Connects to molecular-communication and transport work in porous media.
     \item Explains why walls, junctions, and light barriers are the natural design knobs.
     \item Makes 3D the obvious next step (real porous media are 3D).
     \item Turns the small ``instruction set'' into a feature, not a limitation: it is the complete catalogue of what the substrate can do.
 \end{itemize}
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{3D light delivery: an open experimental challenge}
+
+\textbf{High-$\phi$ as a modelling convenience:}
+\begin{itemize}
+    \item In our 2D Oregonator model, a spatially varying $\phi(x,y)$ quenches excitability where it is high ($\phi \gtrsim 0.030$) and leaves low-$\phi$ regions excitable.
+    \item This is a computationally convenient stand-in for an impermeable wall: same pulse confinement, same speed and amplitude.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{What it does \emph{not} automatically solve:}
+\begin{itemize}
+    \item A 3D scaffold has a solid phase everywhere, not only where light is projected.
+    \item Projecting a 2D light mask into a 3D volume gives the same pattern at every depth, so high-$\phi$ regions would be vertical slabs, not isolated grains.
+    \item Light scattering, absorption, and finite penetration depth make the excitability field continuous rather than binary.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Realistic interpretation:} physical solid scaffolds provide the pore geometry; $\phi$ modulates the excitability of the fluid where light can reach. The two can be combined, but they are not interchangeable in 3D.
 
 \end{frame}
 
@@ -334,13 +356,13 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
     \item A macro-scale porous BZ reactor is a network of pores and throats.
     \item Each throat is a 1-D reaction-diffusion cable; each junction is a collision switch.
     \item The four transfer functions (wire, filter, inhibition, delay) are the complete pore-scale operator set.
-    \item Light-defined high-$\phi$ regions can play the role of the solid matrix.
+    \item Light-defined high-$\phi$ regions can play the role of the solid matrix in 2D, but 3D light delivery is a separate experimental problem.
     \item Upscaling these measurements gives effective equations for the porous medium.
     \item The thesis is therefore a pore-scale characterisation that feeds into a broader porous-media computing story.
 \end{itemize}
 
 \vspace{0.4cm}
-\textbf{Self-contained claim:} structured 2D BZ experiments are a microscope for the dynamics that would occur inside a 3D porous chemical reactor.
+\textbf{Qualified claim:} our 2D structured-BZ measurements characterise the local reaction--diffusion operators --- conduction, filtering, inhibition, delay --- that would also govern pulse traffic in a 3D porous BZ reactor. They do not capture 3D curvature, random tortuosity, or the engineering of volumetric light delivery.
 
 \end{frame}
 
