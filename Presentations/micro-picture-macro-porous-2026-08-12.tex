@@ -213,50 +213,44 @@
 \end{frame}
 
 % ---------------------------------------------------------------------
-\begin{frame}{The solid matrix can be realised as high light intensity}
+\begin{frame}{Pore geometry is the trainable substrate}
 
 \begin{columns}[T]
-\begin{column}{0.48\textwidth}
+\begin{column}{0.55\textwidth}
 \centering
-\textbf{Physical porous medium}\\[0.3cm]
 \begin{tikzpicture}[scale=0.65, every node/.style={font=\small}]
+  % outer boundary
+  \draw[thick] (0,0) rectangle (8,6);
   % solid grains
-  \fill[gray!50] (1,1) circle (0.7);
-  \fill[gray!50] (3,0.8) circle (0.6);
-  \fill[gray!50] (5,1.3) circle (0.8);
-  \fill[gray!50] (1,4) circle (0.65);
-  \fill[gray!50] (3.5,4.5) circle (0.8);
-  \fill[gray!50] (6,4) circle (0.7);
-  % pore space
-  \fill[cyan!20] (0,0) rectangle (7,5.5);
-  \foreach \x/\y/\r in {1/1/0.7, 3/0.8/0.6, 5/1.3/0.8, 1/4/0.65, 3.5/4.5/0.8, 6/4/0.7}
+  \foreach \x/\y/\r in {1.2/1.0/0.7, 2.8/0.8/0.6, 5.0/1.3/0.8, 6.7/0.9/0.6,
+                          0.9/3.0/0.65, 2.5/2.8/0.75, 4.2/2.6/0.7, 6.3/2.9/0.65,
+                          1.5/4.8/0.7, 3.5/4.5/0.8, 5.5/4.7/0.6, 7.0/4.3/0.55}
     \fill[gray!50] (\x,\y) circle (\r);
-  \draw[thick] (0,0) rectangle (7,5.5);
-  \node at (3.5,-0.5) {solid matrix blocks waves};
+  % input arrow
+  \draw[-{Stealth[length=3mm]}, line width=1.5pt, blue] (-1.2,3) -- (0.2,3);
+  \node[blue, above] at (-0.5,3.2) {input pulse};
+  % output arrows
+  \draw[-{Stealth[length=3mm]}, line width=1.5pt, red] (7.8,1.5) -- (9.2,1.5);
+  \draw[-{Stealth[length=3mm]}, line width=1.5pt, red] (7.8,4.5) -- (9.2,4.5);
+  \node[red, right] at (9.3,3) {output probes};
+  % labels
+  \node[gray!70!black] at (4,-0.7) {solid matrix};
+  \node at (4,6.7) {porous BZ reactor};
 \end{tikzpicture}
 \end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\textbf{Photosensitive BZ analogue}\\[0.3cm]
-\begin{tikzpicture}[scale=0.65, every node/.style={font=\small}]
-  % high-phi background
-  \fill[yellow!30] (0,0) rectangle (7,5.5);
-  % low-phi channels
-  \fill[cyan!20] (0,2) rectangle (7,2.8);
-  \fill[cyan!20] (3.5,2) rectangle (4.3,5.5);
-  \draw[thick] (0,0) rectangle (7,5.5);
-  % pulse
-  \fill[blue!70] (1,2.1) rectangle (2,2.7);
-  \draw[-{Stealth}, line width=1.2pt] (2.1,2.4) -- (3.2,2.4);
-  % labels
-  \node at (3.5,-0.5) {high $\phi$ = non-propagating};
-  \node at (3.5,5.0) {low $\phi$ = excitable pore};
-\end{tikzpicture}
+\begin{column}{0.42\textwidth}
+\textbf{What the solid matrix controls:}
+\begin{itemize}
+    \item Pore size and throat width set pulse confinement.
+    \item Junction topology sets collision and branching rules.
+    \item Orientation of elongated pores sets anisotropic pulse delay.
+    \item These are the ``weights'' of the macroscopic computation.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{2D analogue:} lithographed channels, 3D-printed scaffolds, or templated gels all impose the same geometry-driven constraints.
 \end{column}
 \end{columns}
-
-\vspace{0.4cm}
-\textbf{Result:} a 2D pilot shows a high-$\phi$ barrier gives the same pulse confinement as a physical wall (speed 6.464 vs 6.466 cells/t.u., same amplitude, negligible leakage).
 
 \end{frame}
 
@@ -320,7 +314,7 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 \textbf{Advantages of the new framing:}
 \begin{itemize}
     \item Connects to molecular-communication and transport work in porous media.
-    \item Explains why walls, junctions, and light barriers are the natural design knobs.
+    \item Explains why pore geometry --- wall placement, throat width, junction topology --- is the natural design knob.
     \item Makes 3D the obvious next step (real porous media are 3D).
     \item Turns the small ``instruction set'' into a feature, not a limitation: it is the complete catalogue of what the substrate can do.
 \end{itemize}
@@ -328,24 +322,25 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 \end{frame}
 
 % ---------------------------------------------------------------------
-\begin{frame}{3D light delivery: an open experimental challenge}
+\begin{frame}{From 2D characterisation to 3D porous media}
 
-\textbf{High-$\phi$ as a modelling convenience:}
+\textbf{What the 2D measurements give us:}
 \begin{itemize}
-    \item In our 2D Oregonator model, a spatially varying $\phi(x,y)$ quenches excitability where it is high ($\phi \gtrsim 0.030$) and leaves low-$\phi$ regions excitable.
-    \item This is a computationally convenient stand-in for an impermeable wall: same pulse confinement, same speed and amplitude.
+    \item A calibrated catalogue of local operators: conduction speed, refractory time, collision inhibition window, anisotropic delay.
+    \item These operators are governed by the same Oregonator kinetics in 2D and 3D.
 \end{itemize}
 
 \vspace{0.3cm}
-\textbf{What it does \emph{not} automatically solve:}
+\textbf{What 3D adds that 2D cannot capture:}
 \begin{itemize}
-    \item A 3D scaffold has a solid phase everywhere, not only where light is projected.
-    \item Projecting a 2D light mask into a 3D volume gives the same pattern at every depth, so high-$\phi$ regions would be vertical slabs, not isolated grains.
-    \item Light scattering, absorption, and finite penetration depth make the excitability field continuous rather than binary.
+    \item Out-of-plane curvature of wave fronts.
+    \item Random tortuosity and connectivity of a real pore network.
+    \item Radial spreading from point-like sources, changing arrival-time statistics.
+    \item Additional diffusion and mixing in the third dimension.
 \end{itemize}
 
 \vspace{0.3cm}
-\textbf{Realistic interpretation:} physical solid scaffolds provide the pore geometry; $\phi$ modulates the excitability of the fluid where light can reach. The two can be combined, but they are not interchangeable in 3D.
+\textbf{Bottom line:} the 2D work characterises the local physics; a 3D model (or experiment) is still needed to assemble those physics into a macroscopic reactor.
 
 \end{frame}
 
@@ -356,13 +351,13 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
     \item A macro-scale porous BZ reactor is a network of pores and throats.
     \item Each throat is a 1-D reaction-diffusion cable; each junction is a collision switch.
     \item The four transfer functions (wire, filter, inhibition, delay) are the complete pore-scale operator set.
-    \item Light-defined high-$\phi$ regions can play the role of the solid matrix in 2D, but 3D light delivery is a separate experimental problem.
+    \item Pore geometry --- not an externally projected field --- is the trainable substrate.
     \item Upscaling these measurements gives effective equations for the porous medium.
     \item The thesis is therefore a pore-scale characterisation that feeds into a broader porous-media computing story.
 \end{itemize}
 
 \vspace{0.4cm}
-\textbf{Qualified claim:} our 2D structured-BZ measurements characterise the local reaction--diffusion operators --- conduction, filtering, inhibition, delay --- that would also govern pulse traffic in a 3D porous BZ reactor. They do not capture 3D curvature, random tortuosity, or the engineering of volumetric light delivery.
+\textbf{Qualified claim:} our 2D structured-BZ measurements characterise the local reaction--diffusion operators --- conduction, filtering, inhibition, delay --- that would also govern pulse traffic in a 3D porous BZ reactor. They do not capture 3D curvature, random tortuosity, or the full connectivity of a real pore network.
 
 \end{frame}
 
@@ -372,8 +367,8 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 \begin{enumerate}
     \item Does the pore-throat / pore-junction analogy make the micro-to-macro link convincing?
     \item Should we present explicit upscaled equations, or keep it conceptual at this stage?
-    \item Is the high-$\phi$-as-solid-matrix picture experimentally realistic for photosensitive BZ?
-    \item What is the simplest 3D pore network we should demonstrate next?
+    \item What is the simplest 3D pore network (e.g. stacked hexagonal lattice) we should demonstrate next?
+    \item How should we re-ground substrate selection (gel vs. membrane vs. scaffold) under the porous-medium framing?
 \end{enumerate}
 
 \end{frame}
