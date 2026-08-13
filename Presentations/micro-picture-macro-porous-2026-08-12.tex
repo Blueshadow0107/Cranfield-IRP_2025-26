@@ -124,6 +124,9 @@ Inhibition & T-junction & A passes unless B arrives within $\approx 1.0$ t.u.; s
 \vspace{0.3cm}
 \textbf{Why 2D?} It is the controlled micro-scale limit. The same Oregonator kinetics govern 3D; 2D lets us isolate and calibrate the local rules before tackling a real pore network.
 
+\vspace{0.3cm}
+\textbf{Practical reason for 2D first:} a projected light mask gives a known suppression field $\phi(x,y)$ everywhere in a thin slab. In a 3D bulk, absorption and scattering make the interior light field unknown, so the local kinetics would be uncontrolled.
+
 \end{frame}
 
 % ---------------------------------------------------------------------
@@ -264,6 +267,9 @@ A symmetric Y-junction with a chamber should give XOR, but the PDE shows a leak:
 
 \vspace{0.3cm}
 \textbf{Path forward:} use the measured operators to inform effective porous-medium equations and design structured chemical reactors / molecular-communication substrates.
+
+\vspace{0.3cm}
+\textbf{From 2D to 3D:} the graph framework itself is dimensionless. Extending to 3D requires (i) a volumetric light-delivery strategy (the current blocker), and (ii) recalibrating the local operators in 3D throats. Once those are solved, the same network simulator applies.
 
 \vspace{0.3cm}
 \textbf{Qualified claim:} our 2D measurements characterise the local reaction--diffusion operators that govern pulse traffic in a 3D porous BZ reactor. They do not capture 3D curvature, random tortuosity, or the full connectivity of a real pore network.
