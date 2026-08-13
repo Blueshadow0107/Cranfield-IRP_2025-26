@@ -281,6 +281,75 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 \end{frame}
 
 % ---------------------------------------------------------------------
+\begin{frame}{Graph simulator from measured operators}
+
+We translate the transfer functions into an event-driven pulse network:
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item \textbf{Nodes} = pores / junctions.
+    \item \textbf{Edges} = throats with measured transit time $L/c$.
+    \item \textbf{Refractory rule:} a node or edge that just fired ignores new pulses for $\tau \approx 3.0$ t.u.
+    \item \textbf{Inhibition rule:} two pulses arriving at the same node within $\approx 1.0$ t.u. annihilate.
+    \item \textbf{Routing table:} junction topology decides which input can reach which output.
+\end{itemize}
+
+\vspace{0.3cm}
+This lets us design and score candidate networks in milliseconds before running the full PDE.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{PDE validation: A AND (NOT B) inhibition gate}
+
+T-junction with horizontal input A, vertical input B, horizontal output. Dark-spot flashes ($\phi = 0.010 \to 0.002$, 3.0 t.u.) at each port.
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Pattern} & \textbf{Graph output} & \textbf{Graph arrival} & \textbf{PDE output peak} & \textbf{Match?} \\
+\midrule
+00 & none & — & 0.000 & yes \\
+01 (B only) & none & — & 0.003 & yes \\
+10 (A only) & fires & 31.9 t.u. & 0.706 & yes \\
+11 (A+B) & none & — & 0.003 & yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Result:} the graph simulator captures the inhibition operator once the junction routing is encoded. Arrival time is within $\sim 1$ t.u. of the PDE window centre (32.85 t.u.), consistent with the dark-spot launch latency.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{When the graph model needs geometry: the XOR leak}
+
+A symmetric Y-junction with a chamber should give XOR, but the PDE says otherwise:
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Pattern} & \textbf{Graph prediction} & \textbf{PDE (chamber $R = 25$)} \\
+\midrule
+01 / 10 & output fires & output fires \\
+11 & no output & \textbf{output still fires} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Why:} extended channel fronts collide in the chamber, but the excitation curves around the annihilation point and re-ignites the output stem. The graph's ideal ``annihilate'' rule is geometry-dependent. We must use the PDE to classify each junction shape before encoding it in the graph.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
 \begin{frame}{From measured operators to macroscopic equations}
 
 \textbf{Micro-scale output:} a table of speeds, delays, and inhibition windows for given pore geometry and excitability.
@@ -326,7 +395,7 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 
 \textbf{What the 2D measurements give us:}
 \begin{itemize}
-    \item A calibrated catalogue of local operators: conduction speed, refractory time, collision inhibition window, anisotropic delay.
+    \item A calibrated catalogue of local operators: conduction speed, refractory time, and collision inhibition window.
     \item These operators are governed by the same Oregonator kinetics in 2D and 3D.
 \end{itemize}
 
@@ -349,8 +418,9 @@ Delay / routing & Oriented pore structure & Anisotropy steers pulses without blo
 
 \begin{itemize}
     \item A macro-scale porous BZ reactor is a network of pores and throats.
-    \item Each throat is a 1-D reaction-diffusion cable; each junction is a collision switch.
-    \item The four transfer functions (wire, filter, inhibition, delay) are the complete pore-scale operator set.
+    \item Each throat is a 1-D reaction-diffusion cable; each junction is a switch.
+    \item The measured transfer functions (wire, filter, inhibition) become rules in an event-driven graph simulator.
+    \item PDE validation shows the graph captures A AND (NOT B), but also that inhibition is geometry-dependent (XOR leak).
     \item Pore geometry --- not an externally projected field --- is the trainable substrate.
     \item Upscaling these measurements gives effective equations for the porous medium.
     \item The thesis is therefore a pore-scale characterisation that feeds into a broader porous-media computing story.
