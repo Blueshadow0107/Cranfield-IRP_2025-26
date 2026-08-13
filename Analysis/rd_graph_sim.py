@@ -79,6 +79,8 @@ class Node:
     refractory_until: float = 0.0
     # inhibition bookkeeping: pulses arriving here within W_INHIBIT annihilate
     recent_arrivals: List[Pulse] = field(default_factory=list)
+    # optional routing table: incoming edge name -> list of outgoing edge names
+    routing: Dict[str, List[str]] = field(default_factory=dict)
 
 
 class Circuit:
@@ -189,7 +191,16 @@ class Circuit:
                 'amp': p.amp,
             })
 
-            for e in self.outgoing[p.dst]:
+            # Determine incoming edge name.
+            incoming = f"{p.src}->{p.dst}"
+            # Use routing table if present, otherwise forward to all outputs.
+            allowed = node.routing.get(incoming)
+            outputs = (
+                [e for e in self.outgoing[p.dst] if e.name in allowed]
+                if allowed is not None else self.outgoing[p.dst]
+            )
+
+            for e in outputs:
                 if p.t_arrive < e.refractory_until:
                     self.log.append({
                         't': p.t_arrive,
@@ -272,6 +283,70 @@ def xor_truth_table(circ: Circuit, arm_length: float) -> Dict:
     return results
 
 
+
+# ---------------------------------------------------------------------------
+# A AND (NOT B) inhibition gate
+# ---------------------------------------------------------------------------
+def build_andnot_gate(a_to_j: float = 62.0,
+                      b_to_j: float = 49.0,
+                      j_to_out: float = 144.0) -> Circuit:
+    """
+    T-junction inhibition gate.  A travels horizontally through the junction
+    to the output; B enters from the top and has no output path.  B's arrival
+    makes the junction refractory, blocking A.
+
+    Edge lengths mirror the dark-spot T-junction transfer test
+    (rd_transfer_logic_darkspot.py):
+        A port centre x=34, junction x=96  -> a_to_j = 62 cells
+        B port centre y=149, junction y=100 -> b_to_j = 49 cells
+        junction x=96 to probe x=240        -> j_to_out = 144 cells
+    """
+    circ = Circuit()
+    for n in ('A', 'B', 'J', 'OUT'):
+        circ.add_node(n)
+
+    circ.add_edge('A->J', 'A', 'J', a_to_j)
+    circ.add_edge('B->J', 'B', 'J', b_to_j)
+    circ.add_edge('J->OUT', 'J', 'OUT', j_to_out)
+    # A passes through; B enters and blocks but does not exit through OUT.
+    circ.nodes['J'].routing = {
+        'A->J': ['J->OUT'],
+        'B->J': [],
+        'J->OUT': [],
+    }
+    return circ
+
+
+def andnot_truth_table(circ: Circuit) -> Dict:
+    """Run all four input patterns for A AND (NOT B)."""
+    patterns = {
+        '00': (False, False),
+        '01': (False, True),
+        '10': (True, False),
+        '11': (True, True),
+    }
+    results = {}
+
+    for label, (fire_a, fire_b) in patterns.items():
+        circ.reset()
+        if fire_a:
+            circ.schedule(0.0, 'A', 'J')
+        if fire_b:
+            circ.schedule(0.0, 'B', 'J')
+
+        log = circ.run(t_max=200.0)
+        out_arrivals = [e for e in log
+                        if e['event'] == 'arrived' and e['dst'] == 'OUT']
+
+        results[label] = {
+            'out_arrival': out_arrivals[0]['t'] if out_arrivals else None,
+            'out_count': len(out_arrivals),
+            'fired': bool(out_arrivals),
+        }
+
+    return results
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -280,14 +355,18 @@ def main():
     chamber_radius = 10.0
     stem_length = 50.0
 
-    circ = build_xor_with_chamber(arm_length, chamber_radius, stem_length)
-    truth = xor_truth_table(circ, arm_length)
+    # ---- collision-XOR -----------------------------------------------------
+    circ_xor = build_xor_with_chamber(arm_length, chamber_radius, stem_length)
+    truth_xor = xor_truth_table(circ_xor, arm_length)
 
-    # Also sweep chamber radius to see structural effect.
     sweep = {}
     for r in [5.0, 10.0, 15.0, 20.0]:
         c = build_xor_with_chamber(arm_length, r, stem_length)
         sweep[r] = xor_truth_table(c, arm_length)
+
+    # ---- A AND (NOT B) -----------------------------------------------------
+    circ_andnot = build_andnot_gate()
+    truth_andnot = andnot_truth_table(circ_andnot)
 
     out = {
         'calibration': {
@@ -306,13 +385,26 @@ def main():
                 'projected-channel light-sensitive BZ circuits.'
             ),
         },
-        'geometry': {
-            'arm_length': arm_length,
-            'chamber_radius': chamber_radius,
-            'stem_length': stem_length,
+        'collision_xor': {
+            'geometry': {
+                'arm_length': arm_length,
+                'chamber_radius': chamber_radius,
+                'stem_length': stem_length,
+            },
+            'truth_table': truth_xor,
+            'chamber_radius_sweep': sweep,
+            'note': ('PDE validation shows extended channel waves leak in the '
+                     '11 case; the graph idealisation does not capture this.'),
         },
-        'truth_table': truth,
-        'chamber_radius_sweep': sweep,
+        'and_not_b': {
+            'geometry': {
+                'a_to_j': 62.0,
+                'b_to_j': 49.0,
+                'j_to_out': 144.0,
+            },
+            'truth_table': truth_andnot,
+            'pde_reference': 'rd_transfer_logic_darkspot.json',
+        },
     }
 
     path = os.path.join(FIG, 'rd_graph_sim.json')
@@ -320,8 +412,15 @@ def main():
         json.dump(out, f, indent=2)
 
     print('Collision-XOR truth table:')
-    for pat, res in truth.items():
-        print(f"  {pat}: OUT fires = {res['fired']}, arrival = {res['out_arrival']:.3f} t.u."
+    for pat, res in truth_xor.items():
+        print(f"  {pat}: OUT fires = {res['fired']}, "
+              f"arrival = {res['out_arrival']:.3f} t.u."
+              if res['out_arrival'] else f"  {pat}: OUT fires = {res['fired']}")
+
+    print('\nA AND (NOT B) truth table:')
+    for pat, res in truth_andnot.items():
+        print(f"  {pat}: OUT fires = {res['fired']}, "
+              f"arrival = {res['out_arrival']:.3f} t.u."
               if res['out_arrival'] else f"  {pat}: OUT fires = {res['fired']}")
 
     print(f"\nSaved: {path}")
