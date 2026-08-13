@@ -1,9 +1,12 @@
 """
 3D T-junction logic transfer test (dark-spot Oregonator).
 
-Geometry: 48x48x48 domain.  A channel runs horizontally along x through the
-centre; a B channel runs vertically along y and meets it at a T-junction.
-Both channels have a 16x16 cross-section.
+Geometry: 64x48x48 domain.  A channel runs horizontally along x through the
+centre; a B channel runs vertically along y and meets it at a T-junction
+(B enters from the top and the channel stops at the junction, matching the
+2D geometry).  Both channels have a 16x16 cross-section.
+The output probe is placed farther downstream than the original 48^3 pilot
+so that the B diffracted fragment leaves the readout window before A arrives.
 
 The four truth-table cases are run in parallel to keep wall time modest.
 Outputs: JSON + PNG saved to Analysis/figures/rd_3d_transfer_logic.*.
@@ -36,10 +39,10 @@ PHI_DARK = 0.002
 T_FLASH = 3.0
 DT = 0.05
 DX = 1.0
-NX, NY, NZ = 48, 48, 48
+NX, NY, NZ = 64, 48, 48
 W = 16
 W2 = W // 2
-NSTEPS = 400
+NSTEPS = 500
 DURATION = int(T_FLASH / DT)
 SPOT_R = 4
 U_THRESH = 0.5
@@ -47,10 +50,10 @@ WIN_HALF = 2.5
 
 CY = NY // 2            # 24
 CZ = NZ // 2            # 24
-TJ = NX // 2            # 24
-X_PROBE = 40            # output probe x-coordinate
-A_SOURCE_X = 6
-B_SOURCE_Y = NY - 6
+TJ = NX // 2            # 32
+X_PROBE = 56            # output probe x-coordinate (farther from junction)
+A_SOURCE_X = 4          # lengthen A arm so B arrives first at the junction)
+B_SOURCE_Y = 38         # shorter B arm, still inside the top of the vertical channel
 
 
 def rest_u_star(f, phi):
@@ -73,10 +76,11 @@ def build_geometry():
     rd.set_rest(U_STAR, U_STAR)
 
     wall = np.ones((NX, NY, NZ), dtype=bool)
-    # horizontal A channel
+    # horizontal A channel (left to right through the domain centre)
     wall[:, CY - W2:CY + W2, CZ - W2:CZ + W2] = False
-    # vertical B channel joining from the top
-    wall[TJ - W2:TJ + W2, :, CZ - W2:CZ + W2] = False
+    # vertical B channel joining from the top, stopping at the junction
+    # (matches the 2D T-junction: no downward outlet arm)
+    wall[TJ - W2:TJ + W2, CY:, CZ - W2:CZ + W2] = False
     rd.set_walls(wall)
 
     rd.u[~wall] = U_STAR

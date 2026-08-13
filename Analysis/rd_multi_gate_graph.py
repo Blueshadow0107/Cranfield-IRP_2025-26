@@ -29,22 +29,33 @@ FIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figures')
 os.makedirs(FIG, exist_ok=True)
 
 
-def build_shared_control_gate(a_to_j1: float = 50.0,
-                              a_to_j2: float = 60.0,
-                              b1_to_j1: float = 70.0,
-                              b2_to_j2: float = 80.0,
+def build_shared_control_gate(a_to_j1: float = 10.0,
+                              a_to_j2: float = 50.0,
+                              b1_to_j1: float = 25.0,
+                              b2_to_j2: float = 60.0,
                               j1_to_o1: float = 40.0,
                               j2_to_o2: float = 40.0) -> Circuit:
     """
-    Build the shared-control gate.  Lengths are chosen so that A reaches
-    each junction before the corresponding data pulse arrives, giving a
-    refractory block when A is active.
+    Build the shared-control gate.  A is a single control pulse travelling
+    along a horizontal channel; it passes J1 first, then J2, making each
+    junction refractory before the corresponding data pulse B1/B2 arrives.
+
+    Timing (c ~ 6.46 cells/t.u., tau = 3.0 t.u.):
+      A reaches J1 at 10/c ~ 1.55 t.u. -> refractory until 4.55
+      B1 reaches J1 at 25/c ~ 3.87 t.u. -> blocked
+      A reaches J2 at 50/c ~ 7.74 t.u. -> refractory until 10.74
+      B2 reaches J2 at 60/c ~ 9.29 t.u. -> blocked
+
+    These lengths mirror the PDE geometry in rd_multi_gate_pde.py
+    (XA_IN=25, XB1=35, XB2=75, YB1_IN=115, YB2_IN=150, probes at y=50).
+    Junctions are spaced 40 cells apart so a B1 pulse entering the shared A
+    channel at J1 reaches J2 after B2 has already passed.
     """
     circ = Circuit(tau_refract=TAU_REFRACT, w_inhibit=W_INHIBIT)
     for n in ('A', 'B1', 'B2', 'J1', 'J2', 'O1', 'O2'):
         circ.add_node(n)
 
-    # control fan-out
+    # control fan-out (same physical channel, modelled as two edges)
     circ.add_edge('A->J1', 'A', 'J1', a_to_j1)
     circ.add_edge('A->J2', 'A', 'J2', a_to_j2)
     # data paths
@@ -100,15 +111,10 @@ def run_all_patterns(circ):
 
 
 def main():
-    # Choose lengths so A arrives well before B at each junction and the
-    # junction is still refractory when B arrives (refractory time 3.0 t.u.).
-    # A at J1: 35/c ~ 5.4 t.u. -> refractory until 8.4 t.u.
-    # B1 at J1: 45/c ~ 7.0 t.u. -> within refractory window -> blocked.
-    # A at J2: 40/c ~ 6.2 t.u. -> refractory until 9.2 t.u.
-    # B2 at J2: 50/c ~ 7.7 t.u. -> within refractory window -> blocked.
+    # Single travelling control pulse A passes J1, then J2, blocking both.
     geom = {
-        'a_to_j1': 35.0, 'a_to_j2': 40.0,
-        'b1_to_j1': 45.0, 'b2_to_j2': 50.0,
+        'a_to_j1': 10.0, 'a_to_j2': 50.0,
+        'b1_to_j1': 25.0, 'b2_to_j2': 60.0,
         'j1_to_o1': 40.0, 'j2_to_o2': 40.0,
     }
     circ = build_shared_control_gate(**geom)

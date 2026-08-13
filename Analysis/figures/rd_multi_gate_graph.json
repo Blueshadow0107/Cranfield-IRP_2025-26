@@ -1,0 +1,66 @@
+{
+  "circuit": "shared-control selective gate (one control, two data paths)",
+  "geometry": {
+    "a_to_j1": 10.0,
+    "a_to_j2": 50.0,
+    "b1_to_j1": 25.0,
+    "b2_to_j2": 60.0,
+    "j1_to_o1": 40.0,
+    "j2_to_o2": 40.0
+  },
+  "calibration": {
+    "speed": 6.46411888154886,
+    "tau_refract": 3.0,
+    "inhibition_window": 1.0
+  },
+  "truth_table": {
+    "000": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    },
+    "010": {
+      "O1_fires": true,
+      "O1_arrival_tu": 10.05550813515135,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    },
+    "001": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": true,
+      "O2_arrival_tu": 15.47001251561746
+    },
+    "011": {
+      "O1_fires": true,
+      "O1_arrival_tu": 10.05550813515135,
+      "O2_fires": true,
+      "O2_arrival_tu": 15.47001251561746
+    },
+    "100": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    },
+    "110": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    },
+    "101": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    },
+    "111": {
+      "O1_fires": false,
+      "O1_arrival_tu": null,
+      "O2_fires": false,
+      "O2_arrival_tu": null
+    }
+  }
+}

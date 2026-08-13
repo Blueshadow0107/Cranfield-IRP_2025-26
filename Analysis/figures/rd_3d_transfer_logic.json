@@ -1,16 +1,16 @@
 {
   "test": "3D T-junction A AND (NOT B) inhibition (dark-spot Oregonator)",
   "grid": [
-    48,
+    64,
     48,
     48
   ],
   "channel_width": 16,
   "dx": 1.0,
   "dt": 0.05,
-  "nsteps": 400,
-  "physical_time_tu": 20.0,
-  "runtime_s": 93.45629500999348,
+  "nsteps": 500,
+  "physical_time_tu": 25.0,
+  "runtime_s": 153.88051719299983,
   "parameters": {
     "f": 1.4375,
     "eps": 0.0501,
@@ -28,15 +28,15 @@
     "max_u": 0.0030820999329396943,
     "quiet": true
   },
-  "a_alone_arrival_tu": 5.5,
+  "a_alone_arrival_tu": 8.25,
   "readout_window_half_tu": 2.5,
   "truth_table_window_peak": {
-    "00": 0.003082099932939702,
-    "10": 0.6893415420452145,
-    "01": 0.270799376616126,
-    "11": 0.2707995162832958
+    "00": 0.003082099932939695,
+    "10": 0.7127962594094037,
+    "01": 0.042322364618318974,
+    "11": 0.04231530092248617
   },
-  "separation_ratio": 2.5455789268251965,
-  "decision_threshold": 0.48007052916425513,
+  "separation_ratio": 16.842070754734586,
+  "decision_threshold": 0.37755931201386134,
   "logic_recognised": true
 }
