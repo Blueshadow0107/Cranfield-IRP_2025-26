@@ -350,6 +350,32 @@ A symmetric Y-junction with a chamber should give XOR, but the PDE says otherwis
 \end{frame}
 
 % ---------------------------------------------------------------------
+\begin{frame}{Network-level validation: a 2-to-1 priority router}
+
+Two input arms of different lengths merge into one output stem. Arm A is shorter, so it reaches the junction first and makes it refractory; a coincident B pulse is blocked.
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+\textbf{Pattern} & \textbf{Graph output} & \textbf{PDE output} & \textbf{Winner} \\
+\midrule
+00 & none & none & — \\
+01 (B only) & 1 pulse & 1 pulse & B \\
+10 (A only) & 1 pulse & 1 pulse & A \\
+11 (A+B) & 1 pulse & 1 pulse & A (shorter path) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Result:} once the local rules are PDE-calibrated, the graph simulator correctly predicts network-level pulse routing.
+
+\end{frame}
+
+% ---------------------------------------------------------------------
 \begin{frame}{From measured operators to macroscopic equations}
 
 \textbf{Micro-scale output:} a table of speeds, delays, and inhibition windows for given pore geometry and excitability.
@@ -420,7 +446,7 @@ A symmetric Y-junction with a chamber should give XOR, but the PDE says otherwis
     \item A macro-scale porous BZ reactor is a network of pores and throats.
     \item Each throat is a 1-D reaction-diffusion cable; each junction is a switch.
     \item The measured transfer functions (wire, filter, inhibition) become rules in an event-driven graph simulator.
-    \item PDE validation shows the graph captures A AND (NOT B), but also that inhibition is geometry-dependent (XOR leak).
+    \item PDE validation shows the graph captures A AND (NOT B) and a 2-to-1 priority router, but also that inhibition is geometry-dependent (XOR leak).
     \item Pore geometry --- not an externally projected field --- is the trainable substrate.
     \item Upscaling these measurements gives effective equations for the porous medium.
     \item The thesis is therefore a pore-scale characterisation that feeds into a broader porous-media computing story.
