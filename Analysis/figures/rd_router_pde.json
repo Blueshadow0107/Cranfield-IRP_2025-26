@@ -1,0 +1,60 @@
+{
+  "geometry": {
+    "nx": 256,
+    "ny": 256,
+    "hw": 10,
+    "junction": [
+      50,
+      128
+    ],
+    "a_end": [
+      50,
+      68
+    ],
+    "b_end": [
+      50,
+      198
+    ],
+    "stem_end": [
+      200,
+      128
+    ],
+    "src_len": 18
+  },
+  "physics": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "u_star": 0.0030821,
+    "dt": 0.05,
+    "t_flash_tu": 3.0,
+    "t_total_tu": 70.0
+  },
+  "cases": {
+    "00": {
+      "out_arrival_tu": null,
+      "out_peak": 0.00308209993293969,
+      "out_count": 0,
+      "out_fired": false
+    },
+    "01": {
+      "out_arrival_tu": 26.696244292160074,
+      "out_peak": 0.7084497531738078,
+      "out_count": 1,
+      "out_fired": true
+    },
+    "10": {
+      "out_arrival_tu": 25.07587790151601,
+      "out_peak": 0.7084109951159145,
+      "out_count": 1,
+      "out_fired": true
+    },
+    "11": {
+      "out_arrival_tu": 25.07592318571155,
+      "out_peak": 0.708409763324545,
+      "out_count": 1,
+      "out_fired": true
+    }
+  }
+}
