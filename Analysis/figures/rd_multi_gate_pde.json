@@ -24,7 +24,7 @@
     "phi_dark": 0.002,
     "t_flash_tu": 3.0
   },
-  "runtime_s": 49.512729650006804,
+  "runtime_s": 50.93987708599889,
   "control_max_u": 0.0030820999329396943,
   "arrivals_tu": {
     "A_only_O1": null,

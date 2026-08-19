@@ -52,6 +52,43 @@ Porous-reactor reframe of thesis and diode pilot results
 
 The diode pilot script and outputs (`Analysis/rd_diode_pilot.py` plus JSON/PNG figures) were also committed because they belong to the new boundary-experiment narrative.
 
+## Short PDE run results (completed 2026-08-19)
+
+The four short PDE validation scripts finished in the background. Outputs are saved in `Analysis/figures/`.
+
+### 3D channel pulse transfer (`rd_3d_transfer_channel.py`)
+- Grid: 64x64x64, channel 16x16, runtime 219 s.
+- Pulse speed: **6.62 cells/t.u.**, matching the 2D value of 6.46 cells/t.u. to within ~2.5%.
+- Far probe arrival: 6.41 t.u., peak 0.702.
+- Files: `rd_3d_transfer_channel.{json,png,_series.png}`.
+
+### 3D T-junction inhibition gate (`rd_3d_transfer_logic.py`)
+- Grid: 64x48x48, channel cross-section 16x16, runtime 155 s.
+- A alone arrival: 8.25 t.u., peak 0.713.
+- Windowed truth table:
+  - (0,0): 0.003
+  - (1,0): 0.713
+  - (0,1): 0.042
+  - (1,1): 0.042
+- Separation ratio: **16.8x**, logic recognised: True.
+- Files: `rd_3d_transfer_logic.{json,png,_snapshots.png}`.
+
+### Shared-control multi-junction gate (`rd_multi_gate_pde.py`)
+- Grid: 100x180, runtime 51 s.
+- B1-only arrival at O1: 10.0 t.u.; B2-only arrival at O2: 15.35 t.u.
+- O1 separation: **182x**, recognised True.
+- O2 separation: **192x**, but the script flags recognised False (the false output is ~0.0027, well below threshold; the flag appears to be a bookkeeping quirk).
+- Pattern 011 shows crosstalk: B1 reaches the shared horizontal channel and suppresses O2, the same network-level coupling noted in the thesis draft.
+- Files: `rd_multi_gate_pde.{json,png,_series.png,_snapshots.png}`.
+
+### Free-medium collision XOR baseline (`rd_spot_xor.py`)
+- Box: 200x200, spot radius 12, chosen T_flash = 12.0 t.u.
+- Pattern 10 and 01 both emit clean single waves to the probe arc.
+- Pattern 11 still triggers multiple probe crossings, so uniform free-medium collision does not give a clean XOR. This supports the thesis statement that junction geometry is needed.
+- Files: `rd_spot_xor_protocol.{json,png}`.
+
+These outputs have not been inserted into the report yet.
+
 ## Recommended next steps
 
 1. Decide on the canonical root file.

@@ -10,7 +10,7 @@
   "dt": 0.05,
   "nsteps": 500,
   "physical_time_tu": 25.0,
-  "runtime_s": 153.88051719299983,
+  "runtime_s": 154.87655124100274,
   "parameters": {
     "f": 1.4375,
     "eps": 0.0501,
