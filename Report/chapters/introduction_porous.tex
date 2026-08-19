@@ -1,0 +1,150 @@
+% Chapter: Introduction
+% Porous BZ reactor as a structured reaction-diffusion computing substrate
+
+\section{Background and Motivation}
+\label{sec:background}
+
+Digital computers move data between memory and processor for every operation, and this von Neumann bottleneck costs energy and latency at every arithmetic step.
+As machine-learning workloads grow, there is increasing interest in using the physics of a material to compute directly, without clocked digital arithmetic.
+In such physical neural networks, inputs are encoded as physical excitations, the medium transforms them through its own dynamics, and outputs are read from probes.
+Computation is continuous in time and parallel across space, with the medium's structure acting as the network's weights.
+Demonstrations in optics, mechanics, and electronics show that this approach can work in practice \cite{lin2018alloptical, wright2022deep, hughes2019wave}.
+
+This project starts from a simple question: what happens inside a porous chemical reactor when a pulse of reagent is injected at one face?
+The reactor is a solid scaffold saturated with a reacting fluid; its internal geometry is a maze of pores joined by narrow throats.
+A chemical excitation introduced at one pore will travel through the fluid, split at junctions, collide with other excitations, and possibly reach output locations on another face.
+If the local rules that govern this traffic are known, the reactor can be treated as a programmable analog computer whose program is written into the pore geometry and the spatial distribution of chemical properties.
+
+Making this precise requires two things: a medium rich enough to support directed pulse traffic, and a systematic way to describe what a given arrangement of it computes.
+This thesis builds the case for one answer and tests it.
+\refSec{sec:lit_pnn} reviews the physical-neural-network idea, \refSec{sec:lit_chemical} the chemical and excitable-media route to computation, and \refSec{sec:lit_bz} the Belousov--Zhabotinsky reaction and Oregonator model as the practical realisation.
+\refSec{sec:lit_synthesis} draws these threads into the research gap, from which the aim and objectives follow.
+
+\section{Physical Neural Networks}
+\label{sec:lit_pnn}
+
+A physical neural network is a material or device whose internal physical dynamics implement the operations of a neural network.
+Inputs are encoded as fields or excitations, the material transforms them through its natural evolution, and outputs are read from detectors.
+The appeal is that computation can occur in parallel across space and continuously in time, without the repeated memory transfers that dominate digital inference.
+
+Optical systems provide the most prominent demonstrations.
+Lin \etal showed that a stack of diffractive surfaces can be trained to perform image classification entirely through light propagation \cite{lin2018alloptical}.
+The layers modulate the phase of the optical field, and interference in free space produces the desired mapping.
+The geometry of the diffractive elements serves as the trainable weights.
+
+Mechanical systems offer a complementary view.
+Stern \etal demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader framework for learning in physical networks \cite{stern2021physical}.
+Wright \etal extended the idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}.
+Momeni \etal addressed the difficulty of differentiating through noisy physical systems by proposing a backpropagation-free training method \cite{momeni2023backpropagation}.
+
+A unifying theoretical perspective was provided by Hughes \etal, who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}.
+In this view, the wave field at each time step is the hidden state, and the evolution operator is a sparse linear recurrence whose coefficients depend on local material properties.
+
+The present work adopts the same stance, the physical field is the computational state and the material distribution is the trainable parameter set, but moves from linear wave physics to a nonlinear, excitable chemical medium.
+The propagating quantity is a self-sustaining chemical pulse rather than a decaying or superposing wave.
+This situates the work within molecular communication: the substrate is a fluid channel whose input is a spatially patterned chemical excitation and whose output is a measured concentration signal.
+Experimental tabletop molecular communication has already demonstrated digital messages carried by chemical signals \cite{farsad2013tabletop}, and surveys identify reaction--diffusion transport as a physically realistic channel model \cite{farsad2016comprehensive}.
+The present thesis treats the reaction--diffusion channel not merely as a passive link, but as a programmable analog computing substrate.
+
+\section{Chemical and Excitable-Media Computing}
+\label{sec:lit_chemical}
+
+Computation in fluid and chemical media has a long history.
+Matter itself stores and transforms information, so signals are processed by the physics of the substrate rather than by an external arithmetic unit.
+The lineage runs from hydraulic analog machines to modern molecular and microfluidic systems \cite{adamatzky2019liquid}.
+Demonstrated platforms include microfluidic bubble logic, in which gas bubbles carry, route, and process discrete bits through channel networks \cite{prakash2007bubble}, and self-organising chemical reaction networks that classify temporal inputs as reservoir computers \cite{baltussen2024chemical}.
+
+Within this tradition, excitable chemical media offer a direct route to computation because their elementary phenomena map onto computational primitives.
+Colliding pulses annihilate; pulses meeting a narrowing gap or high-curvature turn can be blocked \cite{courtemanche1993instabilities}.
+These primitives have produced working devices: colliding-pulse logic gates, an experimental XOR gate in a reaction--diffusion medium, logical functions of structured channel junctions, and a single oscillating BZ droplet acting as a binary and fuzzy logic processor \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, adamatzky2002collision, sielewiesiuk2001logical, gorecki2009information, gentili2012chemical}.
+The common feature is hand design: each gate or circuit is built geometry by geometry for one logical function.
+
+A parallel line of research pursues trainable chemistry in well-mixed reactors, where a reaction network plays the role of a neural network with reaction rates as trainable weights.
+Neural-network behaviour, universal computation, and end-to-end training have been demonstrated \cite{hjelmfelt1991chemical, magnasco1997chemical, dack2024rncrn, cherry2018scaling}, but these systems are well-mixed: all information resides in scalar concentrations, with no spatial extent.
+They sacrifice exactly the spatial continuity and parallelism that structured excitable media possess natively.
+The present work keeps the spatial structure and asks how it can be abstracted and predicted.
+
+\section{The Belousov--Zhabotinsky Reaction and the Oregonator Model}
+\label{sec:lit_bz}
+
+The Belousov--Zhabotinsky (BZ) reaction, the metal-ion-catalysed oxidation of an organic substrate by bromate in acidic solution, is the canonical experimental excitable chemical medium.
+It oscillates spontaneously under appropriate conditions and, in thin quasi-two-dimensional layers, supports propagating oxidation waves: expanding target patterns, rotating spirals, and interacting fronts.
+Its phenomenology is well characterised, its ingredients are inexpensive and handled at room temperature, and compact models reproduce its behaviour faithfully.
+It is therefore the standard testbed for chemical-wave computing.
+
+The kinetic essence is captured by the Oregonator, Field and Noyes's three-variable reduction of the detailed Field--K\"or\"os--Noyes mechanism \cite{field1974oregonator}, and by Tyson and Fife's further reduction to two variables: a fast activator and a slow recovery variable \cite{tyson1980target}.
+The singular-perturbation structure of the two-variable form underlies the classic understanding of pulse propagation in excitable media \cite{tyson1988singular}.
+It is the model used throughout this thesis, coupled to spatial diffusion of the activator.
+
+A variant of particular importance for computing is the photosensitive BZ reaction, in which the ruthenium-catalysed system is inhibited by illumination.
+A spatial light field then acts as a writable mask: illuminated regions slow or block wave propagation, dark regions transmit it.
+Sakurai \etal exploited this to route chemical waves through optically defined channels and junctions in real time \cite{sakurai2002design}.
+In the language of this thesis, the light field $\phi(x,y)$ turns the substrate into a rewritable device.
+
+The computing-relevant phenomenology of excitable media follows from a small set of robust behaviours.
+A supra-threshold perturbation triggers a pulse travelling at a characteristic speed; behind it lies a refractory zone that cannot be re-excited, setting a maximum signalling frequency.
+Colliding pulses annihilate; pulses meeting a narrowing gap can be blocked \cite{courtemanche1993instabilities}.
+Structure adds more: asymmetric junctions act as chemical diodes \cite{agladze1996chemical}, T-shaped junctions as band-pass filters of pulse frequency \cite{gorecka2003tshaped}, and anisotropy creates preferred propagation directions \cite{steinbock1995anisotropy}.
+Propagation, refractoriness, annihilation, block, rectification, filtering, and anisotropic routing are the native instruction set this work characterises.
+
+\section{Synthesis and Research Gap}
+\label{sec:lit_synthesis}
+
+The literature reviewed above establishes five points.
+First, physical neural networks are a viable alternative to digital inference, with trained demonstrations in optics, mechanics, and wave physics \cite{lin2018alloptical, stern2021physical, wright2022deep, hughes2019wave}.
+Second, chemical and fluid media have a long computing pedigree, from liquid computers to bubble logic and chemical reservoirs \cite{adamatzky2019liquid, prakash2007bubble, baltussen2024chemical}.
+Third, excitable media support wave-collision logic, diodes, filters, and routers, both in simulation and in BZ experiments \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, agladze1996chemical, gorecka2003tshaped}.
+Fourth, well-mixed chemistry is trainable in the neural-network sense, but only by abandoning the spatial continuity that makes physical substrates attractive \cite{dack2024rncrn, cherry2018scaling}.
+Fifth, molecular communication research treats reaction--diffusion transport as an information channel \cite{farsad2016comprehensive, guo2021molecular}, with non-coherent detectors and polynomial-chaos methods that quantify uncertainty \cite{lin2023diversity, abbaszadeh2019uncertainty}.
+
+What is missing is a systematic way to move from the micro-scale physics inside a porous reactor to a predictive model of network-level pulse traffic.
+Existing excitable-media work demonstrates isolated gates in ad hoc geometries; trainable-CRN work achieves learning but in a spaceless setting; and the physical-neural-network framework has not been carried into excitable chemical media arranged as a porous network.
+Nobody has treated a structured BZ-type substrate as a set of local pore-scale operators, measured those operators in controlled two-dimensional simulations, and composed them into a fast graph-level predictor of pulse traffic.
+This thesis addresses that gap.
+
+\section{Research Aim}
+\label{sec:aim}
+
+The aim of this project is to characterise the local pulse-traffic rules inside a structured reaction--diffusion excitable medium and to show that they can be composed into a predictive pore-network model of a larger porous reactor.
+Rather than asking whether such a medium can compute, the work maps out what it does natively at the pore scale, and how those local rules combine at the network scale.
+
+\section{Research Objectives}
+\label{sec:objectives}
+
+To achieve this aim, the following objectives were set:
+
+\begin{enumerate}
+    \item Formulate the two-variable reaction--diffusion model for a two-dimensional domain, extended with structured boundaries, a spatial light-suppression field $\phi(x,y)$, and a spatially varying anisotropic diffusion tensor as substrate knobs.
+    \item Implement an explicit finite-difference solver for this model and verify it against known BZ phenomenology and manufactured solutions.
+    \item Design a black-box characterisation protocol in which the substrate is stimulated with pulses at input ports and its response is recorded at probe locations.
+    \item Measure the native pore-scale transfer functions: channel pulse transmission, refractory-limited frequency response, two-input inhibition at a T-junction, and anisotropic routing.
+    \item Build an event-driven graph simulator from the measured operators and validate it against full PDE solutions for simple networks.
+    \item Identify the conditions under which the micro-scale operators transfer to three-dimensional pore geometries, and the limitations of the approach.
+\end{enumerate}
+
+\section{Scope and Delimitations}
+\label{sec:scope}
+
+In scope:
+\begin{itemize}
+    \item Two-dimensional reaction--diffusion dynamics in the Oregonator model, the chemically grounded reduction of the BZ mechanism.
+    \item Explicit finite-difference time integration on a regular Cartesian grid.
+    \item Three substrate parameterisations: wall geometry, the light-suppression field $\phi(x,y)$, and an anisotropic diffusion tensor field.
+    \item Pulse-based input/output: localised activator perturbations as inputs, time-series probe recordings as outputs.
+    \item A graph simulator built from measured local operators and validated against PDE solutions.
+    \item Boundary three-dimensional tests that probe the transferability of the micro-scale operators.
+\end{itemize}
+
+Out of scope:
+\begin{itemize}
+    \item Full three-dimensional porous-medium simulations at the scale of a laboratory reactor.
+    \item Experimental realisation or wet-lab validation.
+    \item End-to-end training of a pore-network for a large computational task.
+    \item Detailed comparison with acoustic, thermal, or well-mixed chemical alternatives; the starting point is the BZ reaction--diffusion medium.
+\end{itemize}
+
+The thesis is organised as follows.
+\refChap{chap:porous} introduces the porous-reactor picture and the pore-network graph abstraction.
+\refChap{chap:methodology} presents the Oregonator model, the finite-difference solver, and the graph-simulator construction.
+\refChap{chap:results} reports the measured pore-scale operators and the graph-level validations.
+\refChap{chap:conclusions} summarises the contributions, limitations, and next steps.

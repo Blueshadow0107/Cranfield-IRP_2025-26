@@ -1,0 +1,115 @@
+\documentclass[12pt,oneside]{book}
+
+\usepackage{CUThesis2025}
+\usepackage{lscape}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+%% --- THESIS METADATA --- %%
+\title{From Measured Pore-Scale Operators to Network-Level Prediction in a Structured Belousov--Zhabotinsky Reactor}
+\author{Srivijayesh Venugopal}
+\date{September 2026}
+\faculty{\FEAS}
+\course{Computational Fluid Dynamics}
+\degree{MSc}
+\supervisor{Prof. Weisi Guo}
+\academicyear{2025--2026}
+\copyrightyear{2026}
+
+\begin{document}
+
+\maketitle
+\frontmatter
+
+%% --- ABSTRACT --- %%
+\begin{abstract}
+This thesis treats a structured Belousov--Zhabotinsky (BZ) reaction--diffusion medium as the micro-scale picture inside a macro-scale porous chemical reactor.
+The internal geometry of such a reactor, a network of pores connected by narrow throats, is too fine to resolve in a full continuum simulation.
+Instead, the pores and throats are abstracted as nodes and edges of a graph, and the local pulse-traffic rules at each element are measured in controlled two-dimensional simulations of the light-sensitive Oregonator model.
+
+A verified explicit finite-difference solver is used in a black-box protocol to isolate and measure four native operators: pulse transmission along a straight throat, refractory-limited frequency response, two-input inhibition at a T-junction, and anisotropic routing under a tilted diffusion tensor.
+The measurements are translated into an event-driven graph simulator in which nodes and edges carry the measured transit times, refractory times, and inhibition windows.
+The graph simulator is validated against full partial-differential-equation (PDE) solutions for an inhibition gate, a priority router, and a shared-control two-path gate.
+
+The work shows that network-level pulse routing can be predicted from micro-scale transfer functions, but only when junction geometry is accounted for.
+A three-dimensional inhibition gate and a one-way diode pilot are reported as boundary experiments: the 3D gate works after geometry correction, while the diode shows that a simple asymmetric wall or static light barrier is insufficient for robust rectification.
+The thesis closes by identifying the remaining steps toward trained porous chemical processors and molecular-communication substrates.
+\end{abstract}
+
+\begin{keywords}
+physical neural networks, reaction-diffusion computing, excitable media,
+Belousov--Zhabotinsky reaction, Oregonator model, analog computation,
+molecular communication, porous media, pore-network model, neuromorphic engineering
+\end{keywords}
+
+%% --- ACKNOWLEDGEMENTS --- %%
+\chapter*{Acknowledgements}
+I would like to thank my supervisors, Professor Weisi Guo, Professor Panagiotis Takis Tsoutsanis, and Professor Tamas Josza for their guidance and support throughout this research project.
+
+%% --- FRONT MATTER --- %%
+{
+\clearpage
+\singlespacing
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+}
+
+\begin{listofabbreviations}
+    \abbrev{RD}{Reaction--Diffusion}
+    \abbrev{BZ}{Belousov--Zhabotinsky}
+    \abbrev{CRN}{Chemical Reaction Network}
+    \abbrev{RNCRN}{Recurrent Neural Chemical Reaction Network}
+    \abbrev{PNN}{Physical Neural Network}
+    \abbrev{RNN}{Recurrent Neural Network}
+    \abbrev{ODE}{Ordinary Differential Equation}
+    \abbrev{PDE}{Partial Differential Equation}
+    \abbrev{BC}{Boundary Condition}
+    \abbrev{FDTD}{Finite-Difference Time-Domain}
+    \abbrev{CFD}{Computational Fluid Dynamics}
+\end{listofabbreviations}
+
+%% --- MAIN MATTER --- %%
+\mainmatter
+\pagestyle{fancy}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\nouppercase{\rightmark}}
+
+\chapter{Introduction}
+\label{chap:introduction}
+\input{chapters/introduction_porous}
+
+\chapter{From Porous Media to Pore-Network Graphs}
+\label{chap:porous}
+\input{chapters/porous_substrates}
+
+\chapter{Methods}
+\label{chap:methodology}
+\input{chapters/methods_porous}
+
+\chapter{Results and Discussion}
+\label{chap:results}
+\input{chapters/results_porous}
+
+\chapter{Conclusions and Future Work}
+\label{chap:conclusions}
+\input{chapters/conclusions_porous}
+
+%% --- BACK MATTER --- %%
+\renewcommand{\bibname}{References}
+\bibliographystyle{vancouver}
+\bibliography{references}
+
+\appendix
+\chapter{Additional Derivations}
+\label{app:derivations}
+All derivations, model equations, and convergence data required to reproduce the reported transfer functions are presented in the main chapters. No supplementary derivations are needed.
+
+\end{document}

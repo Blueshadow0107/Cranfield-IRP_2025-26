@@ -1,0 +1,56 @@
+% Chapter: Conclusions and Future Work
+
+\section{Summary of Contributions}
+\label{sec:conc_summary}
+
+This thesis treated a structured Belousov--Zhabotinsky reaction--diffusion medium as the micro-scale picture inside a macro-scale porous chemical reactor.
+The reactor's void space was abstracted as a pore-network graph: bulbous pores become nodes and narrow throats become edges.
+The central claim was that the local pulse-traffic rules at each graph element can be measured in controlled two-dimensional simulations and then composed into a fast predictor of network-level behaviour.
+
+Four local operators were isolated and quantified.
+A straight throat is a near-perfect wire: the pulse speed is set by the kinetics and is almost independent of channel width.
+Refractoriness limits the maximum signalling frequency; for the Oregonator working point used here, the absolute refractory period is 3.0 time units and the maximum one-to-one following rate is 0.167 per time unit.
+A T-junction implements two-input inhibition when the readout is windowed in time: A AND (NOT B) was obtained with a separation ratio above $200\times$.
+An anisotropic diffusion tensor steers pulses along preferred directions with a speed ratio that follows the eikonal $\sqrt{r}$ law.
+
+These operators were encoded in an event-driven graph simulator.
+The simulator correctly predicted the behaviour of an inhibition gate and a priority router, and it produced the correct truth table for a shared-control multi-junction gate.
+Where it failed, the failure was instructive: a shared channel introduced crosstalk between two data paths that single-junction measurements did not capture, and a chambered Y-junction intended as a collision XOR leaked because the collision geometry allowed re-ignition of the output stem.
+A thin-slab three-dimensional inhibition gate showed that the same operators transfer once the junction shape is corrected, and a one-way diode pilot showed that a simple asymmetric wall or static light barrier is not enough for robust rectification.
+A light-field training attempt returned a negative result: within the optimisation budget, no improvement over a uniform suppression field was found.
+
+The work therefore supports the following conclusion: network-level pulse routing in a structured excitable medium can be predicted from micro-scale transfer functions, but only when the geometry of every junction is carried explicitly in the model.
+The graph abstraction is viable as a design layer between expensive continuum simulations and large network studies, but it must be calibrated against PDE solutions for each junction family.
+
+\section{Limitations}
+\label{sec:conc_limitations}
+
+The results are limited to two-dimensional controlled simulations.
+A real porous reactor is three-dimensional, and the interior light field is not known in the bulk, so the local kinetic parameters would be uncontrolled.
+The 3D test reported here is a thin-slab boundary experiment, not a validated multi-gate network.
+
+All measurements share the same computational parameter set, so the transfer functions are specific to that set.
+The graph simulator uses scalar transit, refractory, and inhibition parameters extracted from idealised geometries; real junctions with rough walls, curved throats, or varying aspect ratios may require a larger library of local operators.
+
+No experimental validation was attempted.
+The mapping from model units to physical units is a calibration based on literature values, and the actual speeds and times in a wet experiment will depend on recipe, temperature, and illumination.
+
+\section{Future Work}
+\label{sec:conc_future}
+
+The most immediate next step is to build a shape-resolved junction library.
+Each entry would contain the measured transfer function for a family of junction geometries (T, Y, cross, chambered Y, angled branch), so the graph simulator can choose the right operator for each node rather than assuming a single universal value.
+
+A second step is to incorporate uncertainty quantification into the graph simulator itself.
+The one-at-a-time sensitivity analysis showed that kinetic parameters affect speed and amplitude; these uncertainties should propagate through the graph so that network-level predictions carry confidence intervals.
+
+Third, the three-dimensional extension needs a volumetric illumination strategy.
+Without a known $\phi(x,y,z)$ inside the bulk, the local operators cannot be assigned reliably.
+Candidate approaches include structured light absorption, layered masks, or direct chemical patterning of the catalyst distribution.
+
+Fourth, training should be reframed around geometry rather than around a small light-field grid.
+The negative training result suggests that the native operators at the chosen working point are too stiff for small local modulation of the suppression field to change the routing decision.
+Trainable porous processors may need trainable wall shape, catalyst patterning, or a richer parameterisation of the light field.
+
+Finally, the framework should be tested against experimental data from a photosensitive BZ layer or a microfluidic excitable-medium network.
+That would close the loop between the measured transfer functions and the pore-network graph, and would show whether the abstractions introduced here survive the noise and heterogeneity of a real chemical substrate.

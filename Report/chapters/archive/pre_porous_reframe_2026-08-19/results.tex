@@ -1,0 +1,291 @@
+% Chapter: Results and Discussion
+% ACTIVE (2026-08-03): prose built around the verified simulation results.
+
+\section{Solver Verification}
+\label{sec:res_verification}
+
+Before any transfer function was trusted, the solver of \refSec{sec:meth_solver} was verified by the method of manufactured solutions and by grid and timestep convergence studies.
+In the manufactured-solution test, an analytic source term is added to the kinetics so that a known field solves the equations exactly, and the discrete error is measured as the grid and the time step are refined.
+Three configurations were tested: Barkley kinetics with isotropic diffusion, Barkley kinetics with a tilted anisotropic tensor, and Oregonator kinetics at candidate A.
+\reffig{fig:res_mms} shows the measured error norms against grid spacing and time step.
+The observed spatial convergence orders at the finest refinement interval are $2.09$, $2.09$, and $1.99$ for the three cases, against a design order of $2$ for the central-difference diffusion operator.
+The observed temporal orders are approximately $1.0$ across all cases, matching the first-order operator splitting of \refSec{sec:meth_discretisation}.
+The tilted-tensor case converges at the same rate as the isotropic case, validating the divergence-form tensor discretisation that the anisotropy experiment of \refSec{sec:res_anisotropy} depends on.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_mms_convergence.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_mms_convergence.png}}{%
+[figure pending]}
+\caption{Method of manufactured solutions: measured error norms against grid spacing (spatial convergence) and time step (temporal convergence) for three configurations, Barkley isotropic, Barkley with a tilted anisotropic tensor, and Oregonator candidate A. Observed spatial orders are $2.09$, $2.09$, and $1.99$ against a design order of $2$; observed temporal orders are approximately $1.0$ against a design order of $1$. The tilted-tensor case converges like the isotropic case.}
+\label{fig:res_mms}
+\end{figure}
+
+Convergence of the physical quantity of interest, the plane-pulse speed, is summarised in \reftab{tab:res_convergence} and \reffig{fig:res_verification}.
+The Barkley speed rises monotonically from $4.151$ cells per time unit at $\Delta x = 1$ to $4.603$ at $\Delta x = 0.25$; a Richardson extrapolation gives a continuum asymptote of approximately $4.82$, so the working resolution underestimates the Barkley speed by about $14\%$.
+The observed order of the sequence is only about $0.8$: the refinement is still pre-asymptotic, because the pulse front is only two to three cells thick at these resolutions and is not yet smooth on the grid.
+The Oregonator candidate-A speeds, $6.224$, $6.048$, and $6.049$ cells per time unit across the same refinement, lie within a $2.8\%$ band, close to grid-converged at the working resolution.
+Timestep refinement changes measured speeds and timings by at most $1.5\%$ for both kinetics at the working step $\Delta t = 0.05$, and a joint $(\Delta x, \Delta t)$ refinement map shows the error to be space-dominated and approximately separable: at fixed $\Delta x$, temporal refinement contributes less than $0.7\%$ further change.
+
+\begin{table}[htbp]
+\centering
+\caption{Grid convergence of the plane-pulse speed (cells per time unit) at $\Delta t = 0.05$. The Barkley sequence is pre-asymptotic (observed order $\approx 0.8$); a Richardson extrapolation gives a continuum asymptote of $\approx 4.82$, a deficit of $\approx 14\%$ at the working resolution $\Delta x = 1$. The Oregonator candidate-A speeds lie within a $2.8\%$ band.}
+\label{tab:res_convergence}
+\small
+\begin{tabular}{@{}ccc@{}}
+\toprule
+\textbf{$\Delta x$ (cells)} & \textbf{Barkley speed} & \textbf{Oregonator A speed} \\
+\midrule
+1.00 & 4.151 & 6.224 \\
+0.50 & 4.439 & 6.048 \\
+0.25 & 4.603 & 6.049 \\
+\midrule
+Richardson asymptote & $\approx 4.82$ & n/a \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_verification.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_verification.png}}{%
+[figure pending]}
+\caption{Solver verification summary: plane-pulse speed against grid spacing and timestep for both kinetics, and the peak adaptive reaction-substep count. The Barkley refinement sequence is monotonic and pre-asymptotic toward the Richardson asymptote $\approx 4.82$ cells per time unit; the Oregonator sequence is flat within a $2.8\%$ band. Runtime invariants (NaN/Inf tripwire and step-size guard) were clean.}
+\label{fig:res_verification}
+\end{figure}
+
+Every runtime invariant monitored in the simulations underlying this chapter was clean: the NaN/Inf tripwire never fired, and the step-size guard recorded zero trips outside the fast upstroke it was designed for.
+All results reported below were produced by this verified solver.
+
+\section{Channel Pulse Transfer}
+\label{sec:res_channel}
+
+The first component characterised is the wire.
+A circular dark spot of radius $6$ cells at the channel entrance is dimmed to $\phi = 0.002$ for $3.0$ time units, emitting a single pulse into a straight walled channel of width $W$.
+\reffig{fig:res_channel} shows the measured transfer as $W$ is swept down to a single cell.
+The free-medium dark-spot speed is $6.46$ cells per time unit and the channel speed is $6.46$--$6.47$ cells per time unit at every width from $W = 60$ down to $W = 1$, so the width-independence of the wire is reproduced and the pulse transmits with undiminished amplitude.
+No geometric wave block was observed at any width; the eikonal critical width below which confinement would extinguish the pulse is sub-grid for this medium.
+
+The physics of this result is clean.
+A pulse travelling in a straight channel is a planar front, and a planar front has zero curvature, so the eikonal curvature correction to its speed vanishes \cite{keener1991eikonal}.
+The no-flux walls impose a zero normal derivative that a planar front already satisfies identically, so the walls change nothing: propagation in the channel is exactly equivalent to propagation on a one-dimensional cable.
+The width-induced block documented in ring and cable studies \cite{courtemanche1993instabilities} requires the front to acquire curvature, which a straight uniform channel never forces on it.
+As a device characteristic the result cuts both ways: a straight channel is a near-perfect wire whose speed and amplitude are set by the kinetics alone, but its width offers no computing leverage.
+Structure that computes must come from junctions, curvature, or the property fields, not from confinement alone.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}}{%
+[figure pending]}
+\caption{Channel pulse transfer with the dark-spot drive. Left: far-probe traces for representative widths. Centre: measured speed versus channel width. Right: transmission amplitude. The channel speed is bit-identical to the free-medium speed ($6.46$ cells per time unit) at every width down to $W = 1$: a planar front between no-flux walls is exactly equivalent to a one-dimensional cable, and no geometric wave block occurs.}
+\label{fig:res_channel}
+\end{figure}
+
+\section{Frequency Response}
+\label{sec:res_frequency}
+
+The second experiment measures the substrate's bandwidth, which is set by refractoriness.
+A circular dark spot at the channel entrance is flashed to $\phi = 0.002$ for $3.0$ time units; because the flash must end before the next flash can begin, the start-to-start period cannot be shorter than the flash itself.
+The two-pulse measurement locates the absolute refractory period directly at $3.0$ time units for the Oregonator at candidate A.
+Sustained pulse trains then give the transmission curve of \reffig{fig:res_frequency}.
+At low input frequency the output frequency follows the input one-to-one: the curve has unit slope and every pulse transmits.
+The maximum 1:1 following rate is $0.167$ per time unit; above this rate the curve leaves the unit slope and develops a staircase of dropped pulses, in which the medium locks to rational transmission ratios as more input pulses arrive inside the refractory wake of their predecessors.
+
+Two features of the measurement deserve note.
+First, the maximum 1:1 following rate lies well below the naive estimate given by the inverse of the absolute refractory period.
+This is not a failure of the medium --- the Oregonator refractory period is unchanged --- but a property of the input encoder: a single dark spot flashed for $3.0$ time units cannot be asked to emit a sustained train with period shorter than about $6.0$ time units without the flashes merging into one long pacemaker flash.
+Second, the computational reading is direct: refractoriness is the substrate's clock limit.
+Any signal encoding must space pulses by more than the refractory time, and any cascade of devices must operate below the maximum following rate.
+The same property is also a native filter: the channel low-passes pulse trains for free, the same mechanism the junction literature exploits for frequency selection \cite{gorecka2003tshaped}.
+For pulse-train signalling the flash-duration constraint is a real constraint; for single-event computation it is irrelevant.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_frequency_response_darkspot.png}{%
+\includegraphics[width=0.85\textwidth]{../Analysis/figures/pub/pub_frequency_response_darkspot.png}}{%
+[figure pending]}
+\caption{Frequency response with the dark-spot drive (Oregonator A). The absolute refractory period is $3.0$ time units; the maximum 1:1 following rate is $0.167$ per time unit. The staircase structure above the following limit arises because the $3.0$~t.u. minimum flash duration sets the shortest usable start-to-start period.}
+\label{fig:res_frequency}
+\end{figure}
+
+\section{Two-Input Collision Logic}
+\label{sec:res_logic}
+
+The third experiment measures the substrate's native logic at a T-junction, with one input channel per arm and a probe on the output branch.
+The first finding is negative and important: read naively over the whole record, the junction computes OR, whatever it was designed to do - the unconditional diffraction background identified in the protocol design of \refSec{sec:meth_protocol}.
+For the same reason, the complementary construction, annihilation XOR, is not realised by the passive junction alone: diffracted copies of a lone pulse reach the output probe whether or not the other input fires.
+This is consistent with the collision-computing literature, where working gates rely on precisely timed inputs and purpose-built geometry rather than on an unadorned junction \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor}.
+
+With the windowed readout of \refSec{sec:meth_protocol}, the same junction implements a genuine two-input gate.
+The probe record is read only within a window aligned to the expected arrival of a lone pulse from the designated through-arm, input A.
+If input B fires within the coincidence interval, its pulse collides with the A pulse at the junction, the two fronts annihilate, and the window reads silent.
+The windowed device computes the inhibition gate A AND (NOT B), with B acting as a veto on A.
+\reffig{fig:res_logic} shows the measured truth table and the inhibitor-timing sweep for the dark-spot drive.
+
+Three figures of merit quantify the gate.
+The separation ratio, the weakest true output against the strongest false one, is $232\times$ for the Oregonator at candidate A, with a true-output peak of $0.706$ and false-output peaks of $0.003$.
+The inhibition window, the range of relative input timings within which the trailing pulse is still annihilated, spans up to $20$ steps ($1.0$ time unit); transmission has recovered by $40$ steps.
+The window also yields the design rule for scaling such gates: the difference in input-arm lengths must be engineered against the distance a pulse covers within the window, since an asymmetry beyond that budget lets the veto pulse arrive too late to collide.
+The device should therefore be understood as timing-gated rather than as pure combinational logic: its truth table holds only for inputs synchronised within the measured window, and the readout window is part of the device.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}}{%
+[figure pending]}
+\caption{Two-input collision gate with the dark-spot drive (Oregonator A). Left: windowed truth table showing A~AND~(NOT~B) with a separation ratio of $232\times$. Right: inhibitor timing sweep; B blocks A for delays up to $20$ steps ($1.0$ time unit), with transmission recovering by $40$ steps.}
+\label{fig:res_logic}
+\end{figure}
+
+\section{Anisotropic Substrate}
+\label{sec:res_anisotropy}
+
+The fourth experiment characterises the anisotropic parameterisation of \refSec{sec:meth_anisotropy}.
+In a uniform tensor field with anisotropy ratio $r = D_{\parallel}/D_{\perp}$, the expanding front is expected to follow the $\sqrt{r}$ eikonal law of \refSec{sec:meth_anisotropy}.
+The measured front geometry follows this law closely, as \reffig{fig:res_aniso} shows; the isotropic control $r = 1$ reproduces the circular front exactly.
+At $r = 2$ the deviation from the $\sqrt{r}$ prediction is $4.6\%$ for the Barkley kinetics and $0.24\%$ for the Oregonator; at $r = 4$ it is $9.6\%$ and $0.34\%$ respectively; and at $r = 8$ the Barkley deviation reaches $10.2\%$, still within the $\approx 14\%$ spatial error bar established for that kinetics in \refSec{sec:res_verification}.
+The full directional speed profile $c(\theta)$, probed along rays at several orientations to the fibre direction, matches the elliptic theory to within $1.2\%$.
+The tensor discretisation is therefore quantitatively trustworthy; the residual Barkley deviations are accounted for by the known, openly stated grid error rather than by any failure of the anisotropic formulation.
+
+The device-relevant measurement embeds a patch of anisotropic medium in the isotropic substrate and records the delay a pulse accumulates crossing it.
+As the fibre direction of the patch is rotated from parallel ($0$ degrees) to perpendicular ($90$ degrees) to the incident propagation direction, the transmission delay grows monotonically from $644$ to $836$ time steps.
+The response is smooth, monotone, and continuous in the fibre angle: the patch acts as a continuously tunable delay element, and two patches with different orientations route pulses along paths of different effective length without ever blocking them.
+This steers propagation in the interior of the medium rather than at its boundaries, a routing capability neither walls nor the light field provides, in the spirit of patterned-excitability experiments \cite{steinbock1995anisotropy}.
+
+The anisotropic $\sqrt{r}$ check was also attempted with the dark-spot stimulus, but the result was not usable: a circular dark patch of radius 12 cells at $\phi = 0.002$ acts as a pacemaker for the duration of the flash and, in the uniform anisotropic field, continues to emit successive target waves that interfere before the first front can be cleanly tracked.
+The measured front extents are therefore multi-valued and the extracted ratio $c_{\parallel}/c_{\perp}$ does not follow the $\sqrt{r}$ law.
+The seeded-perturbation result reported above therefore remains the validated measurement of the tensor discretisation; the dark-spot drive is better suited to channel-like geometries where the flash duration has been calibrated for a single emitted pulse.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_anisotropic_routing.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_anisotropic_routing.png}}{%
+[figure pending]}
+\caption{Anisotropic substrate. Elliptical pulse fronts in uniform tensor fields follow the $\sqrt{r}$ eikonal law (deviations $4.6$--$10.2\%$ Barkley, $\leq 0.34\%$ Oregonator, for $r = 2$ to $8$); the directional speed profile $c(\theta)$ matches theory to $1.2\%$; and the transmission delay across an embedded anisotropic patch grows monotonically from $644$ to $836$ time steps as the fibre angle rotates from $0$ to $90$ degrees.}
+\label{fig:res_aniso}
+\end{figure}
+
+\section{Parameter Window for the Light Field}
+\label{sec:res_phi_window}
+
+The trainable control in this work is the illumination field $\phi(x,y)$, so its usable range must be known before any optimisation is attempted.
+\reffig{fig:phi_regime_map} combines a linear-stability scan of the homogeneous rest state with sparse channel-propagation tests at $f = 1.4375$, $\varepsilon = 0.0501$.
+Three regimes appear.
+For $\phi \lesssim 0.0045$ the rest state is unstable and the medium oscillates spontaneously.
+For $\phi \gtrsim 0.0045$ the rest state is stable and the point kinetics are excitable, but only up to $\phi \approx 0.026$ does a launched pulse actually propagate tens of cells.
+Above $\phi \approx 0.028$ the medium is excitable in the local sense yet too suppressed to sustain a spatial pulse.
+The working point $\phi = 0.010$ sits near the centre of the usable window, equation~\refeqn{eq:phi_window}.
+
+This window shapes what training can realistically do.
+Raising $\phi$ can slow, attenuate, or locally block waves; lowering it can let waves through or, if taken too far, make the medium oscillatory.
+The dynamic range between `pass' and `block' is therefore bounded, and the transition is sharp rather than gradual.
+Any trained field must keep most of the medium inside the green window of \reffig{fig:phi_regime_map}, which limits how strongly $\phi$ can modulate propagation and makes routing by $\phi$ alone a harder optimisation problem than a continuous `attenuation' picture would suggest.
+
+\section{Uncertainty Quantification of the Channel Pulse}
+\label{sec:res_uq}
+
+The four kinetic parameters that define the Oregonator working point are not known exactly in any real preparation, so the channel transfer function was subjected to a local one-at-a-time sensitivity sweep.
+Each of $\varepsilon$, $f$, $\phi$ and $D_{u}$ was varied independently by $\pm 10\%$ around its nominal value while the other three were held fixed, giving nine additional channel-pulse solves.
+The quantities of interest were the pulse speed $c$ between the near and far probes and the peak activator $u_{\mathrm{peak}}$ at the far probe.
+
+\reffig{fig:res_uq_sensitivity} summarises the normalised changes.
+For pulse speed, the largest response comes from $\varepsilon$ ($\approx -6\%$ for $+10\%$ change, $\approx +7\%$ for $-10\%$ change) and from $D_{u}$ ($\approx +5\%$/$-5\%$), while $f$ and $\phi$ produce only $\approx \pm 2\%$ changes.
+For the probe peak, the dominant parameter is $f$ ($\approx \pm 4\%$), followed by $\varepsilon$ ($\approx \pm 3\%$); $\phi$ and $D_{u}$ have only a weak effect on amplitude ($\lesssim 1\%$).
+All runs remained in the stable-excitable regime and produced finite pulses.
+
+The design message is that timing budgets are most sensitive to the activator/recovery timescale $\varepsilon$ and the activator diffusivity $D_{u}$: a $10\%$ uncertainty in either produces a comparable speed uncertainty.
+The stoichiometric factor $f$ is more important for pulse amplitude than for speed at this operating point, while the background illumination $\phi$ has a relatively mild influence inside the chosen $\pm 10\%$ band.
+
+To move beyond the local OAT picture, a variance-based Sobol decomposition was run on the same four parameters using a Saltelli sample of $N=64$ ($384$ forward solves, all successful).
+\reffig{fig:res_uq_sobol} shows the first-order and total-effect indices.
+For pulse speed, the first-order indices are dominated by $\varepsilon$ ($S_{1}\approx 0.59$), followed by $D_{u}$ ($S_{1}\approx 0.32$), $\phi$ ($S_{1}\approx 0.11$) and $f$ ($S_{1}\approx 0.08$).
+For the probe peak, the ranking is different: $f$ ($S_{1}\approx 0.65$) and $\varepsilon$ ($S_{1}\approx 0.37$) carry almost all the variance, while $\phi$ and $D_{u}$ are essentially inactive.
+The sum of first-order speed indices is close to one, indicating weak interactions; for the peak, $f$ and $\varepsilon$ together exceed one, suggesting a small negative interaction between them.
+The key message is that speed and amplitude must be calibrated against different parameters, and that $\phi$ is not the dominant uncertainty source inside the $\pm 10\%$ band around the working point.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_local_sensitivity/sensitivity.png}{%
+\includegraphics[width=0.48\textwidth]{../Analysis/figures/rd_local_sensitivity/sensitivity.png}}{%
+[figure pending]}
+\hfill
+\IfFileExists{../Analysis/figures/pub/pub_sobol_indices.png}{%
+\includegraphics[width=0.48\textwidth]{../Analysis/figures/pub/pub_sobol_indices.png}}{%
+[figure pending]}
+\caption{Left: local one-at-a-time sensitivity of the channel-pulse QoIs. Right: Sobol first-order and total-effect indices from $384$ forward solves ($N=64$ Saltelli sample).}
+\label{fig:res_uq_sensitivity}
+\label{fig:res_uq_sobol}
+\end{figure}
+
+\section{T-Junction Routing by Trained Illumination}
+\label{sec:res_tjunc}
+
+As a first training target, the T-junction directionality task of \refSec{sec:meth_tjunc_task} was constructed with fixed walls and a trainable illumination field $\phi(x,y)$ around the junction.
+The geometry is a vertical stem feeding a horizontal bar; an input dark spot at the base of the stem launches a single pulse, and the objective is to make the pulse reach the left output probe while remaining below threshold at the right probe (and vice versa).
+Probes record the spatial maximum of $u$ over a small disk, because the mean over the disk is diluted by the wake and underestimates the wavefront amplitude at a T-junction.
+
+Hand-designed fields confirm that $\phi$ can steer the pulse.
+With a uniform field both output probes fire, as the incoming wave splits symmetrically.
+Raising $\phi$ to the propagation-blocking level ($\approx 0.04$) on one side of the junction suppresses that branch and leaves the other branch free, giving clean single-output routing: a right-side block routes the input to the left probe, and a left-side block routes it to the right probe (\reffig{fig:res_tjunc_hand}).
+A high-``phi'' block placed across the top of the junction blocks neither branch effectively, showing that the field must be positioned relative to the incoming wave path, not simply increased everywhere.
+
+This establishes the physical feasibility of trainable routing, but also its limitation: a static $\phi$ field can break the symmetry of a single input, yet it cannot, on its own, route two different inputs entering the same stem to two different outputs, because the field sees both inputs identically.
+The trained routing experiment therefore targets the single-input directionality task.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_tjunc_hand_phi_maps.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/rd_tjunc_hand_phi_maps.png}}{%
+[figure pending]}
+\caption{Hand-designed illumination fields for the fixed-wall T-junction. From left to right, top to bottom: uniform background; high illumination on the left branch (blocks left, routes right); high illumination on the right branch (blocks right, routes left); high illumination across the junction top. A local $\phi$ barrier positioned on one branch suppresses that branch and steers the pulse to the opposite output.}
+\label{fig:res_tjunc_hand}
+\end{figure}
+
+\subsection{Optimiser comparison and trained field}
+\label{sec:res_tjunc_train}
+
+The single-input directionality task was used to compare four black-box optimisers: random search, differential evolution (DE), dual annealing, and CMA-ES.
+The design space is a $4 \times 4$ bilinear interpolation of $\phi$ on the junction region, giving 16 continuous parameters in $[0.010, 0.040]$.
+Each candidate evaluation is one full forward solve of the T-junction.
+The soft objective penalises low peak at the assigned output and high peak at the wrong output; the hard objective records whether the assigned probe crosses the $u = 0.5$ threshold while the wrong probe does not.
+
+\reffig{fig:res_optimizer_compare} shows the best soft loss found by each optimiser as a function of the number of expensive forward evaluations.
+With a small budget of 20 evaluations, CMA-ES reaches a soft loss of $0.006$ and a hard loss of $0.000$; DE also succeeds, finding a zero-hard-loss field on its first evaluation, while random search and dual annealing remain stuck near a hard loss of $1.000$.
+The difference is not merely the algorithm: the landscape is a staircase with wide flat regions, and CMA-ES's covariance learning is better able to discover the correlated block pattern that suppresses one branch without extinguishing the pulse.
+The best trained field is shown in \reffig{fig:res_tjunc_trained}: a smooth gradient of high $\phi$ on the right side of the junction routes the input pulse to the left probe (peak $\approx 0.7$, above threshold) while the right probe remains below threshold.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_optimizer_comparison.png}{%
+\includegraphics[width=0.75\textwidth]{../Analysis/figures/pub/pub_optimizer_comparison.png}}{%
+[figure pending]}
+\caption{Optimiser comparison for the T-junction routing task (route input A to the left output). Shown is the best soft loss found so far against the number of forward evaluations, for a $4 \times 4$ bilinear $\phi$ parameterisation and a budget of 20 evaluations per optimiser.}
+\label{fig:res_optimizer_compare}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_tjunc_trained.png}{%
+\includegraphics[width=0.85\textwidth]{../Analysis/figures/rd_tjunc_trained.png}}{%
+[figure pending]}
+\caption{Trained illumination field for single-input T-junction routing. Left: the optimised $\phi(x,y)$ field; right: the corresponding probe responses, showing that the pulse reaches the target probe while remaining below threshold at the opposite probe.}
+\label{fig:res_tjunc_trained}
+\end{figure}
+
+\section{Discussion}
+\label{sec:res_discussion}
+
+Read together, the four experiments constitute a component datasheet for the substrate: a slow, parallel, threshold-logic medium.
+Straight channels are near-ideal wires whose speed is set by the kinetics alone, though their width carries no computing leverage (\refSec{sec:res_channel}).
+Refractoriness imposes a hard bandwidth ceiling, the medium's clock limit, and doubles as a native pulse-train filter (\refSec{sec:res_frequency}).
+Junctions with windowed readout supply native inhibition logic, A AND (NOT B), from which arbitrary Boolean functions can in principle be composed, provided inputs are synchronised within the measured timing window (\refSec{sec:res_logic}).
+Anisotropy adds continuous, non-blocking routing and delay control in the interior of the medium (\refSec{sec:res_anisotropy}).
+Reproduced across both kinetics (\refSec{sec:meth_overview}), these transfer functions are read as properties of excitable media generally, not of one model's parameterisation.
+
+In the physical-neural-network framing of \refSec{sec:lit_pnn}, the characterisation defines what training would buy.
+The native transfer functions are fixed by the kinetics; the three substrate parameterisations of \refSec{sec:meth_parameterisation} reshape them.
+Walls are the coarse, binary program: they place the ports, wires, and junctions, but contribute no graded behaviour of their own.
+The light field $\phi(x,y)$ is the graded and experimentally rewritable knob \cite{sakurai2002design}; the measurements reported here expose exactly the levers a training loop would pull: regime stability, propagation speed, timing, and block.
+The anisotropic tensor is a continuous steering field with a verified quantitative law.
+Closing the loop from this characterisation to actual training over $\phi(x,y)$ and the geometry was out of scope for the present work; the limitations of the study and the route to trained substrates are taken up in \refChap{chap:conclusions}.

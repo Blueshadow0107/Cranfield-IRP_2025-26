@@ -1,0 +1,61 @@
+% Chapter: Conclusions and Future Work
+% Pathway A framing: characterisation of a structured BZ reaction-diffusion
+% medium as a trainable analog computing substrate.
+
+\section{Summary of Contributions}
+\label{sec:conc_summary}
+
+The aim of this thesis was to characterise how a structured reaction--diffusion excitable medium processes information, treating the medium as an analog computing substrate whose structure can be understood and ultimately designed for computation.
+The work makes five main contributions.
+
+First, it justifies the choice of substrate.
+A systematic comparison of candidate physical computing families---acoustic, thermal, well-mixed chemical, DNA strand-displacement, and reaction--diffusion excitable media---concludes that a structured Belousov--Zhabotinsky (BZ) medium offers the best combination of native nonlinearity, continuous parallel space, a compact validated model, and experimental accessibility (\refChap{chap:substrates}).
+
+Second, it implements and verifies a numerical solver for the two-variable Tyson--Fife Oregonator on a two-dimensional Cartesian grid, extended with no-flux walls, a spatial light-suppression field $\phi(x,y)$, and an anisotropic activator diffusion tensor.
+The solver is verified by the method of manufactured solutions and by grid and timestep convergence studies; the Oregonator pulse speed is grid-converged within a $2.8\%$ band at the working resolution (\refSec{sec:res_verification}).
+
+Third, it establishes a black-box characterisation protocol.
+The substrate is stimulated at defined input ports and read at fixed probes; every reported result is an input--output transfer function, with no inspection of the internal field used for the measurement (\refSec{sec:meth_protocol}).
+
+Fourth, it measures a set of native transfer functions that together form a component datasheet for the substrate: near-ideal pulse transmission in straight channels, a refractory-limited maximum 1:1 following rate of $0.282$ per time unit, an inhibition gate A~AND~(NOT~B) with separation ratios above $200\times$, and continuously tunable routing delays via anisotropic diffusion patches (\refChap{chap:results}).
+
+Fifth, it demonstrates that gradient-free optimisation can discover a working routing field.
+A fixed-wall T-junction with an optimised illumination field $\phi(x,y)$ routes a single input pulse to one output probe while keeping the opposite probe below threshold (\refSec{sec:res_tjunc_train}).
+The trained field recovers the same high-$\phi$ blocking-barrier physics that hand-designed fields used earlier, so the result is better read as a feasibility demonstration than as evidence of complex learned computation.
+
+\section{Limitations}
+\label{sec:conc_limitations}
+
+The results are subject to several limitations that should be stated openly.
+The geometry is idealised to two dimensions; real BZ layers are thin but finite, and three-dimensional scroll-wave dynamics or boundary effects are not captured.
+The Oregonator is a reduced model of the full Field--K\"or\"os--Noyes chemistry; it reproduces the excitable phenomenology but does not resolve all chemical species or recipe-dependent kinetic details.
+The solver is explicit on a regular grid, so absolute speeds and timings carry a spatial discretisation error that is quantified but not eliminated at the working resolution.
+The physical speed of chemical waves---of order $0.1$~mm/s---is slow compared with electronic logic; the substrate's advantage is spatial parallelism, not latency.
+All results are numerical; no wet-lab validation in a photosensitive BZ layer has been performed.
+Finally, the work stops at characterisation: there is no closed optimisation loop that automatically designs a wall geometry or $\phi(x,y)$ for an arbitrary target input--output map.
+
+\section{Future Work}
+\label{sec:conc_future}
+
+The most direct next step is to close the loop from characterisation to training.
+Gradient-free or surrogate-based optimisers should be used to design wall geometry, the light field $\phi(x,y)$, and the anisotropic diffusion tensor field for target input--output maps, using the transfer functions measured here as the feasibility constraints on the design space.
+Because the forward solver is expensive and the loss landscape is noisy and non-differentiable, Bayesian optimisation or hybrid model-based methods are natural candidates.
+
+A second direction is uncertainty quantification and robust design.
+The parameters of the Oregonator, the illumination field, and the initial conditions are all uncertain in a real experiment.
+Polynomial chaos expansion methods have already been applied to molecular signals in fluid-dynamic channels \cite{abbaszadeh2019uncertainty}, and their extension to the reaction--diffusion channel would let trained fields be validated against parameter uncertainty before any wet-lab test \cite{guo2021molecular}.
+
+A third direction is physics-informed inference from sparse probes.
+Rather than treating the internal field as hidden, a training or calibration stage could infer the effective medium parameters from probe time series, turning the substrate into a physically informed communication channel whose state can be tracked from limited observations \cite{lin2023diversity}.
+Related to this, Koopman reduced-order models and sparse probe placement could compress the high-dimensional field dynamics into a low-dimensional state representation suitable for real-time readout and control.
+
+Longer term, experimental validation in a photosensitive ruthenium-catalysed BZ layer would test whether the measured transfer functions survive the recipe dependence, optical projection resolution, and thermal drift of a real chemical implementation.
+
+\section{Concluding Remarks}
+\label{sec:conc_remarks}
+
+This thesis began from the premise that a fluid or chemical medium can compute continuously and in parallel, and that programming such a medium means shaping its structure and property fields.
+The central argument is that characterisation must precede training: before optimising a structured reaction--diffusion substrate for a task, one must know what it already does.
+The four transfer functions reported here provide that baseline.
+They show that a BZ-type medium is not a general-purpose digital computer, but a slow, parallel, threshold-logic substrate with well-defined wiring, bandwidth, logic, and routing primitives.
+Those primitives are exactly the levers from which trainable chemical processors can be built, and the characterisation-first approach offers a general recipe for turning physical substrates into programmable analog machines.

@@ -1,0 +1,77 @@
+% Chapter: From Porous Media to Pore-Network Graphs
+
+\section{The Porous Reactor Picture}
+\label{sec:porous_picture}
+
+Consider a macroscopic block of porous solid saturated with a reacting fluid.
+The solid matrix occupies most of the volume; the remaining void space is a connected network of pores joined by narrow throats.
+When a chemical excitation is injected at one face of the block, it enters the pore network as a pulse of concentration and propagates through the fluid.
+At each throat the pulse travels at a speed set by the local chemistry and geometry; at each junction it may split, merge, annihilate with another pulse, or be blocked by refractory residue from a previous pulse.
+The output is read as a concentration signal at probes on another face.
+
+This is the physical picture that motivates the thesis.
+The internal geometry is too fine to resolve in a full three-dimensional continuum simulation of a laboratory-scale block, and the connectivity is usually unknown.
+The central move is therefore to abstract the pore space as a graph: bulbous pores become nodes and narrow throats become edges.
+The fluid dynamics inside each element are replaced by measured transfer functions, and the network-level traffic is predicted by composing those functions.
+
+The same abstraction is common in petroleum engineering and groundwater flow, where pore-network models predict multiphase flow and transport by assigning conductances to throats and solving for pressure and saturation on the graph \cite{xiong2016review, blunt2017multiphase}.
+What changes here is the physics: the transported quantity is not a passive scalar carried by pressure-driven flow, but a self-sustaining excitation pulse whose existence depends on the local reaction--diffusion state.
+The conductance analogue is a pulse transfer function, and the nodes carry memory in the form of refractory time.
+
+\section{Why Two-Dimensional Controlled Simulations}
+\label{sec:porous_why2d}
+
+A real porous reactor is three-dimensional, so why study two-dimensional channels?
+The answer is control.
+In a thin quasi-two-dimensional layer of the photosensitive BZ reaction, a projected light mask defines the suppression field $\phi(x,y)$ everywhere in the domain.
+The local kinetic parameters are therefore known and uniform across the layer, and the pulse-traffic rules can be isolated and measured.
+In a three-dimensional bulk, absorption and scattering make the interior light field unknown, so the local kinetics would be uncontrolled.
+
+Two-dimensional simulations are thus the controlled micro-scale limit of the three-dimensional porous problem.
+They provide the local operators from which a three-dimensional pore-network model can later be calibrated once a volumetric illumination strategy is chosen.
+The results in this thesis are therefore not a toy model; they are the micro-scale calibration layer that any predictive porous-medium description must rest on.
+
+\section{Pore-Network Graph Abstraction}
+\label{sec:porous_graph}
+
+The graph abstraction is straightforward.
+A pore is represented by a node; a throat by a directed or undirected edge.
+Each edge carries a transit time, the time for a pulse to travel the throat length at the measured pulse speed.
+Each node carries a refractory time, the interval after a pulse arrives during which the node will ignore further pulses.
+Some nodes also carry an inhibition window: two pulses arriving within this window annihilate.
+Finally, a routing table at each node decides which incoming edges feed which outgoing edges, encoding the junction topology.
+
+This abstraction reduces a continuous PDE problem to a discrete event simulation.
+It is fast enough to explore candidate pore networks in milliseconds, before committing to an expensive PDE simulation.
+Its validity is the main question of the thesis.
+
+\section{Local Operators}
+\label{sec:porous_operators}
+
+Four local operators are measured in the two-dimensional simulations reported in \refChap{chap:results}:
+
+\begin{itemize}
+    \item \textbf{Wire:} a straight throat transmits a pulse at a fixed speed with little attenuation.
+    \item \textbf{Low-pass filter:} a throat drops pulses that arrive faster than the refractory time permits.
+    \item \textbf{Inhibition:} at a T-junction, a pulse on one arm can block a pulse on another arm if it arrives within a short window.
+    \item \textbf{Anisotropic routing:} a tilted diffusion tensor steers pulses along preferred directions, introducing path-dependent delays.
+\end{itemize}
+
+These four operators are sufficient to build a simple graph simulator.
+More complex behaviours, such as one-way diodes or frequency-selective band-pass filters, are discussed in the literature but are not included as validated primitives here.
+A diode pilot reported in \refSec{sec:res_diode} shows that a simple asymmetric wall geometry or static light barrier does not give robust rectification in the present parameter regime, so the diode is left as an open problem.
+
+\section{Related Work on Pore-Network Models of Transport}
+\label{sec:porous_related}
+
+Pore-network models have been used for reactive transport, where species diffuse and react inside a network of pores \cite{xiong2016review, meakin2009modeling}.
+The emphasis in that literature is on effective reaction rates and dispersion, not on excitable pulses.
+Excitable media on networks have also been studied, usually by coupling discrete excitable elements according to a graph topology \cite{kinouchi2006optimal}.
+The present work differs in two ways.
+First, the local element is a continuous reaction--diffusion segment, not a discrete cellular-automaton node.
+Second, the graph parameters are not chosen by hand but extracted from PDE simulations, so the model is calibrated rather than assumed.
+
+The closest conceptual precedent is the idea of extracting discrete circuit rules from continuous excitable media.
+Gorecki \etal designed specific junction geometries to obtain logic gates and information processing devices \cite{gorecki2009information}, and Adamatzky demonstrated collision-based computing in structured BZ media \cite{adamatzky2002collision}.
+Those works build one geometry for one function.
+This thesis builds a general composition framework: measure the local rules, put them in a graph simulator, and validate the composition against PDE solutions.

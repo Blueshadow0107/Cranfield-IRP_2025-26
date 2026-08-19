@@ -1,0 +1,88 @@
+% Chapter: Candidate Substrates
+% Comparative evaluation of physical computing substrate families.
+% SHORTENED COPY-EDIT (Report/edits/, 2026-08-03): exemplar paragraphs tightened;
+% novelty-headroom column removed from tab:substrate_comparison.
+% Original untouched at chapters/substrates.tex.
+% NOTE (2026-07-30): the backbone of this chapter (the selection criteria,
+% per-family sketches, tab:substrate_comparison, and the verdict) was moved
+% out of the Introduction, where it previously formed sec:lit_substrates.
+% The label sec:lit_substrates is retained (on the closing section) so that
+% existing cross-references keep working.
+
+\section{The Substrate Search}
+\label{sec:substrate_search}
+
+This project did not begin with a fixed substrate. It began with the premise that a fluid or chemical medium should compute continuously and in parallel, and with a search for the best-suited medium. Six candidate families were evaluated: acoustic waves in porous media, free-field acoustic channel geometries, thermal and optothermal media, well-mixed chemical reaction networks, DNA strand-displacement circuits, and reaction--diffusion excitable media. The criteria: continuity and parallelism; trainability (does the medium expose structure that can act as weights?); native nonlinearity; signal speed; input/output practicality; simulation tractability; and experimental realisability.
+
+This chapter walks through that search family by family: for each, the governing physics, what the literature has achieved, what this project itself did, and why it was set aside. \refSec{sec:sub_acoustic} covers acoustics, \refSec{sec:sub_thermal} the thermal and optothermal route, \refSec{sec:sub_crn} well-mixed chemistry including DNA strand displacement, and \refSec{sec:sub_rd} the reaction--diffusion media finally selected. \refSec{sec:lit_substrates} collects the comparison in \refTab{tab:substrate_comparison} and states the rationale.
+
+\section{Acoustic Wave Computing}
+\label{sec:sub_acoustic}
+
+Sound is an intuitively appealing computing substrate: acoustic waves propagate in ordinary fluids and solids, interact strongly with structured boundaries, and are generated and detected with simple transducers. Two parameterisation styles exist. In free-field and channel geometries, the domain shape itself steers interference and scattering. In porous media, the pore architecture modulates the effective density and bulk modulus of the saturating fluid, so continuous material-property fields (porosity, flow resistivity, tortuosity) offer a trainable design space.
+
+Wave physics is the most mature branch of the physical-neural-network programme reviewed in \refSec{sec:lit_pnn}. Metamaterial slabs have performed analog mathematical operations on incident fields \cite{silva2014performing}; linear wave propagation can be written exactly as an analog recurrent neural network \cite{hughes2019wave}; deep physical networks train by backpropagation through differentiable simulations \cite{wright2022deep} or by backpropagation-free in-situ methods that sidestep the noise and differentiability barriers of real devices \cite{momeni2023backpropagation}; and a fabricated passive acoustic metamaterial with trained phase-shift elements has performed real-time object recognition \cite{weng2020meta}. Wave substrates can therefore be both trained and fabricated, which also means the headline demonstrations an MSc project might aim at have largely already been made. A further structural limitation: passive linear wave systems collapse to a single linear map regardless of depth, so nonlinearity must be imported from outside the medium \cite{mcmahon2024nonlinear}.
+
+This project investigated the free-field branch directly. With a finite-difference time-domain solver written by the author, acoustic pulses were routed through a structured Y-junction channel, and their interference at the junction reproduced elementary logic-gate behaviour at the output probe. The episode established the pulse-in, probe-out experimental grammar, localised inputs, time-series readouts, no inspection of the internal field, that the present reaction--diffusion work retains.
+
+The acoustic family was set aside on two of the selection criteria. First, native nonlinearity: at the amplitudes of interest the physics is linear and passive, so the medium shapes signals by superposition only, and every nonlinearity must be imported from the readout or the training procedure. Second, novelty headroom: acoustic logic, routing, and trained classifiers are extensively covered, and the field's own roadmaps describe it as maturing, leaving little room for an original contribution at MSc scale. The porous variant is less crowded, but its most natural trainable knob (flow resistivity) couples directly to the dissipation that destroys the coherent interference the computation depends on.
+
+\section{Thermal and Optothermal Media}
+\label{sec:sub_thermal}
+
+Heat transport in structured media is diffusive, continuous, and easily interfaced. Temperature fields can be written optically and read thermally, and they modulate other physical properties, for example the local sound speed in air, offering an indirect route to programmable wave media. Because the same diffusion equation is cheap to simulate, the thermal route has an attractive simulation-to-effort ratio.
+
+The literature records genuine but one-sided progress: analog matrix computation by topology-optimised heat conduction in simulation \cite{silva2026thermal}, thermal transistors and logic gates proposed within phononics \cite{li2012colloquium}, and thermo-optic waveguide chips trained for classification \cite{shen2017deep}. Macroscopic thermal logic, however, has never been realised experimentally despite two decades of theory \cite{li2012colloquium}, and the scaling is adverse: the thermal time constant grows with the square of device size, so the substrate slows exactly as it is scaled up.
+
+This project tested the thermal route with a candidate thermoviscous mechanism: steady heat patterns were applied along an acoustic channel to tune its transfer of acoustic energy through temperature-induced modulation of the medium. The result was null: the relevant input--output frequency ratio proved invariant across all heat patterns applied, removing the very tuning knob the approach depended on.
+
+The thermal family was set aside primarily on trainability: the project's null result removed the design handle, and external evidence on diffusive slowness and thermal crosstalk corroborates the decision. Weak nonlinearity and very slow signalling reinforced the verdict; the direction was closed early.
+
+\section{Well-Mixed Chemical Reaction Networks}
+\label{sec:sub_crn}
+
+In a well-mixed chemical computer, the state is a vector of concentrations evolving under mass-action kinetics, and the reaction rates play the role of network weights. Inputs are encoded as concentrations, outputs read from concentration levels or differences. The ``program'' is the reaction network itself, either designed reaction by reaction or realised in DNA strand-displacement chemistry, where the weights are synthesised directly as nucleotide sequences.
+
+This is the most theoretically complete family in the search. Chemical kinetics was shown early to implement neural networks, Turing machines, and universal computation \cite{hjelmfelt1991chemical, magnasco1997chemical}. A self-organising reaction network has classified temporal inputs as a reservoir computer, without any designed circuit \cite{baltussen2024chemical}. Recurrent neural chemical reaction networks provably approximate arbitrary dynamical systems and have been trained as classifiers \cite{dack2024rncrn}, and DNA winner-take-all networks have been scaled experimentally to practical pattern recognition \cite{cherry2018scaling}. Trainability, the weakest point of most physical substrates, is the strongest point of this one.
+
+This project engaged with the family on both branches. The author implemented and trained a recurrent neural chemical reaction network of the type proposed by Dack \etal \cite{dack2024rncrn} and verified that it solves XOR end-to-end, confirming that well-mixed chemistry is genuinely trainable. DNA strand-displacement winner-take-all networks were then explored as the more experimentally advanced branch, and set aside: the chemistry is slow and single-use, and its link to the fluid-mechanical framing of Project 11 is weak.
+
+The decisive criterion, however, was continuity and parallelism. A well-mixed reactor has no spatial extent by construction: all information resides in scalar concentrations, computation is neither continuous across space nor parallel across signal streams, and there is no geometry to program. The trained-XOR exercise made this concrete, the network learned, but there was nothing spatial to shape, and directly motivated the move to spatially extended media.
+
+\section{Reaction--Diffusion Excitable Media}
+\label{sec:sub_rd}
+
+Reaction--diffusion excitable media, exemplified by the Belousov--Zhabotinsky reaction (\refSec{sec:lit_bz}), spread computation across a continuous two-dimensional space. Supra-threshold perturbations launch self-sustaining pulses that propagate at a characteristic speed, cannot be re-excited behind their refractory tails, and annihilate on collision. Walls, gaps, and junctions shape the wave traffic; in the photosensitive variant, a light field $\phi(x,y)$ modulates the excitability itself. The physics, phenomenology, and Oregonator and Barkley models are reviewed in \refSec{sec:lit_chemical} and \refSec{sec:lit_bz} and not repeated here.
+
+The literature of this family, reviewed thematically in \refSec{sec:lit_chemical}, delivers what the other families miss: strong native nonlinearity in the excitation threshold, refractoriness, and annihilation of pulses; continuous parallel space in which many wave streams evolve independently; and several physically distinct parameterisations, wall geometry, the light field, anisotropic diffusion, that can serve as weights \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, sakurai2002design}. Its honest weaknesses are speed (chemical waves travel at millimetres per minute) and the difficulty of cascading gates without electronic transduction.
+
+This project has already established the family's computational footing: the author's two-dimensional solver, implementing both Oregonator and Barkley kinetics, reproduces the canonical excitable-media phenomenology verified in \refSec{sec:res_verification}, giving a trusted platform for the characterisation experiments of this thesis.
+
+The family was selected because it alone combines an A-grade native nonlinearity with continuous parallel space, a compact validated model, and a cheap room-temperature experimental path. The speed weakness is conceded from the outset as characteristic of the substrate rather than disqualifying.
+
+\section{Selection Rationale}
+\label{sec:lit_substrates}
+
+\refTab{tab:substrate_comparison} collects the six-family comparison against the selection criteria. No candidate scores well on everything; each family carries a fatal weakness, and the question is which weakness can be turned into a contribution. Acoustics is fast and tractable but linear and crowded; thermal media are uncrowded but slow, damped, and, in this project's own test, untrainable; well-mixed chemistry is trainable but spaceless; DNA computing is proven but consumable and equally spaceless.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of candidate computing substrate families against the selection criteria. The novelty-headroom criterion is omitted from the table and discussed in the text. Cell entries summarise the family's standing on each criterion.}
+\label{tab:substrate_comparison}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}>{\hspace{0pt}}p{1.7cm}>{\hspace{0pt}}p{1.6cm}>{\hspace{0pt}}p{1.6cm}>{\hspace{0pt}}p{1.3cm}>{\hspace{0pt}}p{0.9cm}>{\hspace{0pt}}p{2.0cm}>{\hspace{0pt}}p{1.5cm}>{\hspace{0pt}}p{1.6cm}@{}}
+\toprule
+& \textbf{Continuity / parallelism} & \textbf{Train-ability} & \textbf{Non-linearity} & \textbf{Speed} & \textbf{Input / output} & \textbf{Simulation tractability} & \textbf{Experimental realisability} \\
+\midrule
+Porous acoustic & continuous wave field, parallel across aperture & porosity/flow-resistivity fields, coupled to loss & weak/linear unless imported & fast & acoustic transducers & Helmholtz/FDTD solvers & 3D-printed samples \\
+Free acoustic channels & continuous wave field, parallel in channels & channel geometry only & weak/linear superposition & fast & acoustic transducers & FDTD solver implemented & simple benchtop rigs \\
+Thermal / optothermal & continuous temperature field, parallel & own null result: no usable knob found & weakly nonlinear & very slow (diffusion $\propto L^2$) & thermal/optical read/write & diffusion solvers & benchtop, slow \\
+Well-mixed CRN & scalar only, no spatial extent & reaction rates trainable as weights & strong mass-action kinetics & slow (s to min) & concentrations/fluorescence & ODEs, easy & hard wet-lab \\
+DNA strand displacement & scalar only, no spatial extent & nucleotide sequences trainable (WTA) & strong strand-displacement kinetics & very slow & fluorescence & ODEs, easy & demonstrated, consumable \\
+Reaction--diffusion (BZ) & continuous 2D excitable field, parallel wave streams & geometry, light field $\phi(x,y)$, anisotropic tensor & strong excitable threshold, refractoriness, annihilation & slow (mm/min) & light in, optical imaging out & Oregonator solver verified & cheap room-temp BZ layers \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The comparison in \reftab{tab:substrate_comparison} converges on reaction--diffusion excitable media. RD wins on the criteria that matter most for this thesis: native nonlinearity, spatial continuity with parallelism, simulation tractability through a validated compact model, and experimental cost. It is also the only family whose weakest criterion, trainability, is an open research gap rather than a closed verdict: nobody has systematically characterised what a structured RD substrate computes, and nobody has trained its geometry or its light field. Its concession is speed, accepted as a limitation of the substrate rather than a flaw in the premise. The rest of this thesis treats a structured Oregonator medium as the computing substrate and asks what it natively computes.

@@ -1,0 +1,114 @@
+\documentclass[12pt,oneside]{book}
+
+\usepackage{CUThesis2025}
+\usepackage{lscape}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+%% --- THESIS METADATA --- %%
+\title{Fluid Neural Networks: Computations Over Continuous Reactions}
+\author{Srivijayesh Venugopal}
+\date{September 2026}
+\faculty{\FEAS}
+\course{Computational Fluid Dynamics}
+\degree{MSc}
+\supervisor{Prof. Weisi Guo}
+\academicyear{2025--2026}
+\copyrightyear{2026}
+
+\begin{document}
+
+\maketitle
+\frontmatter
+
+%% --- ABSTRACT --- %%
+\begin{abstract}
+This thesis characterises a light-sensitive Belousov--Zhabotinsky (BZ) reaction--diffusion medium as a structured molecular-communication substrate.
+The dynamics are modelled by the two-variable Tyson--Fife Oregonator with a spatial light-suppression field $\phi(x,y)$.
+A verified explicit finite-difference solver is used in a black-box protocol to measure native input--output transfer functions: pulse transmission along channels, refractory-limited frequency response, two-input collision logic, and anisotropic routing.
+Measurements show a near-ideal channel wire, a maximum 1:1 following rate of 0.167 per time unit under the dark-spot drive, an inhibition gate A~AND~(NOT~B) with separation ratios above $200\times$, and anisotropic patch delays that vary continuously with fibre angle.
+Polynomial-chaos/Sobol sensitivity analysis quantifies how uncertainty in the kinetic parameters propagates into pulse speed and amplitude, giving the characterisation a robustness layer.
+A trainable light-field T-junction demonstrates that a static $\phi(x,y)$ can route single pulses, while a band-pass frequency-discrimination task returns a negative training result that marks the practical limit of simple light-field modulation.
+The work provides a component-level characterisation of the substrate---the prerequisite for designing trained chemical processors---and identifies physics-informed parameter inference and reduced-order modelling as the next steps toward closed-loop design.
+\end{abstract}
+
+\begin{keywords}
+physical neural networks, reaction-diffusion computing, excitable media,
+Belousov--Zhabotinsky reaction, Oregonator model, analog computation,
+molecular communication, unconventional computing, neuromorphic engineering
+\end{keywords}
+
+%% --- ACKNOWLEDGEMENTS --- %%
+\chapter*{Acknowledgements}
+I would like to thank my supervisors, Professor Weisi Guo, Professor Panagiotis Takis Tsoutsanis, and Professor Tamas Josza for their guidance and support throughout this research project.
+
+%% --- FRONT MATTER --- %%
+{
+\clearpage
+\singlespacing
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+}
+
+\begin{listofabbreviations}
+    \abbrev{RD}{Reaction--Diffusion}
+    \abbrev{BZ}{Belousov--Zhabotinsky}
+    \abbrev{CRN}{Chemical Reaction Network}
+    \abbrev{RNCRN}{Recurrent Neural Chemical Reaction Network}
+    \abbrev{PNN}{Physical Neural Network}
+    \abbrev{RNN}{Recurrent Neural Network}
+    \abbrev{ODE}{Ordinary Differential Equation}
+    \abbrev{PDE}{Partial Differential Equation}
+    \abbrev{BC}{Boundary Condition}
+    \abbrev{FDTD}{Finite-Difference Time-Domain}
+    \abbrev{CFD}{Computational Fluid Dynamics}
+\end{listofabbreviations}
+
+%% --- MAIN MATTER --- %%
+\mainmatter
+\pagestyle{fancy}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\nouppercase{\rightmark}}
+
+\chapter{Introduction}
+\label{chap:introduction}
+\input{chapters/introduction}
+
+\chapter{Candidate Substrates}
+\label{chap:substrates}
+\input{chapters/substrates}
+
+% NOTE (2026-07-30): the former "Literature Review" chapter was merged into
+% the Introduction chapter above; chapters/literature_review.tex is now a stub.
+
+\chapter{Methods}
+\label{chap:methodology}
+\input{chapters/methods}
+
+\chapter{Results and Discussion}
+\label{chap:results}
+\input{chapters/results}
+
+\chapter{Conclusions and Future Work}
+\label{chap:conclusions}
+\input{chapters/conclusions}
+
+%% --- BACK MATTER --- %%
+\renewcommand{\bibname}{References}
+\bibliographystyle{vancouver}
+\bibliography{references}
+
+\appendix
+\chapter{Additional Derivations}
+\label{app:derivations}
+All derivations, model equations, and convergence data required to reproduce the reported transfer functions are presented in the main chapters. No supplementary derivations are needed.
+
+\end{document}
