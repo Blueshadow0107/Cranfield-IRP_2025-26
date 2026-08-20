@@ -1,0 +1,63 @@
+{
+  "test": "merge / OR-with-timing (dark-spot Oregonator)",
+  "grid": [
+    180,
+    140
+  ],
+  "runtime_s": 160.25925064086914,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0,
+    "u_thresh": 0.2
+  },
+  "delays": [
+    {
+      "delay_tu": -6.0,
+      "peak": 0.36016072758710943,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": -3.0,
+      "peak": 0.36016072758710943,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": -1.5,
+      "peak": 0.36016072758710943,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": 0.0,
+      "peak": 0.3563622752321729,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": 1.5,
+      "peak": 0.36015665668095975,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": 3.0,
+      "peak": 0.3601570807797003,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    },
+    {
+      "delay_tu": 6.0,
+      "peak": 0.3601569507147397,
+      "arrival_tu": 13.75,
+      "n_crossings": 1
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "test": "sub-excitable wave-fragment pilot",
+  "grid": [
+    200,
+    200
+  ],
+  "runtime_s": 152.68108677864075,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0,
+    "u_thresh": 0.5
+  },
+  "fragment_scan": [
+    {
+      "phi0": 0.01,
+      "label": "phi=0.01",
+      "active_cells": 542,
+      "peak_u": 0.7458288564680038,
+      "rest_state": 0.0030821
+    },
+    {
+      "phi0": 0.009,
+      "label": "phi=0.009",
+      "active_cells": 557,
+      "peak_u": 0.7501110651213314,
+      "rest_state": 0.0030821
+    },
+    {
+      "phi0": 0.008,
+      "label": "phi=0.008",
+      "active_cells": 558,
+      "peak_u": 0.7509850409679107,
+      "rest_state": 0.0030821
+    },
+    {
+      "phi0": 0.007,
+      "label": "phi=0.007",
+      "active_cells": 584,
+      "peak_u": 0.7482011995234936,
+      "rest_state": 0.0030821
+    },
+    {
+      "phi0": 0.006,
+      "label": "phi=0.006",
+      "active_cells": 0,
+      "peak_u": 0.004085455792344563,
+      "rest_state": 0.0030821
+    },
+    {
+      "phi0": 0.005,
+      "label": "phi=0.005",
+      "active_cells": 0,
+      "peak_u": 0.004606574960789113,
+      "rest_state": 0.0030821
+    }
+  ],
+  "best_phi0": 0.006,
+  "collision": {
+    "phi0": 0.006,
+    "centre_peak": 0.737040102522493,
+    "n_crossings": 1
+  }
+}

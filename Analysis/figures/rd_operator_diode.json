@@ -1,0 +1,32 @@
+{
+  "test": "asymmetric diode junction (dark-spot Oregonator)",
+  "grid": [
+    200,
+    100
+  ],
+  "runtime_s": 14.860235691070557,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0,
+    "u_thresh": 0.5
+  },
+  "forward": {
+    "direction": "forward",
+    "peak": 0.0030820999329396925,
+    "arrival_tu": null,
+    "n_crossings": 0
+  },
+  "reverse": {
+    "direction": "reverse",
+    "peak": 0.0030820999329396925,
+    "arrival_tu": null,
+    "n_crossings": 0
+  },
+  "extinction_ratio": 1.0
+}

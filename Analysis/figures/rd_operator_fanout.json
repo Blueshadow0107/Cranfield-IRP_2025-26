@@ -1,0 +1,30 @@
+{
+  "test": "fan-out splitter (dark-spot Oregonator)",
+  "grid": [
+    160,
+    160
+  ],
+  "runtime_s": 24.454488039016724,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.05014844822490394,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi0": 0.01,
+    "phi_dark": 0.002,
+    "t_flash_tu": 3.0
+  },
+  "outputs": {
+    "up": {
+      "peak": 0.36288221184709757,
+      "arrival_tu": 15.3,
+      "n_crossings": 1
+    },
+    "down": {
+      "peak": 0.36130760872900464,
+      "arrival_tu": 16.45,
+      "n_crossings": 1
+    }
+  }
+}
