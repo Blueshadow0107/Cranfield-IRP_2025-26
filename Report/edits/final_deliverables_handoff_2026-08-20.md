@@ -64,8 +64,14 @@ A composed logic task was added to demonstrate scaling from single gates to a sm
 
 **3D PDE validation** (`Analysis/rd_mux_3d_pde.py`):
 - 80^3 Oregonator geometry with A, S, and B channels meeting at a shared output stem.
-- Four one-hot patterns run in parallel across four workers.
-- Status: in progress (background run started 2026-08-20). Results will appear in `Analysis/figures/rd_mux_3d_pde.json`.
+- Four one-hot patterns run in parallel across four workers; runtime 1775 s (~30 min).
+- Result: **boundary/negative result**. The select pulse S fails to block A.
+  - S=0, A=1, B=0: output fires (A passes), arrival 9.15 t.u. — correct.
+  - S=1, A=1, B=0: output still fires, arrival 8.0 t.u. — **incorrect**, S did not inhibit A.
+  - S=0, A=0, B=1: output fires (B passes), arrival 5.7 t.u. — correct.
+  - S=1, A=0, B=1: output fires (B passes), arrival 5.7 t.u. — correct.
+- Interpretation: the current junction geometry/timing does not produce a usable refractory inhibition in 3D. Likely causes: S path is not short enough relative to A, or the 3D wave geometry does not create a clean refractory shadow at the junction. The graph simulator still demonstrates that the composed MUX task is accessible once the gate-level 3D inhibition is fixed.
+- Results saved to `Analysis/figures/rd_mux_3d_pde.json`.
 
 ## Additional operator pilots (2026-08-20)
 
@@ -84,16 +90,15 @@ These pilots are in `Analysis/rd_operator_*.py` with JSON/PNG outputs in `Analys
 ## Git
 
 Latest commits on `main`:
+- `9a853e5` — Add 3D PDE 2-to-1 MUX validation (boundary result: S fails to block A)
+- `575ff0f` — Update handoff with MUX status and in-flight 3D PDE validation
 - `bdd08e7` — Add graph-simulator 2-to-1 multiplexer
 - `aa73b88` — Update handoff with additional operator pilot findings
 - `2fc6439` — Add additional operator pilots and results
-- `0a520ab` — Add LaTeX poster source and original PPT template
-- `16fea74` — Insert figures and polish porous-reframed thesis chapters
 
 All pushed to `origin main`.
 
-**Untracked / in flight:**
-- `Analysis/rd_mux_3d_pde.py` — running background PDE validation; commit after JSON output is produced.
+Nothing untracked remains.
 
 ## Recommended order for your final pass
 
