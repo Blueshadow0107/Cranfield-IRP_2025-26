@@ -85,6 +85,15 @@ The usable computing window is therefore
 \end{equation}
 and the working point $\phi = 0.010$ lies near its centre.
 
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_regime_map.png}{%
+\includegraphics[width=0.85\textwidth]{../Analysis/figures/pub/pub_regime_map.png}}{%
+[figure pending]}
+\caption{Oregonator regime map in the $(\varepsilon, \phi)$ plane. The excitable propagation band lies between the oscillatory and attenuated regimes; the working point is marked near the centre of the band.}
+\label{fig:meth_regime}
+\end{figure}
+
 \section{Numerical Solver and Verification}
 \label{sec:meth_solver}
 
@@ -141,6 +150,15 @@ The internal state away from ports and probes is not inspected for a measurement
 
 The dark-spot drive is a one-shot flash of darkness: a circular patch is dimmed from $\phi = 0.010$ to $\phi = 0.002$ for a calibrated duration.
 Flashes of $T_{\mathrm{flash}} \leq 4$ time units emit exactly one full-amplitude pulse; the operating point used here is $T_{\mathrm{flash}} = 3.0$ time units.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_flash_calibration.png}{%
+\includegraphics[width=0.85\textwidth]{../Analysis/figures/pub/pub_flash_calibration.png}}{%
+[figure pending]}
+\caption{Dark-spot flash calibration. Flash durations up to 4 time units emit a single pulse; longer flashes become sustained pacemakers. The operating point $T_{\mathrm{flash}} = 3.0$ time units is marked.}
+\label{fig:meth_flash}
+\end{figure}
 
 Probe readouts are evaluated within defined time windows rather than over the whole record, because at an open junction a lone pulse diffracts into all connected branches and a whole-record readout would compute OR regardless of design intent.
 The window is aligned to the expected collision outcome, isolating the annihilation event from the unconditional diffraction background.

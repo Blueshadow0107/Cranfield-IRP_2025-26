@@ -4,7 +4,17 @@
 \label{sec:res_verification}
 
 Before any transfer function was trusted, the solver was verified by the method of manufactured solutions and by grid and timestep convergence studies.
+\reffig{fig:res_verification} summarises the canonical test cases used to validate the solver against known excitable-media phenomenology.
 \reffig{fig:res_mms} shows the measured error norms against grid spacing and time step.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_verification.png}{%
+\includegraphics[width=0.95\textwidth]{../Analysis/figures/pub/pub_verification.png}}{%
+[figure pending]}
+\caption{Solver verification gallery: target waves, head-on collision and annihilation, gap diffraction, and timing control in the Oregonator model.}
+\label{fig:res_verification}
+\end{figure}
 The observed spatial convergence orders at the finest refinement interval are $2.09$, $2.09$, and $1.99$ for Barkley isotropic, Barkley anisotropic, and Oregonator cases, against a design order of $2$.
 The observed temporal orders are approximately $1.0$ across all cases, matching the first-order operator splitting.
 
@@ -50,8 +60,17 @@ The pulse transmits with undiminished amplitude, and no geometric wave block was
 
 The physics is that a planar front has zero curvature, so the eikonal curvature correction to its speed vanishes \cite{keener1991eikonal}.
 The no-flux walls impose a zero normal derivative that a planar front already satisfies, so propagation in the channel is equivalent to a one-dimensional cable.
-A straight channel is therefore a near-perfect wire whose speed and amplitude are set by the kinetics alone; width offers no computing leverage.
+A straight channel is therefore a near-perfect wire whose speed and amplitude are set by the kinetics alone; width offers no computational advantage.
 Structure that computes must come from junctions, curvature, or property fields.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}}{%
+[figure pending]}
+\caption{Channel pulse transfer with the dark-spot drive. A single pulse travels at the free-medium speed independent of channel width, confirming that a straight throat acts as a near-perfect wire.}
+\label{fig:res_channel}
+\end{figure}
 
 \section{Frequency Response}
 \label{sec:res_frequency}
@@ -101,12 +120,30 @@ Pattern & Output peak & Output fires? \\
 The separation ratio between the true output (0.706) and the strongest false output (0.003) is over $200\times$.
 This inhibition operator is one of the primitives used in the graph simulator.
 
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}}{%
+[figure pending]}
+\caption{T-junction inhibition gate with windowed readout. A alone reaches the output; B alone and A+B are suppressed, giving A AND (NOT B).}
+\label{fig:res_logic}
+\end{figure}
+
 \section{Anisotropic Routing}
 \label{sec:res_anisotropy}
 
 A uniform anisotropic diffusion tensor with ratio $r = D_{\parallel}/D_{\perp}$ produces elliptical wave fronts whose fast-to-slow speed ratio is $\sqrt{r}$, confirming the eikonal prediction \cite{keener1991eikonal}.
 A patch of anisotropic medium embedded in an isotropic substrate introduces direction-dependent delays.
 This gives a continuous routing knob that neither walls nor light provide.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_anisotropic_routing.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_anisotropic_routing.png}}{%
+[figure pending]}
+\caption{Anisotropic routing. Elliptical wave fronts in a uniform tilted tensor field follow the eikonal $\sqrt{r}$ speed law, and an embedded anisotropic patch produces orientation-dependent delays.}
+\label{fig:res_anisotropy}
+\end{figure}
 
 \section{Graph-Simulator Validation}
 \label{sec:res_graph}
@@ -130,10 +167,10 @@ The routing table at J sends A to OUT and B nowhere.
 \toprule
 Pattern & Graph output & Graph arrival (t.u.) & PDE output peak & Match? \\
 \midrule
-00 & none & --- & 0.000 & yes \\
-01 & none & --- & 0.003 & yes \\
+00 & none & none & 0.000 & yes \\
+01 & none & none & 0.003 & yes \\
 10 & fires & 31.9 & 0.706 & yes \\
-11 & none & --- & 0.003 & yes \\
+11 & none & none & 0.003 & yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -156,7 +193,7 @@ Arm A is shorter, so it reaches the junction first and makes it refractory; a co
 \toprule
 Pattern & Graph output & PDE output & Winner \\
 \midrule
-00 & none & none & --- \\
+00 & none & none & none \\
 01 (B only) & 1 pulse & 1 pulse & B \\
 10 (A only) & 1 pulse & 1 pulse & A \\
 11 (A+B) & 1 pulse & 1 pulse & A (shorter path) \\
@@ -199,6 +236,15 @@ However, pattern $011$ (both data pulses active, control absent) fails because B
 This is a network-level crosstalk not captured by single-junction primitives.
 It shows that the graph simulator must be calibrated per junction shape and that shared channels can introduce unmodelled coupling.
 
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_multi_gate_pde_snapshots.png}{%
+\includegraphics[width=0.95\textwidth]{../Analysis/figures/rd_multi_gate_pde_snapshots.png}}{%
+[figure pending]}
+\caption{Shared-control multi-junction gate. A single control pulse blocks both data paths, but pattern $011$ produces crosstalk when B1 enters the shared control channel and blocks J2 before B2 arrives.}
+\label{fig:res_graph_multi}
+\end{figure}
+
 \section{Geometry-Dependent Failure of Collision XOR}
 \label{sec:res_xor}
 
@@ -222,7 +268,17 @@ Pattern & Graph prediction & PDE (chamber $R = 25$) \\
 \end{table}
 
 The leak occurs because extended channel fronts collide but the excitation curves around the annihilation point and re-ignites the output stem.
+Pattern $11$ still triggers crossings in the output arms, so the chamber geometry does not achieve clean collision XOR.
 This confirms that inhibition rules are geometry-dependent: the graph model must be PDE-calibrated per junction shape, not assumed universal.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_spot_xor_protocol.png}{%
+\includegraphics[width=0.95\textwidth]{../Analysis/figures/rd_spot_xor_protocol.png}}{%
+[figure pending]}
+\caption{Collision-XOR baseline in a chambered Y-junction. Lone input pulses reach the output, but the coincident-pulse case leaks because the collision re-ignites the output stem.}
+\label{fig:res_xor}
+\end{figure}
 
 \section{Three-Dimensional Inhibition Gate}
 \label{sec:res_3d}
@@ -255,6 +311,15 @@ The 3D channel pulse speed is $6.62$ cells per time unit, close to the 2D value 
 This shows that the micro-scale operators do transfer to a thin-slab 3D geometry once the junction shape is controlled.
 A full 3D multi-gate network remains future work.
 
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_3d_transfer_logic_snapshots.png}{%
+\includegraphics[width=0.95\textwidth]{../Analysis/figures/rd_3d_transfer_logic_snapshots.png}}{%
+[figure pending]}
+\caption{Three-dimensional T-junction inhibition gate. A alone reaches the output; B alone and A+B are suppressed after closing the B outlet arm and scaling the geometry.}
+\label{fig:res_3d}
+\end{figure}
+
 \section{One-Way Diode Pilot}
 \label{sec:res_diode}
 
@@ -282,12 +347,30 @@ The light-only barrier is symmetric because the static $\phi$ field spans both d
 A simple asymmetric taper or static light barrier is therefore insufficient for robust rectification in the present parameter regime.
 The diode is left as an open problem; candidate fixes include angled branches, absorbing side chambers, or timed refractory structures.
 
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/rd_diode_pilot_series.png}{%
+\includegraphics[width=0.95\textwidth]{../Analysis/figures/rd_diode_pilot_series.png}}{%
+[figure pending]}
+\caption{One-way diode pilot. Asymmetric wall geometry, a static light barrier, and a hybrid of the two all fail to give a robust forward-to-reverse extinction ratio in the present parameter regime.}
+\label{fig:res_diode}
+\end{figure}
+
 \section{Uncertainty Quantification}
 \label{sec:res_uq}
 
 A one-at-a-time sensitivity analysis propagates $\pm 10\%$ uncertainty in the kinetic parameters $\varepsilon$, $f$, $\phi$, and $D_{u}$ to the channel pulse speed and amplitude.
 The parameter $f$ dominates the probe peak amplitude, while $\varepsilon$ dominates the pulse speed; $\phi$ and $D_{u}$ have smaller but non-negligible effects.
 This gives the characterisation a robustness layer and identifies which parameters must be constrained most tightly in any future experimental realisation.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{../Analysis/figures/pub/pub_sobol_indices.png}{%
+\includegraphics[width=0.9\textwidth]{../Analysis/figures/pub/pub_sobol_indices.png}}{%
+[figure pending]}
+\caption{One-at-a-time sensitivity of the channel pulse speed and amplitude to $\pm 10\%$ uncertainty in the kinetic parameters. $f$ dominates the amplitude and $\varepsilon$ dominates the speed.}
+\label{fig:res_uq}
+\end{figure}
 
 \section{Training Attempt}
 \label{sec:res_train}
