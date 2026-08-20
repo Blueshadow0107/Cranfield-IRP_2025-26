@@ -1,0 +1,107 @@
+{
+  "test": "2-to-1 multiplexer (graph simulator)",
+  "parameters": {
+    "channel_speed": 6.46411888154886,
+    "refractory_time": 3.0,
+    "inhibition_window": 1.0,
+    "pulse_amplitude": 0.7264304595123359
+  },
+  "truth_table": [
+    {
+      "S": 0,
+      "A": 0,
+      "B": 0,
+      "selected": "A",
+      "output_peak": 0.0,
+      "output_fires": false,
+      "events": []
+    },
+    {
+      "S": 0,
+      "A": 0,
+      "B": 1,
+      "selected": "A",
+      "output_peak": 0.0,
+      "output_fires": false,
+      "events": []
+    },
+    {
+      "S": 0,
+      "A": 1,
+      "B": 0,
+      "selected": "A",
+      "output_peak": 0.7264304595123359,
+      "output_fires": true,
+      "events": [
+        {
+          "t": 7.73500625780873,
+          "selected": "A",
+          "amp": 0.7264304595123359
+        }
+      ]
+    },
+    {
+      "S": 0,
+      "A": 1,
+      "B": 1,
+      "selected": "A",
+      "output_peak": 0.7264304595123359,
+      "output_fires": true,
+      "events": [
+        {
+          "t": 7.73500625780873,
+          "selected": "A",
+          "amp": 0.7264304595123359
+        }
+      ]
+    },
+    {
+      "S": 1,
+      "A": 0,
+      "B": 0,
+      "selected": "B",
+      "output_peak": 0.0,
+      "output_fires": false,
+      "events": []
+    },
+    {
+      "S": 1,
+      "A": 0,
+      "B": 1,
+      "selected": "B",
+      "output_peak": 0.7264304595123359,
+      "output_fires": true,
+      "events": [
+        {
+          "t": 7.73500625780873,
+          "selected": "B",
+          "amp": 0.7264304595123359
+        }
+      ]
+    },
+    {
+      "S": 1,
+      "A": 1,
+      "B": 0,
+      "selected": "B",
+      "output_peak": 0.0,
+      "output_fires": false,
+      "events": []
+    },
+    {
+      "S": 1,
+      "A": 1,
+      "B": 1,
+      "selected": "B",
+      "output_peak": 0.7264304595123359,
+      "output_fires": true,
+      "events": [
+        {
+          "t": 7.73500625780873,
+          "selected": "B",
+          "amp": 0.7264304595123359
+        }
+      ]
+    }
+  ]
+}
