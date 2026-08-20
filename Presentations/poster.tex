@@ -1,0 +1,150 @@
+\documentclass[final,hyperref={pdfpagelabels=false}]{beamer}
+\usepackage[orientation=landscape,size=a1,scale=1.4]{beamerposter}
+\usecolortheme{seahorse}
+\useinnertheme{rounded}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+
+\definecolor{CranfieldBlue}{RGB}{0,51,102}
+\setbeamercolor{title}{fg=CranfieldBlue}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{institute}{fg=black}
+\setbeamercolor{block title}{bg=CranfieldBlue,fg=white}
+\setbeamercolor{block body}{bg=white,fg=black}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+
+\title{From Measured Pore-Scale Operators to Network-Level Prediction in a Structured Belousov--Zhabotinsky Reactor}
+\author{Srivijayesh Venugopal}
+\institute{Supervisor: Prof. Weisi Guo\\Cranfield University, MSc Computational Fluid Dynamics}
+
+\newcommand{\email}[1]{}
+
+\begin{document}
+\begin{frame}[t]{}
+
+\begin{columns}[T]
+
+% ---------------------------------------------------------------------------
+% Column 1
+% ---------------------------------------------------------------------------
+\begin{column}{0.32\paperwidth}
+
+\begin{block}{Motivation}
+Digital inference is limited by the von Neumann bottleneck. Physical neural networks use the material itself as the computer: inputs are excitations, structure is the weights, and outputs are probe readings. We treat a structured Belousov--Zhabotinsky (BZ) reaction--diffusion reactor as a porous computing substrate.
+\end{block}
+
+\begin{block}{Porous reactor picture}
+A macroscopic porous block is a network of pores (nodes) connected by throats (edges). Full 3D continuum simulation is too expensive. Instead, we abstract the geometry as a graph and calibrate each element with controlled 2D simulations.
+\end{block}
+
+\begin{block}{Model and solver}
+The two-variable Tyson--Fife Oregonator with photosensitive suppression:
+\begin{align*}
+\frac{\partial u}{\partial t} &= \frac{1}{\varepsilon}\left[u-u^2-(fv+\phi)\frac{u-q}{u+q}\right]+\nabla\!\cdot\!(\mathbf{D}\nabla u),\\
+\frac{\partial v}{\partial t} &= u-v.
+\end{align*}
+An explicit finite-difference solver with operator splitting and adaptive reaction subcycling is verified against manufactured solutions.
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\columnwidth]{../Analysis/figures/pub/pub_verification.png}
+\caption{Solver verification: target waves, collision annihilation, and gap diffraction.}
+\end{figure}
+
+\end{column}
+
+% ---------------------------------------------------------------------------
+% Column 2
+% ---------------------------------------------------------------------------
+\begin{column}{0.32\paperwidth}
+
+\begin{block}{Measured pore-scale operators}
+Four native operators are isolated with a black-box dark-spot protocol.
+\end{block}
+
+\begin{block}{1. Wire}
+A straight throat transmits a pulse at the kinetic speed with almost no width dependence.
+\begin{itemize}
+\item 2D channel speed: 6.46 cells/t.u.
+\item 3D channel speed: 6.62 cells/t.u.
+\end{itemize}
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.85\columnwidth]{../Analysis/figures/pub/pub_channel_transfer_darkspot.png}
+\caption{Channel pulse transfer: speed is independent of channel width.}
+\end{figure}
+
+\begin{block}{2. Low-pass filter}
+Refractoriness sets the maximum signalling frequency. Absolute refractory period: 3.0 t.u.; max 1:1 following rate: 0.167 t.u.$^{-1}$.
+\end{block}
+
+\begin{block}{3. Inhibition gate}
+At a T-junction, a pulse on one arm blocks the other within a short window. A AND (NOT B) is obtained with separation $>200\times$.
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.85\columnwidth]{../Analysis/figures/pub/pub_tjunction_logic_darkspot.png}
+\caption{T-junction inhibition gate truth-table traces.}
+\end{figure}
+
+\begin{block}{4. Anisotropic routing}
+A tilted diffusion tensor steers pulses; the fast-to-slow speed ratio follows the eikonal $\sqrt{r}$ law.
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.85\columnwidth]{../Analysis/figures/pub/pub_anisotropic_routing.png}
+\caption{Anisotropic routing: elliptical fronts and embedded-patch delay.}
+\end{figure}
+
+\end{column}
+
+% ---------------------------------------------------------------------------
+% Column 3
+% ---------------------------------------------------------------------------
+\begin{column}{0.32\paperwidth}
+
+\begin{block}{Graph simulator}
+The measured operators become an event-driven graph simulator: edges carry transit times, nodes carry refractory and inhibition windows. It predicts pulse traffic before an expensive PDE run.
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\columnwidth]{../Analysis/figures/rd_multi_gate_pde_snapshots.png}
+\caption{Shared-control multi-junction gate: A blocks both data paths.}
+\end{figure}
+
+\begin{block}{Boundary experiments}
+\begin{itemize}
+\item 3D inhibition gate transfers cleanly: 16.8$\times$ separation, A arrival 8.25 t.u.
+\item Collision XOR leaks in free medium and in a simple chamber; junction geometry must be calibrated.
+\item A simple one-way diode is not robust in this regime.
+\end{itemize}
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.42\columnwidth]{../Analysis/figures/rd_3d_transfer_logic_snapshots.png}
+\hfill
+\includegraphics[width=0.42\columnwidth]{../Analysis/figures/rd_spot_xor_protocol.png}
+\caption{Left: 3D inhibition gate. Right: free-medium collision XOR baseline.}
+\end{figure}
+
+\begin{block}{Conclusions}
+Network-level pulse routing in a structured excitable medium can be predicted from micro-scale transfer functions, but only when each junction geometry is carried explicitly. Next steps: a shape-resolved junction library, volumetric 3D illumination, and experimental calibration.
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+\end{document}
