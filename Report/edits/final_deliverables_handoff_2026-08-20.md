@@ -53,6 +53,20 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 - Use `MScCFD_Poster.pptx` if you want to edit text or move blocks in PowerPoint.
 - The PPTX was not converted to PDF because LibreOffice is not installed and I do not have sudo access on this machine.
 
+## 2-to-1 multiplexer (2026-08-20)
+
+A composed logic task was added to demonstrate scaling from single gates to a small network.
+
+**Graph simulator** (`Analysis/rd_mux_graph.py`):
+- Stateful switch-node model built from the measured channel speed, refractory time, and inhibition window.
+- All eight S,A,B input patterns pass: output = A when S=0, output = B when S=1.
+- Results saved to `Analysis/figures/rd_mux_graph.json` and `rd_mux_graph.png`.
+
+**3D PDE validation** (`Analysis/rd_mux_3d_pde.py`):
+- 80^3 Oregonator geometry with A, S, and B channels meeting at a shared output stem.
+- Four one-hot patterns run in parallel across four workers.
+- Status: in progress (background run started 2026-08-20). Results will appear in `Analysis/figures/rd_mux_3d_pde.json`.
+
 ## Additional operator pilots (2026-08-20)
 
 Four quick pilots were run to see what other graph operators are available in the same substrate.
@@ -70,12 +84,16 @@ These pilots are in `Analysis/rd_operator_*.py` with JSON/PNG outputs in `Analys
 ## Git
 
 Latest commits on `main`:
-- `16fea74` — Insert figures and polish porous-reframed thesis chapters
-- `cfec365` — Add MSc CFD poster: populated PPTX with porous-reactor BZ content and figures
-- `0a520ab` — Add LaTeX poster source and original PPT template
+- `bdd08e7` — Add graph-simulator 2-to-1 multiplexer
+- `aa73b88` — Update handoff with additional operator pilot findings
 - `2fc6439` — Add additional operator pilots and results
+- `0a520ab` — Add LaTeX poster source and original PPT template
+- `16fea74` — Insert figures and polish porous-reframed thesis chapters
 
 All pushed to `origin main`.
+
+**Untracked / in flight:**
+- `Analysis/rd_mux_3d_pde.py` — running background PDE validation; commit after JSON output is produced.
 
 ## Recommended order for your final pass
 
