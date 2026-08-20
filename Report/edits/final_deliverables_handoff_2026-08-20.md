@@ -53,12 +53,27 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 - Use `MScCFD_Poster.pptx` if you want to edit text or move blocks in PowerPoint.
 - The PPTX was not converted to PDF because LibreOffice is not installed and I do not have sudo access on this machine.
 
+## Additional operator pilots (2026-08-20)
+
+Four quick pilots were run to see what other graph operators are available in the same substrate.
+
+**In the current regime:**
+- **Fan-out splitter** (`rd_operator_fanout.py`): a symmetric Y-junction copies a single input pulse to two output arms. Up arm arrival 15.3 t.u., down arm 16.45 t.u. This is a usable graph rule: one incoming edge triggers multiple outgoing edges with measured per-arm delays.
+- **Merge / OR-with-timing** (`rd_operator_or_merge.py`): two opposing inputs converging on a vertical output stem produce an output for every tested relative delay (-6 to +6 t.u.). The peak is almost independent of delay, so the geometry acts more like a passive combiner than a true OR/AND discriminator. A different junction shape would be needed to get a sharp delay-dependent response.
+
+**Out of regime:**
+- **Asymmetric diode** (`rd_operator_diode.py`): a ramp-plus-step channel blocked the pulse in both forward and reverse directions. The result confirms that a simple asymmetric wall is not enough for robust rectification; a more sophisticated shape (angled branches, absorbing side chambers) is needed.
+- **Sub-excitable wave fragment** (`rd_operator_subexcitable_pilot.py`): lowering phi0 toward the propagation threshold (0.006) extinguishes propagation; at 0.007 a full target wave still forms. No clean stable wave-fragment window was found in the scanned range with the chosen spot size, so collision-based fragment logic is not immediately accessible without a finer parameter search or a smaller spot.
+
+These pilots are in `Analysis/rd_operator_*.py` with JSON/PNG outputs in `Analysis/figures/`.
+
 ## Git
 
 Latest commits on `main`:
 - `16fea74` — Insert figures and polish porous-reframed thesis chapters
 - `cfec365` — Add MSc CFD poster: populated PPTX with porous-reactor BZ content and figures
 - `0a520ab` — Add LaTeX poster source and original PPT template
+- `2fc6439` — Add additional operator pilots and results
 
 All pushed to `origin main`.
 
