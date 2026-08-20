@@ -1,0 +1,52 @@
+{
+  "test": "2-to-1 multiplexer (3D PDE)",
+  "grid": [
+    80,
+    80,
+    80
+  ],
+  "runtime_s": 1774.65638422966,
+  "parameters": {
+    "f": 1.4375,
+    "eps": 0.0501,
+    "q": 0.002,
+    "Du": 1.0,
+    "Dv": 0.0,
+    "phi0": 0.01,
+    "u_thresh": 0.2
+  },
+  "truth_table": [
+    {
+      "S": 0,
+      "A": 1,
+      "B": 0,
+      "peak": 0.5210784492875824,
+      "arrival_tu": 9.15,
+      "n_crossings": 1
+    },
+    {
+      "S": 1,
+      "A": 1,
+      "B": 0,
+      "peak": 0.5228531726524128,
+      "arrival_tu": 8.0,
+      "n_crossings": 1
+    },
+    {
+      "S": 0,
+      "A": 0,
+      "B": 1,
+      "peak": 0.5229750120773501,
+      "arrival_tu": 5.7,
+      "n_crossings": 1
+    },
+    {
+      "S": 1,
+      "A": 0,
+      "B": 1,
+      "peak": 0.5229832038494935,
+      "arrival_tu": 5.7,
+      "n_crossings": 1
+    }
+  ]
+}
