@@ -50,7 +50,7 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 **LaTeX version:** `Presentations/poster.tex`
 - A0 landscape beamerposter.
 - Compiled PDF: `Presentations/poster.pdf`.
-- Updated with: substrate-selection block, graph-simulator MUX result, uncertainty bands on key numbers.
+- Rewritten as a high-level visual summary rather than a mirror of the thesis: big-picture workflow, four operator panels, composition result, and honest boundary experiments.
 
 **Which poster to use:**
 - Use `poster.pdf` if you need a print-ready PDF now (it compiled cleanly to A0).
