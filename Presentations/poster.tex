@@ -1,5 +1,5 @@
 \documentclass[final,hyperref={pdfpagelabels=false}]{beamer}
-\usepackage[orientation=landscape,size=a1,scale=1.4]{beamerposter}
+\usepackage[orientation=landscape,size=a0,scale=1.55]{beamerposter}
 \usecolortheme{seahorse}
 \useinnertheme{rounded}
 \setbeamertemplate{navigation symbols}{}
@@ -41,6 +41,10 @@ Digital inference is limited by the von Neumann bottleneck. Physical neural netw
 A macroscopic porous block is a network of pores (nodes) connected by throats (edges). Full 3D continuum simulation is too expensive. Instead, we abstract the geometry as a graph and calibrate each element with controlled 2D simulations.
 \end{block}
 
+\begin{block}{Why BZ reaction--diffusion?}
+Acoustic waves lack native nonlinearity; well-mixed CRNs and DNA circuits lack spatial structure. BZ offers self-sustaining pulses, collision/annihilation, refractory inhibition, and a photosensitive variant whose light field acts as a rewritable mask.
+\end{block}
+
 \begin{block}{Model and solver}
 The two-variable Tyson--Fife Oregonator with photosensitive suppression:
 \begin{align*}
@@ -70,8 +74,8 @@ Four native operators are isolated with a black-box dark-spot protocol.
 \begin{block}{1. Wire}
 A straight throat transmits a pulse at the kinetic speed with almost no width dependence.
 \begin{itemize}
-\item 2D channel speed: 6.46 cells/t.u.
-\item 3D channel speed: 6.62 cells/t.u.
+\item 2D channel speed: $6.46 \pm 0.19$ cells/t.u.
+\item 3D channel speed: $6.62 \pm 0.20$ cells/t.u.
 \end{itemize}
 \end{block}
 
@@ -82,11 +86,11 @@ A straight throat transmits a pulse at the kinetic speed with almost no width de
 \end{figure}
 
 \begin{block}{2. Low-pass filter}
-Refractoriness sets the maximum signalling frequency. Absolute refractory period: 3.0 t.u.; max 1:1 following rate: 0.167 t.u.$^{-1}$.
+Refractoriness sets the maximum signalling frequency. Absolute refractory period: $3.0 \pm 0.1$ t.u.; max 1:1 following rate: 0.167 t.u.$^{-1}$.
 \end{block}
 
 \begin{block}{3. Inhibition gate}
-At a T-junction, a pulse on one arm blocks the other within a short window. A AND (NOT B) is obtained with separation $>200\times$.
+At a T-junction, a pulse on one arm blocks the other within a short window. A AND (NOT B) is obtained with separation $>100\times$ (conservative).
 \end{block}
 
 \begin{figure}
@@ -112,20 +116,23 @@ A tilted diffusion tensor steers pulses; the fast-to-slow speed ratio follows th
 % ---------------------------------------------------------------------------
 \begin{column}{0.32\paperwidth}
 
-\begin{block}{Graph simulator}
+\begin{block}{Composition: graph simulator}
 The measured operators become an event-driven graph simulator: edges carry transit times, nodes carry refractory and inhibition windows. It predicts pulse traffic before an expensive PDE run.
 \end{block}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.9\columnwidth]{../Analysis/figures/rd_multi_gate_pde_snapshots.png}
-\caption{Shared-control multi-junction gate: A blocks both data paths.}
+\includegraphics[width=0.42\columnwidth]{../Analysis/figures/rd_multi_gate_pde_snapshots.png}
+\hfill
+\includegraphics[width=0.42\columnwidth]{../Analysis/figures/rd_mux_graph.png}
+\caption{Left: shared-control multi-junction gate. Right: graph-simulator 2-to-1 MUX passes all input patterns.}
 \end{figure}
 
 \begin{block}{Boundary experiments}
 \begin{itemize}
-\item 3D inhibition gate transfers cleanly: 16.8$\times$ separation, A arrival 8.25 t.u.
-\item Collision XOR leaks in free medium and in a simple chamber; junction geometry must be calibrated.
+\item 3D inhibition gate transfers cleanly: $16.8\times$ separation, A arrival 8.25 t.u.
+\item 3D MUX is a boundary result: the S control pulse does not yet block A cleanly.
+\item Collision XOR leaks; junction geometry must be calibrated per shape.
 \item A simple one-way diode is not robust in this regime.
 \end{itemize}
 \end{block}
