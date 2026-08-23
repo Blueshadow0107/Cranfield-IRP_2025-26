@@ -10,9 +10,12 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 
 **What changed since the reframe:**
 - 10 figure environments added across Methods and Results.
-- Latest PDE numbers verified against JSON outputs.
+- Literature review expanded and woven into the Introduction chapter.
+- Substrate-selection rationale added to the porous-reactor chapter (answers Guo's criticism).
+- Uncertainty bands added to key numbers: 2D/3D speeds, refractory period, inhibition separation.
 - Prose polished; em dashes and obvious AI filler removed.
 - Compiles cleanly with no undefined citations or references.
+- Current length: 45 pages.
 
 **Figures now embedded:**
 - `pub_regime_map.png` — regime map (Methods).
@@ -27,11 +30,11 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 - `rd_diode_pilot_series.png` — diode negative result (Results).
 - `pub_sobol_indices.png` — UQ sensitivity (Results).
 
-**Key numbers in the text:**
-- 2D channel speed: 6.46 cells/t.u.
-- 3D channel speed: 6.62 cells/t.u.
-- Refractory period: 3.0 t.u.; max 1:1 following rate: 0.167 t.u.^-1.
-- Inhibition gate separation: >200x (2D), 16.8x (3D).
+**Key numbers in the text (with uncertainty bands):**
+- 2D channel speed: $6.46 \pm 0.19$ cells/t.u.
+- 3D channel speed: $6.62 \pm 0.20$ cells/t.u.
+- Refractory period: $3.0 \pm 0.1$ t.u.; max 1:1 following rate: 0.167 t.u.^-1.
+- Inhibition gate separation: $>100\times$ conservative (2D), 16.8x (3D).
 - Multi-junction separations: O1 182x, O2 192x.
 
 **Still to decide:**
@@ -45,12 +48,13 @@ Both the thesis and the poster are built, compiled, and pushed. What follows is 
 - 3-column landscape layout, 7 figures inserted.
 
 **LaTeX version:** `Presentations/poster.tex`
-- A1 landscape beamerposter.
+- A0 landscape beamerposter.
 - Compiled PDF: `Presentations/poster.pdf`.
+- Updated with: substrate-selection block, graph-simulator MUX result, uncertainty bands on key numbers.
 
 **Which poster to use:**
-- Use `poster.pdf` if you need a print-ready PDF now (it compiled cleanly).
-- Use `MScCFD_Poster.pptx` if you want to edit text or move blocks in PowerPoint.
+- Use `poster.pdf` if you need a print-ready PDF now (it compiled cleanly to A0).
+- Use `MScCFD_Poster.pptx` if you want to edit text or move blocks in PowerPoint. Note: the PPTX is slightly stale relative to the LaTeX version.
 - The PPTX was not converted to PDF because LibreOffice is not installed and I do not have sudo access on this machine.
 
 ## 2-to-1 multiplexer (2026-08-20)
@@ -90,11 +94,11 @@ These pilots are in `Analysis/rd_operator_*.py` with JSON/PNG outputs in `Analys
 ## Git
 
 Latest commits on `main`:
+- `fb0ee93` — Update poster to A0 and add substrate selection, MUX result, and uncertainty bands
+- `c578d48` — Expand intro literature review, add substrate selection rationale, and add uncertainty bands to key results
+- `90bd5cb` — Add length-aware inhibition graph sim and feasible-region sweep
 - `9a853e5` — Add 3D PDE 2-to-1 MUX validation (boundary result: S fails to block A)
-- `575ff0f` — Update handoff with MUX status and in-flight 3D PDE validation
 - `bdd08e7` — Add graph-simulator 2-to-1 multiplexer
-- `aa73b88` — Update handoff with additional operator pilot findings
-- `2fc6439` — Add additional operator pilots and results
 
 All pushed to `origin main`.
 
