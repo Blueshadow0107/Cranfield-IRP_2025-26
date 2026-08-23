@@ -18,6 +18,34 @@ The same abstraction is common in petroleum engineering and groundwater flow, wh
 What changes here is the physics: the transported quantity is not a passive scalar carried by pressure-driven flow, but a self-sustaining excitation pulse whose existence depends on the local reaction--diffusion state.
 The conductance analogue is a pulse transfer function, and the nodes carry memory in the form of refractory time.
 
+\section{Substrate Selection: Why BZ Reaction--Diffusion?}
+\label{sec:porous_substrate_selection}
+
+The project began from the broader idea of physical neural networks in fluid-filled porous media and considered several candidate substrates before settling on the BZ reaction--diffusion system.
+This section records the selection rationale so that the final choice is not arbitrary.
+
+\textbf{Acoustic wave computing in porous media} was the first candidate.
+Linear acoustic waves propagate cleanly through structured geometries, and finite-difference time-domain simulations can predict their behaviour \cite{hughes2019wave}.
+However, linear superposition cannot implement non-trivial logic without nonlinear elements, and the porous-acoustic literature is already well developed for sensing and energy applications.
+The route offered little new insight for trainable analog computation.
+
+\textbf{Well-mixed chemical reaction networks (CRNs)} provide a trainable alternative.
+Recurrent neural CRNs have been shown to solve benchmark tasks such as XOR by treating reaction rates as weights \cite{dack2024rncrn}.
+The problem is spatial: every species is uniformly mixed, so there is no geometry to serve as a network topology and no continuous spatial field to act as the computational state.
+A well-mixed CRN therefore cannot realise the pore-network picture in which structure is the program.
+
+\textbf{DNA strand-displacement circuits} offer programmable molecular logic \cite{cherry2018scaling}, but they operate in a dilute, well-mixed phase.
+Like CRNs, they lack the spatial continuity and parallelism that a structured porous reactor would exploit.
+They also introduce experimental complexity (sequence design, synthesis, hybridisation kinetics) that is hard to reconcile with a continuous-medium computing model.
+
+\textbf{Excitable reaction--diffusion media, and the BZ reaction in particular,} satisfy the requirements that the other candidates lack.
+They support self-sustaining pulses that propagate through structured geometry, collide, annihilate, and can be blocked by refractory residue.
+They offer a natural spatial field (the activator concentration) as the computational state and a natural trainable parameter (the light-suppression field or wall geometry) as the program.
+They have a long experimental history, a compact model (the Oregonator), and a photosensitive variant that allows optical control of the medium \cite{sakurai2002design}.
+
+The selection was therefore driven by three criteria: the need for spatially continuous dynamics, the need for native nonlinear pulse interactions, and the existence of an experimentally accessible control mechanism.
+The BZ Oregonator model is not the only excitable medium that satisfies these criteria, but it is the most studied and best modelled, making it the natural starting point for a proof-of-concept porous-reactor computer.
+
 \section{Why Two-Dimensional Controlled Simulations}
 \label{sec:porous_why2d}
 

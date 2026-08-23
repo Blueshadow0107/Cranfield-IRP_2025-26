@@ -163,6 +163,19 @@ Flashes of $T_{\mathrm{flash}} \leq 4$ time units emit exactly one full-amplitud
 Probe readouts are evaluated within defined time windows rather than over the whole record, because at an open junction a lone pulse diffracts into all connected branches and a whole-record readout would compute OR regardless of design intent.
 The window is aligned to the expected collision outcome, isolating the annihilation event from the unconditional diffraction background.
 
+\section{Uncertainty Quantification}
+\label{sec:meth_uq}
+
+Two sources of uncertainty affect the reported transfer functions.
+\textbf{Numerical uncertainty} arises from the finite grid resolution.
+The Oregonator pulse speed at the working resolution differs from the fine-grid asymptote by less than $3\%$, so speed-based numbers are quoted with an implicit $\pm 3\%$ numerical band.
+Amplitudes are less sensitive to grid spacing once a pulse is fully formed, and are treated as repeatable to within the probe averaging noise.
+
+\textbf{Parameter uncertainty} arises because the kinetic parameters $\varepsilon$, $f$, $\phi$, and $D_{u}$ are fixed by model choice rather than fitted to an experiment.
+A one-at-a-time sensitivity analysis propagates $\pm 10\%$ uncertainty in each parameter to the channel pulse speed and amplitude.
+The results, reported in \refSec{sec:res_uq}, show that $f$ dominates the amplitude and $\varepsilon$ dominates the speed; $\phi$ and $D_{u}$ have smaller but non-negligible effects.
+These uncertainties are not folded into every number in the text, but they define the reliability envelope of the characterisation.
+
 \section{The Pore-Scale Experiments}
 \label{sec:meth_experiments}
 

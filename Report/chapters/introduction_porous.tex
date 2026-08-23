@@ -28,19 +28,22 @@ Inputs are encoded as fields or excitations, the material transforms them throug
 The appeal is that computation can occur in parallel across space and continuously in time, without the repeated memory transfers that dominate digital inference.
 
 Optical systems provide the most prominent demonstrations.
-Lin \etal showed that a stack of diffractive surfaces can be trained to perform image classification entirely through light propagation \cite{lin2018alloptical}.
-The layers modulate the phase of the optical field, and interference in free space produces the desired mapping.
-The geometry of the diffractive elements serves as the trainable weights.
+Silva \etal showed that a metamaterial slab can perform mathematical operations such as spatial differentiation and integration on an incident electromagnetic field \cite{silva2014performing}.
+Shen \etal demonstrated a coherent nanophotonic circuit that implements a deep neural network for image classification entirely in the optical domain \cite{shen2017deep}.
+Lin \etal extended this to diffractive deep neural networks, in which successive phase masks modulate free-space propagation so that the outgoing intensity pattern encodes the classification result \cite{lin2018alloptical}.
+The geometry of the masks or scatterers serves as the trainable weights.
 
-Mechanical systems offer a complementary view.
+Mechanical and thermal analogs offer complementary physical bases.
 Stern \etal demonstrated supervised learning through physical changes in a mechanical network of springs and masses \cite{stern2020supervised}, and later developed a broader framework for learning in physical networks \cite{stern2021physical}.
 Wright \etal extended the idea to deep architectures by chaining multiple physical systems and training them with backpropagation through differentiable simulations \cite{wright2022deep}.
-Momeni \etal addressed the difficulty of differentiating through noisy physical systems by proposing a backpropagation-free training method \cite{momeni2023backpropagation}.
+Thermal analog computing has been proposed for matrix-vector multiplication using inverse-designed metastructures \cite{silva2026thermal}.
+These demonstrations prove that the PNN concept is not restricted to any one physics.
 
 A unifying theoretical perspective was provided by Hughes \etal, who showed that linear wave propagation can be written as an analog recurrent neural network \cite{hughes2019wave}.
 In this view, the wave field at each time step is the hidden state, and the evolution operator is a sparse linear recurrence whose coefficients depend on local material properties.
+McMahon reviewed the broader trend of nonlinear computation with linear systems and argued that such approaches are becoming practical for specialised tasks \cite{mcmahon2024nonlinear}.
 
-The present work adopts the same stance, the physical field is the computational state and the material distribution is the trainable parameter set, but moves from linear wave physics to a nonlinear, excitable chemical medium.
+The present work adopts the same stance---the physical field is the computational state and the material distribution is the trainable parameter set---but moves from linear wave physics to a nonlinear, excitable chemical medium.
 The propagating quantity is a self-sustaining chemical pulse rather than a decaying or superposing wave.
 This situates the work within molecular communication: the substrate is a fluid channel whose input is a spatially patterned chemical excitation and whose output is a measured concentration signal.
 Experimental tabletop molecular communication has already demonstrated digital messages carried by chemical signals \cite{farsad2013tabletop}, and surveys identify reaction--diffusion transport as a physically realistic channel model \cite{farsad2016comprehensive}.
@@ -55,6 +58,8 @@ The lineage runs from hydraulic analog machines to modern molecular and microflu
 Demonstrated platforms include microfluidic bubble logic, in which gas bubbles carry, route, and process discrete bits through channel networks \cite{prakash2007bubble}, and self-organising chemical reaction networks that classify temporal inputs as reservoir computers \cite{baltussen2024chemical}.
 
 Within this tradition, excitable chemical media offer a direct route to computation because their elementary phenomena map onto computational primitives.
+An excitable medium has a stable rest state, a threshold for excitation, and a refractory period after excitation during which the medium cannot be re-excited.
+A supra-threshold perturbation triggers a self-sustaining pulse that propagates at a characteristic speed, leaving a refractory wake.
 Colliding pulses annihilate; pulses meeting a narrowing gap or high-curvature turn can be blocked \cite{courtemanche1993instabilities}.
 These primitives have produced working devices: colliding-pulse logic gates, an experimental XOR gate in a reaction--diffusion medium, logical functions of structured channel junctions, and a single oscillating BZ droplet acting as a binary and fuzzy logic processor \cite{toth1995logic, steinbock1996chemical, adamatzky2002xor, adamatzky2002collision, sielewiesiuk2001logical, gorecki2009information, gentili2012chemical}.
 The common feature is hand design: each gate or circuit is built geometry by geometry for one logical function.
@@ -63,6 +68,18 @@ A parallel line of research pursues trainable chemistry in well-mixed reactors, 
 Neural-network behaviour, universal computation, and end-to-end training have been demonstrated \cite{hjelmfelt1991chemical, magnasco1997chemical, dack2024rncrn, cherry2018scaling}, but these systems are well-mixed: all information resides in scalar concentrations, with no spatial extent.
 They sacrifice exactly the spatial continuity and parallelism that structured excitable media possess natively.
 The present work keeps the spatial structure and asks how it can be abstracted and predicted.
+
+\subsection{From Isolated Gates to Composed Computing}
+\label{subsec:lit_gates}
+
+The excitable-media computing literature is rich in isolated gates but poor in composition rules.
+T\'{o}th and Showalter built a chemical XOR gate in which colliding pulses annihilate in a membrane-separated reaction--diffusion medium \cite{toth1995logic}.
+Steinbock \etal used a geometrically structured BZ layer to implement logic gates and a chemical diode \cite{steinbock1996chemical}.
+Adamatzky explored collision-based computing in excitable media, showing how streams of wave fragments can be routed and combined to perform computation \cite{adamatzky2002collision, adamatzky2002xor}.
+G\'{o}recki \etal designed specific junction geometries to obtain logic gates and information-processing devices \cite{gorecki2009information}.
+
+What is missing is a systematic way to compose these local gates into a predictive network model.
+The present thesis addresses exactly this gap: it measures local transfer functions and composes them in a fast graph-level simulator, so that candidate networks can be explored before committing to expensive continuum simulations.
 
 \section{The Belousov--Zhabotinsky Reaction and the Oregonator Model}
 \label{sec:lit_bz}
@@ -86,6 +103,21 @@ A supra-threshold perturbation triggers a pulse travelling at a characteristic s
 Colliding pulses annihilate; pulses meeting a narrowing gap can be blocked \cite{courtemanche1993instabilities}.
 Structure adds more: asymmetric junctions act as chemical diodes \cite{agladze1996chemical}, T-shaped junctions as band-pass filters of pulse frequency \cite{gorecka2003tshaped}, and anisotropy creates preferred propagation directions \cite{steinbock1995anisotropy}.
 Propagation, refractoriness, annihilation, block, rectification, filtering, and anisotropic routing are the native instruction set this work characterises.
+
+\subsection{Pore-Network Models of Transport}
+\label{subsec:lit_pore_networks}
+
+The graph abstraction used in this thesis is borrowed from petroleum engineering and groundwater flow, where pore-network models predict multiphase flow and transport by assigning conductances to throats and solving for pressure and saturation on the graph \cite{xiong2016review, blunt2017multiphase}.
+In those models a pore is a node, a throat is an edge, and the transport law is usually linear or weakly nonlinear.
+The emphasis is on effective permeability, relative permeability curves, and dispersion, not on excitable pulses.
+
+Pore-network models have also been applied to reactive transport, where species diffuse and react inside a network of pores \cite{meakin2009modeling}.
+Again, the focus is on effective reaction rates rather than on threshold-activated pulse traffic.
+Excitable media on networks have been studied by coupling discrete excitable elements according to a graph topology \cite{kinouchi2006optimal}, but the local element is typically a cellular-automaton node with a hand-chosen rule, not a calibrated continuous reaction--diffusion segment.
+
+The present work differs in two ways.
+First, the local element is a continuous reaction--diffusion segment whose transfer function is extracted from PDE simulations.
+Second, the graph parameters are not chosen by hand but measured, so the model is calibrated rather than assumed.
 
 \section{Synthesis and Research Gap}
 \label{sec:lit_synthesis}

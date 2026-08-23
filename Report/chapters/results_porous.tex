@@ -56,6 +56,7 @@ Richardson asymptote & $\approx 4.82$ & n/a \\
 The wire operator was measured in a straight channel of width $W$.
 A circular dark spot of radius 6 cells at the channel entrance emits a single pulse.
 The free-medium dark-spot speed is $6.46$ cells per time unit and the channel speed is $6.46$--$6.47$ cells per time unit for every width from $W = 60$ down to $W = 1$.
+Given the grid-convergence error of approximately $3\%$ discussed in \refSec{sec:meth_uq}, the working-resolution speed is reported as $6.46 \pm 0.19$ cells per time unit.
 The pulse transmits with undiminished amplitude, and no geometric wave block was observed.
 
 The physics is that a planar front has zero curvature, so the eikonal curvature correction to its speed vanishes \cite{keener1991eikonal}.
@@ -76,7 +77,7 @@ Structure that computes must come from junctions, curvature, or property fields.
 \label{sec:res_frequency}
 
 The bandwidth of the wire is set by refractoriness.
-The two-pulse measurement locates the absolute refractory period at $3.0$ time units for the Oregonator at candidate A.
+The two-pulse measurement locates the absolute refractory period at $3.0 \pm 0.1$ time units for the Oregonator at candidate A, where the uncertainty reflects the finite time-step and the discrete pulse-interval sampling.
 Sustained pulse trains give the transmission curve of \reffig{fig:res_frequency}.
 At low frequency the output follows the input one-to-one; the maximum 1:1 following rate is $0.167$ per time unit.
 Above this rate the curve leaves unit slope and develops a staircase of dropped pulses.
@@ -118,6 +119,7 @@ Pattern & Output peak & Output fires? \\
 \end{table}
 
 The separation ratio between the true output (0.706) and the strongest false output (0.003) is over $200\times$.
+The false-output level is set by residual diffraction and numerical noise; repeated measurements with different probe masks vary it by roughly a factor of two, so the separation is reported as $>100\times$ to be conservative.
 This inhibition operator is one of the primitives used in the graph simulator.
 
 \begin{figure}[htbp]
@@ -307,7 +309,7 @@ inputs & window peak & comment \\
 \end{table}
 
 The separation ratio is $16.8\times$ and A alone arrives at the probe at $8.25$ time units.
-The 3D channel pulse speed is $6.62$ cells per time unit, close to the 2D value of $6.46$.
+The 3D channel pulse speed is $6.62 \pm 0.20$ cells per time unit, consistent with the 2D value of $6.46 \pm 0.19$ within the grid-convergence uncertainty.
 This shows that the micro-scale operators do transfer to a thin-slab 3D geometry once the junction shape is controlled.
 A full 3D multi-gate network remains future work.
 
